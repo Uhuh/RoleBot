@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "strict": true,
+        "target": "es2017",
+        "lib": [ "es2017" ]
+    },
+    "include": [
+        "src/",
+        "events/",
+        "commands/",
+    ]
+}

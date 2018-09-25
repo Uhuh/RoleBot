@@ -1,0 +1,49 @@
+{
+  "name": "bowsette",
+  "version": "1.0.0",
+  "description": "Just learnin stuff",
+  "main": "release/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:dist": "tsc -p tsconfig.dist.json",
+    "clean": "npm run clean:src && npm run clean:events && npm run clean:commands",
+    "clean:src": "rimraf src/**/*.js src/*.js",
+    "clean:events": "rimraf events/*.js",
+    "clean:commands": "rimraf commands/**/*.js commands/*.js",
+    "prestart": "npm run build",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Uhuh/BowsetteBot.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "maymay",
+    "memes",
+    "stuff"
+  ],
+  "author": "Dylan Warren",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Uhuh/BowsetteBot"
+  },
+  "homepage": "https://github.com/Uhuh/BowsetteBot#readme",
+  "dependencies": {
+    "@types/better-sqlite3": "^3.1.3",
+    "better-sqlite3": "^4.1.4",
+    "discord.js": "^11.4.2",
+    "dotenv": "^4.0.0",
+    "node-gyp": "^3.8.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^4.0.2",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^8.10.29",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.7.0",
+    "typescript": "^2.6.2"
+  }
+}
