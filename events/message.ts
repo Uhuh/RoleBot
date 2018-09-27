@@ -5,8 +5,9 @@ import cmds from '../commands/cmd'
 
 export default (client: Bowsette, message: Message) => {
   const channel: Channel | undefined = message.channel
+  const role_channel: String = client.getChannel.get(message.guild.id, channel.id) ? client.getChannel.get(message.guild.id, channel.id).channel_id : "" 
   
-  if (channel.id === client.getChannel.get(message.guild.id, channel.id).channel_id) {
+  if (channel.id === role_channel) {
     roles(client, message)
     return
   }
