@@ -3,13 +3,10 @@ import Bowsette from '../src/bot'
 import roles from '../commands/roles'
 import cmds from '../commands/cmd'
 
-const primary_roles: Map<string, string> = new Map([['twist', '493536445710073893'], ['chocolate', '493536349064921099'], ['split', '493557274460028928'], ['vanilla', '493536643639410708'], ['neopolitan', '493536796349693967']])
-const secondary_roles: Map<string, string> = new Map([['butterscotch', '493943715077947392'], ['tora', '493930168763547648']])
-
 export default (client: Bowsette, message: Message) => {
   const channel: Channel | undefined = message.channel
   
-  if (channel.id === client.config.ROLE_CHANNEL) {
+  if (channel.id === client.getChannel.get(message.guild.id, channel.id).channel_id) {
     roles(client, message)
     return
   }
