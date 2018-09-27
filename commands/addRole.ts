@@ -17,6 +17,9 @@ import { Message, Guild } from "discord.js";
         prim_role: (args[0] === 'prim' ? 1 : 0)
       }
       client.addRole.run(role)
+      message.react("✅")
+      return
     }
+    message.channel.send("You typo'd or forgot a param; good job.")
   }
 }
