@@ -17,6 +17,6 @@ import { Message, Guild } from "discord.js"
       message.react("✅")
       return
     }
-    message.channel.send("❌")
+    message.react("❌")
   }
 }

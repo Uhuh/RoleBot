@@ -6,8 +6,8 @@ import { Message, Guild } from "discord.js"
   run: (message: Message, args: string[], client: Bowsette) => {
     let role: any = {}
     const guild: Guild = message.guild
-    if (guild && args.length === 3 && guild.roles.find(val => (val.name.toLowerCase() === args[1] && val.id === args[2])) && 
-       (args[0] === 'sec' || args[0] === 'prim') && !isNaN(Number(args[2]))) 
+    if (guild && args.length === 3 && guild.roles.find(val => (val.name.toLowerCase() === args[1].toLowerCase() && val.id === args[2])) && 
+       (args[0] === 'sec' || args[0] === 'prim')) 
     {
       role = {
         id: `${guild.id}-${args[2]}`,
