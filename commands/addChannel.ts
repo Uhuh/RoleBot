@@ -1,5 +1,5 @@
-import Bowsette from "../src/bot";
-import { Message, Guild } from "discord.js";
+import Bowsette from "../src/bot"
+import { Message, Guild } from "discord.js"
 
  export default {
   alias: ['rc', 'addChannel'], 
@@ -17,6 +17,6 @@ import { Message, Guild } from "discord.js";
       message.react("✅")
       return
     }
-    message.channel.send("You forgot the channel ID or have to many parameters.")
+    message.channel.send("❌")
   }
 }

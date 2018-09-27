@@ -1,5 +1,5 @@
-import Bowsette from "../src/bot";
-import { Message, GuildMember } from "discord.js";
+import Bowsette from "../src/bot"
+import { Message, GuildMember } from "discord.js"
 export default async function (client: Bowsette, message: Message) {
   const member: GuildMember = message.member
   const words: string[] = message.content.split(' ')

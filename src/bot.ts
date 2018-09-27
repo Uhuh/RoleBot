@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import * as config from './vars'
 import msg from '../events/message'
-import setup_table from './setup_table';
+import setup_table from './setup_table'
 
 export default class Bowsette extends Discord.Client {
   config: any

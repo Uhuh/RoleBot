@@ -1,5 +1,5 @@
-import Bowsette from "../src/bot";
-import { Message, Guild } from "discord.js";
+import Bowsette from "../src/bot"
+import { Message, Guild } from "discord.js"
 
  export default {
   alias: ['role', 'addrole'], 
@@ -20,6 +20,6 @@ import { Message, Guild } from "discord.js";
       message.react("✅")
       return
     }
-    message.channel.send("You typo'd or forgot a param; good job.")
+    message.react("❌")
   }
 }

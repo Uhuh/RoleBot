@@ -1,6 +1,6 @@
 import addRole from './addRole'
-import addChannel from './addChannel';
-import removeChannel from './removeChannel';
+import addChannel from './addChannel'
+import removeChannel from './removeChannel'
 
 let commandsMap = new Map()
 let list  = [addRole, addChannel, removeChannel]
