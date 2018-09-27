@@ -10,7 +10,7 @@ import { Message, Guild } from "discord.js"
     if (guild && args.length === 3 && guild.roles.find(val => (val.name.toLowerCase() === args[1].toLowerCase() && val.id === regex.exec(args[2])![0])) && 
        (args[0] === 'sec' || args[0] === 'prim')) 
     {
-      console.log(args[2])
+      console.log(regex.exec(args[2])![0])
       role = {
         id: `${guild.id}-${regex.exec(args[2])![0]}`,
         role_name: args[1],
