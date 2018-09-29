@@ -29,7 +29,7 @@ export default {
       .addField(`_**> Users**_`, `\`${guild.memberCount}\``, true)
       .addField(`_**> Text Channels**_`, `\`${textC}\``, true)
       .addField(`_**> Voice Channels**_`, `\`${voiceC}\``, true)
-      .addField(`_**> Roles** from highest to lowest_`, `${roles.reverse().join(' ')}`, true)
+      .addField(`_**> Roles**_`, `${roles.reverse().join(' ')}`, true)
 
     message.channel.send(embed)
   }
