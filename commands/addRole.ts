@@ -8,18 +8,24 @@ import { Message, Guild } from "discord.js"
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
 
     let role: any = {}
+    let id: string = args.pop()!
+    let primSec = args.shift()
+    let name: string = ""
+
     const regex = new RegExp('[0-9]+') // I'm getting sick of having to grab the id from `\@roleName` so just regex the id out of it when passed in
     const guild: Guild = message.guild
-    if (guild && args.length === 3 && guild.roles.find(val => (val.name.toLowerCase() === args[1].toLowerCase() && val.id === regex.exec(args[2])![0])) && 
-       (args[0] === 'sec' || args[0] === 'prim')) 
+    // So people like putting spaces in the role names, so this just adds them together.
+    name = args.join(' ')
+
+    if (guild && guild.roles.find(val => (val.name.toLowerCase() === name.toLowerCase() && val.id === regex.exec(id)![0])) && 
+       (primSec === 'sec' || primSec === 'prim')) 
     {
-      console.log(regex.exec(args[2])![0])
       role = {
-        id: `${guild.id}-${regex.exec(args[2])![0]}`,
+        id: `${guild.id}-${regex.exec(id)![0]}`,
         role_name: args[1],
-        role_id: regex.exec(args[2])![0],
+        role_id: regex.exec(id)![0],
         guild: guild.id,
-        prim_role: (args[0] === 'prim' ? 1 : 0)
+        prim_role: (primSec === 'prim' ? 1 : 0)
       }
       client.addRole.run(role)
       message.react("✅")
