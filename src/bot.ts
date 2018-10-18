@@ -4,6 +4,7 @@ dotenv.config()
 import * as config from './vars'
 import msg from '../events/message'
 import setup_table from './setup_table'
+import deleteRoles from '../commands/deleteRoles';
 
 export default class Bowsette extends Discord.Client {
   config: any
@@ -11,6 +12,7 @@ export default class Bowsette extends Discord.Client {
   getRoles: any
   addChannel: any
   removeChannel: any
+  deleteRoles: any
   getChannel: any
   constructor() {
     super()

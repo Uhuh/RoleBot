@@ -14,7 +14,7 @@ export default async function (client: Bowsette, message: Message) {
   }
   for (const word of words) {
     for (const gR of guildRoles) {
-      if (gR.role_name.toLowerCase() === word.toLowerCase()) {
+      if (gR.role_name && gR.role_name.toLowerCase() === word.toLowerCase()) {
         req_role = word.toLowerCase()
         addedRole = await (member.addRole(gR.role_id)
         .then(() => { return true })

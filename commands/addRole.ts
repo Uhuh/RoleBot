@@ -22,7 +22,7 @@ import { Message, Guild } from "discord.js"
     {
       role = {
         id: `${guild.id}-${regex.exec(id)![0]}`,
-        role_name: args[1],
+        role_name: name,
         role_id: regex.exec(id)![0],
         guild: guild.id,
         prim_role: (primSec === 'prim' ? 1 : 0)

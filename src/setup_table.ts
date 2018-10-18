@@ -22,6 +22,7 @@ export default (client: bowsette) => {
     sql.pragma('synchronous = 1')
     sql.pragma('journal_mode = wal')
   }
+  client.deleteRoles = sql.prepare("DELETE FROM roles WHERE guild = ?")
   client.getChannel = sql.prepare("SELECT * FROM role_channel WHERE guild = ? AND channel_id = ?")
   client.removeChannel = sql.prepare("DELETE FROM role_channel WHERE id = ? AND channel_id = ?")
   client.addChannel = sql.prepare("INSERT OR REPLACE INTO role_channel (id, channel_id, guild) VALUES (@id, @channel_id, @guild);")
