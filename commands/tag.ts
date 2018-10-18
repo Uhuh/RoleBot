@@ -7,8 +7,7 @@ function sleep(ms: number = 0) {
 export default {
   alias: ['tag'],
   run: async (message: Message) => {
-    let keys = Array.from(message.guild.members.keys())
-    const member = message.guild.members.get(keys[Math.floor(Math.random() * keys.length)])
+    const member = message.guild.members.random()
     message.channel.send(":thinking:...")
     await sleep(1000)
     message.channel.send(`${member!.user} tag; you're it!`)

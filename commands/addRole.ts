@@ -4,6 +4,9 @@ import { Message, Guild } from "discord.js"
  export default {
   alias: ['role', 'addrole'], 
   run: (message: Message, args: string[], client: Bowsette) => {
+    // ignore them plebians
+    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+
     let role: any = {}
     const regex = new RegExp('[0-9]+') // I'm getting sick of having to grab the id from `\@roleName` so just regex the id out of it when passed in
     const guild: Guild = message.guild

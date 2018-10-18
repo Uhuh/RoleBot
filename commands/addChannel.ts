@@ -4,6 +4,9 @@ import { Message, Guild } from "discord.js"
  export default {
   alias: ['rc', 'addChannel'], 
   run: (message: Message, args: string[], client: Bowsette) => {
+
+    if(!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+
     let channel: any = {}
     const guild: Guild = message.guild
     if (args.length == 1 && guild.channels.find(val => val.id === args[0])) 
