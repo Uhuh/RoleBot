@@ -2,7 +2,7 @@ import Bowsette from "../src/bot"
 import { Message, Guild } from "discord.js"
 
  export default {
-  alias: ['deleteRoles'], 
+  alias: ['deleteroles', 'delete'], 
   run: (message: Message, args: string[], client: Bowsette) => {
     // ignore them plebians
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return message.reply("no stop");
