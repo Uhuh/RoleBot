@@ -2,11 +2,19 @@ import { Message, Channel } from 'discord.js'
 import Bowsette from '../src/bot'
 import roles from '../commands/roles'
 import cmds from '../commands/cmd'
+import counter from './counter';
 
 export default (client: Bowsette, message: Message) => {
+  // Ignore bots.
+  if(message.author.bot) return
+
   const channel: Channel | undefined = message.channel
   const role_channel: String = client.getChannel.get(message.guild.id, channel.id) ? client.getChannel.get(message.guild.id, channel.id).channel_id : "" 
   
+  // Track user message counter...
+  counter(client, message)
+
+  // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(client, message)
     return

@@ -14,6 +14,8 @@ export default class Bowsette extends Discord.Client {
   removeChannel: any
   deleteRoles: any
   getChannel: any
+  updateMessageCounter: any
+  getMessageCount: any
   constructor() {
     super()
     this.config = config
