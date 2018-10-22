@@ -4,7 +4,7 @@ dotenv.config()
 import * as config from './vars'
 import msg from '../events/message'
 import setup_table from './setup_table'
-import deleteRoles from '../commands/deleteRoles';
+import counter from '../events/counter';
 
 export default class Bowsette extends Discord.Client {
   config: any
@@ -24,7 +24,11 @@ export default class Bowsette extends Discord.Client {
       console.log(`[Started]: ${new Date()}`)
       setup_table(this)
     })
-    this.on('message', (message: Discord.Message) => msg(this, message))
+
+    this.on('message', (message) => {
+      counter(this, message)
+      msg(this, message)
+    })
   }
 
   async start() {

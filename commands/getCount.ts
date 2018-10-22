@@ -3,7 +3,7 @@ import { Message } from "discord.js";
 
 export default {
   alias: ['counter', 'messages'],
-  run: async function(message: Message, args: string[], client: Bowsette) {
+  run: function(message: Message, args: string[], client: Bowsette) {
     const userCount = client.getMessageCount.all(message.channel.id, message.guild.id)
     let name: string = ""
     // Just output each user tracked, waiting to find a good chart to use to make a diagram
