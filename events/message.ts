@@ -1,26 +1,30 @@
-import { Message, Channel } from 'discord.js'
-import Bowsette from '../src/bot'
-import roles from '../commands/roles'
-import cmds from '../commands/cmd'
+import { Message, Channel } from "discord.js";
+import RoleBot from "../src/bot";
+import roles from "../commands/help/roles";
+import { getChannel } from "../src/setup_table";
 
-export default (client: Bowsette, message: Message) => {
+export default (client: RoleBot, message: Message) => {
   // Ignore bots.
-  if (message.author.bot) return
+  if (message.author.bot) return;
 
-  const channel: Channel | undefined = message.channel
-  const role_channel: String = client.getChannel.get(message.guild.id, channel.id) ? client.getChannel.get(message.guild.id, channel.id).channel_id : ""
+  const channel: Channel | undefined = message.channel;
+  const role_channel: String = getChannel.get(message.guild.id, channel.id)
+    ? getChannel.get(message.guild.id, channel.id).channel_id
+    : "";
 
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
-    roles(client, message)
-  }
-  else if (message.guild && message.mentions.members.has(client.user.id)) {
-    const length: number = message.content.indexOf(client.config.PREFIX) === 0 ? client.config.PREFIX.length : (message.content.split(' ')[0].length)
+    roles(message);
+  } else if (message.guild && message.mentions.members.has(client.user.id)) {
+    const length: number =
+      message.content.indexOf(client.config.PREFIX) === 0
+        ? client.config.PREFIX.length
+        : message.content.split(" ")[0].length;
     // + 1 for the damn space.
-    const [command, ...args] = message.content.substring(length + 1).split(' ')
+    const [command, ...args] = message.content.substring(length + 1).split(" ");
     //If the command isn't in the big ol' list.
-    if (!cmds.has(command.toLowerCase())) return "Command DNE"
+    if (!client.commands.has(command.toLowerCase())) console.log("Command DNE");
     // Find the command and run it.
-    cmds.get(command.toLowerCase()).run(message, args, client)
+    client.commands.get(command.toLowerCase())!.run(message, args);
   }
-}
+};

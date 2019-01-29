@@ -1,37 +1,35 @@
-import * as Discord from 'discord.js'
-import * as dotenv from 'dotenv'
-dotenv.config()
-import * as config from './vars'
-import msg from '../events/message'
-import setup_table from './setup_table'
-import counter from '../events/counter';
+import * as Discord from "discord.js";
+import * as dotenv from "dotenv";
+dotenv.config();
+import * as config from "./vars";
+import msg from "../events/message";
+import commandHandler from "../commands/commandHandler";
 
-export default class Bowsette extends Discord.Client {
-  config: any
-  addRole: any
-  getRoles: any
-  addChannel: any
-  removeChannel: any
-  deleteRoles: any
-  getChannel: any
-  updateMessageCounter: any
-  getMessageCount: any
+interface Command {
+  name: string;
+  run: Function;
+}
+
+export default class RoleBot extends Discord.Client {
+  config: any;
+  commands: Discord.Collection<string, Command>;
   constructor() {
-    super()
-    this.config = config
+    super();
+    this.config = config;
+    this.commands = new Discord.Collection();
 
-    this.on('ready', () => {
-      console.log(`[Started]: ${new Date()}`)
-      setup_table(this)
-    })
+    commandHandler(this);
+    this.on("ready", () => {
+      console.log(`[Started]: ${new Date()}`);
+      this.user.setUsername("RoleBot");
+    });
 
-    this.on('message', (message) => {
-      counter(this, message)
-      msg(this, message)
-    })
+    this.on("message", message => {
+      msg(this, message);
+    });
   }
 
   async start() {
-    await this.login(this.config.TOKEN)
+    await this.login(this.config.TOKEN);
   }
 }
