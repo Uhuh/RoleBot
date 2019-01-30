@@ -4,6 +4,7 @@ dotenv.config();
 import * as config from "./vars";
 import msg from "../events/message";
 import commandHandler from "../commands/commandHandler";
+import joinRole from "../events/joinRoles";
 
 interface Command {
   name: string;
@@ -26,6 +27,9 @@ export default class RoleBot extends Discord.Client {
 
     this.on("message", message => {
       msg(this, message);
+    });
+    this.on("guildMemberAdd", member => {
+      joinRole(member);
     });
   }
 

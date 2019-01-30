@@ -1,4 +1,3 @@
-import bowsette from "./bot";
 import * as SQLite from "better-sqlite3";
 
 const sql = new SQLite("./roles.sqlite");
@@ -21,12 +20,12 @@ const setupTable = () => {
     sql.pragma("synchronous = 1");
     sql.pragma("journal_mode = wal");
   }
-  const roleChanneltable = sql
+  const roleChannelTable = sql
     .prepare(
       "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'role_channel';"
     )
     .get();
-  if (!roleChanneltable["count(*)"]) {
+  if (!roleChannelTable["count(*)"]) {
     // If the table isn't there, create it and setup the database correctly.
     sql
       .prepare(
@@ -40,10 +39,33 @@ const setupTable = () => {
     sql.pragma("synchronous = 1");
     sql.pragma("journal_mode = wal");
   }
+  const joinRolesTable = sql
+    .prepare(
+      "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'join_roles';"
+    )
+    .get();
+  if (!joinRolesTable["count(*)"]) {
+    // If the table isn't there, create it and setup the database correctly.
+    sql
+      .prepare(
+        "CREATE TABLE join_roles (id TEXT PRIMARY KEY, role_name TEXT, role_id TEXT, guild_id TEXT);"
+      )
+      .run();
+    // Ensure that the 'id' row is always unique and indexed.
+    sql.prepare("CREATE UNIQUE INDEX idx_role_id ON join_roles (id);").run();
+    sql.pragma("synchronous = 1");
+    sql.pragma("journal_mode = wal");
+  }
 };
 
 setupTable();
 
+export const joinRoles = sql.prepare(
+  "INSERT OR REPLACE INTO join_roles (id, role_name, role_id, guild_id) VALUES (@id, @role_name, @role_id, @guild_id);"
+);
+export const getJoinRoles = sql.prepare(
+  "SELECT * FROM join_roles WHERE guild_id = ?"
+);
 export const deleteRole = sql.prepare(
   "DELETE FROM roles WHERE guild = ? AND role_id = ?"
 );
