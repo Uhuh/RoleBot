@@ -5,7 +5,9 @@ function sleep(ms: number = 0) {
 }
 
 export default {
+  desc: "Tag someone at random.",
   name: "tag",
+  args: "",
   run: async (message: Message) => {
     const member = message.guild.members.random();
     message.channel.send(":thinking:...");

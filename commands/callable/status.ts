@@ -1,7 +1,9 @@
 import { Message, RichEmbed, Role, Guild } from "discord.js";
 
 export default {
+  desc: "Shows status of current server",
   name: "status",
+  args: "",
   run: async function(message: Message) {
     const embed: RichEmbed = new RichEmbed();
     const guild: Guild = message.guild;

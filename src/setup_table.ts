@@ -69,6 +69,10 @@ export const getJoinRoles = sql.prepare(
 export const deleteRole = sql.prepare(
   "DELETE FROM roles WHERE guild = ? AND role_id = ?"
 );
+export const getRoles = sql.prepare("SELECT * FROM roles WHERE guild = ?");
+export const addRole = sql.prepare(
+  "INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id);"
+);
 export const getChannel = sql.prepare(
   "SELECT * FROM role_channel WHERE guild = ? AND channel_id = ?"
 );
@@ -78,7 +82,3 @@ export const removeChannel = sql.prepare(
 export const addChannel = sql.prepare(
   "INSERT OR REPLACE INTO role_channel (id, channel_id, guild) VALUES (@id, @channel_id, @guild);"
 );
-export const addRole = sql.prepare(
-  "INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id);"
-);
-export const getRoles = sql.prepare("SELECT * FROM roles WHERE guild = ?");

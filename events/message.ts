@@ -26,6 +26,6 @@ export default (client: RoleBot, message: Message) => {
     if (!client.commands.has(command.toLowerCase()))
       return console.log("Command DNE");
     // Find the command and run it.
-    client.commands.get(command.toLowerCase())!.run(message, args);
+    client.commands.get(command.toLowerCase())!.run(message, args, client);
   }
 };

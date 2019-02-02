@@ -2,23 +2,24 @@ import { Message, Guild } from "discord.js";
 import { addChannel } from "../../src/setup_table";
 
 export default {
+  desc:
+    "Makes a channel the role channel. Bot will prune messages and assign roles from this channel.",
   name: "roleChannel",
+  args: "<channel mention>",
   run: (message: Message, args: string[]) => {
-    console.log("Hmmm");
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+    const roleChannel = message.mentions.channels.first();
+    if (
+      !roleChannel ||
+      !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
+    )
+      return message.react("❌");
 
-    let channel: any = {};
     const guild: Guild = message.guild;
-    if (args.length == 1 && guild.channels.find(val => val.id === args[0])) {
-      channel = {
-        id: `${guild.id}-${args[0]}`,
-        channel_id: args[0],
-        guild: guild.id
-      };
-      addChannel.run(channel);
-      message.react("✅");
-      return;
-    }
-    message.react("❌");
+    addChannel.run({
+      id: `${guild.id}-${roleChannel.id}`,
+      channel_id: roleChannel.id,
+      guild: guild.id
+    });
+    message.react("✅");
   }
 };

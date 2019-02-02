@@ -2,15 +2,17 @@ import { Message, Guild } from "discord.js";
 import { removeChannel } from "../../src/setup_table";
 
 export default {
+  desc:
+    "Channel will no longer be pruned of messages and bot will not hand out roles from channel anymore.",
   name: "removeChannel",
+  args: "<channel mention>",
   run: (message: Message, args: string[]) => {
     const guild: Guild = message.guild;
+    const roleChannel = message.mentions.channels.first();
 
-    if (args.length == 1 && guild.channels.find(val => val.id === args[0])) {
-      removeChannel.run(`${guild.id}-${args[0]}`, args[0]);
-      message.react("✅");
-      return;
-    }
-    message.react("❌");
+    if (!roleChannel) return message.react("❌");
+
+    removeChannel.run(`${guild.id}-${roleChannel.id}`, roleChannel.id);
+    message.react("✅");
   }
 };

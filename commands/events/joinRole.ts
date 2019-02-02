@@ -4,6 +4,7 @@ import { joinRoles } from "../../src/setup_table";
 export default (message: Message, roleName: string) => {
   for (const [key, r] of message.guild.roles) {
     if (r.name === roleName) {
+      message.react("✅");
       return joinRoles.run({
         id: `${r.id}-${message.guild.id}`,
         role_name: r.name,
@@ -24,8 +25,11 @@ export default (message: Message, roleName: string) => {
         role_id: r.id,
         guild_id: message.guild.id
       });
+      message.react("✅");
     })
-    .catch(e => console.log(e));
+    .catch(() => {
+      message.react("❌");
+    });
 };
 
 // check if the role exist

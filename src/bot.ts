@@ -7,6 +7,8 @@ import commandHandler from "../commands/commandHandler";
 import joinRole from "../events/joinRoles";
 
 interface Command {
+  desc: string;
+  args: string;
   name: string;
   run: Function;
 }
