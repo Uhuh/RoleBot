@@ -17,10 +17,7 @@ export default (client: RoleBot, message: Message) => {
   if (channel.id === role_channel) {
     roles(message);
   } else if (message.guild && message.mentions.members.has(client.user.id)) {
-    const length: number =
-      message.content.indexOf(client.config.PREFIX) === 0
-        ? client.config.PREFIX.length
-        : message.content.split(" ")[0].length;
+    const length: number = message.content.split(" ")[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).split(" ");
     // Allow users to mention the bot only, this will return the list of commands in a private message
