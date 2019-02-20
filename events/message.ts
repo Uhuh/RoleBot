@@ -5,8 +5,8 @@ import commands from "../commands/callable/commands";
 import { getChannel } from "../src/setup_table";
 
 export default (client: RoleBot, message: Message) => {
-  // Ignore bots.
-  if (message.author.bot) return;
+  // Ignore bots, also don't allow dm's. No reason for users to DM the bot
+  if (message.author.bot || !message.guild) return;
 
   const channel: Channel | undefined = message.channel;
   const role_channel: String = getChannel.get(message.guild.id, channel.id)
@@ -16,7 +16,7 @@ export default (client: RoleBot, message: Message) => {
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message);
-  } else if (message.guild && message.mentions.members.has(client.user.id)) {
+  } else if (message.guild || message.mentions.members.has(client.user.id)) {
     const length: number =
       message.content.indexOf(client.config.PREFIX) === 0
         ? client.config.PREFIX.length
