@@ -25,6 +25,7 @@ export default class RoleBot extends Discord.Client {
     this.on("ready", () => {
       console.log(`[Started]: ${new Date()}`);
       this.user.setUsername("RoleBot");
+      setInterval(() => this.presence(), 10000);
     });
 
     this.on("message", message => {
@@ -32,6 +33,20 @@ export default class RoleBot extends Discord.Client {
     });
     this.on("guildMemberAdd", member => {
       joinRole(member);
+    });
+  }
+
+  presence() {
+    const presArr = [
+      `@${this.user.username} commands`,
+      `@${this.user.username}`,
+      `Guilds: ${this.guilds.size}`,
+      `Ping: ${this.ping}`
+    ];
+
+    this.user.setPresence({
+      game: { name: presArr[Math.floor(Math.random() * presArr.length)] },
+      status: "online"
     });
   }
 
