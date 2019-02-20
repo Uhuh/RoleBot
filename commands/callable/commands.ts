@@ -18,7 +18,7 @@ export default {
 
     for (const func of client.commands.values()) {
       embed.addField(
-        `**${client.config.PREFIX} ${func.name} ${func.args}**`,
+        `**@${client.user.username} ${func.name} ${func.args}**`,
         `Description: ${func.desc}`
       );
     }
