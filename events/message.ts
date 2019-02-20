@@ -16,7 +16,7 @@ export default (client: RoleBot, message: Message) => {
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message);
-  } else if (message.guild || message.mentions.members.has(client.user.id)) {
+  } else if (message.guild && message.mentions.members.has(client.user.id)) {
     const length: number =
       message.content.indexOf(client.config.PREFIX) === 0
         ? client.config.PREFIX.length
