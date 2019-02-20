@@ -1,6 +1,7 @@
 import { Message, Channel } from "discord.js";
 import RoleBot from "../src/bot";
 import roles from "../commands/events/roles";
+import commands from "../commands/callable/commands";
 import { getChannel } from "../src/setup_table";
 
 export default (client: RoleBot, message: Message) => {
@@ -22,6 +23,10 @@ export default (client: RoleBot, message: Message) => {
         : message.content.split(" ")[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).split(" ");
+    // Allow users to mention the bot only, this will return the list of commands in a private message
+    if (message.mentions.members.has(client.user.id) && !command) {
+      commands.run(message, args, client);
+    }
     //If the command isn't in the big ol' list.
     if (!client.commands.has(command.toLowerCase()))
       return console.log("Command DNE");
