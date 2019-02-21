@@ -3,7 +3,7 @@ import { joinRoles } from "../../src/setup_table";
 
 export default (message: Message, roleName: string) => {
   for (const [key, r] of message.guild.roles) {
-    if (r.name === roleName) {
+    if (r.name.toLowerCase() === roleName.toLowerCase()) {
       message.react("✅");
       return joinRoles.run({
         id: `${r.id}-${message.guild.id}`,
