@@ -38,10 +38,9 @@ export default class RoleBot extends Discord.Client {
 
   presence() {
     const presArr = [
-      `@${this.user.username} commands`,
-      `@${this.user.username}`,
-      `Guilds: ${this.guilds.size}`,
-      `Ping: ${this.ping}`
+      `@${this.user.username} help`,
+      `in ${this.guilds.size} guilds`,
+      `with ${Math.floor(this.ping)} ping`
     ];
 
     this.user.setPresence({

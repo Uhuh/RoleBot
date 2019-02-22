@@ -3,7 +3,7 @@ import RoleBot from "../../src/bot";
 
 export default {
   desc: "Sends a list of all available commands.",
-  name: "commands",
+  name: "help",
   args: "",
   run: async function(message: Message, args: string[], client: RoleBot) {
     const embed = new RichEmbed();

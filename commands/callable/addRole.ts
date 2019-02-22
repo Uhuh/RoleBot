@@ -3,9 +3,12 @@ import { addRole } from "../../src/setup_table";
 import joinRole from "../events/joinRole";
 
 export default {
-  desc: "Add a role to your hand out role list",
+  desc:
+    "Add a role to your hand out role list\n" +
+    "prim = primary, it will replace any other primary role\n" +
+    "sec = secondary and will stack with other secondary's and primaries",
   name: "role",
-  args: "<Role name>",
+  args: "<prim | sec> <Role name>",
   run: (message: Message, args: string[]) => {
     // ignore them plebians
     if (
