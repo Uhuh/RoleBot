@@ -9,14 +9,12 @@ export default {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
     const name = args.join("");
     const guildID = message.guild.id;
-    let roleID: string = "";
     for (const [key, role] of message.guild.roles) {
       if (role.name.toLowerCase() === name.toLowerCase()) {
-        roleID = role.id;
+        deleteRole.run(guildID, role.id);
+        message.react("✅");
+        return;
       }
     }
-
-    deleteRole.run(guildID, roleID);
-    message.react("✅");
   }
 };

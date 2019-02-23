@@ -34,7 +34,7 @@ export default {
         role = {
           id: `${guild.id}-${key}`,
           role_name: r.name,
-          role_id: key,
+          role_id: r.id,
           guild: guild.id,
           prim_role: roleType === "prim" ? 1 : 0
         };
