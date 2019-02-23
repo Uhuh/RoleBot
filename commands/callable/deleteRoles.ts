@@ -11,7 +11,7 @@ export default {
     const guildID = message.guild.id;
     let roleID: string = "";
     for (const [key, role] of message.guild.roles) {
-      if (role.name.toLowerCase === name.toLowerCase) {
+      if (role.name.toLowerCase() === name.toLowerCase()) {
         roleID = role.id;
       }
     }
