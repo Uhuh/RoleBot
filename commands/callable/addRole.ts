@@ -6,9 +6,11 @@ export default {
   desc:
     "Add a role to your hand out role list\n" +
     "prim = primary, it will replace any other primary role\n" +
-    "sec = secondary and will stack with other secondary's and primaries",
+    "sec = secondary and will stack with other secondary's and primaries\n" +
+    "join = when a user joins the server they will be auto assigned this role.\n" +
+    "If the role doesn't exist it's created and given a default color blue.",
   name: "role",
-  args: "<prim | sec> <Role name>",
+  args: "<prim | sec | join> <Role name>",
   run: (message: Message, args: string[]) => {
     // ignore them plebians
     if (
