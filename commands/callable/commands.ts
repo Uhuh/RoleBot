@@ -9,7 +9,10 @@ export default {
     const embed = new RichEmbed();
 
     embed
-      .setTitle("**List of commands**")
+      .setTitle("Invite me to your server!")
+      .setURL(
+        "https://discordapp.com/oauth2/authorize?client_id=493668628361904139&scope=bot&permissions=8"
+      )
       .setColor(16711684)
       .setAuthor(client.user.username, client.user.avatarURL)
       .setThumbnail(client.user.avatarURL)
