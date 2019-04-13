@@ -7,11 +7,12 @@ export default async function(message: Message) {
   let addedRole: boolean = false;
   let req_role: string = "";
   
+  message.delete();
   // IF they already have the role, remove it.
   const roleToRemove = member.roles.find(val => val.name.toLowerCase() === role.toLowerCase())
   if (roleToRemove) {
     return member.removeRole(roleToRemove)
-      .then(member => console.log(`Removed ${roleToRemove.name} from ${member.displayName}`))
+    .then(member => console.log(`Removed ${roleToRemove.name} from ${member.displayName}`))
   }
   // Make sure the server has the role to give.
   for (const gR of guildRoles) {
@@ -47,6 +48,5 @@ export default async function(message: Message) {
         }
       }
     }
-    message.delete();
   }
   
