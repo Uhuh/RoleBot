@@ -1,13 +1,13 @@
-import { GuildMember } from "discord.js";
-import { getJoinRoles } from "../src/setup_table";
+import { GuildMember } from "discord.js"
+import { getJoinRoles } from "../src/setup_table"
 
 export default (member: GuildMember) => {
-  const roles = getJoinRoles.all(member.guild.id);
+  const roles = getJoinRoles.all(member.guild.id)
   for (const role of roles) {
     for (const [key, gRole] of member.guild.roles) {
-      if (gRole.id === role.role_id) {
-        member.addRole(gRole);
+      if (key === role.role_id) {
+        member.addRole(gRole)
       }
     }
   }
-};
+}

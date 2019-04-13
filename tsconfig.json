@@ -3,7 +3,18 @@
         "module": "commonjs",
         "strict": true,
         "target": "es2017",
-        "lib": [ "es2017" ]
+        "lib": [ "es2017" ],
+        "outDir": "build",
+
+        "alwaysStrict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true
     },
     "include": [
         "src/",

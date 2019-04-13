@@ -1,21 +1,21 @@
-import { Message } from "discord.js";
-import { joinRoles } from "../../src/setup_table";
+import { Message } from "discord.js"
+import { joinRoles } from "../../src/setup_table"
 
 export default (message: Message, roleName: string) => {
   if(!roleName) return message.channel.send("No role provided.\n`@RoleBot role join <role name>`")
 
   for (const [key, r] of message.guild.roles) {
     if (r.name.toLowerCase() === roleName.toLowerCase()) {
-      message.react("✅");
+      message.react("✅")
       return joinRoles.run({
-        id: `${r.id}-${message.guild.id}`,
+        id: `${message.guild.id}-${key}`,
         role_name: r.name,
-        role_id: r.id,
+        role_id: key,
         guild_id: message.guild.id
-      });
+      })
     }
   }
-  message.guild
+  return message.guild
     .createRole({
       name: roleName,
       color: "BLUE"
@@ -26,13 +26,13 @@ export default (message: Message, roleName: string) => {
         role_name: r.name,
         role_id: r.id,
         guild_id: message.guild.id
-      });
-      message.react("✅");
+      })
+      message.react("✅")
     })
     .catch(() => {
-      message.react("❌");
-    });
-};
+      message.react("❌")
+    })
+}
 
 // check if the role exist
 // if not create it and assign to list of join roles.

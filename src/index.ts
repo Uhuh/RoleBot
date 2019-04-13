@@ -1,7 +1,7 @@
-import BowsetteBot from "./bot";
+import RB from "./bot"
 
-const RoleBot = new BowsetteBot();
+const RoleBot = new RB()
 
 RoleBot.start().catch(e => {
-  console.log(e);
-});
+  console.log(e)
+})

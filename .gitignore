@@ -2,3 +2,4 @@
 node*
 roles.sql*
 *.js
+build/

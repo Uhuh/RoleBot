@@ -1,25 +1,23 @@
-import { Message, RichEmbed, Role, Guild } from "discord.js";
+import { Message, RichEmbed, Role, Guild } from "discord.js"
 
 export default {
   desc: "Shows status of current server",
   name: "status",
   args: "",
   run: async function(message: Message) {
-    const embed: RichEmbed = new RichEmbed();
-    const guild: Guild = message.guild;
-    let roles: Role[] = [];
-    let textC: number = 0;
-    let voiceC: number = 0;
-    if (message.channel.type === "dm") return;
+    const embed: RichEmbed = new RichEmbed()
+    const guild: Guild = message.guild
+    let roles: Role[] = []
+    let textC: number = 0
+    let voiceC: number = 0
+    if (message.channel.type === "dm") return
 
-    for (const [k, role] of guild.roles) {
-      roles.push(role);
-    }
+    guild.roles.forEach(role => roles.push(role))
 
-    for (const [k, channel] of guild.channels) {
-      if (channel.type === "text") textC++;
-      else if (channel.type === "voice") voiceC++;
-    }
+    guild.channels.forEach(channel => {
+      if (channel.type === "text") textC++
+      else if (channel.type === "voice") voiceC++
+    })
 
     embed
       .setColor(16772864)
@@ -30,8 +28,8 @@ export default {
       .addField(`_**> Users**_`, `\`${guild.memberCount}\``, true)
       .addField(`_**> Text Channels**_`, `\`${textC}\``, true)
       .addField(`_**> Voice Channels**_`, `\`${voiceC}\``, true)
-      .addField(`_**> Roles**_`, `${roles.join(" ")}`, true);
+      .addField(`_**> Roles**_`, `${roles.join(" ")}`, true)
 
-    message.channel.send(embed);
+    message.channel.send(embed)
   }
-};
+}

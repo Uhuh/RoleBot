@@ -1,14 +1,14 @@
-import { Message, RichEmbed, Role } from "discord.js";
-import { getRoles, deleteRole } from "../../src/setup_table";
+import { Message, RichEmbed, Role } from "discord.js"
+import { getRoles, deleteRole } from "../../src/setup_table"
 
 export default {
   desc: "Retrives the list of roles that your server hands out.",
   name: "list",
   args: "",
   run: (message: Message) => {
-    const DB_ROLES = getRoles.all(message.guild.id).map(role => role.role_name);
-    const embed = new RichEmbed();
-    const GUILD_ID = message.guild.id;
+    const DB_ROLES = getRoles.all(message.guild.id).map(role => role.role_name)
+    const embed = new RichEmbed()
+    const GUILD_ID = message.guild.id
     const GUILD_ROLES: string[] = []
     const PRIM_ROLES: Role[] = []
     const SEC_ROLES: Role[] = []
@@ -21,15 +21,15 @@ export default {
       deleteRole.run(GUILD_ID, role)
     }
     // Just deleted some old roles so lets get this updated.
-    const UPDATED_ROLES = getRoles.all(GUILD_ID);
+    const UPDATED_ROLES = getRoles.all(GUILD_ID)
 
     for(const [key, role] of message.guild.roles) {
-      let r = UPDATED_ROLES.find(r => r.role_name === role.name);
+      let r = UPDATED_ROLES.find(r => r.role_id === key)
       if(r && r.prim_role) {
-        PRIM_ROLES.push(role);
+        PRIM_ROLES.push(role)
       }
       else if(r) {
-        SEC_ROLES.push(role);
+        SEC_ROLES.push(role)
       }
     }
 
@@ -43,8 +43,8 @@ export default {
       .addField(`_**SECONDARY ROLES**_`,
                 `${SEC_ROLES.length > 0 ?
                   SEC_ROLES.join("\n") :
-                  "No secondary roles to give."}`);
+                  "No secondary roles to give."}`)
 
-    message.channel.send(embed);
+    message.channel.send(embed)
   }
-};
+}
