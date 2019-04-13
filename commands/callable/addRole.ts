@@ -18,6 +18,7 @@ export default {
       !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
     )
       return;
+    if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")
 
     let role: any = {};
     let roleType = args.shift()!.toLowerCase();
@@ -27,7 +28,11 @@ export default {
     // So people like putting spaces in the role names, so this just adds them together.
     name = args.join(" ");
 
+    
     if (roleType === "join") return joinRole(message, name);
+    if (roleType !== "prim" && roleType !== "sec" ) 
+      return message.channel.send("Role type was not: `prim` `sec` or `join`.\n`@RoleBot role <type> RoleName`");
+    if(!name) return message.channel.send(`No role provided.\n\`@RoleBot role ${roleType} <role>\``)
 
     for (const [key, r] of message.guild.roles) {
       if (r.name.toLowerCase() === name.toLowerCase()) {

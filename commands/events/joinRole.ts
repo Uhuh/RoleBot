@@ -2,6 +2,8 @@ import { Message } from "discord.js";
 import { joinRoles } from "../../src/setup_table";
 
 export default (message: Message, roleName: string) => {
+  if(!roleName) return message.channel.send("No role provided.\n`@RoleBot role join <role name>`")
+
   for (const [key, r] of message.guild.roles) {
     if (r.name.toLowerCase() === roleName.toLowerCase()) {
       message.react("✅");

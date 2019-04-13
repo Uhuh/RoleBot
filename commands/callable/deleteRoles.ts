@@ -6,7 +6,7 @@ export default {
   name: "deleteRole",
   args: "<role name>",
   run: (message: Message, args: string[]) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return message.react("❌");;
     const name = args.join(" ");
     const guildID = message.guild.id;
     
