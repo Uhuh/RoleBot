@@ -69,6 +69,9 @@ export const getJoinRoles = sql.prepare(
 export const deleteRole = sql.prepare(
   "DELETE FROM roles WHERE guild = ? AND role_name = ?"
 )
+export const deleteJoin = sql.prepare(
+  "DELETE FROM join_roles WHERE guild_id = ? AND role_name = ?"
+)
 export const getRoles = sql.prepare("SELECT * FROM roles WHERE guild = ?")
 export const addRole = sql.prepare(
   "INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id)"
