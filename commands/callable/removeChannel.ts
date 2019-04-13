@@ -21,7 +21,7 @@ export default {
         || roleChannel.id !== channel.channel_id) 
       return message.react("❌")
     
-    roleChannel.fetchMessage(channel.message_id).then(msg => msg.delete())
+    if(channel.message_id) roleChannel.fetchMessage(channel.message_id).then(msg => msg.delete())
     removeChannel.run(guild.id)
     
     return message.react("✅")
