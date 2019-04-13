@@ -1,10 +1,18 @@
 import { Message } from "discord.js"
-import { joinRoles } from "../../src/setup_table"
+import { joinRoles, getRoles } from "../../src/setup_table"
 
 export default (message: Message, roleName: string) => {
   if(!roleName) return message.channel.send("No role provided.\n`@RoleBot role join <role name>`")
+  const PRIM_SEC_ROLES = getRoles.all(message.guild.id).map(role => role.role_id)
+
 
   for (const [key, r] of message.guild.roles) {
+    if(r.name.toLowerCase() === roleName.toLowerCase() &&
+      PRIM_SEC_ROLES.includes(r.id)) {
+        return message.channel.send(`Cannot create a join role of an already existing prim/sec role.\n` +
+                              `Run \`@RoleBot deleteRole ${r.name}\` then try again.`)
+    }
+
     if (r.name.toLowerCase() === roleName.toLowerCase()) {
       message.react("✅")
       return joinRoles.run({
@@ -15,26 +23,10 @@ export default (message: Message, roleName: string) => {
       })
     }
   }
-  return message.guild
-    .createRole({
-      name: roleName,
-      color: "BLUE"
-    })
-    .then(r => {
-      joinRoles.run({
-        id: `${r.id}-${message.guild.id}`,
-        role_name: r.name,
-        role_id: r.id,
-        guild_id: message.guild.id
-      })
-      message.react("✅")
-    })
-    .catch(() => {
-      message.react("❌")
-    })
+
+  return message.react("❌")
 }
 
 // check if the role exist
-// if not create it and assign to list of join roles.
 // if it does make it a join role
 // push changes to sql db

@@ -1,5 +1,5 @@
 import { Message, Guild } from "discord.js"
-import { addRole } from "../../src/setup_table"
+import { addRole, getJoinRoles } from "../../src/setup_table"
 import joinRole from "../events/joinRole"
 
 export default {
@@ -19,12 +19,14 @@ export default {
     )
       return
     if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")
+    
+    const JOIN_ROLES = getJoinRoles.all(message.guild.id).map(role => role.role_id)
+    const guild: Guild = message.guild
 
     let role: any = {}
     let roleType = args.shift()!.toLowerCase()
     let name: string = ""
 
-    const guild: Guild = message.guild
     // So people like putting spaces in the role names, so this just adds them together.
     name = args.join(" ")
 
@@ -35,6 +37,12 @@ export default {
     if(!name) return message.channel.send(`No role provided.\n\`@RoleBot role ${roleType} <role>\``)
 
     for (const [key, r] of message.guild.roles) {
+      if(r.name.toLowerCase() === name.toLowerCase() &&
+        JOIN_ROLES.includes(r.id)) {
+          return message.channel.send(`Cannot create a ${roleType} role of an already existing join role.\n` +
+                              `Run \`@RoleBot deleteJoin ${r.name}\` then try again.`)
+      }
+
       if (r.name.toLowerCase() === name.toLowerCase()) {
         role = {
           id: `${guild.id}-${key}`,

@@ -5,6 +5,7 @@ import * as config from "./vars"
 import msg from "../events/message"
 import commandHandler from "../commands/commandHandler"
 import joinRole from "../events/joinRoles"
+import roleUpdate from "../events/roleUpdate";
 
 interface Command {
   desc: string
@@ -28,12 +29,9 @@ export default class RoleBot extends Discord.Client {
       setInterval(() => this.presence(), 10000)
     })
 
-    this.on("message", message => {
-      msg(this, message)
-    })
-    this.on("guildMemberAdd", member => {
-      joinRole(member)
-    })
+    this.on("message", message => msg(this, message))
+    this.on("guildMemberAdd", member => joinRole(member))
+    this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole))
   }
 
   presence() {
