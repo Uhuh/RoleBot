@@ -29,7 +29,7 @@ const setupTable = () => {
     // If the table isn't there, create it and setup the database correctly.
     sql
       .prepare(
-        "CREATE TABLE role_channel (id TEXT PRIMARY KEY, channel_id TEXT, guild TEXT)"
+        "CREATE TABLE role_channel (id TEXT PRIMARY KEY, channel_id TEXT, guild TEXT, message_id TEXT)"
       )
       .run()
     // Ensure that the 'id' row is always unique and indexed.
@@ -77,11 +77,11 @@ export const addRole = sql.prepare(
   "INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id)"
 )
 export const getChannel = sql.prepare(
-  "SELECT * FROM role_channel WHERE guild = ? AND channel_id = ?"
+  "SELECT * FROM role_channel WHERE guild = ?"
 )
 export const removeChannel = sql.prepare(
-  "DELETE FROM role_channel WHERE id = ? AND channel_id = ?"
+  "DELETE FROM role_channel WHERE guild = ?"
 )
 export const addChannel = sql.prepare(
-  "INSERT OR REPLACE INTO role_channel (id, channel_id, guild) VALUES (@id, @channel_id, @guild)"
+  "INSERT OR REPLACE INTO role_channel (id, channel_id, guild, message_id) VALUES (@id, @channel_id, @guild, @message_id)"
 )

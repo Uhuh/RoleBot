@@ -8,7 +8,7 @@ export default {
     "prim = primary, it will replace any other primary role\n" +
     "sec = secondary and will stack with other secondary's and primaries\n" +
     "join = when a user joins the server they will be auto assigned this role.\n" +
-    "If the role doesn't exist it's created and given a default color blue.",
+    "You cannot make a join role if the role is currently a prim/sec role and vice versa.",
   name: "role",
   args: "<prim | sec | join> <Role name>",
   run: (message: Message, args: string[]) => {

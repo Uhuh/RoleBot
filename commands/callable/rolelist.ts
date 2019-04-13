@@ -1,11 +1,11 @@
-import { Message, RichEmbed, Role } from "discord.js"
+import { Message, RichEmbed, Role, TextChannel } from "discord.js"
 import { getRoles, deleteRole, getJoinRoles } from "../../src/setup_table"
 
 export default {
   desc: "Retrives the list of roles that your server hands out.",
   name: "list",
   args: "",
-  run: (message: Message) => {
+  run: (message: Message, roleChannel?: TextChannel) => {
     const GUILD_ID = message.guild.id
     const DB_ROLES = getRoles.all(GUILD_ID).map(role => role.role_name)
     const J_ROLES = getJoinRoles.all(GUILD_ID)
@@ -28,7 +28,7 @@ export default {
     for(const [key, role] of message.guild.roles) {
       const r = UPDATED_ROLES.find(r => r.role_id === key)
       const jR = J_ROLES.find(r => r.role_id === key)
-      
+
       if(r && r.prim_role === 1) {
         PRIM_ROLES.push(role)
       }
@@ -52,11 +52,12 @@ export default {
                 `${SEC_ROLES.length > 0 ?
                   SEC_ROLES.join(" ") :
                   "No secondary roles to give."}`)
-      .addField(`Roles given when users join server`, 
+      .addField(`Roles given when users join the server`, 
                 `${JOIN_ROLES.length > 0 ?
                   JOIN_ROLES.join(" ") : 
                   "No join roles to give."}`)
-
-    message.channel.send(embed)
+    
+    if(roleChannel instanceof TextChannel) return roleChannel.send(embed)
+    return message.channel.send(embed)
   }
 }

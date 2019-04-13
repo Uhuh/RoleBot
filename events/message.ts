@@ -9,7 +9,7 @@ export default (client: RoleBot, message: Message) => {
   if (message.author.bot || !message.guild) return
 
   const channel: Channel | undefined = message.channel
-  const RC = getChannel.get(message.guild.id, channel.id)
+  const RC = getChannel.get(message.guild.id)
   const role_channel = RC ? RC.channel_id : ''
 
   // Someone is trying to request a role (hopefully)
