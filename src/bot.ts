@@ -5,7 +5,8 @@ import * as config from "./vars"
 import msg from "../events/message"
 import commandHandler from "../commands/commandHandler"
 import joinRole from "../events/joinRoles"
-import roleUpdate from "../events/roleUpdate";
+import roleUpdate from "../events/roleUpdate"
+import * as DBL from 'dblapi.js'
 
 interface Command {
   desc: string
@@ -24,8 +25,9 @@ export default class RoleBot extends Discord.Client {
 
     commandHandler(this)
     this.on("ready", () => {
+      const dblapi = new DBL(this.config.DBLTOKEN, this)
       console.log(`[Started]: ${new Date()}`)
-      this.user.setUsername("RoleBot")
+      setInterval(() => dblapi.postStats(this.guilds.size), 1800000)
       setInterval(() => this.presence(), 10000)
     })
 
