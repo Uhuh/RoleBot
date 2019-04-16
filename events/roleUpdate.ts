@@ -1,5 +1,5 @@
-import { Role } from "discord.js";
-import { getRoles, getJoinRoles, addRole, joinRoles } from "../src/setup_table";
+import { Role } from "discord.js"
+import { getRoles, getJoinRoles, addRole, joinRoles } from "../src/setup_table"
 
 export default (role: Role) => {
   const roles = getRoles.all(role.guild.id)

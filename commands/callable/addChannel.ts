@@ -1,5 +1,5 @@
 import { Message, Guild } from "discord.js"
-import { addChannel } from "../../src/setup_table"
+import { addChannel, getChannel } from "../../src/setup_table"
 import rolelist from "./rolelist";
 
 export default {
@@ -12,9 +12,13 @@ export default {
     if (
       !roleChannel ||
       !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
-    )
+      )
       return message.react("❌")
-    
+    const actualChannel = getChannel.get(message.guild.id)
+
+    if(actualChannel && message.guild.channels.get(actualChannel.channel_id)) 
+      return message.channel.send(`${message.guild.channels.get(actualChannel.channel_id)!.toString()} is the current role channel.`)
+  
     //Send role list to channel so users don't have to
     const roleMessage = await rolelist.run(message, roleChannel) as Message
 

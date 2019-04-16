@@ -13,6 +13,7 @@ export default {
       .setURL(
         "https://discordapp.com/oauth2/authorize?client_id=493668628361904139&scope=bot&permissions=8"
       )
+      .setDescription(`Find a bug or want to discuss an idea? [Join the support server here](https://discord.gg/nJBubXy)`)
       .setColor(16711684)
       .setAuthor(client.user.username, client.user.avatarURL)
       .setThumbnail(client.user.avatarURL)

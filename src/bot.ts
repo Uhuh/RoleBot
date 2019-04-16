@@ -27,7 +27,7 @@ export default class RoleBot extends Discord.Client {
     this.on("ready", () => {
       const dblapi = new DBL(this.config.DBLTOKEN, this)
       console.log(`[Started]: ${new Date()}`)
-      setInterval(() => dblapi.postStats(this.guilds.size), 1800000)
+      if(this.config.DEV_MODE === "0") setInterval(() => dblapi.postStats(this.guilds.size), 1800000)
       setInterval(() => this.presence(), 10000)
     })
 
