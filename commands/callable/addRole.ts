@@ -5,10 +5,11 @@ import joinRole from "../events/joinRole"
 export default {
   desc:
     "Add a role to your hand out role list\n" +
-    "prim = primary, it will replace any other primary role\n" +
-    "sec = secondary and will stack with other secondary's and primaries\n" +
-    "join = when a user joins the server they will be auto assigned this role.\n" +
-    "You cannot make a join role if the role is currently a prim/sec role and vice versa.",
+    "prim = Will replace any other prim role\n" +
+    "sec =  Will stack with both prim/sec roles.\n" +
+    "join = Users are given this role upon joining.\n" +
+    "You cannot make a join role if the role is currently a prim/sec role and vice versa.\n" +
+    "E.G: `@RoleBot role prim Role Name`",
   name: "role",
   args: "<prim | sec | join> <Role name>",
   run: (message: Message, args: string[]) => {

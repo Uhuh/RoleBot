@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 import { deleteJoin, getJoinRoles } from "../../src/setup_table"
 
 export default {
-  desc: "Remove a role from the join list.",
+  desc: "Remove a role from the join list. You must match the name exactly as it is in the server.\nE.G: `@RoleBot deleteJoin Role Name`",
   name: "deleteJoin",
   args: "<role name>",
   run: (message: Message, args: string[]) => {

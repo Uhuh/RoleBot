@@ -23,7 +23,7 @@ export default {
     for (const func of client.commands.values()) {
       embed.addField(
         `**@${client.user.username} ${func.name} ${func.args}**`,
-        `Description: ${func.desc}`
+        `${func.desc}`
       )
     }
     message.author.send({ embed })

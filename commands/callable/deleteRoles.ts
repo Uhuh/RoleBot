@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 import { deleteRole, getRoles } from "../../src/setup_table"
 
 export default {
-  desc: "Delete a single role from your hand out roles list.",
+  desc: "Delete a single role from your hand out roles list. You must match the name exactly as it is in the server.\nE.G: `@RoleBot deleteRole Role Name`",
   name: "deleteRole",
   args: "<role name>",
   run: (message: Message, args: string[]) => {

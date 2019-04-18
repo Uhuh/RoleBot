@@ -3,7 +3,7 @@ import { removeChannel, getChannel } from "../../src/setup_table"
 
 export default {
   desc:
-    "Channel will no longer be pruned of messages and bot will not hand out roles from channel anymore.",
+    "Channel will no longer be pruned of messages and bot will not hand out roles from channel anymore.\nE.G: `@RoleBot removeChannel #roles`",
   name: "removeChannel",
   args: "<channel mention>",
   run: (message: Message) => {

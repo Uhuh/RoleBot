@@ -3,7 +3,7 @@ import rolelist from "./rolelist";
 import { Message } from "discord.js";
 
 export default {
-  desc: "Updates the role list in the set role channel.",
+  desc: "Updates the role list in the set role channel.\nE.G: `@RoleBot update #roles`",
   name: "update",
   args: "<role channel mention>",
   run: (message: Message) => {

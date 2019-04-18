@@ -4,7 +4,7 @@ import rolelist from "./rolelist";
 
 export default {
   desc:
-    "Makes a channel the role channel. Bot will prune messages and assign roles from this channel.",
+    "Bot will prune messages and assign roles from this channel.\nE.G: `@RoleBot rolechannel #roles`",
   name: 'roleChannel',
   args: "<channel mention>",
   run: async (message: Message) => {
