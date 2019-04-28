@@ -9,7 +9,7 @@ export default {
   args: '',
   run: (message: Message, _args: string[], client: RoleBot) => {
 
-    let embed = new RichEmbed()
+    const embed = new RichEmbed()
     let userCount = 0
     let channelCount = 0
 
@@ -30,12 +30,12 @@ export default {
     message.channel.send(embed)
 
     if(DEV_ID === message.author.id) {
-      const gNames = client.guilds.map(g => `${g.name} - ${g.id}`)
-      embed = new RichEmbed()
-      embed.setColor(16711683)
-        .setTitle(`**Servers the bots in**`)
-        .addField(`Servers`, gNames.join("\n"))
-      message.channel.send(embed)
+      const gNames = client.guilds.map(g => g.name)
+      const gIds = client.guilds.map(g => g.id)
+      
+      // Having issue detecting size of messages and how I should split it up since they get so large..
+      message.channel.send(`\`\`\` ${gNames.join("\n")} \`\`\``)
+      message.channel.send(`\`\`\` ${gIds.join("\n")} \`\`\``)
     }
   }
 }
