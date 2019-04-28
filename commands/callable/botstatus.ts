@@ -30,12 +30,12 @@ export default {
     message.channel.send(embed)
 
     if(DEV_ID === message.author.id) {
-      const gNames = client.guilds.map(g => g.name)
+      const gNames = client.guilds.map(g => `${g.name} - ${g.memberCount}`)
       const gIds = client.guilds.map(g => g.id)
       
       // Having issue detecting size of messages and how I should split it up since they get so large..
-      message.channel.send(`\`\`\` ${gNames.join("\n")} \`\`\``)
-      message.channel.send(`\`\`\` ${gIds.join("\n")} \`\`\``)
+      message.channel.send(`\`\`\`${gNames.join("\n")} \`\`\``)
+      message.channel.send(`\`\`\`${gIds.join("\n")} \`\`\``)
     }
   }
 }
