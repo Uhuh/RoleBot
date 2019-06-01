@@ -60,22 +60,27 @@ const setupTable = () => {
 
 setupTable()
 
+// Join roles
 export const joinRoles = sql.prepare(
   "INSERT OR REPLACE INTO join_roles (id, role_name, role_id, guild_id) VALUES (@id, @role_name, @role_id, @guild_id)"
 )
 export const getJoinRoles = sql.prepare(
   "SELECT * FROM join_roles WHERE guild_id = ?"
 )
-export const deleteRole = sql.prepare(
-  "DELETE FROM roles WHERE guild = ? AND role_name = ?"
-)
 export const deleteJoin = sql.prepare(
   "DELETE FROM join_roles WHERE guild_id = ? AND role_name = ?"
+)
+
+// Roles
+export const deleteRole = sql.prepare(
+  "DELETE FROM roles WHERE guild = ? AND role_name = ?"
 )
 export const getRoles = sql.prepare("SELECT * FROM roles WHERE guild = ?")
 export const addRole = sql.prepare(
   "INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id)"
 )
+
+// Role channels
 export const getChannel = sql.prepare(
   "SELECT * FROM role_channel WHERE guild = ?"
 )
@@ -84,4 +89,16 @@ export const removeChannel = sql.prepare(
 )
 export const addChannel = sql.prepare(
   "INSERT OR REPLACE INTO role_channel (id, channel_id, guild, message_id) VALUES (@id, @channel_id, @guild, @message_id)"
+)
+
+
+// Removed from guild
+export const removeJoinRoles = sql.prepare(
+  "DELETE FROM join_roles WHERE guild_id = ?"
+)
+export const removeRoles = sql.prepare(
+  "DELETE FROM roles WHERE guild = ?"
+)
+export const removeRoleChannel = sql.prepare(
+  "DELETE FROM role_channel WHERE guild = ?"
 )
