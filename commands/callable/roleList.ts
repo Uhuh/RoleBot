@@ -2,7 +2,7 @@ import { Message, RichEmbed, Role, TextChannel } from "discord.js"
 import { getRoles, deleteRole, getJoinRoles } from "../../src/setup_table"
 
 export default {
-  desc: "Retrives the list of roles that your server hands out.",
+  desc: "Retrieves the list of roles that your server hands out.",
   name: "list",
   args: "",
   run: (message: Message, roleChannel?: TextChannel) => {

@@ -3,5 +3,5 @@ node*
 roles.sql*
 *.js
 build/
-package-lock.json
-yarn-error.log
+*.log
+.idea/

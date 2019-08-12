@@ -1,6 +1,6 @@
 import { Message, Guild } from "discord.js"
 import { addChannel, getChannel } from "../../src/setup_table"
-import rolelist from "./rolelist";
+import roleList from "./roleList";
 
 export default {
   desc:
@@ -20,7 +20,7 @@ export default {
       return message.channel.send(`${message.guild.channels.get(actualChannel.channel_id)!.toString()} is the current role channel.`)
   
     //Send role list to channel so users don't have to
-    const roleMessage = await rolelist.run(message, roleChannel) as Message
+    const roleMessage = await roleList.run(message, roleChannel) as Message
 
     const guild: Guild = message.guild
     addChannel.run({
