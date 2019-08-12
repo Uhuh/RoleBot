@@ -3,7 +3,7 @@ import { removeJoinRoles, removeRoleChannel, removeRoles } from "../src/setup_ta
 import * as logger from "log-to-file";
 
 export default (guild: Guild) => {
-  logger(`Removed from guild: ${guild.name} - ${guild.id}`, 'guilds.log')
+  logger(`Removed - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`, 'guilds.log')
 
   removeJoinRoles.run(guild.id)
   removeRoleChannel.run(guild.id)
