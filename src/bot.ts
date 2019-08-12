@@ -9,7 +9,7 @@ import joinRole from "../events/joinRoles"
 import roleUpdate from "../events/roleUpdate"
 import * as DBL from 'dblapi.js'
 import removed from "../events/removed"
-import * as logger from "log-to-file"
+import * as logger from "log-to-file";
 
 interface Command {
   desc: string
@@ -38,7 +38,7 @@ export default class RoleBot extends Discord.Client {
     this.on("message", message => msg(this, message))
     this.on("guildMemberAdd", member => joinRole(member))
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole))
-    this.on("guildCreate", guild => logger(`Joined guild: ${guild.name} - ${guild.id}`, 'guilds.log'))
+    this.on("guildCreate", guild => logger(`Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`, 'guilds.log'))
     this.on("guildDelete", guild => removed(guild))
   }
 
