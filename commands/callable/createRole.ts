@@ -4,9 +4,9 @@ export default {
     desc: 'Create a role for assignment',
     name: 'createRole',
     args: '<role name> [color]',
-    run: async ({guild, member}: Message, [roleName, color = '']: string[]) => {
+    run: async ({guild, member}: Message, [roleName, ...flags]: string[]) => {
         if (!member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return
-        
-        return guild.createRole({name: roleName, color})
+		// handle creating duplicate roles        
+        return guild.createRole({name: roleName, mentionable: flags.includes('mention')}).catch(console.error)
     }
 }
