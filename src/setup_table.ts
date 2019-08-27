@@ -140,12 +140,12 @@ export const removeJoinMessage = sql.prepare(
 
 // Reaction Roles
 export const getRoleByReaction = sql.prepare(
-  "SELECT role_id from react_role where emoji_id = @emoji_id"
+  "SELECT role_id from reaction_role where emoji_id = @emoji_id"
 )
 export const addReactionRole = sql.prepare(
-  "INSERT INTO join_message VALUES (@emoji_id, @role_id)"
+  "INSERT INTO reaction_role VALUES (@emoji_id, @role_id)"
 )
 
 export const removeReactionRole = sql.prepare(
-  "DELETE FROM join_message where emoji_id = @emoji_id and role_id = @role_id"
+  "DELETE FROM reaction_role where emoji_id = @emoji_id and role_id = @role_id"
 )
