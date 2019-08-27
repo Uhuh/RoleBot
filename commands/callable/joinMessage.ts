@@ -17,6 +17,7 @@ export default {
 		})
         const roleReactions = roles.map((role, i) => role + " => " + reactions[i]) 
         const sentMessage = await originalMessage.channel.sendMessage(roleReactions.join('\n')) as Message
+		// get MessageReaction from .react and send .emoji.id to db?
         reactions.forEach(reaction => sentMessage.react(reaction))
     }
 }

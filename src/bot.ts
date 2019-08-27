@@ -40,6 +40,8 @@ export default class RoleBot extends Discord.Client {
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole))
     this.on("guildCreate", guild => logger(`Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`, 'guilds.log'))
     this.on("guildDelete", guild => removed(guild))
+	this.on("messageReactionAdd", () => console.log('added'))
+	this.on("messageReactionRemove", () => console.log('removed'))
   }
 
   presence() {
@@ -53,6 +55,11 @@ export default class RoleBot extends Discord.Client {
       game: {name: presArr[Math.floor(Math.random() * presArr.length)]},
       status: "online"
     })
+  }
+
+  loadJoinMessages() {
+  	// need channelId, messageId from DB
+	// channel.fetchMessage
   }
 
   async start() {
