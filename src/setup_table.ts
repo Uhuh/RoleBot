@@ -126,26 +126,27 @@ export const removeRoleChannel = sql.prepare(
 )
 
 // Join Message
-export const addJoinMessage = sql.prepare(
+export const addJoinMessage = (message_id: string, channel_id: string) => sql.prepare(
   "INSERT INTO join_message VALUES (@message_id, @channel_id)"
-)
+).run({message_id, channel_id})
 
-export const getJoinMessages = sql.prepare(
+export const getJoinMessages = () => sql.prepare(
   "SELECT * FROM join_message"
-)
+).all()
 
-export const removeJoinMessage = sql.prepare(
-  "DELETE FROM join_message where message_id = @message_id and channel_id = @channel_id"
-)
+export const removeJoinMessage = (message_id: string) => sql.prepare(
+  "DELETE FROM join_message where message_id = @message_id"
+).run({message_id})
 
 // Reaction Roles
-export const getRoleByReaction = sql.prepare(
+export const getRoleByReaction = (emoji_id: string) => sql.prepare(
   "SELECT role_id from reaction_role where emoji_id = @emoji_id"
-)
-export const addReactionRole = sql.prepare(
-  "INSERT INTO reaction_role VALUES (@emoji_id, @role_id)"
-)
+).all({emoji_id})
 
-export const removeReactionRole = sql.prepare(
+export const addReactionRole = (emoji_id: string, role_id: string) => sql.prepare(
+  "INSERT INTO reaction_role VALUES (@emoji_id, @role_id)"
+).run({emoji_id, role_id})
+
+export const removeReactionRole = (emoji_id: string, role_id: string) => sql.prepare(
   "DELETE FROM reaction_role where emoji_id = @emoji_id and role_id = @role_id"
-)
+).run({emoji_id, role_id})
