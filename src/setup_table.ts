@@ -75,7 +75,7 @@ const setupTable = () => {
     .get()
   if (!reactionRoleTable["count(*)"]) {
     sql
-      .prepare("CREATE TABLE reaction_role (emoji_id TEXT, role_id TEXT, PRIMARY KEY (emoji_id, role_id))")
+      .prepare("CREATE TABLE reaction_role (emoji_id TEXT, role_id TEXT, role_name TEXT, PRIMARY KEY (emoji_id, role_id))")
       .run()
   }
 }
@@ -143,9 +143,9 @@ export const getRoleByReaction = (emoji_id: string) => sql.prepare(
   "SELECT role_id from reaction_role where emoji_id = @emoji_id"
 ).all({emoji_id})
 
-export const addReactionRole = (emoji_id: string, role_id: string) => sql.prepare(
-  "INSERT INTO reaction_role VALUES (@emoji_id, @role_id)"
-).run({emoji_id, role_id})
+export const addReactionRole = (emoji_id: string, role_id: string, role_name: string) => sql.prepare(
+  "INSERT INTO reaction_role VALUES (@emoji_id, @role_id, @role_name)"
+).run({emoji_id, role_id, role_name})
 
 export const removeReactionRole = (emoji_id: string, role_id: string) => sql.prepare(
   "DELETE FROM reaction_role where emoji_id = @emoji_id and role_id = @role_id"
