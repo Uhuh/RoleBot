@@ -10,6 +10,7 @@ import roleUpdate from "../events/roleUpdate"
 import * as DBL from 'dblapi.js'
 import removed from "../events/removed"
 import * as logger from "log-to-file";
+import {getRoleByReaction, getJoinMessages} from './setup_table'
 
 interface Command {
   desc: string
@@ -21,11 +22,13 @@ interface Command {
 export default class RoleBot extends Discord.Client {
   config: any
   commands: Discord.Collection<string, Command>
+  joinMessages: Discord.Collection<string, Discord.Message>
 
   constructor() {
     super()
     this.config = config
     this.commands = new Discord.Collection()
+	this.joinMessages = new Discord.Collection()
 
     commandHandler(this)
     this.on("ready", () => {
@@ -40,6 +43,26 @@ export default class RoleBot extends Discord.Client {
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole))
     this.on("guildCreate", guild => logger(`Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`, 'guilds.log'))
     this.on("guildDelete", guild => removed(guild))
+	this.on("messageReactionAdd", async (reaction, user) => {
+		const message = reaction.message
+		if(this.joinMessages.has(message.id)) {
+			const id = reaction.emoji.id || reaction.emoji.name
+			const [{role_id}] = await getRoleByReaction(id)
+			const role = message.guild.roles.get(role_id)!
+			const member = message.guild.members.get(user.id)!
+			member.addRole(role)
+		}
+	})
+	this.on("messageReactionRemove", async (reaction, user) => {
+		const message = reaction.message
+		if(this.joinMessages.has(message.id)) {
+			const id = reaction.emoji.id || reaction.emoji.name
+			const [{role_id}] = await getRoleByReaction(id)
+			const role = message.guild.roles.get(role_id)!
+			const member = message.guild.members.get(user.id)!
+			member.removeRole(role)
+		}
+	})
   }
 
   presence() {
@@ -55,7 +78,14 @@ export default class RoleBot extends Discord.Client {
     })
   }
 
+  async loadJoinMessages() {
+	const rows = await getJoinMessages()
+	const messages = await Promise.all(rows.map(({message_id, channel_id}) => (this.channels.get(channel_id)! as Discord.TextChannel).fetchMessage(message_id)))
+	messages.forEach(m => this.joinMessages.set(m.id, m))
+  }
+
   async start() {
     await this.login(this.config.TOKEN)
+	await this.loadJoinMessages()
   }
 }

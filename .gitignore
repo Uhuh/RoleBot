@@ -5,3 +5,4 @@ roles.sql*
 build/
 *.log
 .idea/
+.vscode
