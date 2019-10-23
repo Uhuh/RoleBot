@@ -3,7 +3,7 @@ import { joinRoles, getRoles } from "../../src/setup_table"
 
 export default (message: Message, roleName: string) => {
   if(!roleName) return message.channel.send("No role provided.\n`@RoleBot role join <role name>`")
-  const PRIM_SEC_ROLES = getRoles.all(message.guild.id).map(role => role.role_id)
+  const PRIM_SEC_ROLES = getRoles(message.guild.id).map(role => role.role_id)
 
 
   for (const [key, r] of message.guild.roles) {

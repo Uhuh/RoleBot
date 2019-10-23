@@ -4,8 +4,8 @@ import {getRoles, getJoinRoles} from "../../src/setup_table"
 export default async function (message: Message) {
   const member = message.member
   const role = message.content
-  const guildRoles = getRoles.all(message.guild.id)
-  const jRoles = getJoinRoles.all(message.guild.id).map(role => role.role_name)
+  const guildRoles = getRoles(message.guild.id)
+  const jRoles = getJoinRoles(message.guild.id).map(role => role.role_name)
   let addedRole: boolean = false
   let req_role: string = ""
 

@@ -9,7 +9,7 @@ export default {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return message.react("❌")
     const name = args.join(" ")
     const guildID = message.guild.id
-    const DB_ROLES = getJoinRoles.all(message.guild.id).map(role => role.role_name)
+    const DB_ROLES = getJoinRoles(message.guild.id).map(role => role.role_name)
 
     if (DB_ROLES.includes(name)) {
       deleteJoin.run(guildID, name)

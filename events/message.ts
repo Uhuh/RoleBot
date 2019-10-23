@@ -2,16 +2,20 @@ import { Message, Channel } from "discord.js"
 import RoleBot from "../src/bot"
 import roles from "../commands/events/roles"
 import commands from "../commands/callable/commands"
-import { getChannel } from "../src/setup_table"
 
 export default (client: RoleBot, message: Message) => {
   // Ignore bots, also don't allow dm's. No reason for users to DM the bot
-  if (message.author.bot || !message.guild) return
-
+  
   const channel: Channel | undefined = message.channel
-  const RC = getChannel.get(message.guild.id)
-  const role_channel = RC ? RC.channel_id : ''
+  const role_channel = client.roleChannels.get(message.guild.id) || ''
 
+  if ((message.author.bot || !message.guild) && role_channel == channel.id) {
+    message.delete()
+    return
+  } else if (message.author.bot || !message.guild) {
+    return
+  }
+  
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message)

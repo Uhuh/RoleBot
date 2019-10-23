@@ -7,8 +7,8 @@ export default {
   args: "",
   run: (message: Message, roleChannel?: TextChannel) => {
     const GUILD_ID = message.guild.id
-    const DB_ROLES = getRoles.all(GUILD_ID).map(role => role.role_name)
-    const J_ROLES = getJoinRoles.all(GUILD_ID)
+    const DB_ROLES = getRoles(GUILD_ID).map(role => role.role_name)
+    const J_ROLES = getJoinRoles(GUILD_ID)
     const embed = new RichEmbed()
     const GUILD_ROLES: string[] = []
     const PRIM_ROLES: Role[] = []
@@ -23,7 +23,7 @@ export default {
       deleteRole.run(GUILD_ID, role)
     }
     // Just deleted some old roles so lets get this updated.
-    const UPDATED_ROLES = getRoles.all(GUILD_ID)
+    const UPDATED_ROLES = getRoles(GUILD_ID)
 
     for(const [key, role] of message.guild.roles) {
       const r = UPDATED_ROLES.find(r => r.role_id === key)

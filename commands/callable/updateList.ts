@@ -8,7 +8,7 @@ export default {
   args: "<role channel mention>",
   run: (message: Message) => {
     const role_channel = message.mentions.channels.first()
-    const channel = getChannel.get(message.guild.id)
+    const channel = getChannel(message.guild.id)[0]
 
     if (!channel)
       return message.channel.send(`There is no role channel set.\nRun \`@RoleBot rolechannel <channel mention>\` to setup a role channel.`)
