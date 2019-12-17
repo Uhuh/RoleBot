@@ -94,8 +94,8 @@ export default class RoleBot extends Discord.Client {
 
   async loadReactMessage() {
     const rows = await getReactMessages();
-
-    const messages = await Promise.all(rows.map(({message_id, channel_id}) => (this.channels.get(channel_id)! as Discord.TextChannel).fetchMessage(message_id)));
+    console.log(rows)
+    const messages = await Promise.all(rows.map(({guild_id, message_id, channel_id}) => (this.guilds.get(guild_id)!.channels.get(channel_id)! as Discord.TextChannel).fetchMessage(message_id)));
     messages.forEach(m => this.reactMessage.set(m.id, m))
   }
 
