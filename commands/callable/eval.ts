@@ -6,7 +6,7 @@ export default {
   name: 'eval',
   args: '',
   run: async (message: Message, args: string[], client: RoleBot) => {
-    if (message.author.id !== client.config.BOT_OWNER) return
+    if (message.author.id !== client.config.DEV_ID) return
 
     const clean = (text: string) => {
       if (typeof (text) === "string")
