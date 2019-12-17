@@ -1,48 +1,98 @@
-import {Message, Emoji} from "discord.js";
-import {addReactionRole, addReactMessage} from '../../src/setup_table'
-import RoleBot from '../../src/bot'
+import { Message } from "discord.js";
+import { addReactionRole, guildReactions } from "../../src/setup_table";
+import RoleBot from "../../src/bot";
 
 export default {
-  desc: 'Create a message with reactions that toggle role assignment',
-  name: 'reactRole',
-  args: '[roleName reaction]...',
-  run: async (originalMessage: Message, _args: string[], client: RoleBot) => {
-    const [, , ...words] = originalMessage.content.split(/\s+/);
-    const roles = words.filter((word, i) => word && i % 2 === 0);
-    const GUILD_ID = originalMessage.guild.id;
+  desc: "Create a message with reactions that toggle role assignment",
+  name: "reactRole",
+  args: "Follow the prompts",
+  run: async (message: Message, _args: string[], client: RoleBot) => {
+    const GUILD_ID = message.guild.id;
+    const channel = message.channel;
+    let id: string = "";
 
-    const reactions: any[] = words.filter((word, i) => word && i % 2 !== 0).map(reaction => {
-      const match = /<:\w+:(\d+)>/.exec(reaction)
-      if (match) {
-        const [, id] = match
-        console.log("match/id: ", match, id)
-        return originalMessage.guild.emojis.get(id) as Emoji
-      }
-      return reaction
-    });
+    /* Let me clarify I am disgusted with the code below */
 
-    const reactionRoleMap: any = reactions.reduce((map, reaction, i) => ({
-      ...map,
-      [reaction.id || reaction]: roles[i]
-    }), {})
+    channel
+      .send("Enter the role name. If you want to stop type say cancel")
+      .then(bm => {
+        // Because I'm fighting callbacks and I'm stupid
+        const emojiId = (i: string) => (id = i);
 
-    const roleReactions = roles.map((role, i) => role + " => " + reactions[i]);
-    const sentMessage = await originalMessage.channel.send(roleReactions.join('\n')) as Message;
+        channel
+          .awaitMessages(m => m.author.id === message.author.id, {
+            max: 1,
+            time: 60000,
+            errors: ["time"]
+          })
+          .then(m => {
+            // Might as well cancel the whole process if they don't wanna do this
+            if (m.first().content.toLocaleLowerCase() === "cancel") return;
 
-    client.reactMessage.set(sentMessage.id, sentMessage)
+            const GUILD_REACT = guildReactions(message.guild.id)
 
-    addReactMessage(sentMessage.id, sentMessage.channel.id, GUILD_ID)
+            const role = message.guild.roles.find(
+              r =>
+                r.name.toLocaleLowerCase() ===
+                m.first().content.toLocaleLowerCase()
+            );
 
-    // get MessageReaction from .react and send .emoji.id or .emoji.name to db?
-    // get role id. Same role from db???
-    const messageReactions = await Promise.all(reactions.map(reaction => sentMessage.react(reaction)));
+            if (role && bm instanceof Message && GUILD_REACT.find(r => r.role_id === role.id)) {
+              bm.edit(`Emoji already exist for this role`)
+              m.first().delete()
+              return
+            }
 
-    messageReactions.forEach(r => {
-      console.log(r);
-      const id = r.emoji.id || r.emoji.name;
-      const roleName = reactionRoleMap[id];
-      const role = originalMessage.guild.roles.find(({name}) => name === roleName)
-      addReactionRole(id, role.id, role.name, GUILD_ID)
-    })
+            if (role && bm instanceof Message) {
+              // They got the role they wanted. Now we need to get the emoji
+              bm.edit(
+                "Now send the emoji to match the role. This must be local to the server or a generic Discord emoji."
+              );
+              m.first().delete();
+
+              channel
+                .awaitMessages(m => m.author.id === message.author.id, {
+                  max: 1,
+                  time: 20000,
+                  errors: ["time"]
+                })
+                .then(m => {
+                  
+                  
+                  // Some discord emojis don't have id's and just use the unicode. Weird
+                  const match = /<:\w+:(\d+)>/.exec(m.first().content);
+                  if (match) {
+                    const [, id] = match;
+                    emojiId(id);
+                  } else if (client.emojis.find(e => e.name === m.first().content)) {
+                    emojiId(m.first().content);
+                  } else {
+                    if (bm instanceof Message) {
+                      bm.edit(`Either not an emoji or it's not available to me. :(`)
+                      m.first().delete()
+                      return
+                    }
+                  }
+                                    
+                  if (role && id !== "") {
+                    // Assuming everything went uh, great. Try to add. :))
+                    addReactionRole(id, role.id, role.name, GUILD_ID);
+                    if (bm instanceof Message) {
+                      m.first().delete();
+                      bm.edit(
+                        "Assuming everything went as planned, get the list!"
+                      );
+                    }
+                  }
+                })
+                .catch(() => {
+                  if (bm instanceof Message) bm.edit("No usable emoji given.");
+                });
+            }
+          })
+          .catch(() => {
+            if (bm instanceof Message) bm.edit("You didn't send role name.");
+          });
+      });
   }
-}
+};

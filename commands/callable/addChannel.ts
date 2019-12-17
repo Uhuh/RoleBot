@@ -8,7 +8,7 @@ export default {
     "Bot will prune messages and assign roles from this channel.\nE.G: `@RoleBot rolechannel #roles`",
   name: 'roleChannel',
   args: "<channel mention>",
-  run: async (message: Message, client: RoleBot) => {
+  run: async (message: Message, _args: string[], client: RoleBot) => {
     const roleChannel = message.mentions.channels.first()
     if (
       !roleChannel ||

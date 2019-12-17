@@ -5,11 +5,13 @@ import commands from "../commands/callable/commands"
 
 export default (client: RoleBot, message: Message) => {
   // Ignore bots, also don't allow dm's. No reason for users to DM the bot
+  if(message.author.bot || !message.guild)
+    return
   
   const channel: Channel | undefined = message.channel
   const role_channel = client.roleChannels.get(message.guild.id) || ''
 
-  if ((message.author.bot || !message.guild) && role_channel == channel.id) {
+  if (role_channel == channel.id) {
     message.delete()
     return
   } else if (message.author.bot || !message.guild) {

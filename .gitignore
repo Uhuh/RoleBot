@@ -6,3 +6,4 @@ build/
 *.log
 .idea/
 .vscode
+errors.log

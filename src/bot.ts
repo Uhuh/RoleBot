@@ -33,7 +33,7 @@ export default class RoleBot extends Discord.Client {
     super()
     this.config = config
     this.commands = new Discord.Collection()
-    this.reactMessage = new Discord.Collection()
+    this.reactMessage = new Discord.Collection<string, Discord.Message>()
     this.reactChannel = new Discord.Collection()
     this.roleChannels = new Discord.Collection<string, string>()
     this.primaryRoles = new Discord.Collection<string, {id: string, name: string}[]>()
@@ -54,6 +54,7 @@ export default class RoleBot extends Discord.Client {
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole))
     this.on("guildCreate", guild => logger(`Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`, 'guilds.log'))
     this.on("guildDelete", guild => removed(guild))
+    // React role handling
     this.on("messageReactionAdd", async (reaction, user) => {
       if (!reaction || user.bot) return
       const message = reaction.message
@@ -69,12 +70,11 @@ export default class RoleBot extends Discord.Client {
       if (!reaction || user.bot) return
       const message = reaction.message
       if (this.reactMessage.has(message.id)) {
-        //const id = reaction.emoji.id || reaction.emoji.name
-        const varr = getRoleByReaction(message.guild.id)
-        console.log(varr)
-        //const role = message.guild.roles.get(varr.role_id)!
-        //const member = message.guild.members.get(user.id)!
-        //member.removeRole(role)
+        const id = reaction.emoji.id || reaction.emoji.name
+        const [{role_id}] = (await getRoleByReaction(id))
+        const role = message.guild.roles.get(role_id)!
+        const member = message.guild.members.get(user.id)!
+        member.removeRole(role)
       }
     })
   }
@@ -128,11 +128,11 @@ export default class RoleBot extends Discord.Client {
 
   async start() {
     await this.login(this.config.TOKEN);
+    await this.loadReactMessage();
+    await this.loadRoles()
     this.user.setPresence({
       game: {name: "with stupid roles."},
       status: "online"
     })
-    await this.loadReactMessage();
-    await this.loadRoles()
   }
 }
