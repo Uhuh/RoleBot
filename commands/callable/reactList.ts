@@ -2,7 +2,7 @@ import { Message, RichEmbed, TextChannel } from "discord.js";
 import { guildReactions } from "../../src/setup_table";
 
 export default {
-  desc: "Roles in current reaction message",
+  desc: "All emojis associated with a role",
   name: "reactlist",
   args: "",
   run: (message: Message, roleChannel?: TextChannel) => {
@@ -16,7 +16,7 @@ export default {
     if(REACT_ROLES.length > 0) {
       embed.setDescription(
         REACT_ROLES.map(
-          r => `${message.guild.emojis.get(r.emoji_id)} - ${r.role_name}`
+          r => `${message.guild.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`
         )
       );
     }
