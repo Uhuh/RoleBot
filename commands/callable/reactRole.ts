@@ -7,6 +7,8 @@ export default {
   name: "reactRole",
   args: "Follow the prompts",
   run: async (message: Message, _args: string[], client: RoleBot) => {
+    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+
     const GUILD_ID = message.guild.id;
     const channel = message.channel;
     let id: string = "";
@@ -29,7 +31,7 @@ export default {
             // Might as well cancel the whole process if they don't wanna do this
             if (m.first().content.toLocaleLowerCase() === "cancel") return;
 
-            const GUILD_REACT = guildReactions(message.guild.id)
+            const GUILD_REACT = guildReactions(message.guild.id);
 
             const role = message.guild.roles.find(
               r =>
@@ -37,10 +39,14 @@ export default {
                 m.first().content.toLocaleLowerCase()
             );
 
-            if (role && bm instanceof Message && GUILD_REACT.find(r => r.role_id === role.id)) {
-              bm.edit(`Emoji already exist for this role`)
-              m.first().delete()
-              return
+            if (
+              role &&
+              bm instanceof Message &&
+              GUILD_REACT.find(r => r.role_id === role.id)
+            ) {
+              bm.edit(`Emoji already exist for this role`);
+              m.first().delete();
+              return;
             }
 
             if (role && bm instanceof Message) {
@@ -57,23 +63,25 @@ export default {
                   errors: ["time"]
                 })
                 .then(m => {
-                  
-                  
                   // Some discord emojis don't have id's and just use the unicode. Weird
                   const match = /<:\w+:(\d+)>/.exec(m.first().content);
                   if (match) {
                     const [, id] = match;
                     emojiId(id);
-                  } else if (client.emojis.find(e => e.name === m.first().content)) {
+                  } else if (
+                    client.emojis.find(e => e.name === m.first().content)
+                  ) {
                     emojiId(m.first().content);
                   } else {
                     if (bm instanceof Message) {
-                      bm.edit(`Either not an emoji or it's not available to me. :(`)
-                      m.first().delete()
-                      return
+                      bm.edit(
+                        `Either not an emoji or it's not available to me. :(`
+                      );
+                      m.first().delete();
+                      return;
                     }
                   }
-                                    
+
                   if (role && id !== "") {
                     // Assuming everything went uh, great. Try to add. :))
                     addReactionRole(id, role.id, role.name, GUILD_ID);
