@@ -33,7 +33,7 @@
     "@types/module-alias": "*",
     "better-sqlite3": "^5.4.3",
     "dblapi.js": "*",
-    "discord.js": "*",
+    "discord.js": "11.5",
     "dotenv": "*",
     "fs": "*",
     "log-to-file": "*",

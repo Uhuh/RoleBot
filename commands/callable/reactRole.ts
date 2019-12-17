@@ -3,9 +3,9 @@ import { addReactionRole, guildReactions } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
 
 export default {
-  desc: "Create a message with reactions that toggle role assignment",
+  desc: "Associate an emoji with a role",
   name: "reactRole",
-  args: "Follow the prompts",
+  args: "<There are prompts to follow>",
   run: async (message: Message, _args: string[], client: RoleBot) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
 
@@ -67,20 +67,20 @@ export default {
                   const match = /<:\w+:(\d+)>/.exec(m.first().content);
                   if (match) {
                     const [, id] = match;
-                    emojiId(id);
-                  } else if (
-                    client.emojis.find(e => e.name === m.first().content)
-                  ) {
-                    emojiId(m.first().content);
-                  } else {
-                    if (bm instanceof Message) {
+                    if (!client.emojis.find(e => e.id === id)) {
                       bm.edit(
                         `Either not an emoji or it's not available to me. :(`
                       );
+                      
                       m.first().delete();
                       return;
                     }
-                  }
+
+                    emojiId(id);
+                  } else {
+                    emojiId(m.first().content);
+                    m.first().delete();
+                  } 
 
                   if (role && id !== "") {
                     // Assuming everything went uh, great. Try to add. :))
