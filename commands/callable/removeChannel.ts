@@ -11,7 +11,7 @@ export default {
       return message.react("❌")
 
     const guild: Guild = message.guild
-    const channel = getChannel.get(message.guild.id)
+    const channel = getChannel(message.guild.id)[0]
     const roleChannel = message.mentions.channels.first()
 
     /**

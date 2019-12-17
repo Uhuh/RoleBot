@@ -2,8 +2,8 @@ import { Role } from "discord.js"
 import { getRoles, getJoinRoles, addRole, joinRoles } from "../src/setup_table"
 
 export default (role: Role) => {
-  const roles = getRoles.all(role.guild.id)
-  const JoinRoles = getJoinRoles.all(role.guild.id)
+  const roles = getRoles(role.guild.id)
+  const JoinRoles = getJoinRoles(role.guild.id)
   const roleIDs = roles.map(role => role.role_id)
   const joinIDS = JoinRoles.map(role => role.role_id)
 

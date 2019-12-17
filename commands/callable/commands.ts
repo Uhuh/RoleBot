@@ -21,6 +21,8 @@ export default {
       .setTimestamp(new Date())
 
     for (const func of client.commands.values()) {
+      if(func.name === "eval") continue
+      
       embed.addField(
         `**@${client.user.username} ${func.name} ${func.args}**`,
         `${func.desc}`

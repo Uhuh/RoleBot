@@ -21,7 +21,7 @@ export default {
       return
     if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")
     
-    const JOIN_ROLES = getJoinRoles.all(message.guild.id).map(role => role.role_id)
+    const JOIN_ROLES = getJoinRoles(message.guild.id).map(role => role.role_id)
     const guild: Guild = message.guild
 
     let role: any = {}
