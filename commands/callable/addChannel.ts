@@ -36,6 +36,8 @@ export default {
       message_id: roleMessage.id
     });
 
+    client.roleChannels.set(guild.id, roleChannel.id)
+
     return message.react("✅");
   }
 };

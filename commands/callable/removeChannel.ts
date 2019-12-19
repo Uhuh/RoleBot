@@ -1,12 +1,13 @@
 import { Message, Guild } from "discord.js"
 import { removeChannel, getChannel } from "../../src/setup_table"
+import RoleBot from "../../src/bot"
 
 export default {
   desc:
     "Channel will no longer be pruned of messages and bot will not hand out roles from channel anymore.\nE.G: `@RoleBot removeChannel #roles`",
   name: "removeChannel",
   args: "<channel mention>",
-  run: (message: Message) => {
+  run: (message: Message, _args: string[], client: RoleBot) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"]))
       return message.react("❌")
 
@@ -23,6 +24,8 @@ export default {
     
     if(channel.message_id) roleChannel.fetchMessage(channel.message_id).then(msg => msg.delete())
     removeChannel.run(guild.id)
+
+    client.roleChannels.delete(guild.id)
     
     return message.react("✅")
   }
