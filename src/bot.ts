@@ -98,7 +98,9 @@ export default class RoleBot extends Discord.Client {
     
     rows.forEach(async(r) => {
       const guild = await this.guilds.get(r.guild_id)
-      const channel = await guild!.channels.get(r.channel_id) as Discord.TextChannel
+      if (!guild) return
+      const channel = await guild.channels.get(r.channel_id) as Discord.TextChannel
+      if (!channel) return
       const msg = await channel.fetchMessage(r.message_id)
 
       this.reactMessage.set(msg.id, msg)

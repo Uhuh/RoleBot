@@ -11,13 +11,6 @@ export default (client: RoleBot, message: Message) => {
   const channel: Channel | undefined = message.channel
   const role_channel = client.roleChannels.get(message.guild.id) || ''
 
-  if (role_channel == channel.id) {
-    message.delete()
-    return
-  } else if (message.author.bot || !message.guild) {
-    return
-  }
-  
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message)
