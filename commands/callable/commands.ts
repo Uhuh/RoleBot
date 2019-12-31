@@ -13,10 +13,10 @@ export default {
     embed
       .setTitle("Invite me to your server!")
       .setURL(
-        "https://discordapp.com/oauth2/authorize?client_id=493668628361904139&scope=bot&permissions=8"
+        "https://discordapp.com/oauth2/authorize?client_id=493668628361904139&scope=bot&permissions=1342531648"
       )
       .setDescription(
-        `Find a bug or want to discuss an idea? [Join the support server here](https://discord.gg/nJBubXy)`
+        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)`
       )
       .setColor(16711684)
       .setAuthor(client.user.username, client.user.avatarURL)
