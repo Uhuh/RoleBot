@@ -13,10 +13,12 @@ export default (client: RoleBot, message: Message) => {
   const channel: Channel | undefined = message.channel;
   const role_channel = client.roleChannels.get(id) || "";
 
+  const mention = message.mentions.users.first()
+
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message);
-  } else if (message.mentions.users.first().id === client.user.id) {
+  } else if (mention && mention.id === client.user.id) {
     const length: number = message.content.split(" ")[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).split(" ");
@@ -30,7 +32,7 @@ export default (client: RoleBot, message: Message) => {
       (!guild && command.toLowerCase() !== "help")
     )
       return console.log("Command DNE");
-      
+
     // Find the command and run it.
     client.commands.get(command.toLowerCase())!.run(message, args, client);
   }
