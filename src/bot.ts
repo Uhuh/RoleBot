@@ -22,6 +22,7 @@ interface Command {
   desc: string;
   args: string;
   name: string;
+  type: string;
   run: Function;
 }
 
@@ -68,13 +69,29 @@ export default class RoleBot extends Discord.Client {
     this.on("message", message => msg(this, message));
     this.on("guildMemberAdd", member => joinRole(member, this.joinRoles));
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole));
-    this.on("guildCreate", guild =>
+    this.on("guildCreate", guild => {
+      const G_ID = "567819334852804626";
+      const C_ID = "661410527309856827";
+
+      const embed = new Discord.RichEmbed();
+
+      embed
+        .setColor(3066993)
+        .setTitle("**Joined Guild**")
+        .setThumbnail(guild.iconURL)
+        .setDescription(guild.name)
+        .addField("Member size:", guild.memberCount);
+
+      (this.guilds.get(G_ID)!.channels.get(C_ID) as Discord.TextChannel).send(
+        embed
+      );
+
       logger(
         `Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`,
         "guilds.log"
-      )
-    );
-    this.on("guildDelete", guild => removed(guild));
+      );
+    });
+    this.on("guildDelete", guild => removed(guild, this));
     // React role handling
     this.on("messageReactionAdd", async (reaction, user) => {
       if (!reaction || user.bot) return;
@@ -124,7 +141,7 @@ export default class RoleBot extends Discord.Client {
         r.channel_id
       )) as Discord.TextChannel;
       if (!channel) return;
-      const msg = await channel.fetchMessage(r.message_id);
+      const msg = await channel.fetchMessage(r.message_id).catch(() => {});
       if (!msg) return;
 
       this.reactMessage.set(msg.id, msg);

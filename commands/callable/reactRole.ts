@@ -6,6 +6,7 @@ export default {
   desc: "Associate an emoji with a role",
   name: "reactRole",
   args: "<There are prompts to follow>",
+  type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
 

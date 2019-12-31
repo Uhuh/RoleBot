@@ -5,6 +5,7 @@ export default {
   desc: "Remove a role from the join list. You must match the name exactly as it is in the server.\nE.G: `@RoleBot deleteJoin Role Name`",
   name: "deleteJoin",
   args: "<role name>",
+  type: "message",
   run: (message: Message, args: string[]) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return message.react("❌")
     const name = args.join(" ")

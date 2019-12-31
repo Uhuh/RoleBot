@@ -5,6 +5,7 @@ export default {
   desc: "Delete a reaction role.",
   name: "deleteReact",
   args: "<role name>",
+  type: "reaction",
   run: (message: Message, args: string[]) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"]))
       return message.react("❌");

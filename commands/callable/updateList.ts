@@ -6,6 +6,7 @@ export default {
   desc: "Updates the role list in the set role channel.\nE.G: `@RoleBot update #roles`",
   name: "update",
   args: "<role channel mention>",
+  type: "message",
   run: (message: Message) => {
     const role_channel = message.mentions.channels.first()
     const channel = getChannel(message.guild.id)[0]

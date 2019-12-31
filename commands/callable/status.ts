@@ -4,6 +4,7 @@ export default {
   desc: "Shows status of current server",
   name: "status",
   args: "",
+  type: "normal",
   run: async function(message: Message) {
     const embed: RichEmbed = new RichEmbed()
     const guild: Guild = message.guild

@@ -7,6 +7,7 @@ export default {
     "Channel will no longer be pruned of messages and bot will not hand out roles from channel anymore.\nE.G: `@RoleBot removeChannel #roles`",
   name: "removeChannel",
   args: "<channel mention>",
+  type: "message",
   run: (message: Message, _args: string[], client: RoleBot) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"]))
       return message.react("❌")

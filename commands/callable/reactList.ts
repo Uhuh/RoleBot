@@ -5,6 +5,7 @@ export default {
   desc: "All emojis associated with a role",
   name: "reactlist",
   args: "",
+  type: "reaction",
   run: (message: Message, roleChannel?: TextChannel) => {
     const GUILD_ID = message.guild.id;
     const REACT_ROLES = guildReactions(GUILD_ID);

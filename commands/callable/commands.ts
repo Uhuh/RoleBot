@@ -5,6 +5,7 @@ export default {
   desc: "Sends a list of all available commands.",
   name: "help",
   args: "",
+  type: "normal",
   run: async function(message: Message, _args: string[], client: RoleBot) {
     const embed = new RichEmbed()
 

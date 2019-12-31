@@ -5,6 +5,7 @@ export default {
   desc: "Retrieves the list of roles that your server hands out.",
   name: "list",
   args: "",
+  type: "message",
   run: (message: Message, roleChannel?: TextChannel) => {
     const GUILD_ID = message.guild.id;
     const DB_ROLES = getRoles(GUILD_ID).map(role => role.role_name);

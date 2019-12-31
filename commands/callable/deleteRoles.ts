@@ -6,6 +6,7 @@ export default {
     "Delete a single role from your hand out roles list. You must match the name exactly as it is in the server.\nE.G: `@RoleBot deleteRole Role Name`",
   name: "deleteRole",
   args: "<role name>",
+  type: "message",
   run: (message: Message, args: string[]) => {
     if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
     const name = args.join(" ");

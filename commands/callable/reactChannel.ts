@@ -8,6 +8,7 @@ export default {
     "Will send a message with the roles and reaction message in a specific channel.",
   name: "reactChannel",
   args: "<channel mention>",
+  type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
     const GUILD_ID = message.guild.id;
     const roleChannel = message.mentions.channels.first();

@@ -12,6 +12,7 @@ export default {
     "E.G: `@RoleBot role prim Role Name`",
   name: "role",
   args: "<prim | sec | join> <Role name>",
+  type: "message",
   run: (message: Message, args: string[]) => {
     // ignore them plebians
     if (
