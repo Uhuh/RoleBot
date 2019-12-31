@@ -29,7 +29,7 @@ export default async function (message: Message) {
           return false
         })
       // if a secondary role don't remove previously given role.
-      if (gR.prim_role === 0) {
+      if (!gR.prim_role) {
         return
       }
       break

@@ -32,7 +32,7 @@ export default {
 
       if (r && r.prim_role === 1) {
         PRIM_ROLES.push(role);
-      } else if (r && r.prim_role === 0) {
+      } else if (r && !r.prim_role) {
         SEC_ROLES.push(role);
       }
       if (jR) {
@@ -40,7 +40,7 @@ export default {
       }
     }
 
-    PRIM_ROLES.length === 0 && SEC_ROLES.length === 0
+    !PRIM_ROLES.length && !SEC_ROLES.length
       ? embed.setDescription(`**No roles to assign**`)
       : embed
           .setDescription(`**Assignable Roles**`)
