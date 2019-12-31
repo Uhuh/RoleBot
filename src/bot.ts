@@ -90,6 +90,10 @@ export default class RoleBot extends Discord.Client {
         `Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`,
         "guilds.log"
       );
+
+      guild.owner.send(
+        "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
+      );
     });
     this.on("guildDelete", guild => removed(guild, this));
     // React role handling
@@ -101,7 +105,7 @@ export default class RoleBot extends Discord.Client {
         const [{ role_id }] = await getRoleByReaction(id);
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
-        member.addRole(role).catch(console.log); 
+        member.addRole(role).catch(console.log);
       }
     });
     this.on("messageReactionRemove", async (reaction, user) => {

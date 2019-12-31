@@ -13,7 +13,7 @@ export default {
     embed
       .setTitle("Invite me to your server!")
       .setURL(
-        "https://discordapp.com/oauth2/authorize?client_id=493668628361904139&scope=bot&permissions=1342531648"
+        `https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=1342531648`
       )
       .setDescription(
         `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)`
