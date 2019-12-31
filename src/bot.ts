@@ -101,7 +101,7 @@ export default class RoleBot extends Discord.Client {
         const [{ role_id }] = await getRoleByReaction(id);
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
-        member.addRole(role);
+        member.addRole(role).catch(console.log); 
       }
     });
     this.on("messageReactionRemove", async (reaction, user) => {

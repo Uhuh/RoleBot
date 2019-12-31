@@ -30,7 +30,14 @@ export default {
           })
           .then(m => {
             // Might as well cancel the whole process if they don't wanna do this
-            if (m.first().content.toLocaleLowerCase() === "cancel") return;
+            if (
+              m.first().content.toLocaleLowerCase() === "cancel" &&
+              bm instanceof Message
+            ) {
+              bm.delete();
+              m.first().delete();
+              return;
+            }
 
             const GUILD_REACT = guildReactions(message.guild.id);
 
@@ -40,12 +47,24 @@ export default {
                 m.first().content.toLocaleLowerCase()
             );
 
+            if (!role && bm instanceof Message) {
+              bm.edit("Role not found, check if you typed it correctly.");
+              m.first().delete();
+              setTimeout(() => {
+                bm.delete();
+              }, 5000);
+              return;
+            }
+
             if (
               role &&
               bm instanceof Message &&
               GUILD_REACT.find(r => r.role_id === role.id)
             ) {
               bm.edit(`Emoji already exist for this role`);
+              setTimeout(() => {
+                bm.delete();
+              }, 5000);
               m.first().delete();
               return;
             }
@@ -72,7 +91,9 @@ export default {
                       bm.edit(
                         `Either not an emoji or it's not available to me. :(`
                       );
-                      
+                      setTimeout(() => {
+                        bm.delete();
+                      }, 5000);
                       m.first().delete();
                       return;
                     }
@@ -81,7 +102,7 @@ export default {
                   } else {
                     emojiId(m.first().content);
                     m.first().delete();
-                  } 
+                  }
 
                   if (role && id !== "") {
                     // Assuming everything went uh, great. Try to add. :))
