@@ -97,12 +97,16 @@ export default class RoleBot extends Discord.Client {
     });
     this.on("guildDelete", guild => removed(guild, this));
     // React role handling
+    //@ts-ignore - all paths don't return
     this.on("messageReactionAdd", async (reaction, user) => {
       if (!reaction || user.bot) return;
       const message = reaction.message;
       if (this.reactMessage.has(message.id)) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const [{ role_id }] = await getRoleByReaction(id);
+        const emoji_role = await getRoleByReaction(id)
+        const [{ role_id }] = emoji_role.length ? emoji_role : [{role_id: null}];
+        // Remove the reaction to prevent reaction spam.
+        if(!role_id) return reaction.remove(message.member.user);
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
         member.addRole(role).catch(console.log);
@@ -113,7 +117,10 @@ export default class RoleBot extends Discord.Client {
       const message = reaction.message;
       if (this.reactMessage.has(message.id)) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const [{ role_id }] = await getRoleByReaction(id);
+        const emoji_role = await getRoleByReaction(id)
+        const [{ role_id }] = emoji_role.length ? emoji_role : [{role_id: null}];
+        // cancel
+        if(!role_id) return
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
         member.removeRole(role);
