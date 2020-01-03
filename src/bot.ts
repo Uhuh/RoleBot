@@ -108,7 +108,7 @@ export default class RoleBot extends Discord.Client {
       const message = reaction.message;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = getRoleByReaction(id);
+        const emoji_role = getRoleByReaction(id, message.guild.id);
         const [{ role_id }] = emoji_role.length
           ? emoji_role
           : [{ role_id: null }];
@@ -123,7 +123,7 @@ export default class RoleBot extends Discord.Client {
       const message = reaction.message;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = getRoleByReaction(id);
+        const emoji_role = getRoleByReaction(id, message.guild.id);
         const [{ role_id }] = emoji_role.length
           ? emoji_role
           : [{ role_id: null }];
@@ -161,13 +161,13 @@ export default class RoleBot extends Discord.Client {
       const C_ID = r.channel_id;
       const M_ID = r.message_id;
 
-      const channel = await this.channels.fetch(C_ID).catch(console.error);
+      const channel = await this.channels.fetch(C_ID).catch(() => console.error(`Either no access or deleted channel: ${C_ID}`));
 
       if (!channel) return;
 
       const msg = await (channel as Discord.TextChannel).messages
         .fetch(M_ID)
-        .catch(console.error);
+        .catch(() => console.error(`M_ID: ${M_ID} not found.`));
 
       if (!msg) return;
 
