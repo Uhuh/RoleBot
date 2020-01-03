@@ -31,9 +31,10 @@
   "dependencies": {
     "@types/better-sqlite3": "*",
     "@types/module-alias": "*",
+    "@types/ws": "^6.0.4",
     "better-sqlite3": "^5.4.3",
     "dblapi.js": "*",
-    "discord.js": "11.5",
+    "discord.js": "discordjs/discord.js",
     "dotenv": "*",
     "fs": "*",
     "log-to-file": "*",

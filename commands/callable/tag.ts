@@ -10,7 +10,7 @@ export default {
   args: "",
   type: "joke",
   run: async (message: Message) => {
-    const member = message.guild.members.random()
+    const member = message.guild!.members.random()
     message.channel.send(":thinking:...")
     await sleep(1000)
     message.channel.send(`${member!.user} tag you're it!`)

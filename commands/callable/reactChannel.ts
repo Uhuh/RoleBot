@@ -10,15 +10,14 @@ export default {
   args: "<channel mention>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
+      return message.react("❌");
+
     const GUILD_ID = message.guild.id;
     const roleChannel = message.mentions.channels.first();
     const REACT_ROLES = guildReactions(GUILD_ID);
 
-    if (
-      !roleChannel ||
-      !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
-    )
-      return message.react("❌");
+    if (!roleChannel) return;
 
     //Send role list to channel so users don't have to
     const rMsg = (await reactList.run(message, roleChannel)) as Message;

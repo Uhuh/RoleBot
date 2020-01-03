@@ -1,4 +1,4 @@
-import { Message, RichEmbed, Role, TextChannel } from "discord.js";
+import { Message, MessageEmbed, Role, TextChannel } from "discord.js";
 import { getRoles, deleteRole, getJoinRoles } from "../../src/setup_table";
 
 export default {
@@ -7,10 +7,12 @@ export default {
   args: "",
   type: "message",
   run: (message: Message, roleChannel?: TextChannel) => {
+    if(!message.guild) return
+
     const GUILD_ID = message.guild.id;
     const DB_ROLES = getRoles(GUILD_ID).map(role => role.role_name);
     const J_ROLES = getJoinRoles(GUILD_ID);
-    const embed = new RichEmbed();
+    const embed = new MessageEmbed();
     const GUILD_ROLES: string[] = [];
     const PRIM_ROLES: Role[] = [];
     const SEC_ROLES: Role[] = [];

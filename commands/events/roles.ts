@@ -2,7 +2,9 @@ import {Message} from "discord.js"
 import {getRoles, getJoinRoles} from "../../src/setup_table"
 
 export default async function (message: Message) {
-  const member = message.member
+  if(!message.guild) return
+
+  const member = message.member!
   const role = message.content
   const guildRoles = getRoles(message.guild.id)
   const jRoles = getJoinRoles(message.guild.id).map(role => role.role_name)
@@ -13,15 +15,16 @@ export default async function (message: Message) {
   // IF they already have the role, remove it.
   const roleToRemove = member.roles.find(val => val.name.toLowerCase() === role.toLowerCase())
   if (roleToRemove && !jRoles.includes(roleToRemove.name)) {
-    return member.removeRole(roleToRemove)
+    return member.roles.remove(roleToRemove)
       .then(member => console.log(`Removed ${roleToRemove.name} from ${member.displayName}`))
+      .catch(console.error)
   }
   // Make sure the server has the role to give.
   for (const gR of guildRoles) {
     if (gR.role_name && gR.role_name.toLowerCase() === role.toLowerCase()) {
       req_role = role.toLowerCase()
       addedRole = await member
-        .addRole(gR.role_id)
+        .roles.add(gR.role_id)
         .then(() => {
           return true
         })
@@ -45,7 +48,7 @@ export default async function (message: Message) {
         addedRole &&
         gR.prim_role == 1
       ) {
-        member.removeRole(k)
+        member.roles.remove(k)
         return
       }
     }

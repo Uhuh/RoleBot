@@ -5,7 +5,7 @@ import commands from "../commands/callable/commands";
 
 export default (client: RoleBot, message: Message) => {
   const { guild } = message;
-  const { id } = guild || "";
+  const { id } = guild || { id: "" };
 
   // Ignore bots
   if (message.author.bot) return;
@@ -13,12 +13,12 @@ export default (client: RoleBot, message: Message) => {
   const channel: Channel | undefined = message.channel;
   const role_channel = client.roleChannels.get(id) || "";
 
-  const mention = message.mentions.users.first()
+  const mention = message.mentions.users.first();
 
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message);
-  } else if (mention && mention.id === client.user.id) {
+  } else if (mention && mention.id === client.user!.id) {
     const length: number = message.content.split(" ")[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).split(" ");

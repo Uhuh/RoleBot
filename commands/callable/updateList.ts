@@ -8,6 +8,8 @@ export default {
   args: "<role channel mention>",
   type: "message",
   run: (message: Message) => {
+    if(!message.guild) return
+
     const role_channel = message.mentions.channels.first()
     const channel = getChannel(message.guild.id)[0]
 
@@ -17,11 +19,11 @@ export default {
       return message.react("❌")
 
     // Delete the current role message so we can send a new one.
-    role_channel.fetchMessage(channel.message_id)
+    role_channel.messages.fetch(channel.message_id)
       .then(msg => msg.delete())
       .catch((err) => console.log(`Couldn't delete message: ${err}`))
 
-    return roleList.run(message, role_channel)
+    return roleList.run(message, role_channel)!
       .then((msg) => {
         addChannel.run({
           id: channel.id,
@@ -30,5 +32,6 @@ export default {
           message_id: msg.toString()
         })
       })
+      .catch(console.error)
   }
 }

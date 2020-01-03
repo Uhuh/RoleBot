@@ -1,4 +1,4 @@
-import { Message, RichEmbed, TextChannel } from "discord.js";
+import { Message, MessageEmbed, TextChannel } from "discord.js";
 import { guildReactions } from "../../src/setup_table";
 
 export default {
@@ -7,9 +7,12 @@ export default {
   args: "",
   type: "reaction",
   run: (message: Message, roleChannel?: TextChannel) => {
+
+    if(!message.guild) return
+
     const GUILD_ID = message.guild.id;
     const REACT_ROLES = guildReactions(GUILD_ID);
-    const embed = new RichEmbed();
+    const embed = new MessageEmbed();
 
     embed.setTitle(`**Server Roles**`);
     embed.setColor("#cffc03");
@@ -17,7 +20,7 @@ export default {
     if(REACT_ROLES.length > 0) {
       embed.setDescription(
         REACT_ROLES.map(
-          r => `${message.guild.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`
+          r => `${message.guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`
         )
       );
     }
