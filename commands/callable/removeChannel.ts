@@ -1,6 +1,6 @@
-import { Message, Guild } from "discord.js"
-import { removeChannel, getChannel } from "../../src/setup_table"
-import RoleBot from "../../src/bot"
+import { Message, Guild } from "discord.js";
+import { removeChannel, getChannel } from "../../src/setup_table";
+import RoleBot from "../../src/bot";
 
 export default {
   desc:
@@ -9,25 +9,28 @@ export default {
   args: "<channel mention>",
   type: "message",
   run: (message: Message, _args: string[], client: RoleBot) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"]))
-      return message.react("❌")
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
+      return message.react("❌");
 
-    const guild: Guild = message.guild
-    const channel = getChannel(message.guild.id)[0]
-    const roleChannel = message.mentions.channels.first()
+    const guild: Guild = message.guild;
+    const channel = getChannel(message.guild.id)[0];
+    const roleChannel = message.mentions.channels.first();
 
     /**
      * Ignore if no role channel exist, make sure they also mention the right channel
      */
-    if (!channel || !roleChannel 
-        || roleChannel.id !== channel.channel_id) 
-      return message.react("❌")
-    
-    if(channel.message_id) roleChannel.fetchMessage(channel.message_id).then(msg => msg.delete())
-    removeChannel.run(guild.id)
+    if (!channel || !roleChannel || roleChannel.id !== channel.channel_id)
+      return message.react("❌");
 
-    client.roleChannels.delete(guild.id)
-    
-    return message.react("✅")
+    if (channel.message_id)
+      roleChannel.messages
+        .fetch(channel.message_id)
+        .then(msg => msg.delete())
+        .catch(console.error);
+    removeChannel.run(guild.id);
+
+    client.roleChannels.delete(guild.id);
+
+    return message.react("✅");
   }
-}
+};

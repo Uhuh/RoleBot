@@ -7,7 +7,7 @@ export default {
   args: "<role name>",
   type: "message",
   run: (message: Message, args: string[]) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return message.react("❌")
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) return message.react("❌")
     const name = args.join(" ")
     const guildID = message.guild.id
     const DB_ROLES = getJoinRoles(message.guild.id).map(role => role.role_name)

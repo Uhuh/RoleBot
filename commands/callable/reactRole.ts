@@ -8,7 +8,7 @@ export default {
   args: "<There are prompts to follow>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+    if (!message.member.hasPermission(["MANAGE_ROLES"])) return;
 
     const GUILD_ID = message.guild.id;
     const channel = message.channel;
@@ -31,6 +31,7 @@ export default {
           .then(m => {
             // Might as well cancel the whole process if they don't wanna do this
             if (
+              m &&
               m.first().content.toLocaleLowerCase() === "cancel" &&
               bm instanceof Message
             ) {

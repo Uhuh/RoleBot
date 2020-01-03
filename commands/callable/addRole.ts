@@ -17,7 +17,7 @@ export default {
     // ignore them plebians
     if (
       !message.guild ||
-      !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
+      !message.member!.hasPermission(["MANAGE_ROLES"])
     )
       return
     if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")

@@ -1,4 +1,4 @@
-import { Guild, RichEmbed, TextChannel } from "discord.js";
+import { Guild, MessageEmbed, TextChannel } from "discord.js";
 import {
   removeJoinRoles,
   removeRoleChannel,
@@ -13,12 +13,12 @@ export default (guild: Guild, client: RoleBot) => {
   const G_ID = "567819334852804626";
   const C_ID = "661410527309856827";
 
-  const embed = new RichEmbed();
+  const embed = new MessageEmbed();
 
   embed
     .setColor(15158332)
     .setTitle("**Left Guild**")
-    .setThumbnail(guild.iconURL)
+    .setThumbnail(guild.iconURL() || "")
     .setDescription(guild.name)
     .addField("Member size:", guild.memberCount);
 

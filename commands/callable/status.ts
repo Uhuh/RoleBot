@@ -1,4 +1,4 @@
-import { Message, RichEmbed, Role, Guild } from "discord.js"
+import { Message, MessageEmbed, Role } from "discord.js"
 
 export default {
   desc: "Shows status of current server",
@@ -6,8 +6,11 @@ export default {
   args: "",
   type: "normal",
   run: async function(message: Message) {
-    const embed: RichEmbed = new RichEmbed()
-    const guild: Guild = message.guild
+    const embed = new MessageEmbed()
+    const guild = message.guild
+
+    if(!guild) return
+
     let roles: Role[] = []
     let textC: number = 0
     let voiceC: number = 0
@@ -22,9 +25,9 @@ export default {
 
     embed
       .setColor(16772864)
-      .setThumbnail(guild.iconURL)
+      .setThumbnail(guild.iconURL() || "")
       .setDescription(`**Server information for _${guild.name}_**`)
-      .addField(`_**> Owner**_`, `\`${guild.owner.user.tag}\``, true)
+      .addField(`_**> Owner**_`, `\`${guild.owner!.user.tag}\``, true)
       .addField(`_**> OwnerID**_`, `\`${guild.ownerID}\``, true)
       .addField(`_**> Users**_`, `\`${guild.memberCount}\``, true)
       .addField(`_**> Text Channels**_`, `\`${textC}\``, true)

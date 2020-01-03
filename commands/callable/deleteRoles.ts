@@ -8,7 +8,7 @@ export default {
   args: "<role name>",
   type: "message",
   run: (message: Message, args: string[]) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])) return;
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) return;
     const name = args.join(" ");
     const guildID = message.guild.id;
     const DB_ROLES = getRoles(message.guild.id).map(role => role.role_name);

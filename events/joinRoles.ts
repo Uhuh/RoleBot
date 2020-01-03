@@ -4,7 +4,7 @@ export default (member: GuildMember, joinRoles: Collection<string, {id: string, 
   for (const role of joinRoles.get(member.guild.id) || []) {
     for (const [key, gRole] of member.guild.roles) {
       if (key === role.id) {
-        member.addRole(gRole)
+        member.roles.add(gRole)
       }
     }
   }

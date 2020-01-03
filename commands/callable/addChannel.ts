@@ -12,8 +12,9 @@ export default {
   run: async (message: Message, _args: string[], client: RoleBot) => {
     const roleChannel = message.mentions.channels.first();
     if (
+      !message.guild ||
       !roleChannel ||
-      !message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"])
+      !message.member!.hasPermission(["MANAGE_ROLES"])
     )
       return message.react("❌");
 

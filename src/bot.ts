@@ -66,19 +66,21 @@ export default class RoleBot extends Discord.Client {
       setInterval(() => this.presence(), 10000);
     });
 
-    this.on("message", message => msg(this, message));
-    this.on("guildMemberAdd", member => joinRole(member, this.joinRoles));
+    this.on("message", message => msg(this, message as Discord.Message));
+    this.on("guildMemberAdd", member =>
+      joinRole(member as Discord.GuildMember, this.joinRoles)
+    );
     this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole));
     this.on("guildCreate", guild => {
       const G_ID = "567819334852804626";
       const C_ID = "661410527309856827";
 
-      const embed = new Discord.RichEmbed();
+      const embed = new Discord.MessageEmbed();
 
       embed
         .setColor(3066993)
         .setTitle("**Joined Guild**")
-        .setThumbnail(guild.iconURL)
+        .setThumbnail(guild.iconURL() || "")
         .setDescription(guild.name)
         .addField("Member size:", guild.memberCount);
 
@@ -91,7 +93,9 @@ export default class RoleBot extends Discord.Client {
         "guilds.log"
       );
 
-      guild.owner.send(
+      const owner = guild.owner || guild.members.get(guild.ownerID)!;
+
+      owner.send(
         "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
       );
     });
@@ -101,44 +105,49 @@ export default class RoleBot extends Discord.Client {
     this.on("messageReactionAdd", async (reaction, user) => {
       if (!reaction || user.bot) return;
       const message = reaction.message;
-      if (this.reactMessage.has(message.id)) {
+      if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = await getRoleByReaction(id)
-        const [{ role_id }] = emoji_role.length ? emoji_role : [{role_id: null}];
-        // Remove the reaction to prevent reaction spam.
-        if(!role_id) return reaction.remove(message.member.user);
+        const emoji_role = await getRoleByReaction(id);
+        const [{ role_id }] = emoji_role.length
+          ? emoji_role
+          : [{ role_id: null }];
+
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
-        member.addRole(role).catch(console.log);
+        member.roles.add(role).catch(console.log);
       }
     });
     this.on("messageReactionRemove", async (reaction, user) => {
       if (!reaction || user.bot) return;
       const message = reaction.message;
-      if (this.reactMessage.has(message.id)) {
+      if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = await getRoleByReaction(id)
-        const [{ role_id }] = emoji_role.length ? emoji_role : [{role_id: null}];
+        const emoji_role = await getRoleByReaction(id);
+        const [{ role_id }] = emoji_role.length
+          ? emoji_role
+          : [{ role_id: null }];
         // cancel
-        if(!role_id) return
+        if (!role_id) return;
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
-        member.removeRole(role);
+        member.roles.remove(role);
       }
     });
   }
 
   presence() {
     const presArr = [
-      `@${this.user.username} help`,
+      `@${this.user!.username} help`,
       `in ${this.guilds.size} guilds`,
-      `with ${Math.floor(this.ping)} ping`
+      ` with roles and hearts.`
     ];
 
-    this.user.setPresence({
-      game: { name: presArr[Math.floor(Math.random() * presArr.length)] },
+    this.user!.setPresence({
+      activity: { name: presArr[Math.floor(Math.random() * presArr.length)] },
       status: "online"
-    });
+    })
+      .then(console.log)
+      .catch(console.error);
   }
 
   async loadReactMessage() {
@@ -152,7 +161,7 @@ export default class RoleBot extends Discord.Client {
         r.channel_id
       )) as Discord.TextChannel;
       if (!channel) return;
-      const msg = await channel.fetchMessage(r.message_id).catch(() => {});
+      const msg = await channel.messages.fetch(r.message_id).catch(console.error);
       if (!msg) return;
 
       this.reactMessage.set(msg.id, msg);
@@ -201,9 +210,5 @@ export default class RoleBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     await this.loadReactMessage();
     await this.loadRoles();
-    this.user.setPresence({
-      game: { name: "with stupid roles." },
-      status: "online"
-    });
   }
 }

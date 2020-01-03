@@ -13,13 +13,13 @@ export default {
     const REACT_ROLES = guildReactions(guild.id);
     const M_ID = args[0];
 
-    if (!message.member.hasPermission(["MANAGE_ROLES_OR_PERMISSIONS"]))
+    if (!message.member.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
 
 
     for(const [, ch] of guild.channels) {
       if(ch instanceof TextChannel) {
-        const msg = await ch.fetchMessage(M_ID).catch(console.log);
+        const msg = await ch.messages.fetch(M_ID).catch(console.log);
 
         if(!msg) continue
 

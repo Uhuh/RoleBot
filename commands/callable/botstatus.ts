@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import * as OS from "os";
 import RoleBot from "../../src/bot";
 
@@ -8,7 +8,7 @@ export default {
   args: "",
   type: "normal",
   run: (message: Message, _args: string[], client: RoleBot) => {
-    const embed = new RichEmbed();
+    const embed = new MessageEmbed();
     let userCount = 0;
     let channelCount = 0;
 
