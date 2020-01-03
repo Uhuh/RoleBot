@@ -18,8 +18,10 @@ export default {
 
 
     for(const [, ch] of guild.channels) {
-      if(ch instanceof TextChannel && ch.fetchMessage(M_ID)) {
-        const msg = await ch.fetchMessage(M_ID);
+      if(ch instanceof TextChannel) {
+        const msg = await ch.fetchMessage(M_ID).catch(console.log);
+
+        if(!msg) continue
 
         REACT_ROLES.forEach(r => {
           msg.react(r.emoji_id);
