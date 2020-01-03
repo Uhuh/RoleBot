@@ -8,7 +8,8 @@ export default {
   args: "<There are prompts to follow>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
-    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) return;
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
+      return;
 
     const GUILD_ID = message.guild.id;
     const channel = message.channel;
@@ -43,9 +44,7 @@ export default {
             const GUILD_REACT = guildReactions(message.guild!.id);
 
             const role = message.guild!.roles.find(
-              r =>
-                r.name.toLocaleLowerCase() ===
-                m.first()!.content.toLocaleLowerCase()
+              r => r.name.toLowerCase() === m.first()!.content.toLowerCase()
             );
 
             if (!role && bm instanceof Message) {
@@ -88,7 +87,7 @@ export default {
                   const match = /<:\w+:(\d+)>/.exec(m.first()!.content);
                   if (match) {
                     const [, id] = match;
-                    if (!client.emojis.find(e => e.id === id)) {
+                    if (!client.emojis.get(id)) {
                       bm.edit(
                         `Either not an emoji or it's not available to me. :(`
                       );
@@ -102,7 +101,6 @@ export default {
                     emojiId(id);
                   } else {
                     emojiId(m.first()!.content);
-                    m.first()!.delete();
                   }
 
                   if (role && id !== "") {
@@ -113,6 +111,10 @@ export default {
                       bm.edit(
                         "Assuming everything went as planned, get the list!"
                       );
+                      setTimeout(() => {
+                        bm.delete();
+                        message.delete();
+                      }, 5000);
                     }
                   }
                 })
