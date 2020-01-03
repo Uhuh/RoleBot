@@ -8,7 +8,7 @@ export default {
   args: "<There are prompts to follow>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
-    if (!message.member.hasPermission(["MANAGE_ROLES"])) return;
+    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) return;
 
     const GUILD_ID = message.guild.id;
     const channel = message.channel;
@@ -32,25 +32,25 @@ export default {
             // Might as well cancel the whole process if they don't wanna do this
             if (
               m &&
-              m.first().content.toLocaleLowerCase() === "cancel" &&
+              m.first()!.content.toLowerCase() === "cancel" &&
               bm instanceof Message
             ) {
               bm.delete();
-              m.first().delete();
+              m.first()!.delete();
               return;
             }
 
-            const GUILD_REACT = guildReactions(message.guild.id);
+            const GUILD_REACT = guildReactions(message.guild!.id);
 
-            const role = message.guild.roles.find(
+            const role = message.guild!.roles.find(
               r =>
                 r.name.toLocaleLowerCase() ===
-                m.first().content.toLocaleLowerCase()
+                m.first()!.content.toLocaleLowerCase()
             );
 
             if (!role && bm instanceof Message) {
               bm.edit("Role not found, check if you typed it correctly.");
-              m.first().delete();
+              m.first()!.delete();
               setTimeout(() => {
                 bm.delete();
               }, 5000);
@@ -66,7 +66,7 @@ export default {
               setTimeout(() => {
                 bm.delete();
               }, 5000);
-              m.first().delete();
+              m.first()!.delete();
               return;
             }
 
@@ -75,7 +75,7 @@ export default {
               bm.edit(
                 "Now send the emoji to match the role. This must be local to the server or a generic Discord emoji."
               );
-              m.first().delete();
+              m.first()!.delete();
 
               channel
                 .awaitMessages(m => m.author.id === message.author.id, {
@@ -85,7 +85,7 @@ export default {
                 })
                 .then(m => {
                   // Some discord emojis don't have id's and just use the unicode. Weird
-                  const match = /<:\w+:(\d+)>/.exec(m.first().content);
+                  const match = /<:\w+:(\d+)>/.exec(m.first()!.content);
                   if (match) {
                     const [, id] = match;
                     if (!client.emojis.find(e => e.id === id)) {
@@ -95,21 +95,21 @@ export default {
                       setTimeout(() => {
                         bm.delete();
                       }, 5000);
-                      m.first().delete();
+                      m.first()!.delete();
                       return;
                     }
 
                     emojiId(id);
                   } else {
-                    emojiId(m.first().content);
-                    m.first().delete();
+                    emojiId(m.first()!.content);
+                    m.first()!.delete();
                   }
 
                   if (role && id !== "") {
                     // Assuming everything went uh, great. Try to add. :))
                     addReactionRole(id, role.id, role.name, GUILD_ID);
                     if (bm instanceof Message) {
-                      m.first().delete();
+                      m.first()!.delete();
                       bm.edit(
                         "Assuming everything went as planned, get the list!"
                       );

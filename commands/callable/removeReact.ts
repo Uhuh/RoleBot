@@ -13,7 +13,7 @@ export default {
     const GUILD_ID = message.guild.id;
     const DB_ROLES = guildReactions(GUILD_ID).map(r => r.role_id);
     const ROLE = message.guild.roles.find(
-      r => r.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+      r => r.name.toLowerCase() === name.toLowerCase()
     );
 
     if (ROLE && DB_ROLES.includes(ROLE.id)) {

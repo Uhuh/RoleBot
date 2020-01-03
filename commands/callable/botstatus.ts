@@ -20,12 +20,11 @@ export default {
     embed
       .setColor(16711683)
       .setTitle(`**Bot Status**`)
-      .setThumbnail(client.user.avatarURL)
+      .setThumbnail(client.user!.avatarURL() || "")
       .addField(`**Bot Developer:**`, `Panku#0721`, true)
       .addField(`**The bot is in:**`, `${client.guilds.size} servers`, true)
       .addField(`**The bot is watching:**`, `${userCount} users`, true)
       .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
-      .addField(`**Ping:**`, `${client.ping} ms`, true)
       .addField(`**Bot OS:**`, `${OS.platform()}`, true);
     message.channel.send(embed);
   }
