@@ -13,7 +13,7 @@ export default {
     setTimeout(() => {
       message.delete();
     }, 5000);
-    
+
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
 
@@ -37,7 +37,7 @@ export default {
 
     // Discord messages only allow 20 reactions per message, so split the reactions into arrays of 20 per.
     for (let i = 1; i < roles.length; i++) {
-      const msg = await message.channel.send("\u200b\n");
+      const msg = await roleChannel.send("\u200b\n");
       addReactMessage(msg.id, roleChannel.id, GUILD_ID);
       client.reactMessage.set(msg.id, msg);
       roles[i].forEach(r => {
