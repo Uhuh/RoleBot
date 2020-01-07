@@ -10,6 +10,10 @@ export default {
   run: async (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return;
 
+    setTimeout(() => {
+      message.delete();
+    }, 5000);
+
     const { guild } = message;
     const REACT_ROLES = guildReactions(guild.id);
     const M_ID = args[0];

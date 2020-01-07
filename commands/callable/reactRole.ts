@@ -84,7 +84,8 @@ export default {
                 })
                 .then(m => {
                   // Some discord emojis don't have id's and just use the unicode. Weird
-                  const match = /<:\w+:(\d+)>/.exec(m.first()!.content);
+                  const match = /:(\d+)>/.exec(m.first()!.content);
+
                   if (match) {
                     const [, id] = match;
                     if (!client.emojis.get(id)) {
@@ -92,6 +93,7 @@ export default {
                         `Either not an emoji or it's not available to me. :(`
                       );
                       setTimeout(() => {
+                        message.delete();
                         bm.delete();
                       }, 5000);
                       m.first()!.delete();

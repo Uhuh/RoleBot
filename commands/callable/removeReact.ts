@@ -7,6 +7,9 @@ export default {
   args: "<role name>",
   type: "reaction",
   run: (message: Message, args: string[]) => {
+    setTimeout(() => {
+      message.delete();
+    }, 5000);
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
     const name = args.join(" ");
