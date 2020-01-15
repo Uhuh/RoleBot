@@ -105,13 +105,18 @@ export default class RoleBot extends Discord.Client {
     //@ts-ignore - all paths don't return
     this.on("messageReactionAdd", async (reaction, user) => {
       if (!reaction || user.bot) return;
-      const message = reaction.message;
+      const {message} = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
+        
         const [{ role_id }] = emoji_role.length
-          ? emoji_role
-          : [{ role_id: null }];
+        ? emoji_role
+        : [{ role_id: null }];
+        
+        if (!role_id) {
+          return reaction.users.remove(user.id).catch(console.error);
+        }
 
         const role = message.guild.roles.get(role_id)!;
         const member = message.guild.members.get(user.id)!;
@@ -120,7 +125,7 @@ export default class RoleBot extends Discord.Client {
     });
     this.on("messageReactionRemove", async (reaction, user) => {
       if (!reaction || user.bot) return;
-      const message = reaction.message;
+      const {message} = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
