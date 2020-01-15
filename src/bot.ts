@@ -75,6 +75,22 @@ export default class RoleBot extends Discord.Client {
     this.on("guildCreate", guild => {
       // const G_ID = "567819334852804626"; - Support guild id
       const C_ID = "661410527309856827";
+      const JOIN_MSG = "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
+
+      // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
+      guild.fetchAuditLogs()
+        .then(audit => {
+          const {executor} = audit.entries.first()!
+
+          executor.send(JOIN_MSG)
+        })
+        .catch(e => {
+          console.log(e)
+
+          const owner = guild.owner || guild.members.get(guild.ownerID)!;
+
+          owner.send(JOIN_MSG);
+        })
 
       const embed = new Discord.MessageEmbed();
 
@@ -83,7 +99,8 @@ export default class RoleBot extends Discord.Client {
         .setTitle("**Joined Guild**")
         .setThumbnail(guild.iconURL() || "")
         .setDescription(guild.name)
-        .addField("Member size:", guild.memberCount);
+        .addField("Member size:", guild.memberCount)
+        .addField("Guilds:", this.guilds.size);
 
       (this.channels.get(C_ID) as Discord.TextChannel).send(
         embed
@@ -94,11 +111,6 @@ export default class RoleBot extends Discord.Client {
         "guilds.log"
       );
 
-      const owner = guild.owner || guild.members.get(guild.ownerID)!;
-
-      owner.send(
-        "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
-      );
     });
     this.on("guildDelete", guild => removed(guild, this));
     // React role handling
