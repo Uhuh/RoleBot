@@ -18,7 +18,7 @@ export default {
     /* Let me clarify I am disgusted with the code below */
 
     channel
-      .send("Enter the role name. If you want to stop type say cancel")
+      .send("Enter the role name. If you want to stop, say cancel.")
       .then(bm => {
         // Because I'm fighting callbacks and I'm stupid
         const emojiId = (i: string) => (id = i);
