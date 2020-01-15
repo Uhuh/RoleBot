@@ -33,7 +33,7 @@ export default {
             // Might as well cancel the whole process if they don't wanna do this
             if (
               m &&
-              m.first()!.content.toLowerCase() === "cancel" &&
+              m.first()!.content.toLowerCase().includes("cancel") &&
               bm instanceof Message
             ) {
               bm.delete();
