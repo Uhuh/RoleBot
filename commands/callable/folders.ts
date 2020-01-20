@@ -46,7 +46,7 @@ export default {
 
     embed.setTitle(`**Role Folders**`);
 
-    embed.addField("‏‏‎  Reaction roles not in a folder.‎", `[ Free Roles ] - [${SIZE} ${SIZE > 1 ? `Roles` : `Role`}]`)
+    embed.addField("‏‏‎Reaction roles not in a folder.‎", `[ Free Roles ] - [${SIZE} ${SIZE > 1 ? `Roles` : `Role`}]`)
     embed.addField("‏‏‎‏‏‎  ", "React with ⬇️ to see free roles.")
 
     if (FOLDERS && FOLDERS.length) {

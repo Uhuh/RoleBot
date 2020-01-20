@@ -48,7 +48,7 @@ export default {
       }
     }
 
-    if (folderName !== "")
+    if (folderName.trim() !== "")
       await channel.send(`Setting up roles for Folder: \`${folderName}\``)
         .then(m => setTimeout(() => m.delete(), 10000))
         .catch(() => { });

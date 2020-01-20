@@ -1,5 +1,6 @@
 import { Message, MessageEmbed, TextChannel } from "discord.js";
-import { Folder } from "../../src/bot";
+import RoleBot, { Folder } from "../../src/bot";
+import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
   desc: "All emojis associated with a role",
@@ -9,12 +10,19 @@ export default {
   run: (message: Message, roleChannel?: TextChannel, folder?: Folder) => {
 
     if(!message.guild) return
+    
+    let { label, roles } = folder || { label: "Server Roles", roles: [] }
+    if(folder instanceof RoleBot || !folder) {
+      label = "Server roles";
+      roles = rolesByFolderId(message.guild.id, null);
+    }
 
-    const { label, roles } = folder || { label: "Server Roles", roles: [] }
     const embed = new MessageEmbed();
 
     embed.setTitle(`**${label}**`);
     embed.setColor("#cffc03");
+
+    console.log(roles)
 
     if(roles.length) {
       let desc = ""

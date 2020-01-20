@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { addReactMessage } from "../../src/setup_table";
+import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
 import reactList from "./reactList";
 import RoleBot from "../../src/bot";
 
@@ -19,17 +19,21 @@ export default {
 
     const GUILD_ID = message.guild.id;
     const roleChannel = message.mentions.channels.first();
-    const GUILD_FOLDERS = client.guildFolders.get(GUILD_ID) || [{ id: null, label: ""}]
+    const GUILD_FOLDERS = client.guildFolders.get(GUILD_ID) || []
+    // I want to enforce the non folder roles.
+    GUILD_FOLDERS.push({ id: 0, label: "" })
     let rMsg = {} as Message
 
     if (!roleChannel) return;
 
-    for(const f of GUILD_FOLDERS) {
+    for (const f of GUILD_FOLDERS) {
       //Send role list to channel so users don't have to
-      const folder = client.folderContents.get(f.id || 0) || { id: null, label: "", guild_id: "", roles: [] }
+      const folder = client.folderContents.get(f.id || 0) || { 
+        id: null, label: "Server Roles", guild_id: "", roles: rolesByFolderId(GUILD_ID, null) 
+      }
       const { roles } = folder
 
-      if(!roles.length && folder.id) continue;
+      if (!roles.length && folder.id) continue;
 
       //@ts-ignore
       rMsg = (await reactList.run(message, roleChannel, folder)) as Message;
@@ -39,7 +43,7 @@ export default {
 
       const REACT_ROLES = RolesChunks(20, roles);
 
-      for(const r of REACT_ROLES[0]) {
+      for (const r of REACT_ROLES[0]) {
         rMsg.react(r.emoji_id);
       }
 
