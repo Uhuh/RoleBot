@@ -15,7 +15,9 @@ import {
   getReactMessages,
   getRoles,
   getJoinRoles,
-  getChannel
+  getChannel,
+  guildFolders,
+  folderContent
 } from "./setup_table";
 
 interface Command {
@@ -26,11 +28,20 @@ interface Command {
   run: Function;
 }
 
+export interface Folder { 
+  id: number; 
+  label: string;
+  guild_id: string;
+  roles: { role_id: string; role_name: string; emoji_id: string }[] 
+}
+
 export default class RoleBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   reactMessage: Discord.Collection<string, Discord.Message>;
   reactChannel: Discord.Collection<string, Discord.Message>;
+  guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
+  folderContents: Discord.Collection<number, Folder>;
   roleChannels: Discord.Collection<string, string>;
   primaryRoles: Discord.Collection<string, { id: string; name: string }[]>;
   secondaryRoles: Discord.Collection<string, { id: string; name: string }[]>;
@@ -42,6 +53,10 @@ export default class RoleBot extends Discord.Client {
     this.commands = new Discord.Collection();
     this.reactMessage = new Discord.Collection<string, Discord.Message>();
     this.reactChannel = new Discord.Collection();
+    this.guildFolders = new Discord.Collection<string,
+      { id: number; label: string; }[]
+    >();
+    this.folderContents = new Discord.Collection<number, Folder>();
     this.roleChannels = new Discord.Collection<string, string>();
     this.primaryRoles = new Discord.Collection<
       string,
@@ -80,7 +95,7 @@ export default class RoleBot extends Discord.Client {
       // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
       guild.fetchAuditLogs()
         .then(audit => {
-          const {executor} = audit.entries.first()!
+          const { executor } = audit.entries.first()!
 
           executor.send(JOIN_MSG)
         })
@@ -100,7 +115,8 @@ export default class RoleBot extends Discord.Client {
         .setThumbnail(guild.iconURL() || "")
         .setDescription(guild.name)
         .addField("Member size:", guild.memberCount)
-        .addField("Guilds:", this.guilds.size);
+        .addField("Guilds:", this.guilds.size)
+        .addField("Guild ID:", guild.id);
 
       (this.channels.get(C_ID) as Discord.TextChannel).send(
         embed
@@ -115,17 +131,17 @@ export default class RoleBot extends Discord.Client {
     this.on("guildDelete", guild => removed(guild, this));
     // React role handling
     //@ts-ignore - all paths don't return
-    this.on("messageReactionAdd", async (reaction, user) => {
+    this.on("messageReactionAdd", (reaction, user) => {
       if (!reaction || user.bot) return;
-      const {message} = reaction;
+      const { message } = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
-        
+
         const [{ role_id }] = emoji_role.length
-        ? emoji_role
-        : [{ role_id: null }];
-        
+          ? emoji_role
+          : [{ role_id: null }];
+
         if (!role_id) {
           return reaction.users.remove(user.id).catch(console.error);
         }
@@ -135,9 +151,9 @@ export default class RoleBot extends Discord.Client {
         member.roles.add(role).catch(console.log);
       }
     });
-    this.on("messageReactionRemove", async (reaction, user) => {
+    this.on("messageReactionRemove", (reaction, user) => {
       if (!reaction || user.bot) return;
-      const {message} = reaction;
+      const { message } = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
@@ -151,6 +167,9 @@ export default class RoleBot extends Discord.Client {
         member.roles.remove(role).catch(console.error);
       }
     });
+    this.on("roleDelete", role => {
+      console.log(role)
+    })
   }
 
   randomPres = () => {
@@ -160,12 +179,12 @@ export default class RoleBot extends Discord.Client {
     const presArr = [
       `@${user.username} help`,
       `in ${this.guilds.size} guilds`,
-      ` roles.`
+      `roles.`
     ];
 
     user
       .setPresence({
-        activity: { name: presArr[Math.floor(Math.random() * presArr.length)], type: "STREAMING", url:"https://www.twitch.tv/rolebot" },
+        activity: { name: presArr[Math.floor(Math.random() * presArr.length)], type: "STREAMING", url: "https://www.twitch.tv/rolebot" },
         status: "online"
       })
       .catch(console.error);
@@ -230,9 +249,25 @@ export default class RoleBot extends Discord.Client {
     }
   }
 
+  async loadFolders() {
+    this.guilds.forEach(g => {
+      const FOLDERS = guildFolders(g.id);
+      this.guildFolders.set(g.id, FOLDERS);
+      FOLDERS.map(f => {
+        const roles = folderContent(f.id);
+        let r = roles.map(r => ({ role_id: r.role_id, role_name: r.role_name, emoji_id: r.emoji_id }));
+
+        if (r.length === 1 && r[0].role_id === null) r = []
+
+        this.folderContents.set(f.id, { id: f.id, label: f.label, guild_id: g.id, roles: r });
+      })
+    })
+  }
+
   async start() {
     await this.login(this.config.TOKEN);
     await this.loadReactMessage();
     await this.loadRoles();
+    await this.loadFolders();
   }
 }
