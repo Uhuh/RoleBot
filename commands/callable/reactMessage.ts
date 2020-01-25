@@ -17,10 +17,13 @@ export default {
     if (!message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
     
-    if (!args.length) return message.channel.send("No message id given.").then(m => setTimeout(() => m.delete(), 5000))
+    if (args.length === 0) return message.channel.send("No message id given.").then(m => setTimeout(() => m.delete(), 5000))
 
     const { guild } = message;
-    const M_ID = args.shift()!;
+    const M_ID = args.shift();
+
+    if (!M_ID) throw new Error("No M_ID given. >:(");
+
     let folder: { id: number; label: string} | undefined = undefined
 
     // Making sure the flag was used properly and that the folder exist.
@@ -36,7 +39,7 @@ export default {
 
       args.shift()
       const ARRAY_ID = Number(args[0]);
-      if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= GUILD_FOLDERS!.length) {
+      if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= GUILD_FOLDERS.length) {
         return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`").then(m => setTimeout(() => m.delete(), 5000));
       }
 

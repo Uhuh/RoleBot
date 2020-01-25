@@ -3,7 +3,7 @@ import { addReactionRole, guildReactions, addFolder, folderId } from "../../src/
 import RoleBot, { Role } from "../../src/bot";
 
 export default {
-  desc: "Associate an emoji with a role.\nCan create a role folder to send reaction roles in a different message.",
+  desc: "Associate an emoji with a role.\nCan create a role folder to send reaction roles in a different message. If creating afolder, it will continue to ask for roles.",
   name: "reactRole",
   args: "[-f <Folder name to create>]",
   type: "reaction",
@@ -56,7 +56,9 @@ export default {
     }
 
     if (folderName !== "") {
-      const SIZE = client.guildFolders.get(GUILD_ID)!.length
+      const FOLDERS = client.guildFolders.get(GUILD_ID);
+      if (!FOLDERS) throw new Error("No folders exist for guild");
+      const SIZE = FOLDERS.length
       channel.send(`Role folder \`${folderName}\` has been set up. Check it out by running \`@RoleBot folders -id ${SIZE - 1}\``)
         .then(m => setTimeout(() => m.delete(), 10000))
         .catch(() => { });
@@ -69,6 +71,8 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
     //@ts-ignore
     const GUILD_ID = message.guild.id;
     let id: string = "";
+    const { guild } = message;
+    if (!guild) throw new Error("Guild not found, possibly a group chat?");
 
     /* Let me clarify I am disgusted with the code below */
     channel
@@ -85,7 +89,9 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
           })
           .then(m => {
             // Might as well cancel the whole process if they don't wanna do this
-            const content = m.first()!.content.toLowerCase();
+            const msg = m.first();
+            if (!msg) throw new Error("Message somehow went missing");
+            const content = msg.content.toLowerCase();
 
             if (
               m &&
@@ -94,19 +100,19 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
             ) {
               finished();
               bm.delete();
-              m.first()!.delete();
+              msg.delete();
               return resolve("Cancelled");
             }
 
-            const GUILD_REACT = guildReactions(message.guild!.id);
+            const GUILD_REACT = guildReactions(guild.id);
 
-            const role = message.guild!.roles.find(
+            const role = guild.roles.find(
               r => r.name.toLowerCase() === content
             );
 
             if (!role && bm instanceof Message) {
               bm.edit("Role not found, check if you typed it correctly.");
-              m.first()!.delete();
+              msg.delete();
               setTimeout(() => {
                 bm.delete();
               }, 5000);
@@ -122,7 +128,7 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
               setTimeout(() => {
                 bm.delete().catch(() => { });
               }, 5000);
-              m.first()!.delete().catch(() => { });
+              msg.delete().catch(() => { });
               return reject("Emoji exist");
             }
 
@@ -131,7 +137,7 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
               bm.edit(
                 "Now send the emoji to match the role. This must be local to the server or a generic Discord emoji."
               );
-              m.first()!.delete().catch(() => { });
+              msg.delete().catch(() => { });
 
               channel
                 .awaitMessages(m => m.author.id === message.author.id, {
@@ -140,8 +146,11 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                   errors: ["time"]
                 })
                 .then(m => {
+                  const msg = m.first()
+                  if(!msg) throw new Error("Msg somehow gone")
                   // Some discord emojis don't have id's and just use the unicode. Weird
-                  const match = /:(\d+)>/.exec(m.first()!.content);
+                  const match = /:(\d+)>/.exec(msg.content);
+
 
                   if (
                     m &&
@@ -150,7 +159,7 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                   ) {
                     finished();
                     bm.delete().catch(() => { });
-                    m.first()!.delete().catch(() => { });
+                    msg.delete().catch(() => { });
                     return resolve("Cancelled");
                   }
 
@@ -164,13 +173,13 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                         message.delete().catch(() => { });
                         bm.delete().catch(() => { });
                       }, 3000);
-                      m.first()!.delete();
+                      msg.delete();
                       return reject("Emoji not avail")
                     }
 
                     emojiId(id);
                   } else {
-                    emojiId(m.first()!.content);
+                    emojiId(msg.content);
                   }
 
                   if (role && id !== "") {
@@ -178,12 +187,13 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                     addReactionRole(id, role.id, role.name, GUILD_ID, folderId);
                     if (folderId) {
                       const r: Role = { role_id: role.id, role_name: role.name, emoji_id: id}
-                      const folder = client.folderContents.get(folderId)!
+                      const folder = client.folderContents.get(folderId)
+                      if (!folder) throw new Error("Folder DNE, id must be incorrect");
                       client.folderContents.set(folder.id, { ...folder, roles: [...folder.roles, r] })
                     }
 
                     if (bm instanceof Message) {
-                      m.first()!.delete().catch(() => { });
+                      msg.delete().catch(() => { });
                       setTimeout(() => {
                         bm.delete().catch(() => { });
                         message.delete().catch(() => { });
