@@ -26,8 +26,11 @@ export default {
       if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length) {
         return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`").then(m => setTimeout(() => m.delete(), 5000));
       }
+      const folder = client.folderContents.get(FOLDERS[folderId].id);
 
-      const {roles} = client.folderContents.get(FOLDERS[folderId].id)!;
+      if (!folder) throw new Error(`Folder ${FOLDERS[folderId].id} DNE`);
+
+      const {roles} = folder;
       embed.setTitle(`**${FOLDERS[folderId].label}**'s roles`);
       if (roles.length) {
         embed.setDescription(
@@ -52,7 +55,8 @@ export default {
     if (FOLDERS && FOLDERS.length) {
       embed.setDescription(
         FOLDERS.map((f, index) => {
-          const folder = client.folderContents.get(f.id)!
+          const folder = client.folderContents.get(f.id);
+          if(!folder) throw new Error("Folder in FOLDERS command DNE");
           return `[ ID ${index} ] - 📁**${f.label}** [${folder.roles.length} ${folder.roles.length > 1 ? `Roles` : "Role"}]`
         })
       )

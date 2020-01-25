@@ -11,7 +11,7 @@ export default {
     setTimeout(() => {
       message.delete();
     }, 5000);
-    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
+    if (!message.guild || (message.member && !message.member!.hasPermission(["MANAGE_ROLES"])))
       return message.react("❌");
     const arg = args.join(" ");
     const GUILD_ID = message.guild.id;
@@ -24,7 +24,10 @@ export default {
 
     if (ROLE && DB_ROLES.includes(ROLE.id)) {
       for(const f of FOLDERS) {
-        const folder = client.folderContents.get(f.id)!
+        const folder = client.folderContents.get(f.id)
+
+        if(!folder) continue;
+
         for(const r of folder.roles) {
           if (r.role_id === ROLE.id) {
             folder.roles.splice(folder.roles.indexOf(r), 1);
@@ -42,7 +45,10 @@ export default {
         console.log(r)
         for(const f of FOLDERS) {
           found = false;
-          const folder = client.folderContents.get(f.id)!
+          const folder = client.folderContents.get(f.id)
+
+          if(!folder) continue;
+
           for(const role of folder.roles) {
             if (role.role_id === r) {
               folder.roles.splice(folder.roles.indexOf(r), 1);

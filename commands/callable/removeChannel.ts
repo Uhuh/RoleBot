@@ -9,7 +9,7 @@ export default {
   args: "<channel mention>",
   type: "message",
   run: (message: Message, _args: string[], client: RoleBot) => {
-    if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
+    if (!message.guild || (message.member && !message.member.hasPermission(["MANAGE_ROLES"])))
       return message.react("❌");
 
     const guild: Guild = message.guild;

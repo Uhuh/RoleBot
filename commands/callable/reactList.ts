@@ -7,7 +7,7 @@ export default {
   name: "reactlist",
   args: "",
   type: "reaction",
-  run: (message: Message, roleChannel?: TextChannel, folder?: Folder) => {
+  run: (message: Message, roleChannel: TextChannel, folder: Folder) => {
     if (!message.guild) return
 
     const { guild } = message
@@ -23,7 +23,11 @@ export default {
       if (!folders) return;
 
       folders.forEach(f => {
-        const R = folder.folderContents.get(f.id)!.roles
+        const contents = folder.folderContents.get(f.id)
+        
+        if (!contents) throw new Error("Folder contents DNE");
+
+        const R = contents.roles
 
         if(!R.length) return;
 
@@ -37,9 +41,9 @@ export default {
 
 
     if (roleChannel instanceof TextChannel) 
-      return roleChannel.send(generateEmbed(folder!.label, roles, guild));
+      return roleChannel.send(generateEmbed(folder.label, roles, guild));
 
-    return message.channel.send(generateEmbed(folder!.label, roles, guild));
+    return message.channel.send(generateEmbed(folder.label, roles, guild));
   }
 };
 
@@ -52,7 +56,7 @@ const generateEmbed = (label: string, roles: any[], guild: Guild): MessageEmbed 
   if (roles.length) {
     let desc = ""
     for (const r of roles)
-      desc += `${guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}\n`
+      desc += `${guild.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}\n`
 
     embed.setDescription(desc)
   } else
