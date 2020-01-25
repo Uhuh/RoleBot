@@ -63,7 +63,9 @@ export default {
     // if (roleChannel instanceof TextChannel) return roleChannel.send(embed);
 
     return message.channel.send(embed).then(m => {
-      m.react("⬇️")
+      m.react("⬇️");
+      // Possibly add ability to go back to folders.
+      // m.react("⬆️");
       m.awaitReactions((r, user) => r.emoji.name === "⬇️" && user.id === message.author.id, { maxEmojis: 1 })
         .then(() => {
           const embed = new MessageEmbed();
@@ -73,12 +75,12 @@ export default {
               FOLDERLESS_ROLES.map(r => `${message.guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
             )
           } else {
-            embed.setDescription("No free roles!")
+            embed.setDescription("No free roles!");
           }
 
-          return m.edit(embed)
+          return m.edit(embed);
         })
-        .catch(console.error)
+        .catch(console.error);
     });
   }
 };

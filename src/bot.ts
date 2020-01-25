@@ -95,14 +95,22 @@ export default class RoleBot extends Discord.Client {
       // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
       guild.fetchAuditLogs()
         .then(audit => {
-          const { executor } = audit.entries.first()!
+          const entry = audit.entries.first()
 
+          if(!entry) throw new Error("Entry DNE")
+
+          const { executor } = entry
+
+          if(!executor) throw new Error("Executor not found")
+          
           executor.send(JOIN_MSG)
         })
         .catch(e => {
           console.log(e)
 
-          const owner = guild.owner || guild.members.get(guild.ownerID)!;
+          const owner = guild.owner || guild.members.get(guild.ownerID);
+
+          if(!owner) throw new Error("Guild owner not found");
 
           owner.send(JOIN_MSG);
         })

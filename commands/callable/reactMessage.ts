@@ -5,7 +5,7 @@ import RoleBot from "../../src/bot";
 export default {
   desc: "Will watch a custom message for reactions.\nApply a folders roles instead by using the `-f` flag.",
   name: "reactMessage",
-  args: "<message id> [-f <Folder id>]",
+  args: "<message id> [-id <Folder id>]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return;
@@ -24,13 +24,13 @@ export default {
     let folder: { id: number; label: string} | undefined = undefined
 
     // Making sure the flag was used properly and that the folder exist.
-    if (args.length === 2 && args[1] === "-f")
+    if (args.length === 2 && args[1] === "-id")
       return message.channel.send("No folder name given. Run `@RoleBot folders` to see folder names.")
               .then(m => setTimeout(() => m.delete(), 5000))
-    else if (args.length === 2 && args[0] === "-f") {
+    else if (args.length === 2 && args[0] === "-id") {
       const GUILD_FOLDERS = client.guildFolders.get(guild.id)
 
-      if (GUILD_FOLDERS)
+      if (!GUILD_FOLDERS || !GUILD_FOLDERS.length)
         return message.channel.send("The server doesn't have any folders.")
                 .then(m => setTimeout(() => m.delete(), 5000))
 

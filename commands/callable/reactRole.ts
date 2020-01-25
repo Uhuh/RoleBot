@@ -1,11 +1,11 @@
 import { Message, TextChannel } from "discord.js";
-import { addReactionRole, guildReactions, addFolder, folderId, folderContent } from "../../src/setup_table";
+import { addReactionRole, guildReactions, addFolder, folderId } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
 
 export default {
-  desc: "Associate an emoji with a role",
+  desc: "Associate an emoji with a role.\nCan create a role folder to send reaction roles in a different message.",
   name: "reactRole",
-  args: "<There are prompts to follow>",
+  args: "[-f <Folder name to create>]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
@@ -28,7 +28,7 @@ export default {
       if (folders.length)
         folder = folders.find(f => f.label.toLowerCase() === folderName.toLowerCase()) || { id: null, label: "" };
 
-      if (!folder.id) {
+      if (folder.id !== null) {
         addFolder(GUILD_ID, folderName);
         // There should only be one Id per name...
         const ID = folderId(GUILD_ID, folderName);
@@ -39,16 +39,10 @@ export default {
 
         //@ts-ignore Not sure how to prove it's gonna be here, so take an ignore
         client.folderContents.set(folder.id, { id: folder.id, label: folder.label, guild_id: GUILD_ID, roles: [] })
-
-        folders.forEach(f => {
-          const stuff = folderContent(f.id);
-
-          console.log(stuff)
-        })
       }
     }
 
-    if (folderName.trim() !== "")
+    if (folderName !== "")
       await channel.send(`Setting up roles for Folder: \`${folderName}\``)
         .then(m => setTimeout(() => m.delete(), 10000))
         .catch(() => { });
@@ -79,7 +73,7 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
     /* Let me clarify I am disgusted with the code below */
     channel
       .send("Enter the role name. If you want to stop, say `cancel` or `done`.")
-      .then(bm => {
+      .then(bm => { 
         // Because I'm fighting callbacks and I'm stupid
         const emojiId = (i: string) => (id = i);
 

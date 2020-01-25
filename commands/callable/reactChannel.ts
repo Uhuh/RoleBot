@@ -11,7 +11,7 @@ export default {
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
     setTimeout(() => {
-      message.delete();
+      message.delete().then(() => console.log("Deleted ReactChannel command"));
     }, 5000);
 
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
@@ -19,9 +19,10 @@ export default {
 
     const GUILD_ID = message.guild.id;
     const roleChannel = message.mentions.channels.first();
-    const GUILD_FOLDERS = client.guildFolders.get(GUILD_ID) || []
+    const FOLDERS_INFO = client.guildFolders.get(GUILD_ID) || []
+    const GUILD_FOLDERS = [...FOLDERS_INFO]
     // I want to enforce the non folder roles.
-    GUILD_FOLDERS.push({ id: 0, label: "" })
+    GUILD_FOLDERS.unshift({ id: 0, label: "" })
     let rMsg = {} as Message
 
     if (!roleChannel) return;
@@ -42,6 +43,8 @@ export default {
       client.reactMessage.set(rMsg.id, rMsg);
 
       const REACT_ROLES = RolesChunks(20, roles);
+
+      if(!REACT_ROLES.length) continue;
 
       for (const r of REACT_ROLES[0]) {
         rMsg.react(r.emoji_id);

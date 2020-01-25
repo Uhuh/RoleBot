@@ -39,6 +39,7 @@ export default {
       return message.react("✅");
     } else if (arg.includes("-all")) {
       DB_ROLES.forEach(r => {
+        console.log(r)
         for(const f of FOLDERS) {
           found = false;
           const folder = client.folderContents.get(f.id)!
