@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
 import reactList from "./reactList";
-import RoleBot from "../../src/bot";
+import RoleBot, { Role } from "../../src/bot";
 
 export default {
   desc:
@@ -65,7 +65,9 @@ export default {
   }
 };
 
-const RolesChunks = (chunkSize: number, ROLES: any[]) => {
+
+
+const RolesChunks = (chunkSize: number, ROLES: Role[]) => {
   let roles = [];
 
   for (let i = 0; i < ROLES.length; i += chunkSize) {

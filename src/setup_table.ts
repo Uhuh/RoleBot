@@ -1,4 +1,5 @@
 import * as SQLite from "better-sqlite3"
+import { Role } from "./bot"
 
 const sql = new SQLite("./roles.sqlite")
 
@@ -189,6 +190,6 @@ export const addReactionRole = (emoji_id: string, role_id: string, role_name: st
 export const removeReactionRole = (role_id: string) => sql.prepare(
   "DELETE FROM reaction_role WHERE role_id = @role_id"
 ).run({ role_id })
-export const rolesByFolderId = (guild_id: string, id: number | null) => sql.prepare(
+export const rolesByFolderId = (guild_id: string, id: number | null): Role[] => sql.prepare(
   `SELECT * FROM reaction_role WHERE reaction_role.folder_id ${id ? "= @id" : "IS NULL"} AND reaction_role.guild_id = @guild_id`
 ).all({ guild_id, id })

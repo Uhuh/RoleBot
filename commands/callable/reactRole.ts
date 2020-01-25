@@ -1,6 +1,6 @@
 import { Message, TextChannel } from "discord.js";
 import { addReactionRole, guildReactions, addFolder, folderId } from "../../src/setup_table";
-import RoleBot from "../../src/bot";
+import RoleBot, { Role } from "../../src/bot";
 
 export default {
   desc: "Associate an emoji with a role.\nCan create a role folder to send reaction roles in a different message.",
@@ -177,7 +177,7 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                     // Assuming everything went uh, great. Try to add. :))
                     addReactionRole(id, role.id, role.name, GUILD_ID, folderId);
                     if (folderId) {
-                      const r = { role_id: role.id, role_name: role.name, emoji_id: id}
+                      const r: Role = { role_id: role.id, role_name: role.name, emoji_id: id}
                       const folder = client.folderContents.get(folderId)!
                       client.folderContents.set(folder.id, { ...folder, roles: [...folder.roles, r] })
                     }

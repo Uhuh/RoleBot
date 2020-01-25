@@ -28,11 +28,17 @@ interface Command {
   run: Function;
 }
 
+export interface Role { 
+  role_id: string; 
+  role_name: string;
+  emoji_id: string;
+} 
+
 export interface Folder { 
   id: number; 
   label: string;
   guild_id: string;
-  roles: { role_id: string; role_name: string; emoji_id: string }[] 
+  roles: Role[] 
 }
 
 export default class RoleBot extends Discord.Client {
@@ -73,7 +79,7 @@ export default class RoleBot extends Discord.Client {
 
     commandHandler(this);
 
-    this.on("ready", () => {
+    this.on("ready", (): void => {
       const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.log(`[Started]: ${new Date()}`);
       if (this.config.DEV_MODE === "0")
@@ -82,12 +88,12 @@ export default class RoleBot extends Discord.Client {
       setInterval(() => this.randomPres(), 10000);
     });
 
-    this.on("message", message => msg(this, message as Discord.Message));
-    this.on("guildMemberAdd", member =>
+    this.on("message", (message): void => msg(this, message as Discord.Message));
+    this.on("guildMemberAdd", (member): void =>
       joinRole(member as Discord.GuildMember, this.joinRoles)
     );
-    this.on("roleUpdate", (_oldRole, newRole) => roleUpdate(newRole));
-    this.on("guildCreate", guild => {
+    this.on("roleUpdate", (_oldRole, newRole): void => roleUpdate(newRole));
+    this.on("guildCreate", (guild): void => {
       // const G_ID = "567819334852804626"; - Support guild id
       const C_ID = "661410527309856827";
       const JOIN_MSG = "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
@@ -136,10 +142,9 @@ export default class RoleBot extends Discord.Client {
       );
 
     });
-    this.on("guildDelete", guild => removed(guild, this));
+    this.on("guildDelete", (guild): void => removed(guild, this));
     // React role handling
-    //@ts-ignore - all paths don't return
-    this.on("messageReactionAdd", (reaction, user) => {
+    this.on("messageReactionAdd", (reaction, user): void => {
       if (!reaction || user.bot) return;
       const { message } = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
@@ -151,15 +156,21 @@ export default class RoleBot extends Discord.Client {
           : [{ role_id: null }];
 
         if (!role_id) {
-          return reaction.users.remove(user.id).catch(console.error);
+          reaction.users.remove(user.id).catch(console.error);
+          return;
         }
 
-        const role = message.guild.roles.get(role_id)!;
-        const member = message.guild.members.get(user.id)!;
+        const role = message.guild.roles.get(role_id);
+        const member = message.guild.members.get(user.id);
+        if(!role) throw new Error("Role DNE");
+        if(!member) throw new Error("Member not found");
         member.roles.add(role).catch(console.log);
+        return;
       }
+
+      return console.log("Message wasn't react-msg")
     });
-    this.on("messageReactionRemove", (reaction, user) => {
+    this.on("messageReactionRemove", (reaction, user): void => {
       if (!reaction || user.bot) return;
       const { message } = reaction;
       if (this.reactMessage.has(message.id) && message.guild) {
@@ -175,12 +186,9 @@ export default class RoleBot extends Discord.Client {
         member.roles.remove(role).catch(console.error);
       }
     });
-    this.on("roleDelete", role => {
-      console.log(role)
-    })
   }
 
-  randomPres = () => {
+  randomPres = (): void => {
     const user = this.user;
     if (!user) return console.log("Client dead?");
 
@@ -198,7 +206,7 @@ export default class RoleBot extends Discord.Client {
       .catch(console.error);
   };
 
-  async loadReactMessage() {
+  async loadReactMessage(): Promise<void> {
     const rows = getReactMessages();
 
     rows.forEach(async r => {
@@ -219,7 +227,7 @@ export default class RoleBot extends Discord.Client {
     });
   }
 
-  async loadRoles() {
+  async loadRoles(): Promise<void> {
     const GUILD_IDS = this.guilds.map(g => g.id);
 
     for (const g_id of GUILD_IDS) {
@@ -257,7 +265,7 @@ export default class RoleBot extends Discord.Client {
     }
   }
 
-  async loadFolders() {
+  async loadFolders(): Promise<void> {
     this.guilds.forEach(g => {
       const FOLDERS = guildFolders(g.id);
       this.guildFolders.set(g.id, FOLDERS);
