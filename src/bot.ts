@@ -119,7 +119,7 @@ export default class RoleBot extends Discord.Client {
           if(!owner) throw new Error("Guild owner not found");
 
           owner.send(JOIN_MSG);
-        })
+        }).catch(e => logger(`Error trying to get bot adder: ${e}`, "errors.log"));
 
       const embed = new Discord.MessageEmbed();
 
@@ -145,30 +145,34 @@ export default class RoleBot extends Discord.Client {
     this.on("guildDelete", (guild): void => removed(guild, this));
     // React role handling
     this.on("messageReactionAdd", (reaction, user): void => {
-      if (!reaction || user.bot) return;
-      const { message } = reaction;
-      if (this.reactMessage.has(message.id) && message.guild) {
-        const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = getRoleByReaction(id, message.guild.id);
+      try {
+        if (!reaction || user.bot) return;
+        const { message } = reaction;
+        if (this.reactMessage.has(message.id) && message.guild) {
+          const id = reaction.emoji.id || reaction.emoji.name;
+          const emoji_role = getRoleByReaction(id, message.guild.id);
 
-        const [{ role_id }] = emoji_role.length
-          ? emoji_role
-          : [{ role_id: null }];
+          const [{ role_id }] = emoji_role.length
+            ? emoji_role
+            : [{ role_id: null }];
 
-        if (!role_id) {
-          reaction.users.remove(user.id).catch(console.error);
+          if (!role_id) {
+            reaction.users.remove(user.id).catch(console.error);
+            return;
+          }
+
+          const role = message.guild.roles.get(role_id);
+          const member = message.guild.members.get(user.id);
+          if(!role) throw new Error("Role DNE");
+          if(!member) throw new Error("Member not found");
+          member.roles.add(role).catch(console.log);
           return;
         }
 
-        const role = message.guild.roles.get(role_id);
-        const member = message.guild.members.get(user.id);
-        if(!role) throw new Error("Role DNE");
-        if(!member) throw new Error("Member not found");
-        member.roles.add(role).catch(console.log);
-        return;
+        return console.log("Message wasn't react-msg")
+      } catch(e) {
+        logger(`Error occured trying to add react-role: ${e}`, "errors.log")
       }
-
-      return console.log("Message wasn't react-msg")
     });
     this.on("messageReactionRemove", (reaction, user): void => {
       if (!reaction || user.bot) return;

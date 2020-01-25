@@ -2,6 +2,7 @@ import { Message, Channel } from "discord.js";
 import RoleBot from "../src/bot";
 import roles from "../commands/events/roles";
 import commands from "../commands/callable/commands";
+import * as logger from "log-to-file"
 
 export default (client: RoleBot, message: Message): void => {
   const { guild } = message;
@@ -37,7 +38,11 @@ export default (client: RoleBot, message: Message): void => {
     )
       return console.log("Command DNE");
 
-    // Find the command and run it.
-    clientCommand.run(message, args, client);
+    try {
+      // Find the command and run it.
+      clientCommand.run(message, args, client);
+    } catch(e) {
+      logger(`Error occurred trying to run command: ${e}`, 'errors.log')
+    }
   }
 };

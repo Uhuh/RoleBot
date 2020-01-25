@@ -23,11 +23,15 @@ export default {
     args.shift();
 
     const ARRAY_ID = Number(args[0]);
+    const FOLDERS = client.guildFolders.get(GUILD_ID)
+    if(!FOLDERS) throw new Error("remove - FOLDERS for guild DNE")
 
-    if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= client.guildFolders.get(GUILD_ID)!.length) return;
+    if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= FOLDERS.length) return;
     
-    const FOLDER_ID = client.guildFolders.get(GUILD_ID)![ARRAY_ID].id
-    const {id, label, roles} = client.folderContents.get(FOLDER_ID)!
+    const FOLDER_ID = FOLDERS[ARRAY_ID].id
+    const CONTENTS = client.folderContents.get(FOLDER_ID)
+    if(!CONTENTS) throw new Error("remove - CONTENTS DNE");
+    const {id, label, roles} = CONTENTS
 
     deleteFolder(id);
     client.guildFolders.get(GUILD_ID)!.splice(ARRAY_ID, 1);

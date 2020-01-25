@@ -6,7 +6,7 @@ export default {
   name: "help",
   args: "",
   type: "normal",
-  run: async function(message: Message, args: string[], client: RoleBot) {
+  run: function(message: Message, args: string[], client: RoleBot) {
     const embed = new MessageEmbed();
     const type = args.length ? args[0] : "normal";
     const clientUser = client.user!
