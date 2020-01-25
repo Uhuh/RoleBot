@@ -1,11 +1,11 @@
 import { Guild, MessageEmbed, TextChannel } from "discord.js";
-import {
+/* import {
   removeJoinRoles,
   removeRoleChannel,
   removeRoles,
   removeReactRoles,
   removeReactMsg
-} from "../src/setup_table";
+} from "../src/setup_table"; */
 import * as logger from "log-to-file";
 import RoleBot from "../src/bot";
 
@@ -31,9 +31,9 @@ export default (guild: Guild, client: RoleBot) => {
     "guilds.log"
   );
 
-  removeJoinRoles(guild.id);
+  /* removeJoinRoles(guild.id);
   removeRoleChannel(guild.id);
   removeRoles(guild.id);
   removeReactRoles(guild.id);
-  removeReactMsg(guild.id);
+  removeReactMsg(guild.id); */
 };
