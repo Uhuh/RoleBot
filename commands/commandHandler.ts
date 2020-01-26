@@ -1,4 +1,4 @@
-import RoleBot, { ReactCommand } from "../src/bot"
+import RoleBot, { CommandCollection } from "../src/bot"
 import * as fs from "fs"
 
 export default (client: RoleBot) => {
@@ -9,21 +9,34 @@ export default (client: RoleBot) => {
 
   for (const file of helpCommands) {
     const command = require(`./callable/${file}`)
-    if(command.default.name === "reaction") loadCommands(command.default)
+    if(command.default.name === "reaction") loadReactCommands(command.default);
+    if(command.default.name === "folder") loadFolderCommands(command.default);
     client.commands.set(command.default.name.toLowerCase(), command.default)
   }
 }
 
-const loadCommands = (reactionHandler: ReactCommand) => {
+const loadReactCommands = (reactionHandler: CommandCollection) => {
   const reactCommands: string[] = []
-  fs.readdirSync("commands/reactCommand/").forEach(file =>
+  fs.readdirSync("commands/reactCommands/").forEach(file =>
     reactCommands.push(file.slice(0, -3))
   )
 
   for (const file of reactCommands) {
-    const command = require(`./reactCommand/${file}`);
+    const command = require(`./reactCommands/${file}`);
     reactionHandler.commands.set(command.default.name, command.default);
-    console.log("COMMAND: " + command.default.name)
     reactionHandler.args += (`\t\t\t\t\t${command.default.name} ${command.default.args}\n`);
+  }
+}
+
+const loadFolderCommands = (folderHandler: CommandCollection) => {
+  const folderCommands: string[] = []
+  fs.readdirSync("commands/folderCommands/").forEach(file =>
+    folderCommands.push(file.slice(0, -3))
+  )
+
+  for (const file of folderCommands) {
+    const command = require(`./folderCommands/${file}`);
+    folderHandler.commands.set(command.default.name, command.default);
+    folderHandler.args += (`\t\t\t\t\t${command.default.name} ${command.default.args}\n`);
   }
 }

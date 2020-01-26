@@ -4,8 +4,8 @@ import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
   desc: "All role folders. If an id is given it list the roles within the folder.",
-  name: "folders",
-  args: "[-id <folder id>]",
+  name: "-list",
+  args: "[folder id]",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return
@@ -19,8 +19,7 @@ export default {
     const embed = new MessageEmbed();
     embed.setColor("#cffc03");
 
-    if (FOLDERS && args.length && args[0].includes("-id")) {
-      args.shift();
+    if (FOLDERS && args.length && !Number.isNaN(Number(args[0]))) {
       const folderId = Number(args[0]);
 
       if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length) {

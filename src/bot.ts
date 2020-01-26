@@ -28,8 +28,8 @@ export interface Command {
   run: Function;
 }
 
-export interface ReactCommand extends Command {
-  commands: Discord.Collection<string, any[]>;
+export interface CommandCollection extends Command {
+  commands: Discord.Collection<string, Command[]>;
 }
 
 export interface Role { 

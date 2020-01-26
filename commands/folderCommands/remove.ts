@@ -4,8 +4,8 @@ import RoleBot from "../../src/bot";
 
 export default {
   desc: "Delete a folder.",
-  name: "remove",
-  args: "-id <folder id>",
+  name: "-remove",
+  args: "<folder id>",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot) => {
     setTimeout(() => {
@@ -15,13 +15,11 @@ export default {
       return message.react("❌");
     const GUILD_ID = message.guild.id;
 
-    if(!args.length || (args.length && args[0] !== "-id")) return;
+    //if(!args.length || (args.length && args[0] !== "-id")) return;
     if(!client.guildFolders.get(GUILD_ID)) 
       return message.channel.send("There are no folders to delete.")
               .then(m => setTimeout(() => m.delete(), 5000))
     
-    args.shift();
-
     const ARRAY_ID = Number(args[0]);
     const FOLDERS = client.guildFolders.get(GUILD_ID)
     if(!FOLDERS) throw new Error("remove - FOLDERS for guild DNE")
