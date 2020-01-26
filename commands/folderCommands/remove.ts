@@ -14,16 +14,14 @@ export default {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
     const GUILD_ID = message.guild.id;
+    const FOLDERS = client.guildFolders.get(GUILD_ID);
 
-    //if(!args.length || (args.length && args[0] !== "-id")) return;
-    if(!client.guildFolders.get(GUILD_ID)) 
+    if(!FOLDERS) 
       return message.channel.send("There are no folders to delete.")
               .then(m => setTimeout(() => m.delete(), 5000))
     
     const ARRAY_ID = Number(args[0]);
-    const FOLDERS = client.guildFolders.get(GUILD_ID)
-    if(!FOLDERS) throw new Error("remove - FOLDERS for guild DNE")
-
+    
     if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= FOLDERS.length) return;
     
     const FOLDER_ID = FOLDERS[ARRAY_ID].id
@@ -32,7 +30,8 @@ export default {
     const {id, label, roles} = CONTENTS
 
     deleteFolder(id);
-    client.guildFolders.get(GUILD_ID)!.splice(ARRAY_ID, 1);
+
+    FOLDERS.splice(ARRAY_ID, 1);
     client.folderContents.delete(FOLDER_ID);
 
     return message.channel.send(`Folder \`${label}\` has been deleted. It's ${roles.length} Roles are no longer associated with it.`)

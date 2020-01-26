@@ -10,15 +10,17 @@ export default {
   run: (message: Message, roleChannel: TextChannel, folder: Folder) => {
     if (!message.guild) return
 
+    // This is true if the user wanted the list.
+    // If they did call it they probably want role id's.
+    const USER_CALLED = (folder instanceof RoleBot);
     const { guild } = message
-
     let { roles } = folder || { roles: [] }
 
     if (folder instanceof RoleBot) {
       const folders = folder.guildFolders.get(guild.id)
       roles = rolesByFolderId(message.guild.id, null);
 
-      message.channel.send(generateEmbed("Server Roles", roles, guild))
+      message.channel.send(generateEmbed("Server Roles", roles, guild, USER_CALLED))
 
       if (!folders) return;
 
@@ -31,7 +33,7 @@ export default {
 
         if(!R.length) return;
 
-        message.channel.send(generateEmbed(f.label, R, guild));
+        message.channel.send(generateEmbed(f.label, R, guild, USER_CALLED));
       })
 
       return;
@@ -39,15 +41,14 @@ export default {
       roles = rolesByFolderId(message.guild.id, null)
     }
 
-
     if (roleChannel instanceof TextChannel) 
-      return roleChannel.send(generateEmbed(folder.label, roles, guild));
+      return roleChannel.send(generateEmbed(folder.label, roles, guild, USER_CALLED));
 
-    return message.channel.send(generateEmbed(folder.label, roles, guild));
+    return message.channel.send(generateEmbed(folder.label, roles, guild, USER_CALLED));
   }
 };
 
-const generateEmbed = (label: string, roles: any[], guild: Guild): MessageEmbed => {
+const generateEmbed = (label: string, roles: any[], guild: Guild, USER_CALLED: boolean): MessageEmbed => {
   const embed = new MessageEmbed();
 
   embed.setTitle(`**${label}**`);
@@ -55,8 +56,8 @@ const generateEmbed = (label: string, roles: any[], guild: Guild): MessageEmbed 
 
   if (roles.length) {
     let desc = ""
-    for (const r of roles)
-      desc += `${guild.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}\n`
+    for (const r in roles)
+      desc += `${USER_CALLED ? `[ ID ${r} ] - ` : ""}${guild.emojis.get(roles[r].emoji_id) || roles[r].emoji_id} - ${roles[r].role_name}\n`
 
     embed.setDescription(desc)
   } else
