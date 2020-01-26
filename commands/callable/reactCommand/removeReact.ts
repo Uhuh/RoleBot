@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
-import { removeReactionRole, guildReactions } from "../../src/setup_table";
-import RoleBot from "../../src/bot";
+import { removeReactionRole, guildReactions } from "../../../src/setup_table";
+import RoleBot from "../../../src/bot";
 
 export default {
   desc: "Delete a reaction role. Use `-all` to delete all current reactions.",

@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
-import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
+import { addReactMessage, rolesByFolderId } from "../../../src/setup_table";
 import reactList from "./reactList";
-import RoleBot, { Role } from "../../src/bot";
+import RoleBot, { Role } from "../../../src/bot";
 
 export default {
   desc:
