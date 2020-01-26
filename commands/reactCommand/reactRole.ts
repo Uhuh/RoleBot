@@ -1,10 +1,10 @@
 import { Message, TextChannel } from "discord.js";
-import { addReactionRole, guildReactions, addFolder, folderId } from "../../../src/setup_table";
-import RoleBot, { Role } from "../../../src/bot";
+import { addReactionRole, guildReactions, addFolder, folderId } from "../../src/setup_table";
+import RoleBot, { Role } from "../../src/bot";
 
 export default {
   desc: "Associate an emoji with a role.\nCan create a role folder to send reaction roles in a different message. If creating afolder, it will continue to ask for roles.",
-  name: "reactRole",
+  name: "-add",
   args: "[-f <Folder name to create>]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot) => {

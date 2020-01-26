@@ -1,10 +1,10 @@
 import { Message, MessageEmbed, TextChannel, Guild } from "discord.js";
-import RoleBot, { Folder } from "../../../src/bot";
-import { rolesByFolderId } from "../../../src/setup_table";
+import RoleBot, { Folder } from "../../src/bot";
+import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
   desc: "All emojis associated with a role",
-  name: "reactlist",
+  name: "-list",
   args: "",
   type: "reaction",
   run: (message: Message, roleChannel: TextChannel, folder: Folder) => {

@@ -20,12 +20,16 @@ import {
   folderContent
 } from "./setup_table";
 
-interface Command {
+export interface Command {
   desc: string;
   args: string;
   name: string;
   type: string;
   run: Function;
+}
+
+export interface ReactCommand extends Command {
+  commands: Discord.Collection<string, any[]>;
 }
 
 export interface Role { 

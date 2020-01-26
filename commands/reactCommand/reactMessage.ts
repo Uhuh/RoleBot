@@ -1,10 +1,10 @@
 import { Message, TextChannel } from "discord.js";
-import { addReactMessage, rolesByFolderId } from "../../../src/setup_table";
-import RoleBot from "../../../src/bot";
+import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
+import RoleBot from "../../src/bot";
 
 export default {
   desc: "Will watch a custom message for reactions.\nApply a folders roles instead by using the `-f` flag.",
-  name: "reactMessage",
+  name: "-msg",
   args: "<message id> [-id <Folder id>]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot) => {

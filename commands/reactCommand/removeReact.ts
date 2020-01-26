@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { removeReactionRole, guildReactions } from "../../../src/setup_table";
-import RoleBot from "../../../src/bot";
+import { removeReactionRole, guildReactions } from "../../src/setup_table";
+import RoleBot from "../../src/bot";
 
 export default {
   desc: "Delete a reaction role. Use `-all` to delete all current reactions.",
-  name: "deleteReact",
-  args: "<role name>\n\t-all",
+  name: "-remove",
+  args: "<role name> or -all",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot) => {
     setTimeout(() => {

@@ -1,12 +1,12 @@
 import { Message } from "discord.js";
-import { addReactMessage, rolesByFolderId } from "../../../src/setup_table";
+import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
 import reactList from "./reactList";
-import RoleBot, { Role } from "../../../src/bot";
+import RoleBot, { Role } from "../../src/bot";
 
 export default {
   desc:
     "Will send a message with the roles and reaction message in a specific channel.",
-  name: "reactChannel",
+  name: "-channel",
   args: "<channel mention>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
