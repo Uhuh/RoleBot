@@ -90,7 +90,7 @@ const setupTable = () => {
   }
 
   // Don't forget to comment this out once ran :)))
-  // sql.prepare("ALTER TABLE reaction_role ADD folder_id TEXT").run()
+  //sql.prepare("ALTER TABLE reaction_role ADD folder_id TEXT").run()
 }
 
 setupTable()
@@ -193,3 +193,6 @@ export const removeReactionRole = (role_id: string) => sql.prepare(
 export const rolesByFolderId = (guild_id: string, id: number | null): Role[] => sql.prepare(
   `SELECT * FROM reaction_role WHERE reaction_role.folder_id ${id ? "= @id" : "IS NULL"} AND reaction_role.guild_id = @guild_id`
 ).all({ guild_id, id })
+export const giveFolderId = (role_id: string, folder_id: number) => sql.prepare(
+  "UPDATE reaction_role SET folder_id = @folder_id WHERE reaction_role.role_id = @role_id"
+).run({ role_id, folder_id });
