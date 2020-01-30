@@ -107,11 +107,11 @@ export default class RoleBot extends Discord.Client {
         .then(audit => {
           const entry = audit.entries.first()
 
-          if(!entry) throw new Error("Entry DNE")
+          if(!entry) return; // No throwing
 
           const { executor } = entry
 
-          if(!executor) throw new Error("Executor not found")
+          if(!executor) return;
           
           executor.send(JOIN_MSG)
         })
@@ -120,7 +120,7 @@ export default class RoleBot extends Discord.Client {
 
           const owner = guild.owner || guild.members.get(guild.ownerID);
 
-          if(!owner) throw new Error("Guild owner not found");
+          if(!owner) return;
 
           owner.send(JOIN_MSG);
         }).catch(e => logger(`Error trying to get bot adder: ${e}`, "errors.log"));

@@ -90,7 +90,7 @@ const setupTable = () => {
   }
 
   // Don't forget to comment this out once ran :)))
-  //sql.prepare("ALTER TABLE reaction_role ADD folder_id TEXT").run()
+  // sql.prepare("ALTER TABLE reaction_role ADD folder_id TEXT").run()
 }
 
 setupTable()

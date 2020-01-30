@@ -55,7 +55,7 @@ export default {
       embed.setDescription(
         FOLDERS.map((f, index) => {
           const folder = client.folderContents.get(f.id);
-          if(!folder) throw new Error("Folder in FOLDERS command DNE");
+          if(!folder) return;
           return `[ ID ${index} ] - 📁**${f.label}** [${folder.roles.length} ${folder.roles.length > 1 ? `Roles` : "Role"}]`
         })
       )

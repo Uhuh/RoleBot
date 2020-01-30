@@ -1,6 +1,7 @@
 import { Message, TextChannel } from "discord.js";
 import { addReactionRole, guildReactions } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
+import * as logger from "log-to-file";
 
 export default {
   desc: "Associate an emoji with a role.",
@@ -16,7 +17,11 @@ export default {
     const finished = () => { done = true; }
 
     while (!done) {
-      await reactSetup(channel as TextChannel, message, client, finished).then(console.log).catch(console.error);
+      try {
+        await reactSetup(channel as TextChannel, message, client, finished).then(console.log).catch(console.error);
+      } catch(e) {
+        logger(`Issue while creating reaction role: ${e}`, 'errors.log');
+      }
     }
   }
 };
