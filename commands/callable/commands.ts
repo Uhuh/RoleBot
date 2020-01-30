@@ -6,7 +6,7 @@ export default {
   name: "help",
   args: "",
   type: "normal",
-  run: async function(message: Message, args: string[], client: RoleBot) {
+  run: function(message: Message, args: string[], client: RoleBot) {
     const embed = new MessageEmbed();
     const type = args.length ? args[0] : "normal";
     const clientUser = client.user!
@@ -17,7 +17,9 @@ export default {
         `https://discordapp.com/oauth2/authorize?client_id=${clientUser.id}&scope=bot&permissions=269315264`
       )
       .setDescription(
-        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)`
+        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)\n\n
+          Anything inside a pair of [] are optional for the command
+        `
       )
       .setColor(16711684)
       .setAuthor(clientUser.username, clientUser.avatarURL() || "")

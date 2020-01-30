@@ -2,8 +2,9 @@ import { Message, Channel } from "discord.js";
 import RoleBot from "../src/bot";
 import roles from "../commands/events/roles";
 import commands from "../commands/callable/commands";
+import * as logger from "log-to-file"
 
-export default (client: RoleBot, message: Message) => {
+export default (client: RoleBot, message: Message): void => {
   const { guild } = message;
   const { id } = guild || { id: "" };
 
@@ -18,22 +19,30 @@ export default (client: RoleBot, message: Message) => {
   // Someone is trying to request a role (hopefully)
   if (channel.id === role_channel) {
     roles(message);
-  } else if (mention && mention.id === client.user!.id) {
+  } else if (mention && client.user && mention.id === client.user.id) {
     const length: number = message.content.split(" ")[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).split(" ");
 
     // Allow users to mention the bot only, this will return the list of commands in a private message
-    if (!command) return commands.run(message, args, client);
+    if (!command) {
+      commands.run(message, args, client);
+      return;
+    }
 
     //If the command isn't in the big ol' list.
+    const clientCommand = client.commands.get(command.toLowerCase());
     if (
-      !client.commands.has(command.toLowerCase()) ||
+      !clientCommand ||
       (!guild && command.toLowerCase() !== "help")
     )
       return console.log("Command DNE");
 
-    // Find the command and run it.
-    client.commands.get(command.toLowerCase())!.run(message, args, client);
+    try {
+      // Find the command and run it.
+      clientCommand.run(message, args, client);
+    } catch(e) {
+      logger(`Error occurred trying to run command: ${e}`, 'errors.log')
+    }
   }
 };

@@ -1,25 +1,38 @@
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import { addReactionRole, guildReactions } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
 
 export default {
-  desc: "Associate an emoji with a role",
-  name: "reactRole",
-  args: "<There are prompts to follow>",
+  desc: "Associate an emoji with a role.",
+  name: "-add",
+  args: "{ Follow the prompts given }",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return;
 
-    const GUILD_ID = message.guild.id;
     const channel = message.channel;
+    let done = false;
+    const finished = () => { done = true; }
+
+    while (!done) {
+      await reactSetup(channel as TextChannel, message, client, finished).then(console.log).catch(console.error);
+    }
+  }
+};
+
+const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, finished: Function) => {
+  return new Promise((resolve, reject) => {
+    //@ts-ignore
+    const GUILD_ID = message.guild.id;
     let id: string = "";
+    const { guild } = message;
+    if (!guild) throw new Error("Guild not found, possibly a group chat?");
 
     /* Let me clarify I am disgusted with the code below */
-
     channel
-      .send("Enter the role name. If you want to stop, say cancel.")
-      .then(bm => {
+      .send("Enter the role name. If you want to stop, say `cancel` or `done`.")
+      .then(bm => { 
         // Because I'm fighting callbacks and I'm stupid
         const emojiId = (i: string) => (id = i);
 
@@ -31,29 +44,34 @@ export default {
           })
           .then(m => {
             // Might as well cancel the whole process if they don't wanna do this
+            const msg = m.first();
+            if (!msg) throw new Error("Message somehow went missing");
+            const content = msg.content.toLowerCase();
+
             if (
               m &&
-              m.first()!.content.toLowerCase().includes("cancel") &&
+              (content.includes("cancel") || content.includes("done")) &&
               bm instanceof Message
             ) {
+              finished();
               bm.delete();
-              m.first()!.delete();
-              return;
+              msg.delete();
+              return resolve("Cancelled");
             }
 
-            const GUILD_REACT = guildReactions(message.guild!.id);
+            const GUILD_REACT = guildReactions(guild.id);
 
-            const role = message.guild!.roles.find(
-              r => r.name.toLowerCase() === m.first()!.content.toLowerCase()
+            const role = guild.roles.find(
+              r => r.name.toLowerCase() === content
             );
 
             if (!role && bm instanceof Message) {
               bm.edit("Role not found, check if you typed it correctly.");
-              m.first()!.delete();
+              msg.delete();
               setTimeout(() => {
                 bm.delete();
               }, 5000);
-              return;
+              return reject("Role not found");
             }
 
             if (
@@ -63,10 +81,10 @@ export default {
             ) {
               bm.edit(`Emoji already exist for this role`);
               setTimeout(() => {
-                bm.delete();
+                bm.delete().catch(() => { });
               }, 5000);
-              m.first()!.delete();
-              return;
+              msg.delete().catch(() => { });
+              return reject("Emoji exist");
             }
 
             if (role && bm instanceof Message) {
@@ -74,7 +92,7 @@ export default {
               bm.edit(
                 "Now send the emoji to match the role. This must be local to the server or a generic Discord emoji."
               );
-              m.first()!.delete();
+              msg.delete().catch(() => { });
 
               channel
                 .awaitMessages(m => m.author.id === message.author.id, {
@@ -83,8 +101,22 @@ export default {
                   errors: ["time"]
                 })
                 .then(m => {
+                  const msg = m.first()
+                  if(!msg) throw new Error("Msg somehow gone")
                   // Some discord emojis don't have id's and just use the unicode. Weird
-                  const match = /:(\d+)>/.exec(m.first()!.content);
+                  const match = /:(\d+)>/.exec(msg.content);
+
+
+                  if (
+                    m &&
+                    (content.includes("cancel") || content.includes("done")) &&
+                    bm instanceof Message
+                  ) {
+                    finished();
+                    bm.delete().catch(() => { });
+                    msg.delete().catch(() => { });
+                    return resolve("Cancelled");
+                  }
 
                   if (match) {
                     const [, id] = match;
@@ -93,41 +125,42 @@ export default {
                         `Either not an emoji or it's not available to me. :(`
                       );
                       setTimeout(() => {
-                        message.delete();
-                        bm.delete();
-                      }, 5000);
-                      m.first()!.delete();
-                      return;
+                        message.delete().catch(() => { });
+                        bm.delete().catch(() => { });
+                      }, 3000);
+                      msg.delete();
+                      return reject("Emoji not avail")
                     }
 
                     emojiId(id);
                   } else {
-                    emojiId(m.first()!.content);
+                    emojiId(msg.content);
                   }
 
                   if (role && id !== "") {
                     // Assuming everything went uh, great. Try to add. :))
                     addReactionRole(id, role.id, role.name, GUILD_ID);
+
                     if (bm instanceof Message) {
-                      m.first()!.delete();
-                      bm.edit(
-                        "Assuming everything went as planned, get the list!"
-                      );
+                      msg.delete().catch(() => { });
                       setTimeout(() => {
-                        bm.delete();
-                        message.delete();
-                      }, 5000);
+                        bm.delete().catch(() => { });
+                        message.delete().catch(() => { });
+                      }, 100);
+                      resolve("Added role.")
                     }
                   }
                 })
                 .catch(() => {
                   if (bm instanceof Message) bm.edit("No usable emoji given.");
+                  reject(finished());
                 });
             }
           })
           .catch(() => {
             if (bm instanceof Message) bm.edit("You didn't send role name.");
+            reject(finished());
           });
       });
-  }
-};
+  })
+}
