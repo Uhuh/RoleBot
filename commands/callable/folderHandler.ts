@@ -3,7 +3,7 @@ import RoleBot, { Command } from "../../src/bot"
 import * as logger from "log-to-file"
 
 const folderHandler = {
-  desc: "Handle your folders using this command.",
+  desc: "Create folders that can separate roles into different categories.",
   name: "folder",
   args: "\n",
   type: "reaction",

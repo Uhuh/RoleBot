@@ -3,7 +3,7 @@ import RoleBot, { Command } from "../../src/bot"
 import * as logger from "log-to-file"
 
 const reactionHandler = {
-  desc: "Handle your reaction roles using this command.",
+  desc: "Create reaction roles, get role id's so you can add to folders.",
   name: "reaction",
   args: "\n",
   type: "reaction",

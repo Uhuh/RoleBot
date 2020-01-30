@@ -34,7 +34,7 @@ export default {
       }
       const { roles } = folder
 
-      if (!roles.length && folder.id) continue;
+      if (!roles.length) continue;
 
       //@ts-ignore
       rMsg = (await reactList.run(message, roleChannel, folder)) as Message;
