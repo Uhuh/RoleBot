@@ -47,8 +47,8 @@ export interface Folder {
 
 export default class RoleBot extends Discord.Client {
   config: any;
+  reactMessage: string[];
   commands: Discord.Collection<string, Command>;
-  reactMessage: Discord.Collection<string, Discord.Message>;
   reactChannel: Discord.Collection<string, Discord.Message>;
   guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
   folderContents: Discord.Collection<number, Folder>;
@@ -61,7 +61,7 @@ export default class RoleBot extends Discord.Client {
     super();
     this.config = config;
     this.commands = new Discord.Collection();
-    this.reactMessage = new Discord.Collection<string, Discord.Message>();
+    this.reactMessage = [];
     this.reactChannel = new Discord.Collection();
     this.guildFolders = new Discord.Collection<string,
       { id: number; label: string; }[]
@@ -152,7 +152,7 @@ export default class RoleBot extends Discord.Client {
       try {
         if (!reaction || user.bot) return;
         const { message } = reaction;
-        if (this.reactMessage.has(message.id) && message.guild) {
+        if (this.reactMessage.includes(message.id) && message.guild) {
           const id = reaction.emoji.id || reaction.emoji.name;
           const emoji_role = getRoleByReaction(id, message.guild.id);
 
@@ -181,7 +181,7 @@ export default class RoleBot extends Discord.Client {
     this.on("messageReactionRemove", (reaction, user): void => {
       if (!reaction || user.bot) return;
       const { message } = reaction;
-      if (this.reactMessage.has(message.id) && message.guild) {
+      if (this.reactMessage.includes(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
         const [{ role_id }] = emoji_role.length
@@ -229,9 +229,11 @@ export default class RoleBot extends Discord.Client {
         .fetch(M_ID)
         .catch(() => console.error(`M_ID: ${M_ID} not found.`));
 
-      if (!msg) return;
+      if (!msg) {
+        return;
+      };
 
-      this.reactMessage.set(msg.id, msg);
+      this.reactMessage.push(msg.id);
     });
   }
 

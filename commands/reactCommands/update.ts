@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import RoleBot from "../../src/bot";
 import { rolesByFolderId } from "../../src/setup_table";
 
@@ -7,7 +7,7 @@ export default {
   name: "-update",
   args: "<msg_id> [-id <folder_id>]",
   type: "reaction",
-  run: (message: Message, args: string[], client: RoleBot): void => {
+  run: async (message: Message, args: string[], client: RoleBot): Promise<void> => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
       message.react("❌");
       return;
@@ -23,11 +23,18 @@ export default {
       return;
     }
 
-    const MSG = client.reactMessage.get(MSG_ID);
-
-    if(!MSG) {
+    if(!client.reactMessage.includes(MSG_ID)) {
       message.channel.send("The message you want updated doesn't seem to have been used for roles before.");
       return;
+    }
+
+    let MSG = {} as Message;
+
+    for(const [, c] of message.guild.channels) {
+      if(c instanceof TextChannel && c.messages.fetch(MSG_ID)) {
+        MSG = await c.messages.fetch(MSG_ID);
+        break;
+      }
     }
 
     if(args.length && args[0] === "-id") {

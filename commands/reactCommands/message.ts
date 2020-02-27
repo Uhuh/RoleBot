@@ -64,7 +64,7 @@ export default {
         });
 
         addReactMessage(msg.id, ch.id, guild.id);
-        client.reactMessage.set(msg.id, msg);
+        client.reactMessage.push(msg.id);
 
         break;
       }

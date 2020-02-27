@@ -40,7 +40,7 @@ export default {
       rMsg = (await reactList.run(message, roleChannel, folder)) as Message;
 
       addReactMessage(rMsg.id, roleChannel.id, GUILD_ID);
-      client.reactMessage.set(rMsg.id, rMsg);
+      client.reactMessage.push(rMsg.id);
 
       const REACT_ROLES = RolesChunks(20, roles);
 
@@ -54,7 +54,7 @@ export default {
       for (let i = 1; i < REACT_ROLES.length; i++) {
         const msg = await roleChannel.send("\u200b\n");
         addReactMessage(msg.id, roleChannel.id, GUILD_ID);
-        client.reactMessage.set(msg.id, msg);
+        client.reactMessage.push(msg.id);
         REACT_ROLES[i].forEach(r => {
           msg.react(r.emoji_id);
         });
@@ -64,8 +64,6 @@ export default {
     return message.react("✅");
   }
 };
-
-
 
 const RolesChunks = (chunkSize: number, ROLES: Role[]) => {
   let roles = [];
