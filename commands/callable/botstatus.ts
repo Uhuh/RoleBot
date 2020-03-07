@@ -12,9 +12,9 @@ export default {
     let userCount = 0;
     let channelCount = 0;
 
-    client.guilds.forEach(g => {
+    client.guilds.cache.forEach(g => {
       userCount += g.memberCount;
-      channelCount += g.channels.size;
+      channelCount += g.channels.cache.size;
     });
 
     embed
@@ -22,7 +22,7 @@ export default {
       .setTitle(`**Bot Status**`)
       .setThumbnail(client.user!.avatarURL() || "")
       .addField(`**Bot Developer:**`, `Panku#0721`, true)
-      .addField(`**The bot is in:**`, `${client.guilds.size} servers`, true)
+      .addField(`**The bot is in:**`, `${client.guilds.cache.size} servers`, true)
       .addField(`**The bot is watching:**`, `${userCount} users`, true)
       .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
       .addField(`**Bot OS:**`, `${OS.platform()}`, true);

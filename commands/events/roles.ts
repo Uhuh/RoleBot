@@ -13,7 +13,7 @@ export default async function (message: Message) {
 
   message.delete()
   // IF they already have the role, remove it.
-  const roleToRemove = member.roles.find(val => val.name.toLowerCase() === role.toLowerCase())
+  const roleToRemove = member.roles.cache.find(val => val.name.toLowerCase() === role.toLowerCase())
   if (roleToRemove && !jRoles.includes(roleToRemove.name)) {
     return member.roles.remove(roleToRemove)
       .then(member => console.log(`Removed ${roleToRemove.name} from ${member.displayName}`))
@@ -40,7 +40,7 @@ export default async function (message: Message) {
     // No need to loop again if role was granted.
     if (addedRole) break
   }
-  for (const [k, role] of member.roles) {
+  for (const [k, role] of member.roles.cache) {
     for (const gR of guildRoles) {
       if (
         gR.role_name.toLowerCase() === role.name.toLowerCase() &&

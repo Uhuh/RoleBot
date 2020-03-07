@@ -20,12 +20,12 @@ export default {
     const FOLDER_ID = Number(args[0]);
 
     if(!FOLDERS) {
-      message.channel.send("No folders to add to.").then(m => setTimeout(() => m.delete(), 5000));
+      message.channel.send("No folders to add to.");
       return;
     }
 
     if (Number.isNaN(FOLDER_ID) || FOLDER_ID < 0 || FOLDER_ID >= FOLDERS.length) {
-      message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`").then(m => setTimeout(() => m.delete(), 5000));
+      message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
       return;
     }
 

@@ -10,10 +10,6 @@ export default {
   args: "<channel mention>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {
-    setTimeout(() => {
-      message.delete().then(() => console.log("Deleted ReactChannel command"));
-    }, 5000);
-
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");
 
@@ -38,6 +34,8 @@ export default {
 
       //@ts-ignore
       rMsg = (await reactList.run(message, roleChannel, folder)) as Message;
+
+      console.log(`Adding ${rMsg.id} as a react msg.`);
 
       addReactMessage(rMsg.id, roleChannel.id, GUILD_ID);
       client.reactMessage.push(rMsg.id);

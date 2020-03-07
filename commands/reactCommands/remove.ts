@@ -8,15 +8,12 @@ export default {
   args: "<role name> or -all",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot) => {
-    setTimeout(() => {
-      message.delete();
-    }, 5000);
     if (!message.guild || (message.member && !message.member!.hasPermission(["MANAGE_ROLES"])))
       return message.react("❌");
     const arg = args.join(" ");
     const GUILD_ID = message.guild.id;
     const DB_ROLES = guildReactions(GUILD_ID).map(r => r.role_id);
-    const ROLE = message.guild.roles.find(
+    const ROLE = message.guild.roles.cache.find(
       r => r.name.toLowerCase() === arg.toLowerCase()
     );
     const FOLDERS = client.guildFolders.get(GUILD_ID) || []

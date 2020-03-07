@@ -10,10 +10,6 @@ export default {
   run: (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return
 
-    setTimeout(() => {
-      message.delete();
-    }, 5000);
-
     const GUILD_ID = message.guild.id;
     const FOLDERS = client.guildFolders.get(GUILD_ID);
     const embed = new MessageEmbed();
@@ -23,7 +19,7 @@ export default {
       const folderId = Number(args[0]);
 
       if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length) {
-        return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`").then(m => setTimeout(() => m.delete(), 5000));
+        return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
       }
       const folder = client.folderContents.get(FOLDERS[folderId].id);
 
@@ -33,7 +29,7 @@ export default {
       embed.setTitle(`**${FOLDERS[folderId].label}**'s roles`);
       if (roles.length) {
         embed.setDescription(
-          roles.map(r => `${message.guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
+          roles.map(r => `${message.guild!.emojis.cache.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
         )
       } else
         embed.setDescription(`No roles in this folder.`)
@@ -75,7 +71,7 @@ export default {
           embed.setTitle("**Free Roles**");
           if (FOLDERLESS_ROLES.length) {
             embed.setDescription(
-              FOLDERLESS_ROLES.map(r => `${message.guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
+              FOLDERLESS_ROLES.map(r => `${message.guild!.emojis.cache.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
             )
           } else {
             embed.setDescription("No free roles!");

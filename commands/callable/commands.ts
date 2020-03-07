@@ -39,6 +39,6 @@ export default {
       "To get the commands for reaction or message based roles, run the commands below",
       "`@RoleBot help reaction` or `@RoleBot help message`"
     );
-    message.author.send({ embed });
+    message.channel.send({ embed });
   }
 };

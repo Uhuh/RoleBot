@@ -12,7 +12,7 @@ export default (role: Role) => {
   if(REACT_ROLES.length > 0) {
     embed.setDescription(
       REACT_ROLES.map(
-        r => `${guild!.emojis.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`
+        r => `${guild!.emojis.cache.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`
       )
     );
   }

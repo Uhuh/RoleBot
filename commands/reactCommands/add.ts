@@ -66,16 +66,13 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
 
             const GUILD_REACT = guildReactions(guild.id);
 
-            const role = guild.roles.find(
+            const role = guild.roles.cache.find(
               r => r.name.toLowerCase() === content
             );
 
             if (!role && bm instanceof Message) {
               bm.edit("Role not found, check if you typed it correctly.");
               msg.delete();
-              setTimeout(() => {
-                bm.delete();
-              }, 5000);
               return reject("Role not found");
             }
 
@@ -85,9 +82,6 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
               GUILD_REACT.find(r => r.role_id === role.id)
             ) {
               bm.edit(`Emoji already exist for this role`);
-              setTimeout(() => {
-                bm.delete().catch(() => { });
-              }, 5000);
               msg.delete().catch(() => { });
               return reject("Emoji exist");
             }
@@ -125,13 +119,12 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
 
                   if (match) {
                     const [, id] = match;
-                    if (!client.emojis.get(id)) {
+                    if (!client.emojis.cache.get(id)) {
                       bm.edit(
                         `Either not an emoji or it's not available to me. :(`
                       );
                       setTimeout(() => {
                         message.delete().catch(() => { });
-                        bm.delete().catch(() => { });
                       }, 3000);
                       msg.delete();
                       return reject("Emoji not avail")
@@ -156,8 +149,9 @@ const reactSetup = (channel: TextChannel, message: Message, client: RoleBot, fin
                     }
                   }
                 })
-                .catch(() => {
+                .catch((e) => {
                   if (bm instanceof Message) bm.edit("No usable emoji given.");
+                  console.error(e);
                   reject(finished());
                 });
             }

@@ -16,9 +16,9 @@ export default {
     let voiceC: number = 0
     if (message.channel.type === "dm") return
 
-    guild.roles.forEach(role => roles.push(role))
+    guild.roles.cache.forEach(role => roles.push(role))
 
-    guild.channels.forEach(channel => {
+    guild.channels.cache.forEach(channel => {
       if (channel.type === "text") textC++
       else if (channel.type === "voice") voiceC++
     })

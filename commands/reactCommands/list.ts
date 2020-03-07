@@ -57,7 +57,7 @@ const generateEmbed = (label: string, roles: any[], guild: Guild, USER_CALLED: b
   if (roles.length) {
     let desc = ""
     for (const r in roles)
-      desc += `${USER_CALLED ? `[ ID ${r} ] - ` : ""}${guild.emojis.get(roles[r].emoji_id) || roles[r].emoji_id} - ${roles[r].role_name}\n`
+      desc += `${USER_CALLED ? `[ ID ${r} ] - ` : ""}${guild.emojis.cache.get(roles[r].emoji_id) || roles[r].emoji_id} - ${roles[r].role_name}\n`
 
     embed.setDescription(desc)
   } else

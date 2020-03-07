@@ -22,7 +22,7 @@ export default (guild: Guild, client: RoleBot) => {
     .setDescription(guild.name)
     .addField("Member size:", guild.memberCount);
 
-  (client.guilds.get(G_ID)!.channels.get(C_ID) as TextChannel).send(
+  (client.guilds.cache.get(G_ID)!.channels.cache.get(C_ID) as TextChannel).send(
     embed
   );
 

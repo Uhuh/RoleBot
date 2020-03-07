@@ -8,9 +8,6 @@ export default {
   args: "<A name for the folder>",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot): void => {
-    setTimeout(() => {
-      message.delete();
-    }, 5000);
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
       message.react("❌");
       return;
@@ -39,7 +36,7 @@ export default {
 
         client.folderContents.set(folder.id, { id: folder.id, label: folder.label, guild_id: GUILD_ID, roles: [] })
       } else {
-        message.channel.send(`Folder \`${folderName}\` already exist.`).then(m => setTimeout(() => m.delete(), 5000));
+        message.channel.send(`Folder \`${folderName}\` already exist.`);
       }
     }
   }

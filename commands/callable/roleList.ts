@@ -19,7 +19,7 @@ export default {
     const JOIN_ROLES: Role[] = [];
 
     // If the DB has roles that the guild doesn't then the guild deleted them
-    message.guild.roles.forEach(role => GUILD_ROLES.push(role.name));
+    message.guild.roles.cache.forEach(role => GUILD_ROLES.push(role.name));
     const DELETED_ROLES = DB_ROLES.filter(role => !GUILD_ROLES.includes(role));
 
     for (const role of DELETED_ROLES) {
@@ -28,7 +28,7 @@ export default {
     // Just deleted some old roles so lets get this updated.
     const UPDATED_ROLES = getRoles(GUILD_ID);
 
-    for (const [key, role] of message.guild.roles) {
+    for (const [key, role] of message.guild.roles.cache) {
       const r = UPDATED_ROLES.find(r => r.role_id === key);
       const jR = J_ROLES.find(r => r.role_id === key);
 

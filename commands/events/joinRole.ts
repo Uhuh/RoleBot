@@ -7,7 +7,7 @@ export default (message: Message, roleName: string) => {
   const PRIM_SEC_ROLES = getRoles(message.guild.id).map(role => role.role_id)
 
 
-  for (const [key, r] of message.guild.roles) {
+  for (const [key, r] of message.guild.roles.cache) {
     if(r.name.toLowerCase() === roleName.toLowerCase() &&
       PRIM_SEC_ROLES.includes(r.id)) {
         return message.channel.send(`Cannot create a join role of an already existing prim/sec role.\n` +

@@ -38,7 +38,7 @@ export default {
       return message.channel.send("Role type was not: `prim` `sec` or `join`.\n`@RoleBot role <type> RoleName`")
     if(!name) return message.channel.send(`No role provided.\n\`@RoleBot role ${roleType} <role>\``)
 
-    for (const [key, r] of message.guild.roles) {
+    for (const [key, r] of message.guild.roles.cache) {
       if(r.name.toLowerCase() === name.toLowerCase() &&
         JOIN_ROLES.includes(r.id)) {
           return message.channel.send(`Cannot create a ${roleType} role of an already existing join role.\n` +

@@ -20,9 +20,9 @@ export default {
 
     const actualChannel = client.roleChannels.get(message.guild.id);
 
-    if (actualChannel && message.guild.channels.get(actualChannel))
+    if (actualChannel && message.guild.channels.cache.get(actualChannel))
       return message.channel.send(
-        `${message.guild.channels
+        `${message.guild.channels.cache
           .get(actualChannel)!
           .toString()} is the current role channel.`
       );

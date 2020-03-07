@@ -34,7 +34,7 @@
     "@types/ws": "^6.0.4",
     "better-sqlite3": "^5.4.3",
     "dblapi.js": "*",
-    "discord.js": "discordjs/discord.js",
+    "discord.js": "12",
     "dotenv": "*",
     "fs": "*",
     "log-to-file": "*",

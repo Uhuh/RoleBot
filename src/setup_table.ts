@@ -76,7 +76,7 @@ const setupTable = () => {
     .get()
   if (!reactionRoleTable["count(*)"]) {
     sql
-      .prepare("CREATE TABLE reaction_role (guild_id TEXT, emoji_id TEXT, role_id TEXT, role_name TEXT, PRIMARY KEY (emoji_id, role_id))")
+      .prepare("CREATE TABLE reaction_role (folder_id TEXT, guild_id TEXT, emoji_id TEXT, role_id TEXT, role_name TEXT, PRIMARY KEY (emoji_id, role_id))")
       .run()
   }
   const reactionFolderTable = sql
