@@ -105,16 +105,15 @@ export default class RoleBot extends Discord.Client {
 
       const react = message.reactions.cache.get(
         //Emojis without a unicode name must be referenced
-        (packet.d.emoji.id ?
-          packet.d.emoji.id :
-          packet.d.emoji.name
-        )
-      )
+        (packet.d.emoji.id || packet.d.emoji.name)
+      );
       const user = await this.users.fetch(packet.d.user_id);
 
       if (packet.t === "MESSAGE_REACTIO_ADD") {
+        console.log("Emitting reaction add");
         this.emit("messageReactionAdd", react, user);
       } else if (packet.t === "MESSAGE_REACTION_REMOVE") {
+        console.log("Emitting react remove");
         this.emit("messageReactionRemove", react, user);
       }
     });
@@ -200,7 +199,6 @@ export default class RoleBot extends Discord.Client {
             reaction.users.remove(user.id).catch(console.error);
             return;
           }
-
           const role = message.guild.roles.cache.get(role_id);
           const member = message.guild.members.cache.get(user.id);
           if(!role) throw new Error("Role DNE");
@@ -226,8 +224,10 @@ export default class RoleBot extends Discord.Client {
           : [{ role_id: null }];
         // cancel
         if (!role_id) return;
-        const role = message.guild.roles.cache.get(role_id)!;
-        const member = message.guild.members.cache.get(user.id)!;
+        const role = message.guild.roles.cache.get(role_id);
+        const member = message.guild.members.cache.get(user.id);
+        if(!role) throw new Error("Role DNE");
+        if(!member) throw new Error("Member not found");
         member.roles.remove(role).catch(console.error);
       }
     });
