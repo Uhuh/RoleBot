@@ -109,6 +109,10 @@ export default class RoleBot extends Discord.Client {
       );
       const user = await this.users.fetch(packet.d.user_id);
 
+      if (user.bot) {
+        return; // Ignore bots. >:((((
+      }
+
       if (packet.t === "MESSAGE_REACTIO_ADD") {
         console.log("Emitting reaction add");
         this.emit("messageReactionAdd", react, user);
