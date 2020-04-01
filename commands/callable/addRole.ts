@@ -1,17 +1,12 @@
-import { Message, Guild } from "discord.js"
-import { addRole, getJoinRoles } from "../../src/setup_table"
-import joinRole from "../events/joinRole"
+import { Message } from "discord.js"
+import { joinRoles } from "../../src/setup_table"
 
 export default {
   desc:
-    "Add a role to your hand out role list\n" +
-    "prim = Will replace any other prim role\n" +
-    "sec =  Will stack with both prim/sec roles.\n" +
-    "join = Users are given this role upon joining.\n" +
-    "You cannot make a join role if the role is currently a prim/sec role and vice versa.\n" +
-    "E.G: `@RoleBot role prim Role Name`",
+    "Users are given this role upon joining.\n" +
+    "E.G: `@RoleBot role join Member`",
   name: "role",
-  args: "<prim | sec | join> <Role name>",
+  args: "join <Role name>",
   type: "message",
   run: (message: Message, args: string[]) => {
     // ignore them plebians
@@ -22,40 +17,19 @@ export default {
       return
     if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")
     
-    const JOIN_ROLES = getJoinRoles(message.guild.id).map(role => role.role_id)
-    const guild: Guild = message.guild
-
-    let role: any = {}
-    let roleType = args.shift()!.toLowerCase()
-    let name: string = ""
-
-    // So people like putting spaces in the role names, so this just adds them together.
-    name = args.join(" ")
+    const roleName = args.join(" ")
 
     
-    if (roleType === "join") return joinRole(message, name)
-    if (roleType !== "prim" && roleType !== "sec" ) 
-      return message.channel.send("Role type was not: `prim` `sec` or `join`.\n`@RoleBot role <type> RoleName`")
-    if(!name) return message.channel.send(`No role provided.\n\`@RoleBot role ${roleType} <role>\``)
+    const role = message.guild.roles.cache.find(r => r.name.toLowerCase() === roleName)
 
-    for (const [key, r] of message.guild.roles.cache) {
-      if(r.name.toLowerCase() === name.toLowerCase() &&
-        JOIN_ROLES.includes(r.id)) {
-          return message.channel.send(`Cannot create a ${roleType} role of an already existing join role.\n` +
-                              `Run \`@RoleBot deleteJoin ${r.name}\` then try again.`)
-      }
-
-      if (r.name.toLowerCase() === name.toLowerCase()) {
-        role = {
-          id: `${guild.id}-${key}`,
-          role_name: r.name,
-          role_id: key,
-          guild: guild.id,
-          prim_role: roleType === "prim" ? 1 : 0
-        }
-        addRole.run(role)
-        return message.react("✅")
-      }
+    if (role) {
+      message.react("✅")
+      return joinRoles.run({
+        id: `${message.guild.id}-${role.id}`,
+        role_name: role.name,
+        role_id: role.id,
+        guild_id: message.guild.id
+      })
     }
 
     return message.react("❌")

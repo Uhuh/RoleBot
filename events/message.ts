@@ -1,6 +1,6 @@
 import { Message, Channel } from "discord.js";
 import RoleBot from "../src/bot";
-import roles from "../commands/events/roles";
+import roles from "../commands/archive/roles";
 import commands from "../commands/callable/commands";
 import * as logger from "log-to-file"
 
@@ -22,7 +22,7 @@ export default (client: RoleBot, message: Message): void => {
   } else if (mention && client.user && mention.id === client.user.id) {
     const length: number = message.content.split(" ")[0].length;
     // + 1 for the damn space.
-    const [command, ...args] = message.content.substring(length + 1).split(" ");
+    const [command, ...args] = message.content.substring(length + 1).match(/\S+/g) || [];
 
     // Allow users to mention the bot only, this will return the list of commands in a private message
     if (!command) {

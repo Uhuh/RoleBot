@@ -6,19 +6,18 @@ import * as config from "./vars";
 import msg from "../events/message";
 import commandHandler from "../commands/commandHandler";
 import joinRole from "../events/joinRoles";
-import roleUpdate from "../events/roleUpdate";
 import * as DBL from "dblapi.js";
 import removed from "../events/removed";
 import * as logger from "log-to-file";
 import {
   getRoleByReaction,
   getReactMessages,
-  getRoles,
   getJoinRoles,
   getChannel,
   guildFolders,
   folderContent
 } from "./setup_table";
+import { handle_packet } from "../events/raw_packet";
 
 export interface Command {
   desc: string;
@@ -53,8 +52,6 @@ export default class RoleBot extends Discord.Client {
   guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
   folderContents: Discord.Collection<number, Folder>;
   roleChannels: Discord.Collection<string, string>;
-  primaryRoles: Discord.Collection<string, { id: string; name: string }[]>;
-  secondaryRoles: Discord.Collection<string, { id: string; name: string }[]>;
   joinRoles: Discord.Collection<string, { id: string; name: string }[]>;
 
   constructor() {
@@ -68,14 +65,6 @@ export default class RoleBot extends Discord.Client {
     >();
     this.folderContents = new Discord.Collection<number, Folder>();
     this.roleChannels = new Discord.Collection<string, string>();
-    this.primaryRoles = new Discord.Collection<
-      string,
-      { id: string; name: string }[]
-    >();
-    this.secondaryRoles = new Discord.Collection<
-      string,
-      { id: string; name: string }[]
-    >();
     this.joinRoles = new Discord.Collection<
       string,
       { id: string; name: string }[]
@@ -86,41 +75,7 @@ export default class RoleBot extends Discord.Client {
      * V12 is a pain and now we have to handle all the packets ourselves since nothing is cahced.
      * Fun. The bot is about roles so I better handle add/remove
      */
-    this.on("raw", async packet => {
-      if (!packet.t || 
-          (packet.t !== 'MESSAGE_REACTION_ADD' && 
-          packet.t !== 'MESSAGE_REACTION_REMOVE')
-      ) {
-        return;
-      }
-      const channel = await this.channels.fetch(packet.d.channel_id, false);
-      if (channel.type !== "text") { return; }
-      //Ignore if messages are cached already
-      if ((channel as Discord.TextChannel).messages.cache.has(packet.d.message_id)) {
-        return;
-      }
-
-      const message = await (channel as Discord.TextChannel)
-        .messages.fetch(packet.d.message_id,false);
-
-      const react = message.reactions.cache.get(
-        //Emojis without a unicode name must be referenced
-        (packet.d.emoji.id || packet.d.emoji.name)
-      );
-      const user = await this.users.fetch(packet.d.user_id);
-
-      if (user.bot) {
-        return; // Ignore bots. >:((((
-      }
-
-      if (packet.t === "MESSAGE_REACTIO_ADD") {
-        console.log("Emitting reaction add");
-        this.emit("messageReactionAdd", react, user);
-      } else if (packet.t === "MESSAGE_REACTION_REMOVE") {
-        console.log("Emitting react remove");
-        this.emit("messageReactionRemove", react, user);
-      }
-    });
+    this.on("raw", packet => handle_packet(packet, this));
 
     this.on("ready", (): void => {
       const dblapi = new DBL(this.config.DBLTOKEN, this);
@@ -135,7 +90,6 @@ export default class RoleBot extends Discord.Client {
     this.on("guildMemberAdd", (member): void =>
       joinRole(member as Discord.GuildMember, this.joinRoles)
     );
-    this.on("roleUpdate", (_oldRole, newRole): void => roleUpdate(newRole));
     this.on("guildCreate", (guild): void => {
       // const G_ID = "567819334852804626"; - Support guild id
       const C_ID = "661410527309856827";
@@ -286,24 +240,7 @@ export default class RoleBot extends Discord.Client {
     const GUILD_IDS = this.guilds.cache.keys();
 
     for (const g_id of GUILD_IDS) {
-      const roles = getRoles(g_id);
       const joinRoles = getJoinRoles(g_id);
-
-      for (const r of roles) {
-        if (r.prim_role) {
-          const guild_roles = this.primaryRoles.get(g_id) || [];
-          this.primaryRoles.set(g_id, [
-            ...guild_roles,
-            { name: r.role_name, id: r.role_id }
-          ]);
-        } else {
-          const guild_roles = this.secondaryRoles.get(g_id) || [];
-          this.secondaryRoles.set(g_id, [
-            ...guild_roles,
-            { name: r.role_name, id: r.role_id }
-          ]);
-        }
-      }
 
       for (const r of joinRoles) {
         const join_roles = this.joinRoles.get(g_id) || [];
@@ -337,7 +274,7 @@ export default class RoleBot extends Discord.Client {
 
   async start() {
     await this.login(this.config.TOKEN);
-    // await this.loadRoles();
+    await this.loadRoles();
     await this.loadFolders();
     await this.loadReactMessage();
   }
