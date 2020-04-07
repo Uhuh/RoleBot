@@ -13,7 +13,6 @@ import {
   getRoleByReaction,
   getReactMessages,
   getJoinRoles,
-  getChannel,
   guildFolders,
   folderContent
 } from "./setup_table";
@@ -51,7 +50,6 @@ export default class RoleBot extends Discord.Client {
   reactChannel: Discord.Collection<string, Discord.Message>;
   guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
   folderContents: Discord.Collection<number, Folder>;
-  roleChannels: Discord.Collection<string, string>;
   joinRoles: Discord.Collection<string, { id: string; name: string }[]>;
 
   constructor() {
@@ -64,7 +62,6 @@ export default class RoleBot extends Discord.Client {
       { id: number; label: string; }[]
     >();
     this.folderContents = new Discord.Collection<number, Folder>();
-    this.roleChannels = new Discord.Collection<string, string>();
     this.joinRoles = new Discord.Collection<
       string,
       { id: string; name: string }[]
@@ -91,9 +88,10 @@ export default class RoleBot extends Discord.Client {
       joinRole(member as Discord.GuildMember, this.joinRoles)
     );
     this.on("guildCreate", (guild): void => {
+      
       // const G_ID = "567819334852804626"; - Support guild id
       const C_ID = "661410527309856827";
-      const JOIN_MSG = "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me."
+      const JOIN_MSG = "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me.\nHere is my documentation: https://duwtgb.gitbook.io/rolebot/";
 
       // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
       guild.fetchAuditLogs()
@@ -249,11 +247,6 @@ export default class RoleBot extends Discord.Client {
           { name: r.role_name, id: r.role_id }
         ]);
       }
-
-      this.roleChannels.set(
-        g_id,
-        getChannel(g_id).length ? getChannel(g_id)[0].channel_id : null
-      );
     }
   }
 

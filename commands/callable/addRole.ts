@@ -4,9 +4,9 @@ import { joinRoles } from "../../src/setup_table"
 export default {
   desc:
     "Users are given this role upon joining.\n" +
-    "E.G: `@RoleBot role join Member`",
-  name: "role",
-  args: "join <Role name>",
+    "E.G: `@RoleBot join Member`",
+  name: "join",
+  args: "",
   type: "message",
   run: (message: Message, args: string[]) => {
     // ignore them plebians
@@ -16,10 +16,8 @@ export default {
     )
       return
     if (!args.length) return message.channel.send("No arguments provided.\n`@RoleBot role <type> <name>`")
-    
-    const roleName = args.join(" ")
+    const roleName = args.join(" ");
 
-    
     const role = message.guild.roles.cache.find(r => r.name.toLowerCase() === roleName)
 
     if (role) {
