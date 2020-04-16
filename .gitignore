@@ -1,6 +1,5 @@
 .env
 node*
-roles.sql*
 *.js
 build/
 *.log
