@@ -19,5 +19,4 @@ export default (role: Role) => {
   else
     embed.setDescription(`There are no reaction roles`)
   
-
 }

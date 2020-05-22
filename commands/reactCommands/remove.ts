@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { removeReactionRole, guildReactions } from "../../src/setup_table";
+import { removeReactionRole, removeReactionRoleNullFolder, guildReactions } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
 
 export default {
@@ -12,53 +12,36 @@ export default {
       return message.react("❌");
     const arg = args.join(" ");
     const GUILD_ID = message.guild.id;
-    const DB_ROLES = guildReactions(GUILD_ID).map(r => r.role_id);
-    const ROLE = message.guild.roles.cache.find(
-      r => r.name.toLowerCase() === arg.toLowerCase()
-    );
-    const FOLDERS = client.guildFolders.get(GUILD_ID) || []
-    let found = false;
+    const DB_ROLES = guildReactions(GUILD_ID);
 
-    if (ROLE && DB_ROLES.includes(ROLE.id)) {
-      for(const f of FOLDERS) {
-        const folder = client.folderContents.get(f.id)
+    const DB_ROLE = DB_ROLES
+      .find(r => (
+        r.role_name.toLowerCase() === arg.toLowerCase()
+      ));
+    
+    if(DB_ROLE) {
+      const folder = client.folderContents.get(DB_ROLE.folder_id);
 
-        if(!folder) continue;
-
-        for(const r of folder.roles) {
-          if (r.role_id === ROLE.id) {
-            folder.roles.splice(folder.roles.indexOf(r), 1);
-            found = true;
-            client.folderContents.set(f.id, folder);
-            break;
-          }
-        }
-        if (found) break;
+      if(folder) {
+        folder.roles.splice(folder.roles.indexOf(DB_ROLE.role_id), 1);
+        client.folderContents.set(folder.id, folder);
       }
-      removeReactionRole(ROLE.id);
+
+      removeReactionRole(DB_ROLE.id);
       return message.react("✅");
-    } else if (arg.includes("-all")) {
-      DB_ROLES.forEach(r => {
-        for(const f of FOLDERS) {
-          found = false;
-          const folder = client.folderContents.get(f.id)
-
-          if(!folder) continue;
-
-          for(const role of folder.roles) {
-            if (role.role_id === r) {
-              folder.roles.splice(folder.roles.indexOf(r), 1);
-              found = true;
-              client.folderContents.set(f.id, folder);
-              break;
-            }
-          }
-        }
-        removeReactionRole(r)
-      });
+    } 
+    else if (arg.includes("-all")) {
+      removeReactionRoleNullFolder();
+      for(const [id, folder] of client.folderContents) {
+        folder.roles.forEach(r => {
+          folder.roles.splice(folder.roles.indexOf(r), 1);
+          removeReactionRole(r.role_id);
+        });
+        client.folderContents.set(id, folder);
+      }
       return message.react("✅");
     }
-
+    
     return message.react("❌");
   }
 };
