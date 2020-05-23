@@ -177,10 +177,8 @@ export default class RoleBot extends Discord.Client {
       if (this.reactMessage.includes(message.id) && message.guild) {
         const id = reaction.emoji.id || reaction.emoji.name;
         const emoji_role = getRoleByReaction(id, message.guild.id);
-        const [{ role_id }] = emoji_role.length
-          ? emoji_role
-          : [{ role_id: null }];
-        // cancel
+        const { role_id } = emoji_role;
+        
         if (!role_id) return;
         const role = message.guild.roles.cache.get(role_id);
         const member = message.guild.members.cache.get(user.id);
