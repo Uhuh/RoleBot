@@ -15,14 +15,12 @@ export default {
     if(!user) return;
     embed
       .setDescription(
-        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)\n[📝Documentation](https://app.gitbook.com/@duwtgb/s/rolebot/)
-          
+        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)          
         <> = required arguments, [] = optional.
         `
       )
 
     embed
-      .setDescription(`<> = required arguments, [] = optional.`)
       .setColor(16711684)
       .setAuthor(user.username, user.avatarURL() || "")
       .setThumbnail(user.avatarURL() || "")
