@@ -18,30 +18,37 @@ export default {
       .find(r => (
         r.role_name.toLowerCase() === arg.toLowerCase()
       ));
+
+    console.log(DB_ROLE);
     
     if(DB_ROLE) {
-      const folder = client.folderContents.get(DB_ROLE.folder_id);
+      const folder = client.folderContents.get(Number(DB_ROLE.folder_id));
 
       if(folder) {
-        folder.roles.splice(folder.roles.indexOf(DB_ROLE.role_id), 1);
+        const role = folder.roles.find(r => r.role_id === DB_ROLE.role_id);
+        if(!role) return console.error(`Role ${args} somehow not in folder but is in database.`);
+        console.log(`Removing role from folder`);
+        console.log(role);
+
+        folder.roles.splice(folder.roles.indexOf(role), 1);
         client.folderContents.set(folder.id, folder);
       }
 
-      removeReactionRole(DB_ROLE.id);
+      removeReactionRole(DB_ROLE.role_id);
       return message.react("✅");
     } 
     else if (arg.includes("-all")) {
       removeReactionRoleNullFolder();
       for(const [id, folder] of client.folderContents) {
         folder.roles.forEach(r => {
-          folder.roles.splice(folder.roles.indexOf(r), 1);
           removeReactionRole(r.role_id);
-        });
+        })
+        folder.roles = [];
         client.folderContents.set(id, folder);
       }
       return message.react("✅");
     }
-    
+
     return message.react("❌");
   }
 };

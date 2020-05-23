@@ -6,4 +6,4 @@ build/
 .idea/
 .vscode
 errors.log
-roles*
+roles.sqlite*
