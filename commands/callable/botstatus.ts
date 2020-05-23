@@ -1,5 +1,4 @@
 import { Message, MessageEmbed } from "discord.js";
-import * as OS from "os";
 import RoleBot from "../../src/bot";
 
 export default {
