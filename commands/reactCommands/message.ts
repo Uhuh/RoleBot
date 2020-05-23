@@ -3,9 +3,9 @@ import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
 import RoleBot from "../../src/bot";
 
 export default {
-  desc: "Will watch a custom message for reactions.\nApply a folders roles instead by using the `-f` flag.",
-  name: "-msg",
-  args: "<message id> [-id <Folder id>]",
+  desc: "Will watch a custom message for reactions.\nUse roles in a folder by passing the folder id after the message id.",
+  name: "msg",
+  args: "<message id> [Folder id]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return;
@@ -22,17 +22,12 @@ export default {
 
     let folder: { id: number; label: string} | undefined = undefined
 
-    // Making sure the flag was used properly and that the folder exist.
-    if (args.length === 2 && args[1] === "-id")
-      return message.channel.send("No folder name given. Run `@RoleBot folders` to see folder names.");
-    else if (args.length === 2 && args[0] === "-id") {
+    if (args.length) {
       const GUILD_FOLDERS = client.guildFolders.get(guild.id)
 
       if (!GUILD_FOLDERS || !GUILD_FOLDERS.length)
         return message.channel.send("The server doesn't have any folders.");
-                
 
-      args.shift()
       const ARRAY_ID = Number(args[0]);
       if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= GUILD_FOLDERS.length) {
         return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");

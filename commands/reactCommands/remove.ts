@@ -4,7 +4,7 @@ import RoleBot from "../../src/bot";
 
 export default {
   desc: "Delete a reaction role. Use `-all` to delete all current reactions.",
-  name: "-remove",
+  name: "remove",
   args: "<role name> or -all",
   type: "reaction",
   run: (message: Message, args: string[], client: RoleBot) => {

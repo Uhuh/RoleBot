@@ -31,8 +31,7 @@ export default {
       .addField(`_**> OwnerID**_`, `\`${guild.ownerID}\``, true)
       .addField(`_**> Users**_`, `\`${guild.memberCount}\``, true)
       .addField(`_**> Text Channels**_`, `\`${textC}\``, true)
-      .addField(`_**> Voice Channels**_`, `\`${voiceC}\``, true)
-      .addField(`_**> Roles**_`, `${roles.join(" ")}`, true)
+      .addField(`_**> Voice Channels**_`, `\`${voiceC}\``, true);
 
     message.channel.send(embed)
   }

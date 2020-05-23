@@ -4,9 +4,9 @@ import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
   desc: "All role folders. If an id is given it list the roles within the folder.",
-  name: "-list",
+  name: "list",
   args: "[folder id]",
-  type: "reaction",
+  type: "folder",
   run: (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild) return
 

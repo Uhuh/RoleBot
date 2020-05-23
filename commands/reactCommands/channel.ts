@@ -6,7 +6,7 @@ import RoleBot, { Role } from "../../src/bot";
 export default {
   desc:
     "Will send a message with the roles and reaction message in a specific channel.",
-  name: "-channel",
+  name: "channel",
   args: "<channel mention>",
   type: "reaction",
   run: async (message: Message, _args: string[], client: RoleBot) => {

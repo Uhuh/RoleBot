@@ -4,9 +4,9 @@ import RoleBot from "../../src/bot";
 
 export default {
   desc: "Create a folder.",
-  name: "-new",
+  name: "create",
   args: "<A name for the folder>",
-  type: "reaction",
+  type: "folder",
   run: (message: Message, args: string[], client: RoleBot): void => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
       message.react("❌");

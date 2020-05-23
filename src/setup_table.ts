@@ -183,7 +183,10 @@ export const guildReactions = (guild_id: string) => sql.prepare(
 ).all({ guild_id });
 export const getRoleByReaction = (emoji_id: string, guild_id: string) => sql.prepare(
   "SELECT * from reaction_role WHERE emoji_id = @emoji_id AND guild_id = @guild_id"
-).all({ emoji_id, guild_id });
+).get({ emoji_id, guild_id });
+export const getRoleByName = (role_name: string, guild_id: string) => sql.prepare(
+  "SELECT * from reaction_role WHERE role_name = @role_name AND guild_id = @guild_id"
+).get({ role_name, guild_id });
 export const addReactionRole = (emoji_id: string, role_id: string, role_name: string, guild_id: string, folder_id?: number | null) => sql.prepare(
   "INSERT INTO reaction_role (emoji_id, role_id, role_name, guild_id, folder_id) VALUES (@emoji_id, @role_id, @role_name, @guild_id, @folder_id)"
 ).run({ emoji_id, role_id, role_name, guild_id, folder_id });

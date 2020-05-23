@@ -3,9 +3,9 @@ import RoleBot from "../../src/bot";
 import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
-  desc: "Update a messages reactions. EG: `@RoleBot reaction -update 660203902193 [-id 1]`",
-  name: "-update",
-  args: "<msg_id> [-id <folder_id>]",
+  desc: "Update a messages reactions. \nUpdate with roles in a folder by passing the folder id. \nEG: `@RoleBot reaction update 660203902193`",
+  name: "update",
+  args: "<msg_id> [folder id]",
   type: "reaction",
   run: async (message: Message, args: string[], client: RoleBot): Promise<void> => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
@@ -37,13 +37,12 @@ export default {
       }
     }
 
-    if(args.length && args[0] === "-id") {
+    if(args.length) {
       const FOLDERS = client.guildFolders.get(GUILD_ID);
       if(!FOLDERS) {
         message.channel.send("No folders to add to.");
         return;
       }
-      args.shift();
       
       const FOLDER_ID = Number(args[0]);
       if (Number.isNaN(FOLDER_ID) || FOLDER_ID < 0 || FOLDER_ID >= FOLDERS.length) {

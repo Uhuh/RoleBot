@@ -6,7 +6,7 @@ const folderHandler = {
   desc: "Create folders that can separate roles into different categories.",
   name: "folder",
   args: "\n",
-  type: "reaction",
+  type: "folder",
   commands: new Collection<string, Command>(),
   run: (message: Message, args: string[], client: RoleBot) => {
     const command = args[0];

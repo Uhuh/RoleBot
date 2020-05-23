@@ -24,8 +24,7 @@ export default {
       .addField(`**Bot Developer:**`, `Panku#0721`, true)
       .addField(`**The bot is in:**`, `${client.guilds.cache.size} servers`, true)
       .addField(`**The bot is watching:**`, `${userCount} users`, true)
-      .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
-      .addField(`**Bot OS:**`, `${OS.platform()}`, true);
+      .addField(`**The bot is watching:**`, `${channelCount} channels`, true);
     message.channel.send(embed);
   }
 };

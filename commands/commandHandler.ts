@@ -24,7 +24,6 @@ const loadReactCommands = (reactionHandler: CommandCollection) => {
   for (const file of reactCommands) {
     const command = require(`./reactCommands/${file}`);
     reactionHandler.commands.set(command.default.name, command.default);
-    reactionHandler.args += (`\t\t\t\t\t${command.default.name} ${command.default.args}\n`);
   }
 }
 
@@ -37,6 +36,5 @@ const loadFolderCommands = (folderHandler: CommandCollection) => {
   for (const file of folderCommands) {
     const command = require(`./folderCommands/${file}`);
     folderHandler.commands.set(command.default.name, command.default);
-    folderHandler.args += (`\t\t\t\t\t${command.default.name} ${command.default.args}\n`);
   }
 }

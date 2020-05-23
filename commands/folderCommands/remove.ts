@@ -4,9 +4,9 @@ import RoleBot from "../../src/bot";
 
 export default {
   desc: "Delete a folder.",
-  name: "-remove",
+  name: "remove",
   args: "<folder id>",
-  type: "reaction",
+  type: "folder",
   run: (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"]))
       return message.react("❌");

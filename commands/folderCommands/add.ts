@@ -3,10 +3,10 @@ import RoleBot from "../../src/bot";
 import { rolesByFolderId, giveFolderId } from "../../src/setup_table";
 
 export default {
-  desc: "Delete a folder. EG: `@RoleBot folder -add 3 1,2,3,4`",
-  name: "-add",
-  args: "<folder id> <list of role id's>",
-  type: "reaction",
+  desc: "Add roles to a folder. EG: `@RoleBot folder add 3 1,2,3,4`",
+  name: "add",
+  args: "<folder id> <list of role ids>",
+  type: "folder",
   run: (message: Message, args: string[], client: RoleBot): void => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
       message.react("❌");
