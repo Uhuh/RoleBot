@@ -31,6 +31,8 @@ export default (client: RoleBot, message: Message): void => {
     )
       return console.log("Command DNE");
 
+    client.commandsRun++;
+
     try {
       // Find the command and run it.
       clientCommand.run(message, args, client);

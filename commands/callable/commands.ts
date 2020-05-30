@@ -40,12 +40,12 @@ export default {
       embed.setTitle(`**${args[0].toUpperCase()} COMMANDS**`);
 
       if(args[0] === 'reaction') {
-        embed.addField(`DOCUMENTATION`, `[In depth reaction documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#reaction-roles)`)
+        embed.addField(`**DOCUMENTATION**`, `[In depth reaction documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#reaction-roles)`)
         for (const func of reactionHandler.commands.values()) {
           embed.addField(`**@${user.username} reaction ${func.name} ${func.args}**`, `${func.desc}`);
         }
       } else if (args[0] === 'folder') {
-        embed.addField(`DOCUMENTATION`, `[In depth folder documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#folders)`)
+        embed.addField(`**DOCUMENTATION**`, `[In depth folder documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#folders)`)
         for (const func of folderHandler.commands.values()) {
           embed.addField(`**@${user.username} folder ${func.name} ${func.args}**`, `${func.desc}`);
         }

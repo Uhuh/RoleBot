@@ -47,6 +47,7 @@ export default class RoleBot extends Discord.Client {
   config: any;
   reactMessage: string[];
   commands: Discord.Collection<string, Command>;
+  commandsRun: number;
   reactChannel: Discord.Collection<string, Discord.Message>;
   guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
   folderContents: Discord.Collection<number, Folder>;
@@ -57,6 +58,7 @@ export default class RoleBot extends Discord.Client {
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactMessage = [];
+    this.commandsRun = 0;
     this.reactChannel = new Discord.Collection();
     this.guildFolders = new Discord.Collection<string,
       { id: number; label: string; }[]
@@ -143,24 +145,28 @@ export default class RoleBot extends Discord.Client {
       try {
         if (!reaction || user.bot) return;
         const { message } = reaction;
-        console.log(this.reactMessage);
-        console.log(message.id);
         if (this.reactMessage.includes(message.id) && message.guild) {
           const id = reaction.emoji.id || reaction.emoji.name;
           const emoji_role = getRoleByReaction(id, message.guild.id);
-
-          console.log(emoji_role)
-
-          const { role_id } = emoji_role;
-
-          if (!role_id) {
+          // Remove reaction since it doesn't exist.
+          if (!emoji_role) {
             reaction.users.remove(user.id).catch(console.error);
             return;
           }
+          const { role_id } = emoji_role;
+
           const role = message.guild.roles.cache.get(role_id);
-          const member = message.guild.members.cache.get(user.id);
-          if(!role) throw new Error("Role DNE");
-          if(!member) throw new Error("Member not found");
+          let member = message.guild.members.cache.get(user.id);
+
+          if(!member) {
+            console.log(`Role add - Failed to get member from cache. Going to fetch and retry....`);
+            message.guild.members.fetch(user.id);
+            member = message.guild.members.cache.get(user.id);
+          }
+          
+          if(!role) throw new Error(`Role DNE`);
+          if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
+
           member.roles.add(role).catch(console.log);
           return;
         }
@@ -172,19 +178,33 @@ export default class RoleBot extends Discord.Client {
     });
 
     this.on("messageReactionRemove", (reaction, user): void => {
-      if (!reaction || user.bot) return;
-      const { message } = reaction;
-      if (this.reactMessage.includes(message.id) && message.guild) {
-        const id = reaction.emoji.id || reaction.emoji.name;
-        const emoji_role = getRoleByReaction(id, message.guild.id);
-        const { role_id } = emoji_role;
-        
-        if (!role_id) return;
-        const role = message.guild.roles.cache.get(role_id);
-        const member = message.guild.members.cache.get(user.id);
-        if(!role) throw new Error("Role DNE");
-        if(!member) throw new Error("Member not found");
-        member.roles.remove(role).catch(console.error);
+      try {
+        if (!reaction || user.bot) return;
+        const { message } = reaction;
+        if (this.reactMessage.includes(message.id) && message.guild) {
+          const id = reaction.emoji.id || reaction.emoji.name;
+          const emoji_role = getRoleByReaction(id, message.guild.id);
+          // Just for bot to not die
+          if(!emoji_role) return;
+          
+          const { role_id } = emoji_role;
+          
+          if (!role_id) return;
+          const role = message.guild.roles.cache.get(role_id);
+          let member = message.guild.members.cache.get(user.id);
+
+          if(!member) {
+            console.log(`Role remove - Failed to get member from cache. Going to fetch and retry....`);
+            message.guild.members.fetch(user.id);
+            member = message.guild.members.cache.get(user.id);
+          }
+
+          if(!role) throw new Error("Role DNE");
+          if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
+          member.roles.remove(role).catch(console.error);
+        }
+      } catch(e) {
+        logger(`Error occured trying to remove react-role: ${e}`, "errors.log");
       }
     });
   }
@@ -208,25 +228,17 @@ export default class RoleBot extends Discord.Client {
   };
 
   /**
-   * This is a mess. I have no idea how I want to fix this right now.
-   * I'm just loading all id's even if the messages don't exist anymore.
-   * This will get huge eventually.
+   * Hmm, the issue currently is being limited by Discords API
+   * Need to find out how clear guilds messages by bot vs custom.
+   * Maybe a new system is in place
    */
   async loadReactMessage(): Promise<void> {
     const rows = getReactMessages();
 
-    rows.forEach(async r => {
-      const C_ID = r.channel_id;
+    for(const r of rows) {
       const M_ID = r.message_id;
-
       this.reactMessage.push(M_ID);
-      await this.channels.fetch(C_ID).catch(() => {
-        const index = this.reactMessage.indexOf(M_ID);
-        if (index > -1) {
-          this.reactMessage.splice(index, 1);
-        }
-      });
-    });
+    }
 
     console.log(this.reactMessage)
   }
