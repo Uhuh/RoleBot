@@ -30,8 +30,13 @@ export default {
     }
 
     args.shift();
+    const id = FOLDERS[FOLDER_ID].id;
 
-    const folder = client.folderContents.get(FOLDERS[FOLDER_ID].id);
+    if(!id) {
+      throw Error(`Error retrying folder: ${FOLDER_ID}`);
+    }
+
+    const folder = client.folderContents.get(id);
 
     if(!folder) throw new Error("Folder not found, cannot add roles");
 

@@ -1,13 +1,14 @@
 import { Message, MessageEmbed, TextChannel, Guild } from "discord.js";
-import RoleBot, { Folder } from "../../src/bot";
+import RoleBot from "../../src/bot";
 import { rolesByFolderId } from "../../src/setup_table";
+import { IFolderReactEmoji } from "../../src/interfaces";
 
 export default {
   desc: "All emojis associated with a role",
   name: "list",
   args: "",
   type: "reaction",
-  run: (message: Message, roleChannel: TextChannel, folder: Folder) => {
+  run: (message: Message, roleChannel: TextChannel, folder: IFolderReactEmoji) => {
     if (!message.guild) return
 
     // This is true if the user wanted the list.

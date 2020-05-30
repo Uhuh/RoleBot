@@ -17,7 +17,7 @@ import {
   folderContent
 } from "./setup_table";
 import { handle_packet } from "../events/raw_packet";
-import { IFolder, IJoinRole, IRoleEmoji } from "./interfaces";
+import { IFolder, IJoinRole, IFolderReactEmoji } from "./interfaces";
 
 export interface Command {
   desc: string;
@@ -31,18 +31,14 @@ export interface CommandCollection extends Command {
   commands: Discord.Collection<string, Command[]>;
 }
 
-interface IFolderReactEmoji extends IFolder {
-  roles: IRoleEmoji[];
-}
-
 export default class RoleBot extends Discord.Client {
   config: any;
   reactMessage: string[];
   commands: Discord.Collection<string, Command>;
   commandsRun: number;
   reactChannel: Discord.Collection<string, Discord.Message>;
-  guildFolders: Discord.Collection<string, Partial<IFolder>[]>;
-  folderContents: Discord.Collection<number, Partial<IFolderReactEmoji>>;
+  guildFolders: Discord.Collection<string, IFolder[]>;
+  folderContents: Discord.Collection<number, IFolderReactEmoji>;
   joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
   constructor() {
@@ -53,9 +49,9 @@ export default class RoleBot extends Discord.Client {
     this.commandsRun = 0;
     this.reactChannel = new Discord.Collection();
     this.guildFolders = new Discord.Collection<string,
-      Partial<IFolder>[]
+      IFolder[]
     >();
-    this.folderContents = new Discord.Collection<number, IFolder>();
+    this.folderContents = new Discord.Collection<number, IFolderReactEmoji>();
     this.joinRoles = new Discord.Collection<
       string,
       Partial<IJoinRole>[]

@@ -26,6 +26,16 @@ export interface IFolder {
   label: string;
 };
 
+export interface IFolderReactEmoji extends IFolder {
+  roles: IRoleEmoji[];
+}
+
+export interface IRoleEmoji {
+  role_id: string;
+  role_name: string;
+  emoji_id: string;
+}
+
 export interface IRoleChannel {
   id: string;
   channel_id: string;

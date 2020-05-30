@@ -28,7 +28,7 @@ export default {
         // There should only be one Id per name...
         const ID = folderId(GUILD_ID, folderName);
 
-        client.guildFolders.set(GUILD_ID, [...folders, { id: ID[0].id, label: folderName }]);
+        client.guildFolders.set(GUILD_ID, [...folders, { id: ID[0].id, label: folderName, guild_id: GUILD_ID }]);
 
         folder = { id: ID[0].id, label: folderName };
 

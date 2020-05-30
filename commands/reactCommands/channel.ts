@@ -1,7 +1,8 @@
 import { Message } from "discord.js";
 import { addReactMessage, rolesByFolderId } from "../../src/setup_table";
 import reactList from "./list";
-import RoleBot, { Role } from "../../src/bot";
+import RoleBot from "../../src/bot";
+import { IRoleEmoji } from "../../src/interfaces";
 
 export default {
   desc:
@@ -18,7 +19,7 @@ export default {
     const FOLDERS_INFO = client.guildFolders.get(GUILD_ID) || []
     const GUILD_FOLDERS = [...FOLDERS_INFO]
     // I want to enforce the non folder roles.
-    GUILD_FOLDERS.unshift({ id: 0, label: "" })
+    GUILD_FOLDERS.unshift({ id: 0, label: "", guild_id: GUILD_ID })
     let rMsg = {} as Message
 
     if (!roleChannel) return;
@@ -63,7 +64,7 @@ export default {
   }
 };
 
-const RolesChunks = (chunkSize: number, ROLES: Role[]) => {
+const RolesChunks = (chunkSize: number, ROLES: IRoleEmoji[]) => {
   let roles = [];
 
   for (let i = 0; i < ROLES.length; i += chunkSize) {

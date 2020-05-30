@@ -24,8 +24,8 @@ export default {
     if (role) {
       message.react("✅");
       client.joinRoles.get(message.guild.id)!.push({
-        id: role.id,
-        name: role.name
+        role_id: role.id,
+        role_name: role.name
       })
       return joinRoles.run({
         id: `${message.guild.id}-${role.id}`,
