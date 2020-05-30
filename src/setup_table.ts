@@ -1,5 +1,5 @@
 import * as SQLite from "better-sqlite3";
-import { IFolder, IReactMessage, IJoinRole, IRole, IRoleChannel, IReactionRole } from "./interfaces";
+import { IFolder, IReactMessage, IJoinRole, IRole, IRoleChannel, IReactionRole, IRoleEmoji } from "./interfaces";
 
 const sql = new SQLite("./roles.sqlite");
 
@@ -106,7 +106,7 @@ export const folderId = (guild_id: string, label: string): IFolder[] => sql.prep
   "SELECT id FROM folder WHERE guild_id = @guild_id AND label = @label"
 ).all({ guild_id, label });
 
-interface IFolderReactRole extends IFolder, IReactionRole {}
+interface IFolderReactRole extends IFolder, IRoleEmoji {}
 
 export const folderContent = (id: number | null): IFolderReactRole[] => sql.prepare(
   `

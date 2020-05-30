@@ -18,16 +18,23 @@ export default {
     if (FOLDERS && args.length && !Number.isNaN(Number(args[0]))) {
       const folderId = Number(args[0]);
 
-      if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length || folderId === undefined) {
+      if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length) {
         return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
       }
-      const folder = client.folderContents.get(FOLDERS[folderId].id);
+
+      const id = FOLDERS[folderId].id;
+
+      if(!id) {
+        return;
+      }
+
+      const folder = client.folderContents.get(id);
 
       if (!folder) throw new Error(`Folder ${FOLDERS[folderId].id} DNE`);
 
-      const {roles} = folder;
+      const { roles } = folder;
       embed.setTitle(`**${FOLDERS[folderId].label}**'s roles`);
-      if (roles.length) {
+      if (roles && roles.length) {
         embed.setDescription(
           roles.map(r => `${message.guild!.emojis.cache.get(r.emoji_id) || r.emoji_id} - ${r.role_name}`)
         )
@@ -50,8 +57,9 @@ export default {
     if (FOLDERS && FOLDERS.length) {
       embed.setDescription(
         FOLDERS.map((f, index) => {
+          if(!f.id) return;
           const folder = client.folderContents.get(f.id);
-          if(!folder) return;
+          if(!folder || !folder.roles) return;
           return `[ ID ${index} ] - 📁**${f.label}** [${folder.roles.length} ${folder.roles.length > 1 ? `Roles` : "Role"}]`
         })
       )
