@@ -29,10 +29,8 @@ const handle_packet = async (packet: any, client: RoleBot) => {
   }
 
   if (packet.t === "MESSAGE_REACTION_ADD") {
-    console.log("Emitting reaction add");
     client.emit("messageReactionAdd", react, user);
   } else if (packet.t === "MESSAGE_REACTION_REMOVE") {
-    console.log("Emitting react remove");
     client.emit("messageReactionRemove", react, user);
   }
 }
