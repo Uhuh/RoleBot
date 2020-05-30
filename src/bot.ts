@@ -141,12 +141,12 @@ export default class RoleBot extends Discord.Client {
     });
     this.on("guildDelete", (guild): void => removed(guild, this));
     // React role handling
-    this.on("messageReactionAdd", (reaction, user) => this.handleRole(reaction, user, 'add'));
+    this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
 
-    this.on("messageReactionRemove", (reaction, user) => this.handleRole(reaction, user, 'remove'));
+    this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
   }
 
-  handleRole = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
+  handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
     try {
       if (!reaction || user.bot) return;
       const { message, emoji } = reaction;
