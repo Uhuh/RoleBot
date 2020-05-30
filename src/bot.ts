@@ -17,6 +17,7 @@ import {
   folderContent
 } from "./setup_table";
 import { handle_packet } from "../events/raw_packet";
+import { IFolder, IJoinRole, IRoleEmoji } from "./interfaces";
 
 export interface Command {
   desc: string;
@@ -30,17 +31,8 @@ export interface CommandCollection extends Command {
   commands: Discord.Collection<string, Command[]>;
 }
 
-export interface Role { 
-  role_id: string; 
-  role_name: string;
-  emoji_id: string;
-} 
-
-export interface Folder { 
-  id: number; 
-  label: string;
-  guild_id: string;
-  roles: Role[] 
+interface IFolderReactEmoji extends IFolder {
+  roles: IRoleEmoji[];
 }
 
 export default class RoleBot extends Discord.Client {
@@ -49,9 +41,9 @@ export default class RoleBot extends Discord.Client {
   commands: Discord.Collection<string, Command>;
   commandsRun: number;
   reactChannel: Discord.Collection<string, Discord.Message>;
-  guildFolders: Discord.Collection<string, { id: number; label: string; }[]>;
-  folderContents: Discord.Collection<number, Folder>;
-  joinRoles: Discord.Collection<string, { id: string; name: string }[]>;
+  guildFolders: Discord.Collection<string, Partial<IFolder>[]>;
+  folderContents: Discord.Collection<number, Partial<IFolderReactEmoji>>;
+  joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
   constructor() {
     super();
@@ -61,12 +53,12 @@ export default class RoleBot extends Discord.Client {
     this.commandsRun = 0;
     this.reactChannel = new Discord.Collection();
     this.guildFolders = new Discord.Collection<string,
-      { id: number; label: string; }[]
+      Partial<IFolder>[]
     >();
-    this.folderContents = new Discord.Collection<number, Folder>();
+    this.folderContents = new Discord.Collection<number, IFolder>();
     this.joinRoles = new Discord.Collection<
       string,
-      { id: string; name: string }[]
+      Partial<IJoinRole>[]
     >();
 
     commandHandler(this);
@@ -235,19 +227,16 @@ export default class RoleBot extends Discord.Client {
     for (const g_id of GUILD_IDS) {
       const joinRoles = getJoinRoles(g_id);
 
-      for (const r of joinRoles) {
-        const join_roles = this.joinRoles.get(g_id) || [];
-        this.joinRoles.set(g_id, [
-          ...join_roles,
-          { name: r.role_name, id: r.role_id }
-        ]);
-      }
+      const roles: Partial<IJoinRole>[] = joinRoles.map(r => ({role_name: r.role_name, role_id: r.role_id}))
+      
+      this.joinRoles.set(g_id, roles);
     }
   }
 
   async loadFolders(): Promise<void> {
     this.guilds.cache.forEach(g => {
       const FOLDERS = guildFolders(g.id);
+      if(!FOLDERS || !FOLDERS.length) return;
       this.guildFolders.set(g.id, FOLDERS);
       FOLDERS.map(f => {
         const roles = folderContent(f.id);

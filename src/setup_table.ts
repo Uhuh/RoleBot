@@ -1,5 +1,5 @@
 import * as SQLite from "better-sqlite3";
-import { Role } from "./bot";
+import { IFolder, IReactMessage, IJoinRole, IRole, IRoleChannel, IReactionRole } from "./interfaces";
 
 const sql = new SQLite("./roles.sqlite");
 
@@ -99,18 +99,21 @@ setupTable();
 export const addFolder = (guild_id: string, label: string) => sql.prepare(
   "INSERT OR REPLACE INTO folder (guild_id, label) VALUES (@guild_id, @label)"
 ).run({ guild_id, label });
-export const guildFolders = (guild_id: string) => sql.prepare(
+export const guildFolders = (guild_id: string): IFolder[] => sql.prepare(
   "SELECT folder.id, folder.label FROM folder WHERE guild_id = @guild_id"
 ).all({ guild_id });
-export const folderId = (guild_id: string, label: string): { id: number }[] => sql.prepare(
+export const folderId = (guild_id: string, label: string): IFolder[] => sql.prepare(
   "SELECT id FROM folder WHERE guild_id = @guild_id AND label = @label"
 ).all({ guild_id, label });
-export const folderContent = (id: number | null) => sql.prepare(
+
+interface IFolderReactRole extends IFolder, IReactionRole {}
+
+export const folderContent = (id: number | null): IFolderReactRole[] => sql.prepare(
   `
    SELECT folder.id, folder.guild_id, folder.label, reaction_role.emoji_id, reaction_role.role_id, reaction_role.role_name
    FROM folder LEFT JOIN reaction_role ON folder.id=reaction_role.folder_id WHERE folder.id = @id
   `
-).all({ id });
+).get({ id });
 export const deleteFolder = (id: number) => {
   sql.prepare(`DELETE FROM folder WHERE folder.id = @id`).run({ id })
   sql.prepare(`UPDATE reaction_role SET folder_id = null WHERE reaction_role.folder_id = @id`).run({ id })
@@ -120,7 +123,7 @@ export const deleteFolder = (id: number) => {
 export const joinRoles = sql.prepare(
   "INSERT OR REPLACE INTO join_roles (id, role_name, role_id, guild_id) VALUES (@id, @role_name, @role_id, @guild_id)"
 );
-export const getJoinRoles = (guild_id: string) => sql.prepare(
+export const getJoinRoles = (guild_id: string): IJoinRole[] => sql.prepare(
   "SELECT * FROM join_roles WHERE guild_id = @guild_id"
 ).all({ guild_id });
 export const deleteJoin = sql.prepare(
@@ -131,7 +134,7 @@ export const deleteJoin = sql.prepare(
 export const deleteRole = sql.prepare(
   "DELETE FROM roles WHERE guild = ? AND role_name = ?"
 );
-export const getRoles = (guild: string) => sql.prepare(
+export const getRoles = (guild: string): IRole[] => sql.prepare(
   "SELECT * FROM roles WHERE guild = @guild"
 ).all({ guild });
 export const addRole = sql.prepare(
@@ -139,9 +142,9 @@ export const addRole = sql.prepare(
 );
 
 // Role channels
-export const getChannel = (guild_id: string) => sql.prepare(
+export const getChannel = (guild_id: string): IRoleChannel => sql.prepare(
   "SELECT * FROM role_channel WHERE guild = @guild_id"
-).all({ guild_id });
+).get({ guild_id });
 export const removeChannel = sql.prepare(
   "DELETE FROM role_channel WHERE guild = ?"
 );
@@ -170,7 +173,7 @@ export const removeReactMsg = (guild_id: string) => sql.prepare(
 export const addReactMessage = (message_id: string, channel_id: string, guild_id: string) => sql.prepare(
   "INSERT OR REPLACE INTO react_message (message_id, channel_id, guild_id) VALUES (@message_id, @channel_id, @guild_id)"
 ).run({ message_id, channel_id, guild_id });
-export const getReactMessages = () => sql.prepare(
+export const getReactMessages = (): IReactMessage[] => sql.prepare(
   "SELECT * FROM react_message"
 ).all();
 export const removeReactMessage = (message_id: string) => sql.prepare(
@@ -178,13 +181,13 @@ export const removeReactMessage = (message_id: string) => sql.prepare(
 ).run({ message_id });
 
 // Reaction Roles
-export const guildReactions = (guild_id: string) => sql.prepare(
+export const guildReactions = (guild_id: string): IReactionRole[] => sql.prepare(
   "SELECT * FROM reaction_role WHERE guild_id = @guild_id"
 ).all({ guild_id });
-export const getRoleByReaction = (emoji_id: string, guild_id: string) => sql.prepare(
+export const getRoleByReaction = (emoji_id: string, guild_id: string): IReactionRole => sql.prepare(
   "SELECT * from reaction_role WHERE emoji_id = @emoji_id AND guild_id = @guild_id"
 ).get({ emoji_id, guild_id });
-export const getRoleByName = (role_name: string, guild_id: string) => sql.prepare(
+export const getRoleByName = (role_name: string, guild_id: string): IReactionRole => sql.prepare(
   "SELECT * from reaction_role WHERE role_name = @role_name AND guild_id = @guild_id"
 ).get({ role_name, guild_id });
 export const addReactionRole = (emoji_id: string, role_id: string, role_name: string, guild_id: string, folder_id?: number | null) => sql.prepare(
@@ -196,7 +199,7 @@ export const removeReactionRole = (role_id: string) => sql.prepare(
 export const removeReactionRoleNullFolder = () => sql.prepare(
   "DELETE FROM reaction_role WHERE folder_id IS NULL"
 ).run();
-export const rolesByFolderId = (guild_id: string, id: number | null): Role[] => sql.prepare(
+export const rolesByFolderId = (guild_id: string, id: number | null): IReactionRole[] => sql.prepare(
   `SELECT * FROM reaction_role WHERE reaction_role.folder_id ${id ? "= @id" : "IS NULL"} AND reaction_role.guild_id = @guild_id`
 ).all({ guild_id, id });
 export const giveFolderId = (role_id: string, folder_id: number) => sql.prepare(
