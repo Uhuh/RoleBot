@@ -141,72 +141,55 @@ export default class RoleBot extends Discord.Client {
     });
     this.on("guildDelete", (guild): void => removed(guild, this));
     // React role handling
-    this.on("messageReactionAdd", (reaction, user): void => {
-      try {
-        if (!reaction || user.bot) return;
-        const { message } = reaction;
-        if (this.reactMessage.includes(message.id) && message.guild) {
-          const id = reaction.emoji.id || reaction.emoji.name;
-          const emoji_role = getRoleByReaction(id, message.guild.id);
-          // Remove reaction since it doesn't exist.
-          if (!emoji_role) {
-            reaction.users.remove(user.id).catch(console.error);
-            return;
-          }
-          const { role_id } = emoji_role;
+    this.on("messageReactionAdd", (reaction, user) => this.handleRole(reaction, user, 'add'));
 
-          const role = message.guild.roles.cache.get(role_id);
-          let member = message.guild.members.cache.get(user.id);
+    this.on("messageReactionRemove", (reaction, user) => this.handleRole(reaction, user, 'remove'));
+  }
 
-          if(!member) {
-            console.log(`Role add - Failed to get member from cache. Going to fetch and retry....`);
-            message.guild.members.fetch(user.id);
-            member = message.guild.members.cache.get(user.id);
-          }
-          
-          if(!role) throw new Error(`Role DNE`);
-          if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
-
-          member.roles.add(role).catch(console.log);
+  handleRole = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
+    try {
+      if (!reaction || user.bot) return;
+      const { message, emoji } = reaction;
+      const { guild } = message;
+      if (this.reactMessage.includes(message.id) && guild) {
+        const id = emoji.id || emoji.name;
+        const emoji_role = getRoleByReaction(id, guild.id);
+        // Remove reaction since it doesn't exist.
+        if (!emoji_role && type === 'add') {
+          reaction.users.remove(user.id).catch(console.error);
           return;
+        }
+        const { role_id } = emoji_role;
+
+        if(!role_id) return;
+
+        const role = guild.roles.cache.get(role_id);
+        let member = guild.members.cache.get(user.id);
+
+        if(!member) {
+          console.log(`Role ${type} - Failed to get member from cache. Going to fetch and retry....`);
+          guild.members.fetch(user.id);
+          member = guild.members.cache.get(user.id);
+        }
+        
+        if(!role) throw new Error(`Role does not exist. Possibly deleted from server.`);
+        if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
+
+        switch(type) {
+          case 'add':
+            member.roles.add(role).catch(console.error);
+            break;
+          case 'remove':
+            member.roles.remove(role).catch(console.error);
         }
 
         return;
-      } catch(e) {
-        logger(`Error occured trying to add react-role: ${e}`, "errors.log")
       }
-    });
 
-    this.on("messageReactionRemove", (reaction, user): void => {
-      try {
-        if (!reaction || user.bot) return;
-        const { message } = reaction;
-        if (this.reactMessage.includes(message.id) && message.guild) {
-          const id = reaction.emoji.id || reaction.emoji.name;
-          const emoji_role = getRoleByReaction(id, message.guild.id);
-          // Just for bot to not die
-          if(!emoji_role) return;
-          
-          const { role_id } = emoji_role;
-          
-          if (!role_id) return;
-          const role = message.guild.roles.cache.get(role_id);
-          let member = message.guild.members.cache.get(user.id);
-
-          if(!member) {
-            console.log(`Role remove - Failed to get member from cache. Going to fetch and retry....`);
-            message.guild.members.fetch(user.id);
-            member = message.guild.members.cache.get(user.id);
-          }
-
-          if(!role) throw new Error("Role DNE");
-          if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
-          member.roles.remove(role).catch(console.error);
-        }
-      } catch(e) {
-        logger(`Error occured trying to remove react-role: ${e}`, "errors.log");
-      }
-    });
+      return;
+    } catch(e) {
+      logger(`Error occured trying to ${type} react-role: ${e}`, "errors.log")
+    }
   }
 
   randomPres = (): void => {
