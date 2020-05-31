@@ -39,12 +39,18 @@ export default {
     } 
     else if (arg.includes("-all")) {
       removeReactionRoleNullFolder(GUILD_ID);
-      for(const [id, folder] of client.folderContents) {
+      const folders = client.guildFolders.get(GUILD_ID) || [];
+
+      for(const f of folders) {
+        const folder = client.folderContents.get(f.id);
+
+        if(!folder) continue;
+        
         folder.roles.forEach(r => {
           removeReactionRole(r.role_id);
         })
         folder.roles = [];
-        client.folderContents.set(id, folder);
+        client.folderContents.set(f.id, folder);
       }
       return message.react("✅");
     }

@@ -42,15 +42,15 @@ export default {
 
     for (const [, ch] of guild.channels.cache) {
       if (ch instanceof TextChannel) {
-        const msg = await ch.messages.fetch(M_ID).catch(console.log);
+        const msg = await ch.messages.fetch(M_ID).catch(() => {}); // Silently fail, it probably doesn't exist on the channel.
 
         if (!msg) continue;
 
         const { id } = folder || { id: null }
-        const REACT_ROLES = rolesByFolderId(guild.id, id)
+        const REACT_ROLES = rolesByFolderId(guild.id, id);
 
         REACT_ROLES.forEach(r => {
-          msg.react(r.emoji_id);
+          msg.react(r.emoji_id).catch(() => {}); // silently fail
         });
 
         addReactMessage(msg.id, ch.id, guild.id);
