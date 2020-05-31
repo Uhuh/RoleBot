@@ -113,7 +113,7 @@ export const folderContent = (id: number | null): IFolderReactRole[] => sql.prep
    SELECT folder.id, folder.guild_id, folder.label, reaction_role.emoji_id, reaction_role.role_id, reaction_role.role_name
    FROM folder LEFT JOIN reaction_role ON folder.id=reaction_role.folder_id WHERE folder.id = @id
   `
-).get({ id });
+).all({ id });
 export const deleteFolder = (id: number) => {
   sql.prepare(`DELETE FROM folder WHERE folder.id = @id`).run({ id })
   sql.prepare(`UPDATE reaction_role SET folder_id = null WHERE reaction_role.folder_id = @id`).run({ id })
