@@ -38,7 +38,7 @@ export default {
       return message.react("✅");
     } 
     else if (arg.includes("-all")) {
-      removeReactionRoleNullFolder();
+      removeReactionRoleNullFolder(GUILD_ID);
       for(const [id, folder] of client.folderContents) {
         folder.roles.forEach(r => {
           removeReactionRole(r.role_id);
