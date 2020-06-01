@@ -146,7 +146,8 @@ export default class RoleBot extends Discord.Client {
         if (!emoji_role && type === 'add') {
           reaction.users.remove(user.id).catch(console.error);
           return;
-        }
+        } else if (!emoji_role) return;
+        
         const { role_id } = emoji_role;
 
         if(!role_id) return;
