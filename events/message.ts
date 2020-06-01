@@ -10,10 +10,13 @@ export default (client: RoleBot, message: Message): void => {
   if (message.author.bot) return;
 
   const mention = message.mentions.users.first();
+  const prefix = 'rb';
 
   // Someone is trying to request a role (hopefully)
-  if (mention && client.user && mention.id === client.user.id) {
-    const length: number = message.content.split(" ")[0].length;
+  if (client.user && 
+      ((mention && mention.id === client.user.id) || message.content.startsWith(prefix))
+  ) {
+    const length: number = message.content.split(' ')[0].length;
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(length + 1).match(/\S+/g) || [];
 

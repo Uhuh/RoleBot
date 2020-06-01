@@ -19,7 +19,7 @@ export default {
       const folderId = Number(args[0]);
 
       if (Number.isNaN(folderId) || folderId < 0 || folderId >= FOLDERS.length) {
-        return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
+        return message.channel.send("Incorrect folder ID given. Try running `rb folder list`");
       }
 
       const id = FOLDERS[folderId].id;

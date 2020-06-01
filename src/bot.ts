@@ -185,7 +185,7 @@ export default class RoleBot extends Discord.Client {
     if (!user) return console.log("Client dead?");
 
     const presArr = [
-      `@${user.username} help`,
+      `rb help`,
       `in ${this.guilds.cache.size} guilds`,
       `roles.`
     ];

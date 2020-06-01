@@ -3,7 +3,7 @@ import RoleBot from "../../src/bot";
 import { rolesByFolderId } from "../../src/setup_table";
 
 export default {
-  desc: "Update a messages reactions. \nUpdate with roles in a folder by passing the folder id. \nEG: `@RoleBot reaction update 660203902193`",
+  desc: "Update a messages reactions. \nUpdate with roles in a folder by passing the folder id. \nEG: `rb reaction update 660203902193`",
   name: "update",
   args: "<msg_id> [folder id]",
   type: "reaction",
@@ -53,7 +53,7 @@ export default {
       
       const FOLDER_ID = Number(args[0]);
       if (Number.isNaN(FOLDER_ID) || FOLDER_ID < 0 || FOLDER_ID >= FOLDERS.length) {
-        message.channel.send("Incorrect folder ID given. Try running `@RoleBot folder -list`");
+        message.channel.send("Incorrect folder ID given. Try running `rb folder -list`");
         return;
       }
     

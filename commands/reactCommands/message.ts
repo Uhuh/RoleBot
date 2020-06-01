@@ -30,7 +30,7 @@ export default {
 
       const ARRAY_ID = Number(args[0]);
       if (Number.isNaN(ARRAY_ID) || ARRAY_ID < 0 || ARRAY_ID >= GUILD_FOLDERS.length) {
-        return message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
+        return message.channel.send("Incorrect folder ID given. Try running `rb folder list`");
       }
 
       folder = GUILD_FOLDERS![ARRAY_ID];

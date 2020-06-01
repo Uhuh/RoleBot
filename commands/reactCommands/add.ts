@@ -3,7 +3,7 @@ import { addReactionRole, getRoleByReaction, getRoleByName  } from "../../src/se
 import RoleBot from "../../src/bot";
 
 export default {
-  desc: "Associate an emoji with a role.",
+  desc: "Associate an emoji with a role.\nExample `rb reaction add Member | :D`",
   name: "add",
   args: "<Role name> | <Emoji>",
   type: "reaction",

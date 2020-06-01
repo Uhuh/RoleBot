@@ -25,7 +25,7 @@ export default {
     }
 
     if (Number.isNaN(FOLDER_ID) || FOLDER_ID < 0 || FOLDER_ID >= FOLDERS.length) {
-      message.channel.send("Incorrect folder ID given. Try running `@RoleBot folders`");
+      message.channel.send("Incorrect folder ID given. Try running `rb folder list`");
       return;
     }
 

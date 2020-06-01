@@ -17,6 +17,7 @@ export default {
       .setDescription(
         `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)          
         <> = required arguments, [] = optional.
+        Mention or \`rb\` to use commands
         `
       )
 
@@ -29,8 +30,8 @@ export default {
     
     if(!args.length) {
       embed.setTitle('**COMMAND CATEGORIES**')
-      embed.addField(`**REACTION**`, `Try out \`@${user.tag} help reaction\``);
-      embed.addField(`**FOLDER**`, `Try out \`@${user.tag} help folder\``);
+      embed.addField(`**REACTION**`, `Try out \`rb help reaction\``);
+      embed.addField(`**FOLDER**`, `Try out \`rb help folder\``);
     } 
     else if(args.length === 1) {
       args[0] = args[0].toLowerCase();
@@ -42,12 +43,12 @@ export default {
       if(args[0] === 'reaction') {
         embed.addField(`**DOCUMENTATION**`, `[In depth reaction documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#reaction-roles)`)
         for (const func of reactionHandler.commands.values()) {
-          embed.addField(`**@${user.username} reaction ${func.name} ${func.args}**`, `${func.desc}`);
+          embed.addField(`**rb reaction ${func.name} ${func.args}**`, `${func.desc}`);
         }
       } else if (args[0] === 'folder') {
         embed.addField(`**DOCUMENTATION**`, `[In depth folder documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#folders)`)
         for (const func of folderHandler.commands.values()) {
-          embed.addField(`**@${user.username} folder ${func.name} ${func.args}**`, `${func.desc}`);
+          embed.addField(`**rb folder ${func.name} ${func.args}**`, `${func.desc}`);
         }
       }
     }
