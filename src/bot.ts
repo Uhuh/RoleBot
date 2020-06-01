@@ -70,7 +70,14 @@ export default class RoleBot extends Discord.Client {
       if (this.config.DEV_MODE === "0")
         setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
 
-      setInterval(() => this.randomPres(), 10000);
+      if(this.user) {
+        this.user
+          .setPresence({
+            activity: { name: `rb help`, type: 'WATCHING' },
+            status: "dnd"
+          })
+          .catch(console.error);
+      }
     });
 
     this.on("message", (message): void => msg(this, message as Discord.Message));
@@ -184,12 +191,6 @@ export default class RoleBot extends Discord.Client {
   randomPres = (): void => {
     const user = this.user;
     if (!user) return console.log("Client dead?");
-
-    const presArr = [
-      `rb help`,
-      `in ${this.guilds.cache.size} guilds`,
-      `roles.`
-    ];
 
     user
       .setPresence({
