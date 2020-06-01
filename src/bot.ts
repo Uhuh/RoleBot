@@ -193,8 +193,8 @@ export default class RoleBot extends Discord.Client {
 
     user
       .setPresence({
-        activity: { name: presArr[Math.floor(Math.random() * presArr.length)], type: "STREAMING", url: "https://www.twitch.tv/rolebot" },
-        status: "online"
+        activity: { name: `rb help`, type: 'WATCHING' },
+        status: "dnd"
       })
       .catch(console.error);
   };
