@@ -7,7 +7,7 @@ export default {
   name: "create",
   args: "<A name for the folder>",
   type: "folder",
-  run: (message: Message, args: string[], client: RoleBot): void => {
+  run: (message: Message, args: string[], client: RoleBot) => {
     if (!message.guild || !message.member!.hasPermission(["MANAGE_ROLES"])) {
       message.react("❌");
       return;
@@ -34,7 +34,8 @@ export default {
 
         if(folder.id === null) throw new Error("New folder id is null");
 
-        client.folderContents.set(folder.id, { id: folder.id, label: folder.label, guild_id: GUILD_ID, roles: [] })
+        client.folderContents.set(folder.id, { id: folder.id, label: folder.label, guild_id: GUILD_ID, roles: [] });
+        message.react("✅");
       } else {
         message.channel.send(`Folder \`${folderName}\` already exist.`);
       }
