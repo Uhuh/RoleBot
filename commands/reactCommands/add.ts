@@ -21,7 +21,7 @@ export default {
     } else {
       const reaction = getRoleByName(role.name, message.guild.id);
       if(reaction) {
-        return message.channel.send(`Role is already being used.`);
+        return message.channel.send(`Role \`${role.name}\` is already being used.`);
       }
     }
 

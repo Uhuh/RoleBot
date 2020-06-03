@@ -84,7 +84,6 @@ export default {
       return;
     }
 
-
     for(const role of FOLDERLESS_ROLES) {
       MSG.react(role.emoji_id).catch(()=>{});
     }
