@@ -23,7 +23,7 @@ export default {
     let folder: { id: number; label: string} | undefined = undefined
 
     if (args.length) {
-      const GUILD_FOLDERS = client.guildFolders.get(guild.id)
+      const GUILD_FOLDERS = client.guildFolders.get(guild.id);
 
       if (!GUILD_FOLDERS || !GUILD_FOLDERS.length)
         return message.channel.send("The server doesn't have any folders.");

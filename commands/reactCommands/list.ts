@@ -1,7 +1,7 @@
 import { Message, MessageEmbed, TextChannel, Guild } from "discord.js";
 import RoleBot from "../../src/bot";
 import { rolesByFolderId } from "../../src/setup_table";
-import { IFolderReactEmoji } from "../../src/interfaces";
+import { IFolderReactEmoji, IRoleEmoji } from "../../src/interfaces";
 
 export default {
   desc: "All emojis associated with a role",
@@ -49,7 +49,7 @@ export default {
   }
 };
 
-const generateEmbed = (label: string, roles: any[], guild: Guild, USER_CALLED: boolean): MessageEmbed => {
+const generateEmbed = (label: string, roles: IRoleEmoji[], guild: Guild, USER_CALLED: boolean): MessageEmbed => {
   const embed = new MessageEmbed();
 
   embed.setTitle(`**${label}**`);

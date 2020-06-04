@@ -81,7 +81,7 @@ export default class RoleBot extends Discord.Client {
     });
 
     this.on("message", (message): void => msg(this, message as Discord.Message));
-    this.on("guildMemberAdd", (member): void =>
+    this.on("guildMemberAdd", (member) =>
       joinRole(member as Discord.GuildMember, this.joinRoles)
     );
     this.on("guildCreate", (guild): void => {

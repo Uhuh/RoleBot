@@ -184,6 +184,9 @@ export const removeReactMessage = (message_id: string) => sql.prepare(
 export const guildReactions = (guild_id: string): IReactionRole[] => sql.prepare(
   "SELECT * FROM reaction_role WHERE guild_id = @guild_id"
 ).all({ guild_id });
+export const reactionById = (role_id: string): IReactionRole => sql.prepare(
+  "SELECT * FROM reaction_role WHERE role_id = @role_id"
+).get({ role_id });
 export const getRoleByReaction = (emoji_id: string, guild_id: string): IReactionRole => sql.prepare(
   "SELECT * from reaction_role WHERE emoji_id = @emoji_id AND guild_id = @guild_id"
 ).get({ emoji_id, guild_id });
@@ -202,6 +205,6 @@ export const removeReactionRoleNullFolder = (guild_id: string) => sql.prepare(
 export const rolesByFolderId = (guild_id: string, id: number | null): IReactionRole[] => sql.prepare(
   `SELECT * FROM reaction_role WHERE reaction_role.folder_id ${id ? "= @id" : "IS NULL"} AND reaction_role.guild_id = @guild_id`
 ).all({ guild_id, id });
-export const giveFolderId = (role_id: string, folder_id: number) => sql.prepare(
+export const giveFolderId = (role_id: string, folder_id: number | null) => sql.prepare(
   "UPDATE reaction_role SET folder_id = @folder_id WHERE reaction_role.role_id = @role_id"
 ).run({ role_id, folder_id });
