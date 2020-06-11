@@ -13,11 +13,11 @@ const port = 8080;
 
 app.use(cors());
 
-app.get('/unicode', (_req, res) => {
+app.get('/unicode', (_req, res: express.Response) => {
   res.send(emojis);
 });
 
-app.use(function (req, res, next) {
+app.use(function (req: express.Request, res: express.Response, next: express.NextFunction) {
   console.log('Heyo')
   if(!req.headers.authorization) {
     return res.status(403).json({ error: 'No credentials sent!' });
@@ -43,7 +43,7 @@ const middleWare = (
   return next();
 }
 
-app.get('/guild/:guildId', middleWare, (req, res) => {
+app.get('/guild/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const guild = RoleBot.guilds.cache.get(guildId);
 
@@ -70,19 +70,19 @@ app.get('/guild/:guildId', middleWare, (req, res) => {
 });
 
 
-app.get('/reaction/:guildId', middleWare, (req, res) => {
+app.get('/reaction/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const guildRoles = guildReactions(guildId);
   return res.send(guildRoles);
 });
 
-app.get('/folder/:guildId', middleWare, (req, res) => {
+app.get('/folder/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const folder = guildFolders(guildId);
   res.send(folder);
 });
 
-app.get('/roles/:guildId', middleWare, (req, res) => {
+app.get('/roles/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const guild = RoleBot.guilds.cache.get(guildId);
 
@@ -97,7 +97,7 @@ app.get('/roles/:guildId', middleWare, (req, res) => {
   return res.send(guild.roles);
 });
 
-app.get('/emojis/:guildId', middleWare, (req, res) => {
+app.get('/emojis/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const guild = RoleBot.guilds.cache.get(guildId);
 
