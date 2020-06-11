@@ -5,4 +5,6 @@ const RoleBot = new RB()
 
 RoleBot.start().catch(e => {
   logger(`Error occurred during bot runtime: ${e}`, 'errors.log')
-})
+});
+
+export default RoleBot;
