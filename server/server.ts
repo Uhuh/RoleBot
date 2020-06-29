@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import * as cors from 'cors';
 dotenv.config();
-import { guildReactions, guildFolders } from '../src/setup_table';
+import { guildReactions, guildFolders, removeReactionRole } from '../src/setup_table';
 import emojis from './emojis';
 import RoleBot from '../src';
 
@@ -74,6 +74,20 @@ app.get('/reaction/:guildId', middleWare, (req: express.Request, res: express.Re
   const { guildId } = req.params;
   const guildRoles = guildReactions(guildId);
   return res.send(guildRoles);
+});
+
+app.post('/reaction/:roleId/delete', middleWare, (req: express.Request, res: express.Response) => {
+  const { roleId } = req.params;
+  if(Number.isNaN(Number(roleId))) {
+    return res.status(404).send({ error: 'Role ID sent is not a valid ID' });
+  }
+  try {
+    removeReactionRole(roleId)
+    res.send(roleId);
+  } catch {
+    res.status(404).send({ error: 'Issue deleting role', id: roleId });
+  }
+  return;
 });
 
 app.get('/folder/:guildId', middleWare, (req: express.Request, res: express.Response) => {
