@@ -57,7 +57,7 @@ app.get('/guild/:guildId', middleWare, (req: express.Request, res: express.Respo
   
   return res.send({
     guild: guild,
-    roles: guild.roles.cache.map(r => (
+    roles: guild.roles.cache.filter(r => !r.managed).map(r => (
       {
         id: r.id,
         hexColor: r.hexColor,
@@ -88,6 +88,10 @@ app.post('/reaction/:roleId/delete', middleWare, (req: express.Request, res: exp
     res.status(404).send({ error: 'Issue deleting role', id: roleId });
   }
   return;
+});
+
+app.post('/reaction/create', middleWare, (req: express.Request, _res: express.Response) => {
+  console.log(req.query);
 });
 
 app.get('/folder/:guildId', middleWare, (req: express.Request, res: express.Response) => {
