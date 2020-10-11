@@ -100,6 +100,12 @@ app.get('/folder/:guildId', middleWare, (req: express.Request, res: express.Resp
   res.send(folder);
 });
 
+app.get('/folder/:folderId/roles', middleWare, (req: express.Request, res: express.Response) => {
+  const { folderId } = req.params;
+  const roles = guildFolders(folderId);
+  res.send(roles);
+});
+
 app.get('/roles/:guildId', middleWare, (req: express.Request, res: express.Response) => {
   const { guildId } = req.params;
   const guild = RoleBot.guilds.cache.get(guildId);

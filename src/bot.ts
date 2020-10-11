@@ -41,8 +41,8 @@ export default class RoleBot extends Discord.Client {
   folderContents: Discord.Collection<number, IFolderReactEmoji>;
   joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
-  constructor() {
-    super();
+  constructor(intents: Discord.WebSocketOptions) {
+    super({ ws: intents });
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactMessage = [];
