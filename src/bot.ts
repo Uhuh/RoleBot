@@ -41,8 +41,8 @@ export default class RoleBot extends Discord.Client {
   folderContents: Discord.Collection<number, IFolderReactEmoji>;
   joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
-  constructor(intents: Discord.WebSocketOptions) {
-    super({ ws: intents });
+  constructor() {
+    super();
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactMessage = [];
@@ -142,9 +142,11 @@ export default class RoleBot extends Discord.Client {
   }
 
   handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
+    console.log("Got reaction");
     try {
       if (!reaction || user.bot) return;
       const { message, emoji } = reaction;
+      console.log(this.reactMessage.includes(message.id));
       const { guild } = message;
       if (this.reactMessage.includes(message.id) && guild) {
         const id = emoji.id || emoji.name;
