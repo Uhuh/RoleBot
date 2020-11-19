@@ -11,10 +11,7 @@ export default {
     // ignore them plebians
     if (!message.guild || !message.member!.hasPermission(['MANAGE_ROLES']))
       return;
-    if (!args.length)
-      return message.channel.send(
-        'No arguments provided.\n`@RoleBot role <type> <name>`'
-      );
+
     const roleName = args.join(' ');
 
     const role = message.guild.roles.cache.find(
@@ -34,6 +31,10 @@ export default {
         role_id: role.id,
         guild_id: message.guild.id,
       });
+    } else {
+      message.reply(
+        `I couldn't find that role with that name, make sure it's correct.`
+      );
     }
 
     return message.react('❌');
