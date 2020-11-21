@@ -141,7 +141,11 @@ export default class RoleBot extends Discord.Client {
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
   }
 
-  handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
+  handleReaction = async (
+    reaction: Discord.MessageReaction,
+    user: Discord.User | Discord.PartialUser,
+    type: string
+  ) => {
     try {
       if (!reaction || user.bot) return;
       const { message, emoji } = reaction;
@@ -157,21 +161,25 @@ export default class RoleBot extends Discord.Client {
         
         const { role_id } = emoji_role;
 
-        if(!role_id) return;
+        if (!role_id) return;
 
         const role = guild.roles.cache.get(role_id);
         let member = guild.members.cache.get(user.id);
 
-        if(!member) {
-          console.log(`Role ${type} - Failed to get member from cache. Going to fetch and retry....`);
-          guild.members.fetch(user.id);
+        if (!member) {
+          console.log(
+            `Role ${type} - Failed to get member from cache. Going to fetch and retry....`
+          );
+          await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
         }
         
-        if(!role) throw new Error(`Role does not exist. Possibly deleted from server.`);
-        if(!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
+        if (!role)
+          throw new Error(`Role does not exist. Possibly deleted from server.`);
+        if (!member)
+          throw new Error(`Member not found: ${user.username} - ${user.id}`);
 
-        switch(type) {
+        switch (type) {
           case 'add':
             member.roles.add(role).catch(console.error);
             break;
