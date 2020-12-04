@@ -10,7 +10,7 @@ export default (client: RoleBot, message: Message): void => {
   if (message.author.bot) return;
 
   const mention = message.mentions.users.first();
-  const prefix = 'bb';
+  const prefix = 'rb';
 
   // Someone is trying to request a role (hopefully)
   if (
