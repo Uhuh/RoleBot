@@ -25,28 +25,20 @@ export default {
 
     if (!args.length) {
       embed.setTitle('**COMMAND CATEGORIES**');
-      embed.addField(`**General**`, `Try out \`rb help general\``);
+      embed.addField(
+        `**General**`,
+        `Wanna add auto(join) roles? Try out \`rb help general\``
+      );
       embed.addField(`**Reaction**`, `Try out \`rb reaction help\``);
       embed.addField(`**Folder**`, `Try out \`rb folder help\``);
-    } else if (args.length === 1) {
+    } else {
       args[0] = args[0].toLowerCase();
-      if (
-        args[0] !== 'reaction' &&
-        args[0] !== 'folder' &&
-        args[0] !== 'general'
-      )
-        return;
+      if (args[0] !== 'general') return;
 
       embed.setTitle(`**${args[0].toUpperCase()} COMMANDS**`);
       for (const func of client.commands.values()) {
-        if (args[0] === 'general') {
-          embed.addField(`**rb ${func.name} ${func.args}**`, func.desc);
-        } else if (args[0] === func.type) {
-          embed.addField(
-            `**rb ${func.type} ${func.name} ${func.args}**`,
-            func.desc
-          );
-        }
+        if (func.type !== args[0]) continue;
+        embed.addField(`**rb ${func.name} ${func.args}**`, func.desc);
       }
     }
 

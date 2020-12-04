@@ -24,10 +24,7 @@ export default {
         client.user?.username;
         const embed = new MessageEmbed();
         embed
-          .setTitle('**Config commands**')
-          .setDescription(
-            `All config commands require MANAGE_GUILD permissions.`
-          )
+          .setTitle('**Folder commands**')
           .setColor(16711684)
           .setAuthor(client.user?.username, client.user?.avatarURL() || '')
           .setThumbnail(client.user?.avatarURL() || '')

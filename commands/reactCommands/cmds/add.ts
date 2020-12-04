@@ -23,20 +23,38 @@ export default {
     let emoji = emojiId;
 
     const role = message.guild.roles.cache.find(
-      (r) => r.name.toLowerCase() === roleName.toLowerCase()
+      (r) =>
+        r.id === roleName || r.name.toLowerCase() === roleName.toLowerCase()
     );
 
     if (!role) {
-      return message.channel.send(
-        `Unable to find role \`${roleName}\`. Check for typos!`
+      return message.reply(`couldn't find a role with that name or ID`);
+    }
+
+    const clientMember = message.guild.members.cache.find(
+      (m) => m.id === client.user?.id
+    );
+
+    if (!clientMember) {
+      return console.error(
+        `Join command - I don't know why the client member was unfindable.`
       );
-    } else {
-      const reaction = getRoleByName(role.name, message.guild.id);
-      if (reaction) {
-        return message.channel.send(
-          `Role \`${role.name}\` is already being used.`
-        );
-      }
+    }
+
+    if (
+      role.position >
+      Math.max(...clientMember.roles.cache.map((r) => r.position))
+    ) {
+      return message.reply(
+        `the role you're trying to add is higher in the role hierarchy so I can't give it out. Put it below my role or give me a role that's above it.`
+      );
+    }
+
+    const react = getRoleByName(role.name, message.guild.id);
+    if (react) {
+      return message.channel.send(
+        `Role \`${role.name}\` is already being used.`
+      );
     }
 
     if (!emoji || emoji === '') {
