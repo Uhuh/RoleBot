@@ -50,14 +50,14 @@
     "jsonwebtoken": "^8.5.1",
     "log-to-file": "*",
     "node-gyp": "^6.0.0",
-    "request": "*"
+    "request": "*",
+    "typescript": "^4.1.2"
   },
   "devDependencies": {
     "@types/dotenv": "*",
     "@types/moment": "*",
     "@types/node": "^12.7.12",
     "rimraf": "*",
-    "tslint": "^5.20.0",
-    "typescript": "^3.6.4"
+    "tslint": "^5.20.0"
   }
 }

@@ -1,58 +1,55 @@
-import { Message, MessageEmbed } from "discord.js";
-import RoleBot from "../../src/bot";
-import reactionHandler from "./reactionHandler";
-import folderHandler from "./folderHandler";
+import { Message, MessageEmbed } from 'discord.js';
+import RoleBot from '../../src/bot';
 
 export default {
-  desc: "Sends a list of all available commands.",
-  name: "help",
-  args: "[category]",
-  type: "normal",
-  run: function(message: Message, args: string[], client: RoleBot) {
+  desc: 'Sends a list of all available commands.',
+  name: 'help',
+  args: '[category]',
+  type: 'general',
+  run: function (message: Message, args: string[], client: RoleBot) {
     const embed = new MessageEmbed();
-    const {user} = client;
-    
-    if(!user) return;
-    embed
-      .setDescription(
-        `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)          
-        <> = required arguments, [] = optional.
-        Mention or \`rb\` to use commands
-        `
-      )
+    const { user } = client;
+
+    if (!user) return;
 
     embed
       .setColor(16711684)
-      .setAuthor(user.username, user.avatarURL() || "")
-      .setThumbnail(user.avatarURL() || "")
+      .setAuthor(user.username, user.avatarURL() || '')
+      .setThumbnail(user.avatarURL() || '')
       .setFooter(`Replying to: ${message.author.tag}`)
-      .setTimestamp(new Date());
-    
-    if(!args.length) {
-      embed.setTitle('**COMMAND CATEGORIES**')
-      embed.addField(`**REACTION**`, `Try out \`rb help reaction\``);
-      embed.addField(`**FOLDER**`, `Try out \`rb help folder\``);
-    } 
-    else if(args.length === 1) {
-      args[0] = args[0].toLowerCase();
-      if(args[0] !== 'reaction' && args[0] !== 'folder') {
-        return;
-      }
-      embed.setTitle(`**${args[0].toUpperCase()} COMMANDS**`);
+      .setTimestamp(new Date())
+      .addField(
+        `**Commands**`,
+        `[In depth use of commands](https://app.gitbook.com/@duwtgb/s/rolebot/)`
+      );
 
-      if(args[0] === 'reaction') {
-        embed.addField(`**DOCUMENTATION**`, `[In depth reaction documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#reaction-roles)`)
-        for (const func of reactionHandler.commands.values()) {
-          embed.addField(`**rb reaction ${func.name} ${func.args}**`, `${func.desc}`);
-        }
-      } else if (args[0] === 'folder') {
-        embed.addField(`**DOCUMENTATION**`, `[In depth folder documentation](https://app.gitbook.com/@duwtgb/s/rolebot/#folders)`)
-        for (const func of folderHandler.commands.values()) {
-          embed.addField(`**rb folder ${func.name} ${func.args}**`, `${func.desc}`);
+    if (!args.length) {
+      embed.setTitle('**COMMAND CATEGORIES**');
+      embed.addField(`**General**`, `Try out \`rb help general\``);
+      embed.addField(`**Reaction**`, `Try out \`rb reaction help\``);
+      embed.addField(`**Folder**`, `Try out \`rb folder help\``);
+    } else if (args.length === 1) {
+      args[0] = args[0].toLowerCase();
+      if (
+        args[0] !== 'reaction' &&
+        args[0] !== 'folder' &&
+        args[0] !== 'general'
+      )
+        return;
+
+      embed.setTitle(`**${args[0].toUpperCase()} COMMANDS**`);
+      for (const func of client.commands.values()) {
+        if (args[0] === 'general') {
+          embed.addField(`**rb ${func.name} ${func.args}**`, func.desc);
+        } else if (args[0] === func.type) {
+          embed.addField(
+            `**rb ${func.type} ${func.name} ${func.args}**`,
+            func.desc
+          );
         }
       }
     }
 
     message.channel.send({ embed });
-  }
+  },
 };

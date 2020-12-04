@@ -1,23 +1,23 @@
-import * as Discord from "discord.js";
-import * as dotenv from "dotenv";
+import * as Discord from 'discord.js';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
-import * as config from "./vars";
-import msg from "../events/message";
-import commandHandler from "../commands/commandHandler";
-import joinRole from "../events/joinRoles";
-import * as DBL from "dblapi.js";
-import removed from "../events/removed";
-import * as logger from "log-to-file";
+import * as config from './vars';
+import msg from '../events/message';
+import commandHandler from '../commands/commandHandler';
+import joinRole from '../events/joinRoles';
+import * as DBL from 'dblapi.js';
+import removed from '../events/removed';
+import * as logger from 'log-to-file';
 import {
   getRoleByReaction,
   getReactMessages,
   getJoinRoles,
   guildFolders,
-  folderContent
-} from "./setup_table";
-import { handle_packet } from "../events/raw_packet";
-import { IFolder, IJoinRole, IFolderReactEmoji } from "./interfaces";
+  folderContent,
+} from './setup_table';
+import { handle_packet } from '../events/raw_packet';
+import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
 
 export interface Command {
   desc: string;
@@ -48,97 +48,99 @@ export default class RoleBot extends Discord.Client {
     this.reactMessage = [];
     this.commandsRun = 0;
     this.reactChannel = new Discord.Collection();
-    this.guildFolders = new Discord.Collection<string,
-      IFolder[]
-    >();
+    this.guildFolders = new Discord.Collection<string, IFolder[]>();
     this.folderContents = new Discord.Collection<number, IFolderReactEmoji>();
-    this.joinRoles = new Discord.Collection<
-      string,
-      Partial<IJoinRole>[]
-    >();
+    this.joinRoles = new Discord.Collection<string, Partial<IJoinRole>[]>();
 
     commandHandler(this);
     /**
      * V12 is a pain and now we have to handle all the packets ourselves since nothing is cahced.
      * Fun. The bot is about roles so I better handle add/remove
      */
-    this.on("raw", packet => handle_packet(packet, this));
+    this.on('raw', (packet) => handle_packet(packet, this));
 
-    this.on("ready", (): void => {
+    this.on('ready', (): void => {
       const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.log(`[Started]: ${new Date()}`);
-      if (this.config.DEV_MODE === "0")
+      if (this.config.DEV_MODE === '0')
         setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
 
-      if(this.user) {
+      if (this.user) {
         this.user
           .setPresence({
             activity: { name: `rb help`, type: 'WATCHING' },
-            status: "dnd"
+            status: 'dnd',
           })
           .catch(console.error);
       }
     });
 
-    this.on("message", (message): void => msg(this, message as Discord.Message));
-    this.on("guildMemberAdd", (member) =>
+    this.on('message', (message): void =>
+      msg(this, message as Discord.Message)
+    );
+    this.on('guildMemberAdd', (member) =>
       joinRole(member as Discord.GuildMember, this.joinRoles)
     );
-    this.on("guildCreate", (guild): void => {
-      
+    this.on('guildCreate', (guild): void => {
       // const G_ID = "567819334852804626"; - Support guild id
-      const C_ID = "661410527309856827";
-      const JOIN_MSG = "Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me.\nHere is my documentation: https://duwtgb.gitbook.io/rolebot/";
+      const C_ID = '661410527309856827';
+      const JOIN_MSG =
+        'Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me.\nHere is my documentation: https://duwtgb.gitbook.io/rolebot/';
 
       // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
-      guild.fetchAuditLogs()
-        .then(audit => {
-          const entry = audit.entries.first()
+      guild
+        .fetchAuditLogs()
+        .then((audit) => {
+          const entry = audit.entries.first();
 
-          if(!entry) return; // No throwing
+          if (!entry) return; // No throwing
 
-          const { executor } = entry
+          const { executor } = entry;
 
-          if(!executor) return;
-          
-          executor.send(JOIN_MSG)
+          if (!executor) return;
+
+          executor.send(JOIN_MSG);
         })
-        .catch(e => {
-          console.log(e)
+        .catch((e) => {
+          console.log(e);
 
           const owner = guild.owner || guild.members.cache.get(guild.ownerID);
 
-          if(!owner) return;
+          if (!owner) return;
 
           owner.send(JOIN_MSG);
-        }).catch(e => logger(`Error trying to get bot adder: ${e}`, "errors.log"));
+        })
+        .catch((e) =>
+          logger(`Error trying to get bot adder: ${e}`, 'errors.log')
+        );
 
       const embed = new Discord.MessageEmbed();
 
       embed
         .setColor(3066993)
-        .setTitle("**Joined Guild**")
-        .setThumbnail(guild.iconURL() || "")
+        .setTitle('**Joined Guild**')
+        .setThumbnail(guild.iconURL() || '')
         .setDescription(guild.name)
-        .addField("Member size:", guild.memberCount)
-        .addField("Guilds:", this.guilds.cache.size)
-        .addField("Guild ID:", guild.id);
+        .addField('Member size:', guild.memberCount)
+        .addField('Guilds:', this.guilds.cache.size)
+        .addField('Guild ID:', guild.id);
 
-      (this.channels.cache.get(C_ID) as Discord.TextChannel).send(
-        embed
-      );
+      (this.channels.cache.get(C_ID) as Discord.TextChannel).send(embed);
 
       logger(
         `Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`,
-        "guilds.log"
+        'guilds.log'
       );
-
     });
-    this.on("guildDelete", (guild): void => removed(guild, this));
+    this.on('guildDelete', (guild): void => removed(guild, this));
     // React role handling
-    this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
+    this.on('messageReactionAdd', (reaction, user) =>
+      this.handleReaction(reaction, user, 'add')
+    );
 
-    this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
+    this.on('messageReactionRemove', (reaction, user) =>
+      this.handleReaction(reaction, user, 'remove')
+    );
   }
 
   handleReaction = async (
@@ -158,7 +160,7 @@ export default class RoleBot extends Discord.Client {
           reaction.users.remove(user.id).catch(console.error);
           return;
         } else if (!emoji_role) return;
-        
+
         const { role_id } = emoji_role;
 
         if (!role_id) return;
@@ -173,7 +175,7 @@ export default class RoleBot extends Discord.Client {
           await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
         }
-        
+
         if (!role)
           throw new Error(`Role does not exist. Possibly deleted from server.`);
         if (!member)
@@ -191,19 +193,19 @@ export default class RoleBot extends Discord.Client {
       }
 
       return;
-    } catch(e) {
-      logger(`Error occured trying to ${type} react-role: ${e}`, "errors.log")
+    } catch (e) {
+      logger(`Error occured trying to ${type} react-role: ${e}`, 'errors.log');
     }
-  }
+  };
 
   randomPres = (): void => {
     const user = this.user;
-    if (!user) return console.log("Client dead?");
+    if (!user) return console.log('Client dead?');
 
     user
       .setPresence({
         activity: { name: `rb help`, type: 'WATCHING' },
-        status: "dnd"
+        status: 'dnd',
       })
       .catch(console.error);
   };
@@ -216,12 +218,12 @@ export default class RoleBot extends Discord.Client {
   async loadReactMessage(): Promise<void> {
     const rows = getReactMessages();
 
-    for(const r of rows) {
+    for (const r of rows) {
       const M_ID = r.message_id;
       this.reactMessage.push(M_ID);
     }
 
-    console.log(this.reactMessage)
+    console.log(this.reactMessage);
   }
 
   /**
@@ -233,28 +235,40 @@ export default class RoleBot extends Discord.Client {
     for (const g_id of GUILD_IDS) {
       const joinRoles = getJoinRoles(g_id);
 
-      const roles: Partial<IJoinRole>[] = joinRoles.map(r => ({role_name: r.role_name, role_id: r.role_id}))
-      
+      const roles: Partial<IJoinRole>[] = joinRoles.map((r) => ({
+        role_name: r.role_name,
+        role_id: r.role_id,
+      }));
+
       this.joinRoles.set(g_id, roles);
     }
   }
 
   async loadFolders(): Promise<void> {
-    this.guilds.cache.forEach(g => {
+    this.guilds.cache.forEach((g) => {
       const FOLDERS = guildFolders(g.id);
       console.log(FOLDERS);
-      if(!FOLDERS || !FOLDERS.length) return;
+      if (!FOLDERS || !FOLDERS.length) return;
       this.guildFolders.set(g.id, FOLDERS);
-      for(const f of FOLDERS) {
+      for (const f of FOLDERS) {
         const roles = folderContent(f.id);
         console.log(roles);
-        let r = roles.map(r => ({ role_id: r.role_id, role_name: r.role_name, emoji_id: r.emoji_id }));
+        let r = roles.map((r) => ({
+          role_id: r.role_id,
+          role_name: r.role_name,
+          emoji_id: r.emoji_id,
+        }));
 
-        if (r.length === 1 && r[0].role_id === null) r = []
+        if (r.length === 1 && r[0].role_id === null) r = [];
 
-        this.folderContents.set(f.id, { id: f.id, label: f.label, guild_id: g.id, roles: r });
+        this.folderContents.set(f.id, {
+          id: f.id,
+          label: f.label,
+          guild_id: g.id,
+          roles: r,
+        });
       }
-    })
+    });
   }
 
   async start() {

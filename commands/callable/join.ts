@@ -6,7 +6,7 @@ export default {
   desc: 'Users are given this role upon joining.\n' + 'E.G: `rb join Member`',
   name: 'join',
   args: '',
-  type: 'message',
+  type: 'general',
   run: (message: Message, args: string[], client: RoleBot) => {
     // ignore them plebians
     if (!message.guild || !message.member!.hasPermission(['MANAGE_ROLES']))
