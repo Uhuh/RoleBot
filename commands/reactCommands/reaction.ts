@@ -65,7 +65,7 @@ export default {
          */
         RoleList.run(message, null, client);
         break;
-      case 'message':
+      case 'msg':
         RoleMessage.run(message, args, client);
         break;
       case 'move':
