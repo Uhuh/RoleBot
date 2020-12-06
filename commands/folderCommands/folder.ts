@@ -40,12 +40,10 @@ export default {
       case 'add':
         FolderAdd.run(message, args, client);
         break;
-      case 'channel':
-        break;
       case 'list':
         FolderList.run(message, args, client);
         break;
-      case 'message':
+      case 'create':
         FolderNew.run(message, args, client);
         break;
       case 'remove':
