@@ -17,13 +17,21 @@ export default {
       .split('|')
       .map((l) => l.trim().toLowerCase());
 
+    const roleMention = message.mentions.roles.first();
+
     if (!roleName) {
       return message.channel.send('No role given! Try `rb reaction move Blue`');
     }
 
-    const role = message.guild.roles.cache.find(
-      (r) => r.name.toLowerCase() === roleName.toLowerCase()
-    );
+    let role = null;
+    if (roleMention) {
+      role = roleMention;
+    } else {
+      role = message.guild.roles.cache.find(
+        (r) =>
+          r.id === roleName || r.name.toLowerCase() === roleName.toLowerCase()
+      );
+    }
 
     if (!role) {
       return message.channel.send(

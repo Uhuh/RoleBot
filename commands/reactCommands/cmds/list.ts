@@ -76,7 +76,7 @@ const generateEmbed = (
     for (const r in roles)
       desc += `${USER_CALLED ? `[ ID ${r} ] - ` : ''}${
         guild.emojis.cache.get(roles[r].emoji_id) || roles[r].emoji_id
-      } - ${roles[r].role_name}\n`;
+      } - <@&${roles[r].role_id}>\n`;
 
     embed.setDescription(desc);
   } else embed.setDescription(`There are no reaction roles`);
