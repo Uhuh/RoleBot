@@ -83,36 +83,6 @@ export default class RoleBot extends Discord.Client {
     this.on('guildCreate', (guild): void => {
       // const G_ID = "567819334852804626"; - Support guild id
       const C_ID = '661410527309856827';
-      const JOIN_MSG =
-        'Thanks for the invite! Be aware that my role must be above the ones you want me to hand out to others.\nCheck out my commands by mentioning me.\nHere is my documentation: https://duwtgb.gitbook.io/rolebot/';
-
-      // Send a DM to the user that invited the bot. If that breaks for some reason, dm the owner.
-      guild
-        .fetchAuditLogs()
-        .then((audit) => {
-          const entry = audit.entries.first();
-
-          if (!entry) return; // No throwing
-
-          const { executor } = entry;
-
-          if (!executor) return;
-
-          executor.send(JOIN_MSG);
-        })
-        .catch((e) => {
-          console.log(e);
-
-          const owner = guild.owner || guild.members.cache.get(guild.ownerID);
-
-          if (!owner) return;
-
-          owner.send(JOIN_MSG);
-        })
-        .catch((e) =>
-          logger(`Error trying to get bot adder: ${e}`, 'errors.log')
-        );
-
       const embed = new Discord.MessageEmbed();
 
       embed

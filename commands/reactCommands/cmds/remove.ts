@@ -25,8 +25,6 @@ export default {
       (r) => r.role_name.toLowerCase() === arg.toLowerCase()
     );
 
-    console.log(DB_ROLE);
-
     if (DB_ROLE) {
       const folder = client.folderContents.get(Number(DB_ROLE.folder_id));
 
@@ -36,8 +34,6 @@ export default {
           return console.error(
             `Role ${args} somehow not in folder but is in database.`
           );
-        console.log(`Removing role from folder`);
-        console.log(role);
 
         folder.roles.splice(folder.roles.indexOf(role), 1);
       }

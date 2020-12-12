@@ -31,8 +31,6 @@ export default {
       return;
     }
 
-    console.log(MSG_ID);
-
     let MSG: void | Message = {} as Message;
 
     for (const [, c] of message.guild.channels.cache) {
