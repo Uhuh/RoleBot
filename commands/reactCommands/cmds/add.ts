@@ -20,12 +20,20 @@ export default {
       .join(' ')
       .split('|')
       .map((l) => l.trim());
+
+    const roleMention = message.mentions.roles.first();
+
     let emoji = emojiId;
 
-    const role = message.guild.roles.cache.find(
-      (r) =>
-        r.id === roleName || r.name.toLowerCase() === roleName.toLowerCase()
-    );
+    let role = null;
+    if (roleMention) {
+      role = roleMention;
+    } else {
+      role = message.guild.roles.cache.find(
+        (r) =>
+          r.id === roleName || r.name.toLowerCase() === roleName.toLowerCase()
+      );
+    }
 
     if (!role) {
       return message.reply(`couldn't find a role with that name or ID`);
