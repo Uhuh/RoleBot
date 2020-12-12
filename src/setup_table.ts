@@ -3,7 +3,6 @@ import {
   IFolder,
   IReactMessage,
   IJoinRole,
-  IRole,
   IReactionRole,
   IRoleEmoji,
 } from './interfaces';
@@ -11,23 +10,6 @@ import {
 const sql = new SQLite('./roles.sqlite');
 
 const setupTable = () => {
-  const table = sql
-    .prepare(
-      "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'roles'"
-    )
-    .get();
-  if (!table['count(*)']) {
-    // If the table isn't there, create it and setup the database correctly.
-    sql
-      .prepare(
-        'CREATE TABLE roles (id TEXT PRIMARY KEY, role_name TEXT, prim_role INT, guild TEXT, role_id TEXT)'
-      )
-      .run();
-    // Ensure that the 'id' row is always unique and indexed.
-    sql.prepare('CREATE UNIQUE INDEX idx_roles_id ON roles (id)').run();
-    sql.pragma('synchronous = 1');
-    sql.pragma('journal_mode = wal');
-  }
   const joinRolesTable = sql
     .prepare(
       "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'join_roles'"
@@ -147,16 +129,6 @@ export const deleteJoin = sql.prepare(
   'DELETE FROM join_roles WHERE guild_id = ? AND role_id = ?'
 );
 
-// Roles
-export const deleteRole = sql.prepare(
-  'DELETE FROM roles WHERE guild = ? AND role_name = ?'
-);
-export const getRoles = (guild: string): IRole[] =>
-  sql.prepare('SELECT * FROM roles WHERE guild = @guild').all({ guild });
-export const addRole = sql.prepare(
-  'INSERT OR REPLACE INTO roles (id, role_name, prim_role, guild, role_id) VALUES (@id, @role_name, @prim_role, @guild, @role_id)'
-);
-
 // Removed from guild
 export const removeJoinRoles = (guild_id: string) =>
   sql
@@ -176,6 +148,28 @@ export const removeReactMsg = (guild_id: string) =>
   sql
     .prepare('DELETE FROM react_message WHERE guild_id = @guild_id')
     .run({ guild_id });
+
+export const updateRoleNames = (role_id: string, new_name: string) => {
+  sql
+    .prepare(
+      `UPDATE reaction_role SET reaction_role.role_name = @new_name WHERE reaction_role.role_id = @role_id`
+    )
+    .run({ role_id, new_name });
+  sql
+    .prepare(
+      `UPDATE join_roles SET join_roles.role_name = @new_name WHERE join_roles.role_id = @role_id `
+    )
+    .run({ role_id, new_name });
+};
+
+export const deleteRole = (role_id: string) => {
+  sql
+    .prepare(`DELETE FROM reaction_role WHERE reaction_role.role_id = @role_id`)
+    .run({ role_id });
+  sql
+    .prepare(`DELETE FROM join_roles WHERE join_roles.role_id = @role_id `)
+    .run({ role_id });
+};
 
 // The message that contains all the react roles to type
 export const addReactMessage = (

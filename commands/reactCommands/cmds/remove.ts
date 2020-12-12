@@ -40,7 +40,6 @@ export default {
         console.log(role);
 
         folder.roles.splice(folder.roles.indexOf(role), 1);
-        client.folderContents.set(folder.id, folder);
       }
 
       removeReactionRole(DB_ROLE.role_id);
@@ -58,7 +57,6 @@ export default {
           removeReactionRole(r.role_id);
         });
         folder.roles = [];
-        client.folderContents.set(f.id, folder);
       }
       return message.react('✅');
     }

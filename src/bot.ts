@@ -1,6 +1,5 @@
 import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
-
 dotenv.config();
 import * as config from './vars';
 import msg from '../events/message';
@@ -18,6 +17,7 @@ import {
 } from './setup_table';
 import { handle_packet } from '../events/raw_packet';
 import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
+import { roleDelete, roleUpdate } from '../events/roleupdate';
 
 export interface Command {
   desc: string;
@@ -74,7 +74,6 @@ export default class RoleBot extends Discord.Client {
           .catch(console.error);
       }
     });
-
     this.on('message', (message): void =>
       msg(this, message as Discord.Message)
     );
@@ -137,9 +136,16 @@ export default class RoleBot extends Discord.Client {
     this.on('messageReactionAdd', (reaction, user) =>
       this.handleReaction(reaction, user, 'add')
     );
-
     this.on('messageReactionRemove', (reaction, user) =>
       this.handleReaction(reaction, user, 'remove')
+    );
+    /**
+     * Whenever roles get deleted or changed let's update RoleBots DB.
+     * Remove roles deleted and update role names.
+     */
+    this.on('roleDelete', (role) => roleDelete(role, this));
+    this.on('roleUpdate', (oldRole, newRole) =>
+      roleUpdate(oldRole, newRole, this)
     );
   }
 
