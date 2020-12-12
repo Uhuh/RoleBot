@@ -18,6 +18,7 @@ export default {
     const roleChannel = message.mentions.channels.first();
     const FOLDERS_INFO = client.guildFolders.get(GUILD_ID) || [];
     const GUILD_FOLDERS = [...FOLDERS_INFO];
+    console.log(FOLDERS_INFO);
     // I want to enforce the non folder roles.
     GUILD_FOLDERS.unshift({ id: 0, label: '', guild_id: GUILD_ID });
     let rMsg = {} as Message;

@@ -29,11 +29,13 @@ export default {
     const folder = client.guildFolders
       .get(GUILD_ID)
       ?.find((f) => f.label.toLowerCase() === oldName.toLowerCase());
-
     if (!folder) {
       return message.reply(`I couldn't find a folder with that name.`);
     }
+    const folderContents = client.folderContents.get(folder.id);
+    folderContents!.label = newName;
     folder.label = newName;
+
     renameFolder(GUILD_ID, folder.id, newName);
 
     return message.reply(
