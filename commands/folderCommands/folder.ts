@@ -4,8 +4,9 @@ import FolderAdd from './cmds/add';
 import FolderList from './cmds/list';
 import FolderNew from './cmds/new';
 import FolderRemove from './cmds/remove';
+import FolderReName from './cmds/rename';
 
-const funcs = [FolderAdd, FolderList, FolderNew, FolderRemove];
+const funcs = [FolderAdd, FolderList, FolderNew, FolderRemove, FolderReName];
 
 export default {
   desc: 'Folder command handler, does not get seen by users',
@@ -48,6 +49,9 @@ export default {
         break;
       case 'remove':
         FolderRemove.run(message, args, client);
+        break;
+      case 'rename':
+        FolderReName.run(message, args, client);
         break;
       default:
         message.reply(`that's not a valid folder command.`);

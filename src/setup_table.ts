@@ -89,6 +89,13 @@ const setupTable = () => {
 setupTable();
 
 // Folders
+export const renameFolder = (guild_id: string, id: number, newLabel: string) =>
+  sql
+    .prepare(
+      `UPDATE folder SET label = @newLabel WHERE folder.id = @id AND folder.guild_id = @guild_id`
+    )
+    .run({ guild_id, id, newLabel });
+
 export const addFolder = (guild_id: string, label: string) =>
   sql
     .prepare(
