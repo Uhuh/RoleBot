@@ -18,6 +18,7 @@ import {
 import { handle_packet } from '../events/raw_packet';
 import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
 import { roleDelete, roleUpdate } from '../events/roleupdate';
+import * as mongoose from 'mongoose';
 
 export interface Command {
   desc: string;
@@ -248,6 +249,11 @@ export default class RoleBot extends Discord.Client {
   }
 
   async start() {
+    await mongoose.connect(`mongodb://localhost/${config.DATABASE_TYPE}`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
     await this.login(this.config.TOKEN);
     await this.loadRoles();
     await this.loadFolders();
