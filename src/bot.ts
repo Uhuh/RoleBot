@@ -254,6 +254,7 @@ export default class RoleBot extends Discord.Client {
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
+    mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
     await this.loadRoles();
     await this.loadFolders();

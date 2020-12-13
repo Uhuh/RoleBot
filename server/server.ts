@@ -1,7 +1,6 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
-import * as cors from 'cors';
 dotenv.config();
 import {
   guildReactions,
@@ -15,7 +14,7 @@ const app = express();
 
 const port = 8080;
 
-app.use(cors());
+app.use();
 
 app.get('/unicode', (_req, res: express.Response) => {
   res.send(emojis);
