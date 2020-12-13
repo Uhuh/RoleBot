@@ -198,8 +198,6 @@ export default class RoleBot extends Discord.Client {
       const M_ID = r.message_id;
       this.reactMessage.push(M_ID);
     }
-
-    console.log(this.reactMessage);
   }
 
   /**
@@ -223,12 +221,10 @@ export default class RoleBot extends Discord.Client {
   async loadFolders(): Promise<void> {
     this.guilds.cache.forEach((g) => {
       const FOLDERS = guildFolders(g.id);
-      console.log(FOLDERS);
       if (!FOLDERS || !FOLDERS.length) return;
       this.guildFolders.set(g.id, FOLDERS);
       for (const f of FOLDERS) {
         const roles = folderContent(f.id);
-        console.log(roles);
         let r = roles.map((r) => ({
           role_id: r.role_id,
           role_name: r.role_name,

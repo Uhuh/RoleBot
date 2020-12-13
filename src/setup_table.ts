@@ -152,12 +152,12 @@ export const removeReactMsg = (guild_id: string) =>
 export const updateRoleNames = (role_id: string, new_name: string) => {
   sql
     .prepare(
-      `UPDATE reaction_role SET reaction_role.role_name = @new_name WHERE reaction_role.role_id = @role_id`
+      `UPDATE reaction_role SET role_name = @new_name WHERE reaction_role.role_id = @role_id`
     )
     .run({ role_id, new_name });
   sql
     .prepare(
-      `UPDATE join_roles SET join_roles.role_name = @new_name WHERE join_roles.role_id = @role_id `
+      `UPDATE join_roles SET role_name = @new_name WHERE join_roles.role_id = @role_id `
     )
     .run({ role_id, new_name });
 };
