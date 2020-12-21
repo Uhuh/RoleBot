@@ -12,7 +12,7 @@ export default {
   run: (message: Message, args: string[], client: RoleBot) => {
     if (
       !message.guild ||
-      !message.member?.hasPermission(['MANAGE_GUILD']) ||
+      !message.member?.hasPermission(['MANAGE_ROLES']) ||
       args.length === 0
     )
       return;
