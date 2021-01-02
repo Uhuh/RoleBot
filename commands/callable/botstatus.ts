@@ -12,11 +12,8 @@ export default {
     let channelCount = 0;
 
     client.guilds.cache.forEach((g) => {
-      // Ignore DBL, they only list the bot. Not use it.
-      if (g.id !== '264445053596991498') {
-        userCount += g.memberCount;
-        channelCount += g.channels.cache.size;
-      }
+      userCount += g.memberCount;
+      channelCount += g.channels.cache.size;
     });
     embed.setDescription(
       `[Support server](https://discord.gg/nJBubXy)\n[🤖Vote for me!](https://top.gg/bot/493668628361904139/vote)          
