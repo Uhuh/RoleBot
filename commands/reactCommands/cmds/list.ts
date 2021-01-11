@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, TextChannel, Guild } from 'discord.js';
+import { Message, MessageEmbed, TextChannel } from 'discord.js';
 import RoleBot from '../../../src/bot';
 import { rolesByFolderId } from '../../../src/setup_table';
 import { IFolderReactEmoji, IRoleEmoji } from '../../../src/interfaces';
@@ -11,7 +11,8 @@ export default {
   run: (
     message: Message,
     roleChannel: any,
-    folder: IFolderReactEmoji | null | RoleBot
+    folder: IFolderReactEmoji | null | RoleBot,
+    client?: RoleBot
   ) => {
     if (!message.guild) return;
 
@@ -27,7 +28,7 @@ export default {
       roles = rolesByFolderId(message.guild.id, null);
 
       message.channel.send(
-        generateEmbed('Server Roles', roles, guild, USER_CALLED)
+        generateEmbed('Server Roles', roles, USER_CALLED, folder)
       );
 
       if (!folders) return;
@@ -41,7 +42,7 @@ export default {
 
         if (!R.length) return;
 
-        message.channel.send(generateEmbed(f.label, R, guild, USER_CALLED));
+        message.channel.send(generateEmbed(f.label, R, USER_CALLED, folder));
       });
 
       return;
@@ -51,11 +52,11 @@ export default {
 
     if (roleChannel instanceof TextChannel)
       return roleChannel.send(
-        generateEmbed(folder!.label, roles, guild, USER_CALLED)
+        generateEmbed(folder!.label, roles, USER_CALLED, client)
       );
 
     return message.channel.send(
-      generateEmbed(folder!.label, roles, guild, USER_CALLED)
+      generateEmbed(folder!.label, roles, USER_CALLED, client)
     );
   },
 };
@@ -63,8 +64,8 @@ export default {
 const generateEmbed = (
   label: string,
   roles: IRoleEmoji[],
-  guild: Guild,
-  USER_CALLED: boolean
+  USER_CALLED: boolean,
+  client?: RoleBot
 ): MessageEmbed => {
   const embed = new MessageEmbed();
 
@@ -73,10 +74,16 @@ const generateEmbed = (
 
   if (roles.length) {
     let desc = '';
-    for (const r in roles)
+    for (const r in roles) {
+      let emoji = client?.emojis.cache.get(roles[r].emoji_id);
+      if (!emoji) {
+        //@ts-ignore
+        emoji = client?.emojis.resolve(roles[r].emoji_id);
+      }
       desc += `${USER_CALLED ? `[ ID ${r} ] - ` : ''}${
-        guild.emojis.cache.get(roles[r].emoji_id) || roles[r].emoji_id
+        emoji || roles[r].emoji_id
       } - <@&${roles[r].role_id}>\n`;
+    }
 
     embed.setDescription(desc);
   } else embed.setDescription(`There are no reaction roles`);

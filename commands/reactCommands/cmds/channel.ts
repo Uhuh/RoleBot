@@ -37,7 +37,13 @@ export default {
       if (!roles.length) continue;
 
       //@ts-ignore
-      rMsg = (await reactList.run(message, roleChannel, folder)) as Message;
+      rMsg = (await reactList.run(
+        message,
+        roleChannel,
+        //@ts-ignore
+        folder,
+        client
+      )) as Message;
 
       addReactMessage(rMsg.id, roleChannel.id, GUILD_ID);
       client.reactMessage.push(rMsg.id);
