@@ -1,13 +1,13 @@
 import { Schema, Document, Model, model } from 'mongoose';
 
-interface IFolder {
+interface ICategory {
   id: number;
   label: string;
   roleIds: string[];
 }
 
 interface IRoleEmoji {
-  folderId: string;
+  categoryId: string;
   emojiId: string;
   roleId: string;
 }
@@ -17,9 +17,9 @@ interface IReactMessage {
   channelId: string;
 }
 
-const ReactRole = new Schema({
+const GuildInfo = new Schema({
   guildId: { type: String, required: true, unique: true, index: true },
-  folders: {
+  categories: {
     type: [],
     default: [],
   },
@@ -33,13 +33,13 @@ const ReactRole = new Schema({
   },
 });
 
-export interface IReactRole {
+export interface IGuildInfo {
   guildId: string;
-  folders: IFolder[];
+  categories: ICategory[];
   reactRoles: IRoleEmoji[];
   reactMessage: IReactMessage[];
 }
 
-export interface IReactRoleDoc extends IReactRole, Document {}
-export interface IReactRoleModel extends Model<IReactRoleDoc> {}
-export default model<IReactRoleDoc>('ReactRole', ReactRole);
+export interface IGuildInfoDoc extends IGuildInfo, Document {}
+export interface IGuildInfoModel extends Model<IGuildInfoDoc> {}
+export default model<IGuildInfoDoc>('GuildInfo', GuildInfo);
