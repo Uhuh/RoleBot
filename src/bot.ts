@@ -146,7 +146,11 @@ export default class RoleBot extends Discord.Client {
 
         if (!member) {
           console.log(
-            `Role ${type} - Failed to get member from cache. Going to fetch and retry....`
+            `Role Exist: ${Boolean(
+              role
+            )} Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${
+              guild.id
+            }] - user[${user.id}]`
           );
           await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
