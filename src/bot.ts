@@ -42,7 +42,9 @@ export default class RoleBot extends Discord.Client {
   joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
   constructor() {
-    super();
+    super({
+      partials: ['REACTION'],
+    });
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactMessage = [];
