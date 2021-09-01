@@ -1,10 +1,9 @@
-import RB from "./bot"
-import * as logger from "log-to-file"
+import RB from './bot';
 
-const RoleBot = new RB()
+const RoleBot = new RB();
 
-RoleBot.start().catch(e => {
-  logger(`Error occurred during bot runtime: ${e}`, 'errors.log')
-});
+RoleBot.start().catch((e) =>
+  console.error(`RoleBot has encounter an error while starting up. ${e}`)
+);
 
 export default RoleBot;

@@ -1,31 +1,18 @@
 {
   "name": "rolebot",
   "version": "1.0.0",
-  "description": "Just learnin stuff",
+  "description": "Manage reaction roles",
   "main": "build/src/index.js",
   "scripts": {
     "build": "tsc",
     "build:dist": "tsc -p tsconfig.json",
-    "clean": "rimraf build/",
-    "prestart": "npm run build",
-    "prestart:bot": "npm run build",
-    "prestart:server": "npm run build",
-    "start": "yarn start:bot && yarn start:server",
-    "start:server": "node build/server/server.js",
-    "start:bot": "node build/src/index.js",
-    "watch": "tsc --watch"
+    "prestart": "yarn build",
+    "start": "node build/src/index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Uhuh/BowsetteBot.git"
   },
-  "keywords": [
-    "discord",
-    "bot",
-    "maymay",
-    "memes",
-    "stuff"
-  ],
   "author": "Dylan Warren",
   "license": "MIT",
   "bugs": {
@@ -33,30 +20,15 @@
   },
   "homepage": "https://github.com/Uhuh/RoleBot#readme",
   "dependencies": {
-    "@types/better-sqlite3": "*",
-    "@types/express": "^4.17.6",
-    "@types/jsonwebtoken": "^8.5.0",
-    "@types/module-alias": "*",
+    "@types/mongoose": "^5.11.97",
     "@types/ws": "^6.0.4",
-    "better-sqlite3": "^5.4.3",
-    "dblapi.js": "*",
-    "discord.js": "12",
+    "discord.js": "^13.1.0",
     "dotenv": "*",
-    "express": "^4.17.1",
     "fs": "*",
-    "https": "^1.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "log-to-file": "*",
-    "mongoose": "^5.11.7",
-    "node-gyp": "^6.0.0",
-    "request": "*",
-    "typescript": "^4.1.2"
+    "mongoose": "^6.0.3",
+    "typescript": "^4.4.2"
   },
   "devDependencies": {
-    "@types/dotenv": "*",
-    "@types/moment": "*",
-    "@types/node": "^12.7.12",
-    "rimraf": "*",
-    "tslint": "^5.20.0"
+    "@types/dotenv": "*"
   }
 }

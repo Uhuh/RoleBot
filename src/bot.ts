@@ -5,31 +5,18 @@ import * as config from './vars';
 import msg from '../events/message';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
-import * as DBL from 'dblapi.js';
-import removed from '../events/removed';
-import * as logger from 'log-to-file';
-import {
-  getRoleByReaction,
-  getReactMessages,
-  getJoinRoles,
-  guildFolders,
-  folderContent,
-} from './setup_table';
+import { guildUpdate } from '../events/guildUpdate';
+
 import { handle_packet } from '../events/raw_packet';
 import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
 import { roleDelete, roleUpdate } from '../events/roleupdate';
-import * as mongoose from 'mongoose';
 
 export interface Command {
   desc: string;
   args: string;
   name: string;
   type: string;
-  run: Function;
-}
-
-export interface CommandCollection extends Command {
-  commands: Discord.Collection<string, Command[]>;
+  run: (msg: Discord.Message, args: string[], client: RoleBot) => unknown;
 }
 
 export default class RoleBot extends Discord.Client {
@@ -43,7 +30,10 @@ export default class RoleBot extends Discord.Client {
   joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
 
   constructor() {
-    super();
+    super({
+      partials: ['REACTION'],
+      intents: [],
+    });
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactMessage = [];
@@ -61,48 +51,17 @@ export default class RoleBot extends Discord.Client {
     this.on('raw', (packet) => handle_packet(packet, this));
 
     this.on('ready', (): void => {
-      const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.log(`[Started]: ${new Date()}`);
-      if (this.config.DEV_MODE === '0')
-        setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
-
-      if (this.user) {
-        this.user
-          .setPresence({
-            activity: { name: `rb help`, type: 'WATCHING' },
-            status: 'dnd',
-          })
-          .catch(console.error);
-      }
-    });
-    this.on('message', (message): void =>
-      msg(this, message as Discord.Message)
-    );
-    this.on('guildMemberAdd', (member) =>
-      joinRole(member as Discord.GuildMember, this.joinRoles)
-    );
-    this.on('guildCreate', (guild): void => {
-      // const G_ID = "567819334852804626"; - Support guild id
-      const C_ID = '661410527309856827';
-      const embed = new Discord.MessageEmbed();
-
-      embed
-        .setColor(3066993)
-        .setTitle('**Joined Guild**')
-        .setThumbnail(guild.iconURL() || '')
-        .setDescription(guild.name)
-        .addField('Member size:', guild.memberCount)
-        .addField('Guilds:', this.guilds.cache.size)
-        .addField('Guild ID:', guild.id);
-
-      (this.channels.cache.get(C_ID) as Discord.TextChannel).send(embed);
-
-      logger(
-        `Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`,
-        'guilds.log'
+      console.log(
+        `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
+
+      setInterval(() => this.updatePresence(), 10000);
     });
-    this.on('guildDelete', (guild): void => removed(guild, this));
+    this.on('message', (message): void => msg(this, message));
+    this.on('guildMemberAdd', (member) => joinRole(member, this.joinRoles));
+    this.on('guildCreate', (guild): void => guildUpdate(guild, 'Joined', this));
+    this.on('guildDelete', (guild): void => guildUpdate(guild, 'Left', this));
     // React role handling
     this.on('messageReactionAdd', (reaction, user) =>
       this.handleReaction(reaction, user, 'add')
@@ -120,8 +79,23 @@ export default class RoleBot extends Discord.Client {
     );
   }
 
+  updatePresence = () => {
+    if (!this.user)
+      return console.error(`Can't set presence due to client user missing.`);
+
+    this.user.setPresence({
+      activities: [
+        {
+          name: 'rb help',
+          type: 'WATCHING',
+        },
+      ],
+      status: 'dnd',
+    });
+  };
+
   handleReaction = async (
-    reaction: Discord.MessageReaction,
+    reaction: Discord.MessageReaction | Discord.PartialMessageReaction,
     user: Discord.User | Discord.PartialUser,
     type: string
   ) => {
@@ -174,9 +148,7 @@ export default class RoleBot extends Discord.Client {
       }
 
       return;
-    } catch (e) {
-      logger(`Error occured trying to ${type} react-role: ${e}`, 'errors.log');
-    }
+    } catch (e) {}
   };
 
   randomPres = (): void => {
@@ -249,12 +221,6 @@ export default class RoleBot extends Discord.Client {
   }
 
   async start() {
-    await mongoose.connect(`mongodb://localhost/${config.DATABASE_TYPE}`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    });
-    mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
     await this.loadRoles();
     await this.loadFolders();
