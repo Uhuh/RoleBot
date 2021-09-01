@@ -3,22 +3,22 @@ import { Schema, Document, Model, model } from 'mongoose';
 interface ICategory {
   id: number;
   label: string;
-  roleIds: string[];
+  roleIds: BigInt[];
 }
 
 interface IRoleEmoji {
-  categoryId: string;
+  categoryId: number;
   emojiId: string;
-  roleId: string;
+  roleId: BigInt;
 }
 
 interface IReactMessage {
-  messageId: string;
-  channelId: string;
+  messageId: BigInt;
+  channelId: BigInt;
 }
 
 const GuildInfo = new Schema({
-  guildId: { type: String, required: true, unique: true, index: true },
+  guildId: { type: BigInt, required: true, unique: true, index: true },
   categories: {
     type: [],
     default: [],

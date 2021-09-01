@@ -10,6 +10,7 @@ import { guildUpdate } from '../events/guildUpdate';
 import { handle_packet } from '../events/raw_packet';
 import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
 import { roleDelete, roleUpdate } from '../events/roleupdate';
+import * as mongoose from 'mongoose';
 
 export interface Command {
   desc: string;
@@ -220,10 +221,15 @@ export default class RoleBot extends Discord.Client {
     });
   }
 
-  async start() {
+  start = async () => {
+    await mongoose.connect(`mongodb://localhost/rolebotBeta`);
+
     await this.login(this.config.TOKEN);
-    await this.loadRoles();
-    await this.loadFolders();
-    await this.loadReactMessage();
-  }
+
+    await Promise.all([
+      this.loadRoles(),
+      this.loadFolders(),
+      this.loadReactMessage(),
+    ]);
+  };
 }
