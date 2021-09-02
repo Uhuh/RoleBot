@@ -1,33 +1,53 @@
-import RoleBot from '../src/bot';
+import RoleBot, { Command } from '../src/bot';
 import * as fs from 'fs';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { TOKEN } from '../src/vars';
+
+const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 export default (client: RoleBot) => {
-  const helpCommands: string[] = [];
-  const reactCommands: string[] = [];
-  const folderCommands: string[] = [];
+  const categoryCommands: string[] = [];
+  const slashGenerators: string[] = [];
 
-  fs.readdirSync('commands/callable/').forEach((file) =>
-    helpCommands.push(file.slice(0, -3))
+  const commandsJson: any = [];
+
+  fs.readdirSync('commands/category-slash-commands/').forEach((file) =>
+    categoryCommands.push(file.slice(0, -3))
   );
-  fs.readdirSync('commands/reactCommands/').forEach((file) => {
-    if (file !== 'cmds') reactCommands.push(file.slice(0, -3));
-  });
-  fs.readdirSync('commands/folderCommands/').forEach((file) => {
-    if (file !== 'cmds') folderCommands.push(file.slice(0, -3));
-  });
 
-  for (const file of helpCommands) {
-    const command = require(`./callable/${file}`);
-    client.commands.set(command.default.name.toLowerCase(), command.default);
+  fs.readdirSync('commands/slashGenerators/').forEach((file) =>
+    slashGenerators.push(file.slice(0, -3))
+  );
+
+  for (const file of categoryCommands) {
+    const command: {
+      command: Command;
+    } = require(`./category-slash-commands/${file}`);
+    client.commands.set(command.command.name.toLowerCase(), command.command);
   }
 
-  for (const file of reactCommands) {
-    const command = require(`./reactCommands/${file}`);
-    client.commands.set(command.default.name, command.default);
+  for (const file of slashGenerators) {
+    const command = require(`./slashGenerators/${file}`);
+    commandsJson.push(command.default.toJSON());
   }
 
-  for (const file of folderCommands) {
-    const command = require(`./folderCommands/${file}`);
-    client.commands.set(command.default.name, command.default);
-  }
+  console.log(commandsJson);
+
+  (async () => {
+    try {
+      await rest.put(
+        Routes.applicationGuildCommands(
+          client.user?.id || '',
+          '647960154079232041'
+        ),
+        {
+          body: commandsJson,
+        }
+      );
+      console.log(`Created slash commands successfully.`);
+    } catch (e) {
+      console.error(`Errored when trying to create slash commands. ${e}`);
+    }
+  })();
 };

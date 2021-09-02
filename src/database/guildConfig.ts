@@ -1,19 +1,19 @@
 import { Schema, Document, Model, model } from 'mongoose';
 
 const GuildConfig = new Schema({
-  guildId: { type: BigInt, required: true, unique: true, index: true },
+  guildId: { type: String, required: true, unique: true, index: true },
   prefix: { type: String, default: 'rb' },
   joinRoles: {
-    type: [BigInt],
+    type: [String],
     default: [],
     maxlength: 5,
   },
 });
 
 export interface IGuildConfig {
-  guildId: BigInt;
+  guildId: string;
   prefix: string;
-  joinRoles: BigInt[];
+  joinRoles: string[];
 }
 
 export interface IGuildConfigDoc extends IGuildConfig, Document {}

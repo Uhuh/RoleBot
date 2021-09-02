@@ -8,13 +8,10 @@
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true
   },
-  "include": ["src/", "events/", "commands/", "server/"],
+  "include": ["src/", "events/", "commands/"],
   "compileOnSave": true
 }

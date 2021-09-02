@@ -2,33 +2,34 @@ import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import * as config from './vars';
-import msg from '../events/message';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
 
-import { handle_packet } from '../events/raw_packet';
-import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
-import { roleDelete, roleUpdate } from '../events/roleupdate';
+import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
+import {
+  GET_ALL_GUILD_PREFIXES,
+  GET_ALL_JOIN_ROLES,
+  GET_ALL_REACT_MESSAGES,
+  GET_REACT_ROLE_BY_EMOJI,
+} from './database/database';
 
 export interface Command {
-  desc: string;
-  args: string;
   name: string;
-  type: string;
-  run: (msg: Discord.Message, args: string[], client: RoleBot) => unknown;
+  execute: (interaction: Discord.Interaction) => unknown;
 }
 
 export default class RoleBot extends Discord.Client {
   config: any;
+  commandsRun: number;
   reactMessage: string[];
   commands: Discord.Collection<string, Command>;
-  commandsRun: number;
-  reactChannel: Discord.Collection<string, Discord.Message>;
+  joinRoles: Discord.Collection<string, string[]>;
   guildFolders: Discord.Collection<string, IFolder[]>;
+  reactChannel: Discord.Collection<string, Discord.Message>;
   folderContents: Discord.Collection<number, IFolderReactEmoji>;
-  joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
+  guildPrefix: Discord.Collection<string, string>;
 
   constructor() {
     super({
@@ -36,20 +37,15 @@ export default class RoleBot extends Discord.Client {
       intents: [],
     });
     this.config = config;
-    this.commands = new Discord.Collection();
     this.reactMessage = [];
     this.commandsRun = 0;
+
+    this.commands = new Discord.Collection();
     this.reactChannel = new Discord.Collection();
     this.guildFolders = new Discord.Collection<string, IFolder[]>();
     this.folderContents = new Discord.Collection<number, IFolderReactEmoji>();
-    this.joinRoles = new Discord.Collection<string, Partial<IJoinRole>[]>();
-
-    commandHandler(this);
-    /**
-     * V12 is a pain and now we have to handle all the packets ourselves since nothing is cahced.
-     * Fun. The bot is about roles so I better handle add/remove
-     */
-    this.on('raw', (packet) => handle_packet(packet, this));
+    this.joinRoles = new Discord.Collection<string, string[]>();
+    this.guildPrefix = new Discord.Collection();
 
     this.on('ready', (): void => {
       console.log(`[Started]: ${new Date()}`);
@@ -59,28 +55,45 @@ export default class RoleBot extends Discord.Client {
 
       setInterval(() => this.updatePresence(), 10000);
     });
-    this.on('message', (message): void => msg(this, message));
+    //this.on('message', (message): void => msg(this, message));
+
+    this.on('interactionCreate', async (interaction) => {
+      if (!interaction.isCommand()) return;
+
+      const command = this.commands.get(interaction.commandName);
+
+      if (!command) return;
+
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({
+          content: 'There was an error while executing this command!',
+          ephemeral: true,
+        });
+      }
+    });
+
     this.on('guildMemberAdd', (member) => joinRole(member, this.joinRoles));
     this.on('guildCreate', (guild): void => guildUpdate(guild, 'Joined', this));
     this.on('guildDelete', (guild): void => guildUpdate(guild, 'Left', this));
     // React role handling
-    this.on('messageReactionAdd', (reaction, user) =>
-      this.handleReaction(reaction, user, 'add')
-    );
-    this.on('messageReactionRemove', (reaction, user) =>
-      this.handleReaction(reaction, user, 'remove')
-    );
+    this.on('messageReactionAdd', (...r) => {
+      this.handleReaction(...r, 'add');
+    });
+    this.on('messageReactionRemove', (...r) => {
+      this.handleReaction(...r, 'remove');
+    });
     /**
      * Whenever roles get deleted or changed let's update RoleBots DB.
      * Remove roles deleted and update role names.
      */
-    this.on('roleDelete', (role) => roleDelete(role, this));
-    this.on('roleUpdate', (oldRole, newRole) =>
-      roleUpdate(oldRole, newRole, this)
-    );
+    //this.on('roleDelete', (role) => roleDelete(role, this));
+    //this.on('roleUpdate', (...r) => roleUpdate(...r, this));
   }
 
-  updatePresence = () => {
+  private updatePresence = () => {
     if (!this.user)
       return console.error(`Can't set presence due to client user missing.`);
 
@@ -95,47 +108,51 @@ export default class RoleBot extends Discord.Client {
     });
   };
 
-  handleReaction = async (
+  private handleReaction = async (
     reaction: Discord.MessageReaction | Discord.PartialMessageReaction,
     user: Discord.User | Discord.PartialUser,
-    type: string
+    type: 'add' | 'remove'
   ) => {
     try {
       if (!reaction || user.bot) return;
       const { message, emoji } = reaction;
       const { guild } = message;
       if (this.reactMessage.includes(message.id) && guild) {
-        const id = emoji.id || emoji.name;
-        const emoji_role = getRoleByReaction(id, guild.id);
+        const emojiId = emoji.id || emoji.name;
+
+        if (!emojiId) {
+          return console.error(`Couldn't get emoji ID from reaction event.`);
+        }
+
+        const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
+
         // Remove reaction since it doesn't exist.
-        if (!emoji_role && type === 'add') {
-          reaction.users.remove(user.id).catch(console.error);
+        if (!reactRole && type === 'add') {
+          return reaction.users.remove(user.id).catch(console.error);
+        } else if (!reactRole) {
           return;
-        } else if (!emoji_role) return;
+        }
 
-        const { role_id } = emoji_role;
-
-        if (!role_id) return;
-
-        const role = guild.roles.cache.get(role_id);
+        const role = guild.roles.cache.get(reactRole.roleId);
         let member = guild.members.cache.get(user.id);
 
         if (!member) {
-          console.log(
-            `Role Exist: ${Boolean(
-              role
-            )} Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${
-              guild.id
-            }] - user[${user.id}]`
+          console.info(
+            `Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${guild.id}] - user[${user.id}]`
           );
           await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
         }
 
-        if (!role)
-          throw new Error(`Role does not exist. Possibly deleted from server.`);
-        if (!member)
-          throw new Error(`Member not found: ${user.username} - ${user.id}`);
+        if (!role) {
+          return console.error(
+            `Role does not exist. Possibly deleted from server.`
+          );
+        } else if (!member) {
+          return console.error(
+            `Member not found: ${user.username} - ${user.id}`
+          );
+        }
 
         switch (type) {
           case 'add':
@@ -144,92 +161,45 @@ export default class RoleBot extends Discord.Client {
           case 'remove':
             member.roles.remove(role).catch(console.error);
         }
-
-        return;
       }
-
-      return;
-    } catch (e) {}
+    } catch (e) {
+      console.error(
+        `Error thrown when tryingg to [${type}] a reaction role to user.`
+      );
+    }
   };
 
-  randomPres = (): void => {
-    const user = this.user;
-    if (!user) return console.log('Client dead?');
+  private async loadReactMessageIds(): Promise<void> {
+    const messages = await GET_ALL_REACT_MESSAGES();
+    this.reactMessage = messages.map((m) => m.messageId);
+  }
 
-    user
-      .setPresence({
-        activity: { name: `rb help`, type: 'WATCHING' },
-        status: 'dnd',
-      })
-      .catch(console.error);
-  };
+  private async loadGuildJoinRoles(): Promise<void> {
+    const guilds = await GET_ALL_JOIN_ROLES();
 
-  /**
-   * Hmm, the issue currently is being limited by Discords API
-   * Need to find out how clear guilds messages by bot vs custom.
-   * Maybe a new system is in place
-   */
-  async loadReactMessage(): Promise<void> {
-    const rows = getReactMessages();
-
-    for (const r of rows) {
-      const M_ID = r.message_id;
-      this.reactMessage.push(M_ID);
+    for (const g of guilds) {
+      this.joinRoles.set(g.guildId, g.joinRoles);
     }
   }
 
-  /**
-   * I might kill this role system off.
-   */
-  async loadRoles(): Promise<void> {
-    const GUILD_IDS = this.guilds.cache.keys();
+  private async loadGuildPrefixes(): Promise<void> {
+    const guilds = await GET_ALL_GUILD_PREFIXES();
 
-    for (const g_id of GUILD_IDS) {
-      const joinRoles = getJoinRoles(g_id);
-
-      const roles: Partial<IJoinRole>[] = joinRoles.map((r) => ({
-        role_name: r.role_name,
-        role_id: r.role_id,
-      }));
-
-      this.joinRoles.set(g_id, roles);
+    for (const g of guilds) {
+      this.guildPrefix.set(g.guildId, g.prefix || 'rb');
     }
   }
 
-  async loadFolders(): Promise<void> {
-    this.guilds.cache.forEach((g) => {
-      const FOLDERS = guildFolders(g.id);
-      if (!FOLDERS || !FOLDERS.length) return;
-      this.guildFolders.set(g.id, FOLDERS);
-      for (const f of FOLDERS) {
-        const roles = folderContent(f.id);
-        let r = roles.map((r) => ({
-          role_id: r.role_id,
-          role_name: r.role_name,
-          emoji_id: r.emoji_id,
-        }));
-
-        if (r.length === 1 && r[0].role_id === null) r = [];
-
-        this.folderContents.set(f.id, {
-          id: f.id,
-          label: f.label,
-          guild_id: g.id,
-          roles: r,
-        });
-      }
-    });
-  }
-
-  start = async () => {
+  public start = async () => {
     await mongoose.connect(`mongodb://localhost/rolebotBeta`);
 
     await this.login(this.config.TOKEN);
+    commandHandler(this);
 
     await Promise.all([
-      this.loadRoles(),
-      this.loadFolders(),
-      this.loadReactMessage(),
+      this.loadGuildJoinRoles(),
+      this.loadReactMessageIds(),
+      this.loadGuildPrefixes(),
     ]);
   };
 }

@@ -1,15 +1,14 @@
 import { GuildMember, Collection } from 'discord.js';
-import { IJoinRole } from '../src/interfaces';
 
 export default async (
   member: GuildMember,
-  joinRoles: Collection<string, Partial<IJoinRole>[]>
+  joinRoles: Collection<string, string[]>
 ) => {
   for (const role of joinRoles.get(member.guild.id) || []) {
-    await member.guild.roles.fetch(role.role_id);
-    const joinRole = member.guild.roles.cache.get(role.role_id || '');
+    await member.guild.roles.fetch(role);
+    const joinRole = member.guild.roles.cache.get(role || '');
     if (joinRole) {
-      member.roles.add(joinRole).catch(console.error);
+      member.roles.add(joinRole).catch(() => console.error(``));
     }
   }
 };

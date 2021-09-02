@@ -33,7 +33,9 @@ export const guildUpdate = (
     .setTitle(`**${type} Guild**`)
     .setThumbnail(guild.iconURL() || '')
     .setDescription(guild.name)
-    .addField('Member size:', `${guild.memberCount}`);
+    .addField('Member size:', `${guild.memberCount}`, true)
+    .addField('Guild ID:', `${guild.id}`, true)
+    .setFooter(`Guilds I'm in: ${client.guilds.cache.size}`);
 
   (rolebotChannel as TextChannel).send({ embeds: [embed] });
 };
