@@ -1,13 +1,16 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
 
 export const command = {
-  name: 'create',
+  data: new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Look at all the current commands.'),
   execute: (interaction: Interaction) => {
     if (!interaction.isCommand()) return;
 
     interaction.reply({
       ephemeral: true,
-      content: 'D.JS slash command worked haha',
+      content: 'Help responds.',
     });
   },
 };
