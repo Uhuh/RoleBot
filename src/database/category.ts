@@ -7,7 +7,7 @@ const Category = new Schema({
 });
 
 export interface ICategory {
-  guildId: String;
+  guildId: string;
   name: string;
   categoryId: number;
 }

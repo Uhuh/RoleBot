@@ -14,9 +14,11 @@ import {
   GET_ALL_REACT_MESSAGES,
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 export interface Command {
   name: string;
+  data: SlashCommandBuilder;
   execute: (interaction: Discord.Interaction) => unknown;
 }
 
