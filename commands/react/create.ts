@@ -13,7 +13,7 @@ import { CLIENT_ID } from '../../src/vars';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('reactionrole')
-    .setDescription('Create reaction roles.')
+    .setDescription('Create a new reaction roles.')
     .addRoleOption((option) =>
       option
         .setName('role')

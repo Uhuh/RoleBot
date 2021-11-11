@@ -3,6 +3,10 @@ import ConfigModel from './guildConfig';
 import MessageModel from './reactMessage';
 import ReactModel from './reactRole';
 
+export const GET_REACT_ROLES_BY_GUILD = (guildId: string) => {
+  return ReactModel.find({ guildId });
+};
+
 export const GET_REACT_ROLE_BY_EMOJI = (emojiId: string, guildId: string) => {
   return ReactModel.findOne({ emojiId, guildId: guildId });
 };
