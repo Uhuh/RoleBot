@@ -12,17 +12,20 @@ export const guildUpdate = (
 ) => {
   const rolebotGuild = client.guilds.cache.get(ROLEBOT_GUILD_ID);
 
-  if (!rolebotGuild) return console.error(`Could not get RoleBots guild.`);
+  if (!rolebotGuild)
+    return LogService.logError(`Could not get RoleBots guild.`);
 
   const rolebotChannel = rolebotGuild.channels.cache.get(
     ROLEBOT_LOG_CHANNEL_ID
   );
 
   if (!rolebotChannel)
-    return console.error(`Could not get RoleBots logging channel.`);
+    return LogService.logError(`Could not get RoleBots logging channel.`);
 
   if (!rolebotChannel.isText)
-    return console.error(`The fetched logging channel was not a text channel.`);
+    return LogService.logError(
+      `The fetched logging channel was not a text channel.`
+    );
 
   const color = type === 'Joined' ? Colors.green : Colors.red;
 

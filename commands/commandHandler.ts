@@ -1,12 +1,16 @@
-import RoleBot, { Command } from '../src/bot';
+import RoleBot from '../src/bot';
 import * as fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { TOKEN } from '../src/vars';
+import { Command } from '../utilities/types/commands';
+import { LogService } from '../src/services/logService';
 
 const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 export default (client: RoleBot) => {
+  LogService.logInfo(`Loading all slash commands...`);
+
   const categoryCommands: string[] = [];
   const generalCommands: string[] = [];
   const reactionCommands: string[] = [];
@@ -81,9 +85,9 @@ export default (client: RoleBot) => {
           body: commandsJson,
         }
       );
-      console.log(`Created slash commands successfully.`);
+      LogService.logOk(`Created slash commands successfully.`);
     } catch (e) {
-      console.error(`Errored when trying to create slash commands. ${e}`);
+      LogService.logError(`Errored when trying to create slash commands. ${e}`);
     }
   })();
 };

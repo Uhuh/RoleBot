@@ -1,10 +1,14 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const command = {
+  name: '/reaction-delete',
+  desc: `Delete an existing reaction role from a drop down menu.`,
+  type: Category.react,
   data: new SlashCommandBuilder()
-    .setName('reactiondelete')
+    .setName('reaction-delete')
     .setDescription('Delete a reaction role.'),
   execute: async (interaction: Interaction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
@@ -27,7 +31,7 @@ export const command = {
     const role = interaction.options.get('role')?.role;
     const emoji = interaction.options.get('emoji')?.value;
 
-    console.log(`Role: ${role?.name} | Emoji: ${emoji}`);
+    LogService.logInfo(`Role: ${role?.name} | Emoji: ${emoji}`);
 
     interaction.reply({
       ephemeral: true,

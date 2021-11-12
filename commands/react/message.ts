@@ -1,9 +1,13 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
+import { Category } from '../../utilities/types/commands';
 
 export const command = {
+  name: '/reaction-message',
+  desc: 'Have a custom message you want rolebot to react to? Pass the message ID and select the category and RoleBot will handle it!',
+  type: Category.react,
   data: new SlashCommandBuilder()
-    .setName('reactionmessage')
+    .setName('reaction-message')
     .setDescription('Set a custom message for your reaction roles.'),
   execute: (interaction: Interaction) => {
     if (!interaction.isCommand()) return;
@@ -15,7 +19,7 @@ export const command = {
     const role = interaction.options.get('role')?.role;
     const emoji = interaction.options.get('emoji')?.value;
 
-    console.log(`Role: ${role?.name} | Emoji: ${emoji}`);
+    LogService.logInfo(`Role: ${role?.name} | Emoji: ${emoji}`);
 
     interaction.reply({
       ephemeral: true,

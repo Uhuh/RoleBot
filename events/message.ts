@@ -23,8 +23,7 @@ export default (client: RoleBot, message: Message): void => {
 
     //If the command isn't in the big ol' list.
     const clientCommand = client.commands.get(command.toLowerCase());
-    if (!clientCommand || (!guild && command.toLowerCase() !== 'help'))
-      return console.log('Command DNE');
+    if (!clientCommand || (!guild && command.toLowerCase() !== 'help')) return;
 
     client.commandsRun++;
 

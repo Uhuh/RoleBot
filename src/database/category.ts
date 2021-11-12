@@ -4,12 +4,14 @@ const Category = new Schema({
   guildId: { type: String, required: true, unique: true, index: true },
   name: { type: String, required: true },
   categoryId: { type: Number, required: true },
+  roles: { type: [String], required: true },
 });
 
 export interface ICategory {
   guildId: string;
   name: string;
   categoryId: number;
+  roles: string[];
 }
 
 export interface ICategoryDoc extends ICategory, Document {}

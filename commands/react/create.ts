@@ -7,10 +7,18 @@ import {
   MessageEmbed,
   Role,
 } from 'discord.js';
-import { GET_REACT_ROLE_BY_EMOJI } from '../../src/database/database';
+import {
+  CREATE_REACT_ROLE,
+  GET_REACT_ROLE_BY_EMOJI,
+} from '../../src/database/database';
+import { LogService } from '../../src/services/logService';
 import { CLIENT_ID } from '../../src/vars';
+import { Category } from '../../utilities/types/commands';
 
 export const command = {
+  name: '/reactionrole',
+  desc: 'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
+  type: Category.react,
   data: new SlashCommandBuilder()
     .setName('reactionrole')
     .setDescription('Create a new reaction roles.')
@@ -26,8 +34,8 @@ export const command = {
         .setDescription('The emoji you want to use.')
         .setRequired(true)
     ),
-  execute: (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+  execute: async (interaction: Interaction) => {
+    if (!interaction.isCommand() || !interaction.guildId) return;
     /**
      * When user calls this command.
      * Prompt them if they want to add the role to an existing category.
@@ -82,12 +90,34 @@ export const command = {
       emojiId = id;
     }
 
-    const reactRole = GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
+    /**
+     * For now RoleBot doesn't allow two roles to share the same emoji.
+     */
+    const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
-    interaction.reply({
-      ephemeral: true,
-      content: 'Reaction role created.',
-    });
+    if (reactRole) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `The role \`${reactRole.roleName}\` already has this emoji assigned to them.`,
+      });
+    }
+
+    CREATE_REACT_ROLE(role.name, role.id, emojiId, interaction.guildId)
+      .then(() => {
+        interaction.reply({
+          ephemeral: true,
+          content: ':tada:',
+        });
+      })
+      .catch(() => {
+        LogService.logError(
+          `Failed to create reaction role[${role.id}] | guild[${interaction.guildId}] | emoji[${emojiId}]`
+        );
+        interaction.reply({
+          ephemeral: true,
+          content: 'Reaction role failed to create.',
+        });
+      });
   },
 };
 

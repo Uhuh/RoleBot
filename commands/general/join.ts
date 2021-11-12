@@ -1,9 +1,13 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
+import { Category } from '../../utilities/types/commands';
 
 export const command = {
+  name: '/auto-join',
+  desc: `Setup auto join roles for the server.`,
+  type: Category.general,
   data: new SlashCommandBuilder()
-    .setName('join')
+    .setName('auto-join')
     .setDescription('Auto join roles for users that join your server.')
     .addSubcommandGroup((subCommandGroup) =>
       subCommandGroup

@@ -1,5 +1,6 @@
+import { LogService } from '../services/logService';
 import CategoryModel from './category';
-import ConfigModel from './guildConfig';
+import ConfigModel from './guild';
 import MessageModel from './reactMessage';
 import ReactModel from './reactRole';
 
@@ -29,4 +30,18 @@ export const GET_ALL_GUILD_CATEGORIES = () => {
 
 export const GET_ROLES_BY_CATEGORY_ID = (categoryId: number) => {
   return ReactModel.find({ categoryId });
+};
+
+export const CREATE_REACT_ROLE = (
+  roleName: string,
+  roleId: string,
+  emojiId: string,
+  guildId: string
+) => {
+  return ReactModel.create({
+    roleId,
+    roleName,
+    emojiId,
+    guildId,
+  });
 };
