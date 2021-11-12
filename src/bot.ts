@@ -5,7 +5,7 @@ import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
-
+import { Command } from '../utilities/types/commands';
 import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
 import {
@@ -14,13 +14,7 @@ import {
   GET_ALL_REACT_MESSAGES,
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
-import { SlashCommandBuilder } from '@discordjs/builders';
-
-export interface Command {
-  name: string;
-  data: SlashCommandBuilder;
-  execute: (interaction: Discord.Interaction) => unknown;
-}
+import { LogService } from './services/logService';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -50,8 +44,8 @@ export default class RoleBot extends Discord.Client {
     this.guildPrefix = new Discord.Collection();
 
     this.on('ready', (): void => {
-      console.log(`[Started]: ${new Date()}`);
-      console.log(
+      LogService.logDebug(`[Started]: ${new Date()}`);
+      LogService.logInfo(
         `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
 
@@ -69,7 +63,10 @@ export default class RoleBot extends Discord.Client {
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(error);
+        LogService.logError(
+          `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]`
+        );
+
         await interaction.reply({
           content: 'There was an error while executing this command!',
           ephemeral: true,
@@ -97,7 +94,9 @@ export default class RoleBot extends Discord.Client {
 
   private updatePresence = () => {
     if (!this.user)
-      return console.error(`Can't set presence due to client user missing.`);
+      return LogService.logError(
+        `Can't set presence due to client user missing.`
+      );
 
     this.user.setPresence({
       activities: [
@@ -123,14 +122,16 @@ export default class RoleBot extends Discord.Client {
         const emojiId = emoji.id || emoji.name;
 
         if (!emojiId) {
-          return console.error(`Couldn't get emoji ID from reaction event.`);
+          return LogService.logError(
+            `Couldn't get emoji ID from reaction event.`
+          );
         }
 
         const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
         // Remove reaction since it doesn't exist.
         if (!reactRole && type === 'add') {
-          return reaction.users.remove(user.id).catch(console.error);
+          return reaction.users.remove(user.id).catch(LogService.logError);
         } else if (!reactRole) {
           return;
         }
@@ -147,25 +148,25 @@ export default class RoleBot extends Discord.Client {
         }
 
         if (!role) {
-          return console.error(
+          return LogService.logError(
             `Role does not exist. Possibly deleted from server.`
           );
         } else if (!member) {
-          return console.error(
+          return LogService.logError(
             `Member not found: ${user.username} - ${user.id}`
           );
         }
 
         switch (type) {
           case 'add':
-            member.roles.add(role).catch(console.error);
+            member.roles.add(role).catch(LogService.logError);
             break;
           case 'remove':
-            member.roles.remove(role).catch(console.error);
+            member.roles.remove(role).catch(LogService.logError);
         }
       }
     } catch (e) {
-      console.error(
+      LogService.logError(
         `Error thrown when tryingg to [${type}] a reaction role to user.`
       );
     }
