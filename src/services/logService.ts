@@ -4,14 +4,27 @@ export class LogService {
   static ANSI_YELLOW = '\u001b[33m';
   static ANSI_PURPLE = '\u001b[35m';
   static ANSI_RESET = '\u001b[0m';
+
+  static prefix = 'General';
+
   constructor() {}
 
+  static setPrefix = (prefix: string) => (this.prefix = prefix);
+
   static logError = (content: string) =>
-    console.log(`${this.ANSI_RED}[  ERROR ]${this.ANSI_RESET} - ${content}`);
+    console.log(
+      `${this.ANSI_RED}[  ERROR ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
+    );
   static logOk = (content: string) =>
-    console.log(`${this.ANSI_GREEN}[   OK   ]${this.ANSI_RESET} - ${content}`);
+    console.log(
+      `${this.ANSI_GREEN}[   OK   ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
+    );
   static logInfo = (content: string) =>
-    console.log(`${this.ANSI_YELLOW}[  INFO  ]${this.ANSI_RESET} - ${content}`);
+    console.log(
+      `${this.ANSI_YELLOW}[  INFO  ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
+    );
   static logDebug = (content: string) =>
-    console.log(`${this.ANSI_PURPLE}[  DEBUG ]${this.ANSI_RESET} - ${content}`);
+    console.log(
+      `${this.ANSI_PURPLE}[  DEBUG ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
+    );
 }
