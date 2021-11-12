@@ -36,6 +36,9 @@ export const command = {
     ),
   execute: async (interaction: Interaction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
+
+    LogService.setPrefix('ReactionRoleCreate');
+
     /**
      * When user calls this command.
      * Prompt them if they want to add the role to an existing category.

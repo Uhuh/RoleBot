@@ -28,11 +28,6 @@ export const command = {
         )
     );
 
-    const role = interaction.options.get('role')?.role;
-    const emoji = interaction.options.get('emoji')?.value;
-
-    LogService.logInfo(`Role: ${role?.name} | Emoji: ${emoji}`);
-
     interaction.reply({
       ephemeral: true,
       content: 'Reaction role created.',

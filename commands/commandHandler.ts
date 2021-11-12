@@ -9,6 +9,8 @@ import { LogService } from '../src/services/logService';
 const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 export default (client: RoleBot) => {
+  LogService.setPrefix('SlashCommandHandler');
+
   LogService.logInfo(`Loading all slash commands...`);
 
   const categoryCommands: string[] = [];

@@ -1,6 +1,7 @@
 import { Guild, MessageEmbed, TextChannel } from 'discord.js';
 import RoleBot from '../src/bot';
 import { Colors } from '../src/interfaces';
+import { LogService } from '../src/services/logService';
 
 const ROLEBOT_GUILD_ID = '567819334852804626';
 const ROLEBOT_LOG_CHANNEL_ID = '661410527309856827';
