@@ -1,5 +1,6 @@
 import { MessageEmbed, User } from 'discord.js';
-import ViviBot from '../../src/bot';
+import RoleBot from '../../src/bot';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 
 export class EmbedService {
@@ -14,24 +15,22 @@ export class EmbedService {
   /**
    * Generate a help embed based on the category type passed in.
    * @param type @Category type to filter out commands.
-   * @param prefix Prefix for the guild so that the help command correctly reflects what's used
-   * @param client Vivi client to filter commands.
+   * @param client Rolebot client to filter commands.
    * @returns Return built embed
    */
-  public static helpEmbed = (type: string, prefix: string, client: ViviBot) => {
+  public static helpEmbed = (type: string, client: RoleBot) => {
     const embed = new MessageEmbed();
 
-    embed
-      .setTitle(`**${type.toUpperCase()} commands**`)
-      .setColor(COLOR.AQUA)
-      .setDescription('***<> = required arguments, [] = optional.***\n\n');
+    embed.setTitle(`**${type.toUpperCase()} commands**`).setColor(COLOR.AQUA);
 
-    // I wanna keep the "config" prefix whenever a config command is ran. Don't judge me
-    const config = type === 'config' ? 'config ' : '';
+    // I did category stupidly so
+    const slashPrefix = type === Category.category ? '/category ' : '';
 
     client.commands
       .filter((c) => c.type === type)
-      .forEach((func) => embed.addField(`**${func.name}`, func.desc));
+      .forEach((func) =>
+        embed.addField(`**${slashPrefix}${func.name}**`, func.desc)
+      );
 
     return embed;
   };
