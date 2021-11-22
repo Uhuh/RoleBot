@@ -13,9 +13,9 @@ import {
 } from '../../src/database/database';
 import { LogService } from '../../src/services/logService';
 import { CLIENT_ID } from '../../src/vars';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 
-export const reactCreate = {
+export const reactCreate: DataCommand = {
   name: '/reactionrole',
   desc: 'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
   type: Category.react,

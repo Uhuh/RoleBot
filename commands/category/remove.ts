@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
-import { Category } from '../../utilities/types/commands';
+import { BaseCommand, Category } from '../../utilities/types/commands';
 
-export const remove = {
+export const remove: BaseCommand = {
   name: 'remove',
   desc: 'Delete a category. Deleting a category frees all roles it contains.',
   type: Category.category,

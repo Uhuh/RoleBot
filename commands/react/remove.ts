@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 
-export const reactRemove = {
+export const reactRemove: DataCommand = {
   name: '/reaction-delete',
   desc: `Delete an existing reaction role from a drop down menu.`,
   type: Category.react,

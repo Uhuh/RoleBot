@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
 import { LogService } from '../../src/services/logService';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 
-export const channel = {
+export const channel: DataCommand = {
   name: '/reaction-channel',
   desc: 'RoleBot will send each category in their own embed including all their reaction roles to the selected channel.',
   type: Category.react,

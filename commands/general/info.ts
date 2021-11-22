@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 
-export const info = {
+export const info: DataCommand = {
   name: '/info',
   desc: `RoleBot's invite, ping, etc.`,
   type: Category.general,

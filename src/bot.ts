@@ -5,7 +5,7 @@ import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
-import { Command } from '../utilities/types/commands';
+import { BaseCommand } from '../utilities/types/commands';
 import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
 import {
@@ -21,7 +21,7 @@ export default class RoleBot extends Discord.Client {
   config: any;
   commandsRun: number;
   reactMessage: string[];
-  commands: Discord.Collection<string, Command>;
+  commands: Discord.Collection<string, BaseCommand>;
   joinRoles: Discord.Collection<string, string[]>;
   guildFolders: Discord.Collection<string, IFolder[]>;
   reactChannel: Discord.Collection<string, Discord.Message>;

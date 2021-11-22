@@ -1,9 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
-import { LogService } from '../../src/services/logService';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 
-export const reactList = {
+export const reactList: DataCommand = {
   name: '/listroles',
   desc: `List all reaction roles that are currently in your server.`,
   type: Category.react,

@@ -6,10 +6,10 @@ import {
   MessageSelectMenu,
 } from 'discord.js';
 import RoleBot from '../../src/bot';
-import { Category } from '../../utilities/types/commands';
+import { Category, DataCommand } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 
-export const help = {
+export const help: DataCommand = {
   name: '/help',
   desc: 'This command!',
   type: Category.general,
