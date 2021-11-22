@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const info = {
   name: '/info',
   desc: `RoleBot's invite, ping, etc.`,
   type: Category.general,

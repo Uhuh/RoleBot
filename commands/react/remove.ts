@@ -3,7 +3,7 @@ import { Interaction, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const reactRemove = {
   name: '/reaction-delete',
   desc: `Delete an existing reaction role from a drop down menu.`,
   type: Category.react,

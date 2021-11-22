@@ -3,7 +3,7 @@ import { Interaction } from 'discord.js';
 import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const reactMessage = {
   name: '/reaction-message',
   desc: 'Have a custom message you want rolebot to react to? Pass the message ID and select the category and RoleBot will handle it!',
   type: Category.react,

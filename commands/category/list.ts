@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const list = {
   name: 'list',
   desc: `List all your categories and the roles within them.`,
   type: Category.category,

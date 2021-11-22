@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const create = {
   name: 'create',
   desc: `Create a new category to categorize your reaction roles in.`,
   type: Category.category,

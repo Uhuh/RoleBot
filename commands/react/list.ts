@@ -3,7 +3,7 @@ import { Interaction } from 'discord.js';
 import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 
-export const command = {
+export const reactList = {
   name: '/listroles',
   desc: `List all reaction roles that are currently in your server.`,
   type: Category.react,

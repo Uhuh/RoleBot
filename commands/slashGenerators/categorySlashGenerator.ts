@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 
-const categorySlashObject = new SlashCommandBuilder()
+export const categorySlashObject = new SlashCommandBuilder()
   .setName('category')
   .setDescription('Everything you need to control your servers categories.')
   .addSubcommand((subCommand) =>
@@ -27,5 +27,3 @@ const categorySlashObject = new SlashCommandBuilder()
   .addSubcommand((subCommand) =>
     subCommand.setName('remove').setDescription('Remove a category.')
   );
-
-export default categorySlashObject;
