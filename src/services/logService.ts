@@ -9,6 +9,11 @@ export class LogService {
 
   constructor() {}
 
+  /**
+   * Set a prefix to debug which method the Log is from.
+   * @param prefix : Method that the log is currently in;
+   * @returns Nothing
+   */
   static setPrefix = (prefix: string) => (this.prefix = prefix);
 
   static logError = (content: string) =>
