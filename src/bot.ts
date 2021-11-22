@@ -15,6 +15,7 @@ import {
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
 import { LogService } from './services/logService';
+import { SelectService } from './services/selectService';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -55,6 +56,10 @@ export default class RoleBot extends Discord.Client {
     //this.on('message', (message): void => msg(this, message));
 
     this.on('interactionCreate', async (interaction) => {
+      if (SelectService.isSelectMenu(interaction)) {
+        SelectService.parseSelection(interaction, this);
+      }
+
       if (!interaction.isCommand()) return;
       LogService.setPrefix('InteractionCreate');
 
@@ -63,10 +68,10 @@ export default class RoleBot extends Discord.Client {
       if (!command) return;
 
       try {
-        await command.execute(interaction);
+        await command.execute(interaction, this);
       } catch (error) {
         LogService.logError(
-          `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]`
+          `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]\n\t\t${error}\n`
         );
 
         await interaction.reply({
