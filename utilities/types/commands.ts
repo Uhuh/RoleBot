@@ -10,10 +10,13 @@ export enum Category {
 
 export type CategoryStrings = keyof typeof Category;
 
-export interface Command {
+export interface BaseCommand {
   name: string;
   desc: string;
   type: Category;
-  data?: Pick<SlashCommandBuilder, 'toJSON'>;
   execute: (interaction: Interaction, client: RoleBot) => unknown;
+}
+
+export interface DataCommand extends BaseCommand {
+  data: Pick<SlashCommandBuilder, 'toJSON' | 'name'>;
 }
