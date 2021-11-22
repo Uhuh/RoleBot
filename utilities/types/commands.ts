@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction } from 'discord.js';
+import RoleBot from '../../src/bot';
 
 export enum Category {
   general = 'general',
@@ -13,6 +14,6 @@ export interface Command {
   name: string;
   desc: string;
   type: Category;
-  data: SlashCommandBuilder;
-  execute: (interaction: Interaction) => unknown;
+  data?: Pick<SlashCommandBuilder, 'toJSON'>;
+  execute: (interaction: Interaction, client: RoleBot) => unknown;
 }
