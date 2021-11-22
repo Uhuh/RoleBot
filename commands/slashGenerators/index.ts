@@ -1,0 +1,1 @@
+export { categorySlashObject } from './categorySlashGenerator';
