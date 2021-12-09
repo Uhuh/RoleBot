@@ -5,7 +5,6 @@ import * as config from './vars';
 import msg from '../events/message';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
-import * as DBL from 'dblapi.js';
 import removed from '../events/removed';
 import * as logger from 'log-to-file';
 import {
@@ -62,10 +61,7 @@ export default class RoleBot extends Discord.Client {
     this.on('raw', (packet) => handle_packet(packet, this));
 
     this.on('ready', (): void => {
-      const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.log(`[Started]: ${new Date()}`);
-      if (this.config.DEV_MODE === '0')
-        setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
 
       if (this.user) {
         this.user

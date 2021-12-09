@@ -3,8 +3,7 @@ import { addReactMessage, rolesByFolderId } from '../../../src/setup_table';
 import RoleBot from '../../../src/bot';
 
 export default {
-  desc:
-    'Will watch a custom message for reactions.\nUse roles in a folder by passing the folder id after the message id.',
+  desc: 'Will watch a custom message for reactions.\nUse roles in a folder by passing the folder id after the message id.',
   name: 'msg',
   args: '<message id> [Folder id]',
   type: 'reaction',
@@ -40,13 +39,15 @@ export default {
         );
       }
 
-      folder = GUILD_FOLDERS![ARRAY_ID];
+      folder = GUILD_FOLDERS[ARRAY_ID];
 
       if (!folder)
         return message.channel.send(`Folder \`${ARRAY_ID}\` not found.`);
     }
 
-    for (const [, ch] of guild.channels.cache) {
+    for (const [, ch] of guild.channels.cache.filter(
+      (c) => c.type === 'text'
+    )) {
       if (ch instanceof TextChannel) {
         const msg = await ch.messages.fetch(M_ID).catch(() => {}); // Silently fail, it probably doesn't exist on the channel.
 
@@ -55,8 +56,14 @@ export default {
         const { id } = folder || { id: null };
         const REACT_ROLES = rolesByFolderId(guild.id, id);
 
-        REACT_ROLES.forEach((r) => {
-          msg.react(r.emoji_id).catch(() => {}); // silently fail
+        REACT_ROLES.forEach(async (r) => {
+          await msg
+            .react(r.emoji_id)
+            .catch(() =>
+              console.error(
+                `Failed to react to message[${M_ID}] with emoji[${r.emoji_id}] for role[${r.role_name} - ${r.role_id}]`
+              )
+            ); // silently fail
         });
 
         addReactMessage(msg.id, ch.id, guild.id);

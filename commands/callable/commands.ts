@@ -42,6 +42,10 @@ export default {
       }
     }
 
+    embed.setDescription(
+      `**Due to unfortunate events with Discord this version of RoleBot needs to be replaced with a new bot.** Good news however, the new RoleBot is getting an upgrade. It will certainly help remove most of the confusion that RoleBot creates with the complicated commands. It will be using slash commands due to Discords new rules for bots requiring to use slash commands.\nYou can join the [support server to invite the replacement bot](https://discord.gg/5sEEc347dc)`
+    );
+
     message.channel.send({ embed });
   },
 };
