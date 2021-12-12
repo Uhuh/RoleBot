@@ -24,6 +24,10 @@ export const GET_ALL_GUILD_PREFIXES = () => {
   return ConfigModel.find().select('guildId prefix -_id');
 };
 
+export const GET_GUILD_CATEGORIES = (guildId: string) => {
+  return CategoryModel.find({ guildId });
+};
+
 export const GET_ALL_GUILD_CATEGORIES = () => {
   return CategoryModel.find();
 };
