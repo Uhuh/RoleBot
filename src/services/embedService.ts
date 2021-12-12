@@ -1,6 +1,5 @@
 import { MessageEmbed, User } from 'discord.js';
 import RoleBot from '../../src/bot';
-import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 
 export class EmbedService {
@@ -23,14 +22,9 @@ export class EmbedService {
 
     embed.setTitle(`**${type.toUpperCase()} commands**`).setColor(COLOR.AQUA);
 
-    // I did category stupidly so
-    const slashPrefix = type === Category.category ? '/category ' : '';
-
     client.commands
       .filter((c) => c.type === type)
-      .forEach((func) =>
-        embed.addField(`**${slashPrefix}${func.name}**`, func.desc)
-      );
+      .forEach((func) => embed.addField(`**${func.name}**`, func.desc));
 
     return embed;
   };
