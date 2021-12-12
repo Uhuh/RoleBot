@@ -15,7 +15,7 @@ import {
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
 import { LogService } from './services/logService';
-import { SelectService } from './services/selectService';
+import { handleInteraction } from '../events/interaction';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -31,7 +31,12 @@ export default class RoleBot extends Discord.Client {
   constructor() {
     super({
       partials: ['REACTION'],
-      intents: [],
+      intents: [
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.DIRECT_MESSAGES,
+      ],
     });
     this.config = config;
     this.reactMessage = [];
@@ -55,35 +60,13 @@ export default class RoleBot extends Discord.Client {
     });
     //this.on('message', (message): void => msg(this, message));
 
-    this.on('interactionCreate', async (interaction) => {
-      if (SelectService.isSelectMenu(interaction)) {
-        SelectService.parseSelection(interaction, this);
-      }
-
-      if (!interaction.isCommand()) return;
-      LogService.setPrefix('InteractionCreate');
-
-      const command = this.commands.get(interaction.commandName);
-
-      if (!command) return;
-
-      try {
-        await command.execute(interaction, this);
-      } catch (error) {
-        LogService.logError(
-          `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]\n\t\t${error}\n`
-        );
-
-        await interaction.reply({
-          content: 'There was an error while executing this command!',
-          ephemeral: true,
-        });
-      }
-    });
+    this.on('interactionCreate', async (interaction) =>
+      handleInteraction(interaction, this)
+    );
 
     this.on('guildMemberAdd', (member) => joinRole(member, this.joinRoles));
-    this.on('guildCreate', (guild): void => guildUpdate(guild, 'Joined', this));
-    this.on('guildDelete', (guild): void => guildUpdate(guild, 'Left', this));
+    this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
+    this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
     // React role handling
     this.on('messageReactionAdd', (...r) => {
       this.handleReaction(...r, 'add');
@@ -108,7 +91,7 @@ export default class RoleBot extends Discord.Client {
     this.user.setPresence({
       activities: [
         {
-          name: 'rb help',
+          name: 'reactions...',
           type: 'WATCHING',
         },
       ],
@@ -141,9 +124,7 @@ export default class RoleBot extends Discord.Client {
         // Remove reaction since it doesn't exist.
         if (!reactRole && type === 'add') {
           return reaction.users.remove(user.id).catch(LogService.logError);
-        } else if (!reactRole) {
-          return;
-        }
+        } else if (!reactRole) return;
 
         const role = guild.roles.cache.get(reactRole.roleId);
         let member = guild.members.cache.get(user.id);
