@@ -109,7 +109,7 @@ export const reactCreate: DataCommand = {
       .then(() => {
         interaction.reply({
           ephemeral: true,
-          content: ':tada:',
+          content: ':tada: Successfully created the reaction role. :tada:',
         });
       })
       .catch(() => {
@@ -118,7 +118,7 @@ export const reactCreate: DataCommand = {
         );
         interaction.reply({
           ephemeral: true,
-          content: 'Reaction role failed to create.',
+          content: 'Reaction role failed to create. Please try again.',
         });
       });
   },
