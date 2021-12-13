@@ -14,15 +14,15 @@ const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 export default (client: RoleBot) => {
   LogService.setPrefix('SlashCommandHandler');
-  LogService.logInfo(`Loading all slash commands...`);
+  LogService.info(`Loading all slash commands...`);
 
   const commandsJson: RESTPostAPIApplicationCommandsJSONBody[] = [];
 
   // Use the slash commands name generated from their data.
   for (const cmd of [
-    ...Object.values(generalCommands),
-    ...Object.values(categoryCommands),
-    ...Object.values(reactionCommands),
+    ...Object.values(generalCommands).map((c) => new c()),
+    ...Object.values(categoryCommands).map((c) => new c()),
+    ...Object.values(reactionCommands).map((c) => new c()),
   ]) {
     client.commands.set(cmd.data.name.toLowerCase(), cmd);
     commandsJson.push(cmd.data.toJSON());
@@ -40,11 +40,9 @@ export default (client: RoleBot) => {
           body: commandsJson,
         }
       );
-      LogService.logOk(`Created slash commands successfully.`);
+      LogService.info(`Created slash commands successfully.`);
     } catch (e) {
-      LogService.logError(
-        `Errored when trying to create slash commands.\n${e}\n`
-      );
+      LogService.error(`Errored when trying to create slash commands.\n${e}\n`);
     }
   })();
 };
