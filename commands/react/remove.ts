@@ -1,18 +1,24 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction, MessageActionRow, MessageSelectMenu } from 'discord.js';
+import {
+  CommandInteraction,
+  MessageActionRow,
+  MessageSelectMenu,
+  Permissions,
+} from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const reactRemove: DataCommand = {
-  name: '/reaction-delete',
-  desc: `Delete an existing reaction role from a drop down menu.`,
-  type: Category.react,
-  data: new SlashCommandBuilder()
-    .setName('reaction-delete')
-    .setDescription('Delete a reaction role.'),
-  execute: async (interaction: Interaction) => {
-    if (!interaction.isCommand() || !interaction.guildId) return;
+export class ReactDeleteCommand extends SlashCommand {
+  constructor() {
+    super(
+      'reaction-delete',
+      'Delete an existing reaction role from a drop down menu.',
+      Category.react,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+  }
 
+  execute = async (interaction: CommandInteraction) => {
     const reactionRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
 
     const selectMenu = new MessageActionRow().addComponents(
@@ -33,5 +39,5 @@ export const reactRemove: DataCommand = {
       content: 'Reaction role created.',
       components: [selectMenu],
     });
-  },
-};
+  };
+}

@@ -1,5 +1,5 @@
-export { channel } from './channel';
-export { reactCreate } from './create';
-export { reactList } from './list';
-export { reactMessage } from './message';
-export { reactRemove } from './remove';
+export { ReactChannelCommand } from './channel';
+export { ReactRoleCommand } from './create';
+export { ReactListCommand } from './list';
+export { ReactMessageCommand } from './message';
+export { ReactDeleteCommand } from './remove';

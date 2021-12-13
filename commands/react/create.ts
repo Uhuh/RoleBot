@@ -1,10 +1,11 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { APIRole } from 'discord-api-types';
 import {
+  CommandInteraction,
   Interaction,
   MessageActionRow,
   MessageButton,
   MessageEmbed,
+  Permissions,
   Role,
 } from 'discord.js';
 import {
@@ -13,36 +14,26 @@ import {
 } from '../../src/database/database';
 import { LogService } from '../../src/services/logService';
 import { CLIENT_ID } from '../../src/vars';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const reactCreate: DataCommand = {
-  name: '/reactionrole',
-  desc: 'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
-  type: Category.react,
-  data: new SlashCommandBuilder()
-    .setName('reactionrole')
-    .setDescription('Create a new reaction roles.')
-    .addRoleOption((option) =>
-      option
-        .setName('role')
-        .setDescription('The role you want to use.')
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName('emoji')
-        .setDescription('The emoji you want to use.')
-        .setRequired(true)
-    ),
-  execute: async (interaction: Interaction) => {
+export class ReactRoleCommand extends SlashCommand {
+  constructor() {
+    super(
+      'reactionrole',
+      'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
+      Category.react,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+
+    this.addRoleOption('role', 'The role you want to use.', true);
+    this.addStringOption('emoji', 'The emoji you want to use.', true);
+  }
+
+  execute = async (interaction: CommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     LogService.setPrefix('ReactionRoleCreate');
-
-    /**
-     * When user calls this command.
-     * Prompt them if they want to add the role to an existing category.
-     */
 
     const { guild } = interaction;
     if (!guild) return;
@@ -113,7 +104,7 @@ export const reactCreate: DataCommand = {
         });
       })
       .catch(() => {
-        LogService.logError(
+        LogService.error(
           `Failed to create reaction role[${role.id}] | guild[${interaction.guildId}] | emoji[${emojiId}]`
         );
         interaction.reply({
@@ -121,8 +112,8 @@ export const reactCreate: DataCommand = {
           content: 'Reaction role failed to create. Please try again.',
         });
       });
-  },
-};
+  };
+}
 
 /**
  * Check that RoleBot has a role above the one the user wants to hand out.

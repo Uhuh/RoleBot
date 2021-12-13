@@ -1,4 +1,4 @@
-export { help } from './help';
-export { info } from './info';
-export { join } from './join';
-export { tutorial } from './tutorial';
+export { HelpCommand } from './help';
+export { InfoCommand } from './info';
+export { AutoJoinCommand } from './join';
+export { TutorialCommand } from './tutorial';

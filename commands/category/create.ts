@@ -1,26 +1,40 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction } from 'discord.js';
-import { DataCommand, Category } from '../../utilities/types/commands';
+import { CommandInteraction, Permissions } from 'discord.js';
+import { CREATE_GUILD_CATEGORY } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const create: DataCommand = {
-  name: '/category-create',
-  desc: `Create a new category to categorize your reaction roles in.`,
-  type: Category.category,
-  data: new SlashCommandBuilder()
-    .setName('category-create')
-    .setDescription('Create a new category to store reaction roles in!')
-    .addStringOption((option) =>
-      option
-        .setName('category-name')
-        .setDescription('The name of the category.')
-        .setRequired(true)
-    ),
-  execute: (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+export class CreateCategoryCommand extends SlashCommand {
+  constructor() {
+    super(
+      'category-create',
+      'Create a new category to categorize your reaction roles in.',
+      Category.category,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
 
-    interaction.reply({
-      ephemeral: true,
-      content: 'Category Create command',
+    this.addStringOption('category-name', 'The name of the category', true);
+    this.addStringOption('category-desc', 'Give your category a description.');
+  }
+
+  execute = async (interaction: CommandInteraction) => {
+    const categoryName = interaction.options.get('category-name')?.value;
+    const categoryDesc = interaction.options.get('category-desc')?.value;
+
+    if (!categoryName) {
+      return await interaction.reply({
+        ephemeral: true,
+        content: `Hey! It appears I am struggling to find the name you sent me. Please try again.`,
+      });
+    }
+
+    CREATE_GUILD_CATEGORY(
+      interaction.guildId,
+      categoryName as string,
+      categoryDesc as string | undefined
+    ).then(() => {
+      interaction.reply({
+        content: `Hey! I successfully created the category for you!`,
+      });
     });
-  },
-};
+  };
+}

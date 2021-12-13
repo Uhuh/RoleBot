@@ -1,15 +1,19 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction } from 'discord.js';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { CommandInteraction, Permissions } from 'discord.js';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const join: DataCommand = {
-  name: '/auto-join',
-  desc: `Setup auto join roles for the server.`,
-  type: Category.general,
-  data: new SlashCommandBuilder()
-    .setName('auto-join')
-    .setDescription('Auto join roles for users that join your server.')
-    .addSubcommandGroup((subCommandGroup) =>
+export class AutoJoinCommand extends SlashCommand {
+  constructor() {
+    super(
+      'auto-join',
+      'Setup auto join roles for the server.',
+      Category.general,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+
+    // Sigh figure out how to add all this shit.
+    /**
+     * .addSubcommandGroup((subCommandGroup) =>
       subCommandGroup
         .setName('role')
         .setDescription('Add, remove or list all your auto-join roles.')
@@ -36,16 +40,14 @@ export const join: DataCommand = {
             .setName('list')
             .setDescription('See all your auto join roles.')
         )
-    ),
-  execute: (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+    )
+     */
+  }
 
-    const command = interaction.options.getSubcommand();
-    const role = interaction.options.getRole('join-role');
-
+  execute = (interaction: CommandInteraction) => {
     interaction.reply({
       ephemeral: true,
-      content: `Join responds. What command: ${command} | Was there a role: ${role}`,
+      content: `Join responds.`,
     });
-  },
-};
+  };
+}

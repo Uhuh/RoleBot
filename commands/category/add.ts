@@ -1,20 +1,21 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction } from 'discord.js';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { CommandInteraction, Permissions } from 'discord.js';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const add: DataCommand = {
-  name: '/category-add',
-  desc: `Add reaction roles to a specific category.`,
-  type: Category.category,
-  data: new SlashCommandBuilder()
-    .setName('category-add')
-    .setDescription('Add roles to your category to manage the roles easier!'),
-  execute: (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+export class AddCategoryCommand extends SlashCommand {
+  constructor() {
+    super(
+      'category-add',
+      'Add reaction roles to a specific category.',
+      Category.category,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+  }
 
+  execute = (interaction: CommandInteraction) => {
     interaction.reply({
       ephemeral: true,
-      content: 'Category-add-roles responds.',
+      content: 'Category-add responds.',
     });
-  },
-};
+  };
+}

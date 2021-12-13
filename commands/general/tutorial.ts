@@ -1,19 +1,18 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { Interaction, MessageAttachment, MessageEmbed } from 'discord.js';
-import RoleBot from '../../src/bot';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 import * as fs from 'fs/promises';
 
-export const tutorial: DataCommand = {
-  desc: 'RoleBot can be confusing at times. Use this command to learn the flow.',
-  name: 'tutorial',
-  type: Category.general,
-  data: new SlashCommandBuilder()
-    .setName('tutorial')
-    .setDescription(
-      'RoleBot can be confusing at times. Use this command to learn the flow.'
-    ),
-  execute: async (interaction: Interaction, client: RoleBot) => {
+export class TutorialCommand extends SlashCommand {
+  constructor() {
+    super(
+      'tutorial',
+      'RoleBot can be confusing at times. Use this command to learn the flow.',
+      Category.general
+    );
+  }
+
+  execute = async (interaction: Interaction) => {
     if (!interaction.isCommand()) return;
     const image = await fs.readFile('assets/banner.png');
     const embed = new MessageEmbed()
@@ -27,5 +26,5 @@ export const tutorial: DataCommand = {
       embeds: [embed],
       files: [new MessageAttachment(image, 'banner.png')],
     });
-  },
-};
+  };
+}

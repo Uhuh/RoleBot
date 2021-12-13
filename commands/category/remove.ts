@@ -1,20 +1,21 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction } from 'discord.js';
-import { DataCommand, Category } from '../../utilities/types/commands';
+import { CommandInteraction, Permissions } from 'discord.js';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
 
-export const remove: DataCommand = {
-  name: '/category-remove',
-  desc: 'Delete a category. Deleting a category frees all roles it contains.',
-  type: Category.category,
-  data: new SlashCommandBuilder()
-    .setName('category-remove')
-    .setDescription('Remove a category.'),
-  execute: (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+export class RemoveCategoryCommand extends SlashCommand {
+  constructor() {
+    super(
+      'category-remove',
+      'Delete a category. Deleting a category frees all roles it contains.',
+      Category.category,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+  }
 
+  execute = (interaction: CommandInteraction) => {
     interaction.reply({
       ephemeral: true,
       content: 'Category-remove responds.',
     });
-  },
-};
+  };
+}

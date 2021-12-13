@@ -1,27 +1,22 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
 import {
-  Interaction,
+  CommandInteraction,
   MessageActionRow,
   MessageEmbed,
   MessageSelectMenu,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
-import { Category, DataCommand } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
+import { SlashCommand } from '../slashCommand';
 
-export const help: DataCommand = {
-  name: '/help',
-  desc: 'This command!',
-  type: Category.general,
-  data: new SlashCommandBuilder()
-    .setName('help')
-    .setDescription('Look at all the current commands.'),
-  execute: (interaction: Interaction, client: RoleBot) => {
-    if (!interaction.isCommand()) return;
+export class HelpCommand extends SlashCommand {
+  constructor() {
+    super('help', 'This command!', Category.general);
+  }
 
+  execute = (interaction: CommandInteraction) => {
     const embed = new MessageEmbed();
 
-    const { user } = client;
+    const { user } = interaction.client;
     if (!user) return;
 
     const selectMenu = new MessageActionRow().addComponents(
@@ -65,5 +60,5 @@ export const help: DataCommand = {
       embeds: [embed],
       components: [selectMenu],
     });
-  },
-};
+  };
+}
