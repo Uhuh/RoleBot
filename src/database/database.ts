@@ -47,6 +47,10 @@ export const CREATE_GUILD_CATEGORY = (
   });
 };
 
+export const GET_CATEGORY_BY_NAME = (guildId: string, name: string) => {
+  return CategoryModel.findOne({ guildId, name });
+};
+
 export const CREATE_REACT_ROLE = (
   roleName: string,
   roleId: string,

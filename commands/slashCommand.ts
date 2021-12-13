@@ -34,6 +34,8 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   }
 
   public run = (interaction: Interaction) => {
+    LogService.setPrefix(this.name);
+
     // Ignore interactions that aren't commands.
     if (!interaction.isCommand())
       return LogService.debug(
@@ -62,5 +64,28 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
 
   private canUserRunCommand = (interaction: Interaction) => {
     return interaction.memberPermissions?.has(this.permissions, true);
+  };
+
+  /**
+   * TypeScript doesn't know what type a value is but I know the types for some commands options as they are setup in the constructor.
+   * Instead of adding these checks for every command use this function to parse out all the properties.
+   * @param interaction Command ran.
+   * @param args Array of properties. This is because we set options and give them custom IDs.
+   * @returns All properties passed in.
+   */
+  extractStringVariables = (
+    interaction: CommandInteraction,
+    ...args: string[]
+  ): string[] => {
+    return args.map((a) => {
+      const val = interaction.options.get(a)?.value;
+      if (typeof val !== 'string') {
+        LogService.error(
+          `Failed to extract string variable from interaction | [${a} : ${val}]`
+        );
+        return '';
+      }
+      return val;
+    });
   };
 }

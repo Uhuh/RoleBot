@@ -1,5 +1,8 @@
 import { CommandInteraction, Permissions } from 'discord.js';
-import { CREATE_GUILD_CATEGORY } from '../../src/database/database';
+import {
+  CREATE_GUILD_CATEGORY,
+  GET_CATEGORY_BY_NAME,
+} from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -17,8 +20,17 @@ export class CreateCategoryCommand extends SlashCommand {
   }
 
   execute = async (interaction: CommandInteraction) => {
-    const categoryName = interaction.options.get('category-name')?.value;
-    const categoryDesc = interaction.options.get('category-desc')?.value;
+    const [categoryName, categoryDesc] = this.extractStringVariables(
+      interaction,
+      'category-name',
+      'category-desc'
+    );
+
+    if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
+      return await interaction.reply({
+        content: `Hey! It turns out you already have a category with that name made. Try checking it out.`,
+      });
+    }
 
     if (!categoryName) {
       return await interaction.reply({
@@ -27,14 +39,12 @@ export class CreateCategoryCommand extends SlashCommand {
       });
     }
 
-    CREATE_GUILD_CATEGORY(
-      interaction.guildId,
-      categoryName as string,
-      categoryDesc as string | undefined
-    ).then(() => {
-      interaction.reply({
-        content: `Hey! I successfully created the category for you!`,
-      });
-    });
+    CREATE_GUILD_CATEGORY(interaction.guildId, categoryName, categoryDesc).then(
+      () => {
+        interaction.reply({
+          content: `Hey! I successfully created the category for you!`,
+        });
+      }
+    );
   };
 }
