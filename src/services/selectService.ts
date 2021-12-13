@@ -4,6 +4,7 @@ import { Category } from '../../utilities/types/commands';
 import { EmbedService } from './embedService';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
+import { handleMessageChoice } from '../../commands/react/message';
 
 export class SelectService {
   /**
@@ -15,7 +16,7 @@ export class SelectService {
     interaction: SelectMenuInteraction,
     client: RoleBot
   ) {
-    LogService.setPrefix('[SelectService]');
+    LogService.setPrefix('SelectService');
 
     const [type, value] = interaction.values.join('').split('-');
 
@@ -27,22 +28,30 @@ export class SelectService {
           interaction
             .reply({ ephemeral: true, embeds: [embed] })
             .catch(() =>
-              LogService.logError(
+              LogService.error(
                 `Error sending help embed for interaction. [${interaction.guildId}]`
               )
             );
         }
         break;
 
+      case 'message':
+        handleMessageChoice(interaction);
+        break;
+
       default:
+        LogService.error(
+          `A nonexistent select[${type}] type was picked in guild[${interaction.guildId}]`
+        );
+
         interaction
           .reply({
             ephemeral: true,
             content: `I couldn't find that select option. Try again or report it to the [support server](${SUPPORT_URL}).`,
           })
           .catch(() =>
-            LogService.logError(
-              `Error telling user that I couldn't the selected dropdown.`
+            LogService.error(
+              `Error telling user that I couldn't use the selected dropdown.`
             )
           );
     }
