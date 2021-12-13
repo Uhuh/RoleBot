@@ -1,12 +1,38 @@
+enum LogLevel {
+  debug = 1,
+  info,
+  warning,
+  error,
+  critical,
+}
+
+enum Color {
+  red = '\x1b[31m',
+  bold_red = '\x1b[31;1m',
+  green = '\x1b[32m',
+  yellow = '\x1b[33m',
+  purple = '\x1b[35m',
+  reset = '\x1b[0m',
+}
+
+const colorMap: Record<LogLevel, string> = {
+  [LogLevel.debug]: Color.purple,
+  [LogLevel.info]: Color.yellow,
+  [LogLevel.warning]: Color.yellow,
+  [LogLevel.error]: Color.red,
+  [LogLevel.critical]: Color.bold_red,
+};
+
+const labelMap: Record<LogLevel, string> = {
+  [LogLevel.debug]: '  DEBUG ',
+  [LogLevel.info]: '  INFO  ',
+  [LogLevel.warning]: '  WARN  ',
+  [LogLevel.error]: '  ERROR ',
+  [LogLevel.critical]: '  CRITL ',
+};
+
 export class LogService {
-  static ANSI_RED = '\u001b[31m';
-  static ANSI_GREEN = '\u001b[32m';
-  static ANSI_YELLOW = '\u001b[33m';
-  static ANSI_PURPLE = '\u001b[35m';
-  static ANSI_RESET = '\u001b[0m';
-
-  static prefix = 'General';
-
+  static prefix = '[General]';
   constructor() {}
 
   /**
@@ -14,22 +40,38 @@ export class LogService {
    * @param prefix : Method that the log is currently in;
    * @returns Nothing
    */
-  static setPrefix = (prefix: string) => (this.prefix = prefix);
+  static setPrefix = (prefix: string) => (this.prefix = `[${prefix}]`);
 
-  static logError = (content: string) =>
+  static log(level: LogLevel, content: string, ...args: any[]) {
     console.log(
-      `${this.ANSI_RED}[  ERROR ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
+      colorMap[level],
+      '[',
+      labelMap[level],
+      ']',
+      Color.reset,
+      ' - ',
+      this.prefix,
+      ` ${content}`
     );
-  static logOk = (content: string) =>
-    console.log(
-      `${this.ANSI_GREEN}[   OK   ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
-    );
-  static logInfo = (content: string) =>
-    console.log(
-      `${this.ANSI_YELLOW}[  INFO  ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
-    );
-  static logDebug = (content: string) =>
-    console.log(
-      `${this.ANSI_PURPLE}[  DEBUG ]${this.ANSI_RESET} - [${this.prefix}] ${content}`
-    );
+  }
+
+  static error(content: string) {
+    this.log(LogLevel.error, content);
+  }
+
+  static debug(content: string) {
+    this.log(LogLevel.debug, content);
+  }
+
+  static info(content: string) {
+    this.log(LogLevel.info, content);
+  }
+
+  static warning(content: string) {
+    this.log(LogLevel.warning, content);
+  }
+
+  static critical(content: string) {
+    this.log(LogLevel.critical, content);
+  }
 }

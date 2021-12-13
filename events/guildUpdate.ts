@@ -4,7 +4,7 @@ import { Colors } from '../src/interfaces';
 import { LogService } from '../src/services/logService';
 
 const ROLEBOT_GUILD_ID = '567819334852804626';
-const ROLEBOT_LOG_CHANNEL_ID = '661410527309856827';
+const ROLEBOT_LOG_CHANNEL_ID = '918626628756709387';
 
 export const guildUpdate = (
   guild: Guild,
@@ -13,18 +13,17 @@ export const guildUpdate = (
 ) => {
   const rolebotGuild = client.guilds.cache.get(ROLEBOT_GUILD_ID);
 
-  if (!rolebotGuild)
-    return LogService.logError(`Could not get RoleBots guild.`);
+  if (!rolebotGuild) return LogService.error(`Could not get RoleBots guild.`);
 
   const rolebotChannel = rolebotGuild.channels.cache.get(
     ROLEBOT_LOG_CHANNEL_ID
   );
 
   if (!rolebotChannel)
-    return LogService.logError(`Could not get RoleBots logging channel.`);
+    return LogService.error(`Could not get RoleBots logging channel.`);
 
   if (!rolebotChannel.isText)
-    return LogService.logError(
+    return LogService.error(
       `The fetched logging channel was not a text channel.`
     );
 

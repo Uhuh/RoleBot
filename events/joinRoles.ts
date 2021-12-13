@@ -12,7 +12,7 @@ export default async (
       member.roles
         .add(joinRole)
         .catch(() =>
-          LogService.logError(
+          LogService.error(
             `Issue giving user[${member.id}] auto-join role[${joinRole.id}]`
           )
         );
