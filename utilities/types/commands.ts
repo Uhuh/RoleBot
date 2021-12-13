@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Interaction } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import RoleBot from '../../src/bot';
 
 export enum Category {
@@ -10,13 +10,10 @@ export enum Category {
 
 export type CategoryStrings = keyof typeof Category;
 
-export interface BaseCommand {
+export interface DataCommand {
   name: string;
   desc: string;
   type: Category;
-  execute: (interaction: Interaction, client: RoleBot) => unknown;
-}
-
-export interface DataCommand extends BaseCommand {
-  data: Pick<SlashCommandBuilder, 'toJSON' | 'name'>;
+  data: SlashCommandBuilder;
+  execute: (interaction: CommandInteraction, client: RoleBot) => unknown;
 }
