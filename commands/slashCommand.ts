@@ -34,16 +34,24 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   }
 
   public run = (interaction: Interaction) => {
-    LogService.setPrefix(this.name);
+    LogService.setPrefix(`command:${this.name}`);
 
     // Ignore interactions that aren't commands.
     if (!interaction.isCommand())
       return LogService.debug(
         `Interaction was not a command. Command that got ran[${this.name}]`
       );
+
     // Check all user perms.
-    if (!this.canUserRunCommand(interaction))
-      return LogService.debug(`User cannot run command[${this.name}]`);
+    if (!this.canUserRunCommand(interaction)) {
+      interaction.reply({
+        ephemeral: true,
+        content: `You don't have the correct permissions to run this.`,
+      });
+      return LogService.debug(
+        `User doesn't have correct perms to run command.`
+      );
+    }
 
     this.executions.push({
       channelId: interaction.channelId,

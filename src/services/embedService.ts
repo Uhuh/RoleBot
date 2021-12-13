@@ -24,7 +24,7 @@ export class EmbedService {
 
     client.commands
       .filter((c) => c.type === type)
-      .forEach((func) => embed.addField(`**${func.name}**`, func.desc));
+      .forEach((func) => embed.addField(`**/${func.name}**`, func.desc));
 
     return embed;
   };
