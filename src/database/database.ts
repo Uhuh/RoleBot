@@ -1,4 +1,3 @@
-import { LogService } from '../services/logService';
 import CategoryModel from './category';
 import ConfigModel from './guild';
 import MessageModel from './reactMessage';
@@ -34,6 +33,18 @@ export const GET_ALL_GUILD_CATEGORIES = () => {
 
 export const GET_ROLES_BY_CATEGORY_ID = (categoryId: number) => {
   return ReactModel.find({ categoryId });
+};
+
+export const CREATE_GUILD_CATEGORY = (
+  guildId: string,
+  name: string,
+  description: string | undefined
+) => {
+  return CategoryModel.create({
+    guildId,
+    name,
+    description,
+  });
 };
 
 export const CREATE_REACT_ROLE = (

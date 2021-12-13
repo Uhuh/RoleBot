@@ -5,7 +5,6 @@ import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
-import { BaseCommand } from '../utilities/types/commands';
 import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
 import {
@@ -16,12 +15,13 @@ import {
 } from './database/database';
 import { LogService } from './services/logService';
 import { handleInteraction } from '../events/interaction';
+import { SlashCommand } from '../commands/slashCommand';
 
 export default class RoleBot extends Discord.Client {
   config: any;
   commandsRun: number;
   reactMessage: string[];
-  commands: Discord.Collection<string, BaseCommand>;
+  commands: Discord.Collection<string, SlashCommand>;
   joinRoles: Discord.Collection<string, string[]>;
   guildFolders: Discord.Collection<string, IFolder[]>;
   reactChannel: Discord.Collection<string, Discord.Message>;
@@ -51,14 +51,13 @@ export default class RoleBot extends Discord.Client {
 
     this.on('ready', (): void => {
       LogService.setPrefix('BotReady');
-      LogService.logDebug(`[Started]: ${new Date()}`);
-      LogService.logOk(
+      LogService.debug(`[Started]: ${new Date()}`);
+      LogService.info(
         `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
 
       setInterval(() => this.updatePresence(), 10000);
     });
-    //this.on('message', (message): void => msg(this, message));
 
     this.on('interactionCreate', async (interaction) =>
       handleInteraction(interaction, this)
@@ -84,9 +83,7 @@ export default class RoleBot extends Discord.Client {
 
   private updatePresence = () => {
     if (!this.user)
-      return LogService.logError(
-        `Can't set presence due to client user missing.`
-      );
+      return LogService.error(`Can't set presence due to client user missing.`);
 
     this.user.setPresence({
       activities: [
@@ -114,38 +111,36 @@ export default class RoleBot extends Discord.Client {
         const emojiId = emoji.id || emoji.name;
 
         if (!emojiId) {
-          return LogService.logError(
-            `Couldn't get emoji ID from reaction event.`
-          );
+          return LogService.error(`Couldn't get emoji ID from reaction event.`);
         }
 
         const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
         // Remove reaction since it doesn't exist.
         if (!reactRole && type === 'add') {
-          return reaction.users.remove(user.id).catch(LogService.logError);
+          return reaction.users.remove(user.id).catch(LogService.error);
         } else if (!reactRole) return;
 
         const role = guild.roles.cache.get(reactRole.roleId);
         let member = guild.members.cache.get(user.id);
 
         if (!member) {
-          LogService.logInfo(
+          LogService.info(
             `Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${guild.id}] - user[${user.id}]`
           );
           await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
-          LogService.logInfo(
+          LogService.info(
             `Did member fectch successfully?. Does member exist: ${!!member}`
           );
         }
 
         if (!role) {
-          return LogService.logError(
+          return LogService.error(
             `Could not find GuildRole from stored ReactRole: roleID[${reactRole.id}]. Possibly deleted.`
           );
         } else if (!member) {
-          return LogService.logError(
+          return LogService.error(
             `Could not find GuildMember from ReactionUser: username[${user.username}] | ID[${user.id}]`
           );
         }
@@ -155,7 +150,7 @@ export default class RoleBot extends Discord.Client {
             member.roles
               .add(role)
               .catch(() =>
-                LogService.logError(
+                LogService.error(
                   `Error issuing role[${role.id}] to user[${member?.id}]. Perhaps a permission issue.`
                 )
               );
@@ -164,14 +159,14 @@ export default class RoleBot extends Discord.Client {
             member.roles
               .remove(role)
               .catch(() =>
-                LogService.logError(
+                LogService.error(
                   `Error removing role[${role.id}] from user[${member?.id}]. Perhaps a permission issue.`
                 )
               );
         }
       }
     } catch (e) {
-      LogService.logError(
+      LogService.error(
         `Error thrown when tryingg to [${type}] a reaction role to user.`
       );
     }
@@ -201,18 +196,18 @@ export default class RoleBot extends Discord.Client {
   public start = async () => {
     LogService.setPrefix('BotStart');
 
-    LogService.logInfo(`Connecting to MONGODB: ${config.DATABASE_TYPE}`);
+    LogService.info(`Connecting to MONGODB: ${config.DATABASE_TYPE}`);
     await mongoose.connect(`mongodb://localhost/rolebotBeta`);
 
-    LogService.logInfo(`Connecting to Discord with bot token.`);
+    LogService.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
-    LogService.logInfo('Bot connected.');
+    LogService.info('Bot connected.');
 
     // Slash commands can only load once the bot is connected?
     commandHandler(this);
 
     LogService.setPrefix('BotStart');
-    LogService.logInfo(
+    LogService.info(
       `Loading basic data.\n\t\t- Guild auto-join roles\n\t\t- Message IDs\n\t\t- Prefixes`
     );
     await Promise.all([
@@ -221,6 +216,6 @@ export default class RoleBot extends Discord.Client {
       this.loadGuildPrefixes(),
     ]);
 
-    LogService.logOk(`Successfully loaded all data and logged in.`);
+    LogService.info(`Successfully loaded all data and logged in.`);
   };
 }

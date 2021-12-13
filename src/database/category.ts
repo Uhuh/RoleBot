@@ -2,18 +2,16 @@ import { Schema, Document, Model, model } from 'mongoose';
 import { IReactRole } from './reactRole';
 
 const Category = new Schema({
-  guildId: { type: String, required: true, unique: true, index: true },
+  guildId: { type: String, required: true },
   name: { type: String, required: true },
-  description: { type: String, maxlength: 1024 },
-  categoryId: { type: Number, required: true },
-  roles: { type: [Object], required: true },
+  description: { type: String, maxlength: 1024, default: '' },
+  roles: { type: [Object] },
 });
 
 export interface ICategory {
   guildId: string;
   name: string;
   description: string;
-  categoryId: number;
   roles: IReactRole[];
 }
 
