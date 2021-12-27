@@ -8,6 +8,7 @@ import {
   Permissions,
   Role,
 } from 'discord.js';
+import RoleBot from '../../src/bot';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLE_BY_EMOJI,
@@ -18,9 +19,10 @@ import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactRoleCommand extends SlashCommand {
-  constructor() {
+  constructor(client: RoleBot) {
     super(
-      'reactionrole',
+      client,
+      'react-role',
       'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
       Category.react,
       [Permissions.FLAGS.MANAGE_ROLES]
@@ -39,9 +41,9 @@ export class ReactRoleCommand extends SlashCommand {
     if (!guild) return;
 
     const role = interaction.options.get('role')?.role;
-    const emoji = interaction.options.get('emoji')?.value;
+    const [emoji] = this.extractStringVariables(interaction, 'emoji');
 
-    if (!role || !emoji || typeof emoji !== 'string') {
+    if (!role || !emoji) {
       return interaction.reply({
         ephemeral: true,
         content:
@@ -55,8 +57,7 @@ export class ReactRoleCommand extends SlashCommand {
       const embed = new MessageEmbed()
         .setTitle('Reaction Roles Setup')
         .setDescription(
-          `The role <@&${role.id}> is above me in the role list so I can't hand it out.{
-          }\nPlease make sure I have a role that is above it.`
+          `The role <@&${role.id}> is above me in the role list so I can't hand it out.\nPlease make sure I have a role that is above it.`
         );
 
       const button = new MessageActionRow().addComponents(
@@ -79,9 +80,20 @@ export class ReactRoleCommand extends SlashCommand {
     let emojiId = emoji;
 
     if (emojiRegex) {
-      const [, id] = emojiRegex;
+      const id = emojiRegex[0];
 
       emojiId = id;
+    }
+
+    if (!emojiId || emojiId === '') {
+      LogService.error(
+        `Failed to extract emoji[${emoji}] with regex from string.`
+      );
+
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! I had an issue trying to use that emoji. Please wait a moment and try again.`,
+      });
     }
 
     /**
@@ -98,15 +110,20 @@ export class ReactRoleCommand extends SlashCommand {
 
     CREATE_REACT_ROLE(role.name, role.id, emojiId, interaction.guildId)
       .then(() => {
+        LogService.debug(
+          `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
+        );
         interaction.reply({
           ephemeral: true,
           content: ':tada: Successfully created the reaction role. :tada:',
         });
       })
-      .catch(() => {
+      .catch((e) => {
         LogService.error(
-          `Failed to create reaction role[${role.id}] | guild[${interaction.guildId}] | emoji[${emojiId}]`
+          `Failed to create reaction role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]`
         );
+        LogService.error(e);
+
         interaction.reply({
           ephemeral: true,
           content: 'Reaction role failed to create. Please try again.',
