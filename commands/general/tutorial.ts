@@ -2,10 +2,12 @@ import { Interaction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import * as fs from 'fs/promises';
+import RoleBot from '../../src/bot';
 
 export class TutorialCommand extends SlashCommand {
-  constructor() {
+  constructor(client: RoleBot) {
     super(
+      client,
       'tutorial',
       'RoleBot can be confusing at times. Use this command to learn the flow.',
       Category.general
