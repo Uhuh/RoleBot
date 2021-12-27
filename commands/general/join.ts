@@ -1,10 +1,12 @@
 import { CommandInteraction, Permissions } from 'discord.js';
+import RoleBot from '../../src/bot';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
 export class AutoJoinCommand extends SlashCommand {
-  constructor() {
+  constructor(client: RoleBot) {
     super(
+      client,
       'auto-join',
       'Setup auto join roles for the server.',
       Category.general,
