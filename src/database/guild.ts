@@ -2,7 +2,6 @@ import { Schema, Document, Model, model } from 'mongoose';
 
 const GuildConfig = new Schema({
   guildId: { type: String, required: true, unique: true, index: true },
-  prefix: { type: String, default: 'rb' },
   joinRoles: {
     type: [String],
     default: [],
