@@ -16,11 +16,11 @@ export class InteractionHandler {
    * @returns void to exit early.
    */
   public static handleInteraction(interaction: Interaction, client: RoleBot) {
-    /* if (!InteractionHandler.isSupportedInteractionType(interaction)) {
+    if (!InteractionHandler.isSupportedInteractionType(interaction)) {
       return LogService.debug(
         `Received interaction that is not one of the supported types.`
       );
-    } */
+    }
 
     if (interaction.isCommand()) {
       return InteractionHandler.handleCommand(interaction, client);
