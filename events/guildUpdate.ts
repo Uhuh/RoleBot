@@ -1,5 +1,5 @@
-import { Guild, MessageEmbed, TextChannel } from 'discord.js';
 import RoleBot from '../src/bot';
+import { Guild, MessageEmbed, TextChannel } from 'discord.js';
 import { Colors } from '../src/interfaces';
 import { LogService } from '../src/services/logService';
 
@@ -39,6 +39,11 @@ export const guildUpdate = (
     .addField('Member size:', `${guild.memberCount}`, true)
     .addField('Guild ID:', `${guild.id}`, true)
     .setFooter(`Guilds I'm in: ${client.guilds.cache.size}`);
+
+  LogService.setPrefix('GuildUpdate');
+  LogService.debug(
+    `${type} guild. I am now in ${client.guilds.cache.size} guilds.`
+  );
 
   (rolebotChannel as TextChannel).send({ embeds: [embed] });
 };
