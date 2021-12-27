@@ -26,6 +26,10 @@ export const GET_REACT_ROLES_BY_GUILD = (guildId: string) => {
   return ReactModel.find({ guildId });
 };
 
+export const GET_REACT_ROLES_NOT_IN_CATEGORIES = (guildId: string) => {
+  return ReactModel.find({ guildId, categoryId: undefined });
+};
+
 export const GET_REACT_ROLE_BY_ROLE_ID = (_id: string) => {
   return ReactModel.findOne({ _id });
 };
