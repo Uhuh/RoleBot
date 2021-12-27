@@ -8,14 +8,13 @@ import { guildUpdate } from '../events/guildUpdate';
 import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
 import {
-  GET_ALL_GUILD_PREFIXES,
   GET_ALL_JOIN_ROLES,
   GET_ALL_REACT_MESSAGES,
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
 import { LogService } from './services/logService';
-import { handleInteraction } from '../events/interaction';
 import { SlashCommand } from '../commands/slashCommand';
+import { InteractionHandler } from './services/interactionHandler';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -60,7 +59,7 @@ export default class RoleBot extends Discord.Client {
     });
 
     this.on('interactionCreate', async (interaction) =>
-      handleInteraction(interaction, this)
+      InteractionHandler.handleInteraction(interaction, this)
     );
 
     this.on('guildMemberAdd', (member) => joinRole(member, this.joinRoles));
@@ -185,14 +184,6 @@ export default class RoleBot extends Discord.Client {
     }
   }
 
-  private async loadGuildPrefixes(): Promise<void> {
-    const guilds = await GET_ALL_GUILD_PREFIXES();
-
-    for (const g of guilds) {
-      this.guildPrefix.set(g.guildId, g.prefix || 'rb');
-    }
-  }
-
   public start = async () => {
     LogService.setPrefix('BotStart');
 
@@ -208,13 +199,9 @@ export default class RoleBot extends Discord.Client {
 
     LogService.setPrefix('BotStart');
     LogService.info(
-      `Loading basic data.\n\t\t- Guild auto-join roles\n\t\t- Message IDs\n\t\t- Prefixes`
+      `Loading basic data.\n\t\t-\tGuild auto-join roles\n\t\t-\tMessage IDs`
     );
-    await Promise.all([
-      this.loadGuildJoinRoles(),
-      this.loadReactMessageIds(),
-      this.loadGuildPrefixes(),
-    ]);
+    await Promise.all([this.loadGuildJoinRoles(), this.loadReactMessageIds()]);
 
     LogService.info(`Successfully loaded all data and logged in.`);
   };
