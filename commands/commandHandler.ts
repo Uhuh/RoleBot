@@ -20,9 +20,9 @@ export default (client: RoleBot) => {
 
   // Use the slash commands name generated from their data.
   for (const cmd of [
-    ...Object.values(generalCommands).map((c) => new c()),
-    ...Object.values(categoryCommands).map((c) => new c()),
-    ...Object.values(reactionCommands).map((c) => new c()),
+    ...Object.values(generalCommands).map((c) => new c(client)),
+    ...Object.values(categoryCommands).map((c) => new c(client)),
+    ...Object.values(reactionCommands).map((c) => new c(client)),
   ]) {
     client.commands.set(cmd.data.name.toLowerCase(), cmd);
     commandsJson.push(cmd.data.toJSON());
@@ -34,7 +34,7 @@ export default (client: RoleBot) => {
       await rest.put(
         Routes.applicationGuildCommands(
           client.user?.id || '',
-          '756395872811483177'
+          '567819334852804626'
         ),
         {
           body: commandsJson,
