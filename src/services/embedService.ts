@@ -1,6 +1,8 @@
 import { MessageEmbed, User } from 'discord.js';
-import RoleBot from '../../src/bot';
 import { COLOR } from '../../utilities/types/globals';
+import { ICategory } from '../database/category';
+import { IReactRole } from '../database/reactRole';
+import RoleBot from '../../src/bot';
 
 export class EmbedService {
   constructor() {}
@@ -25,6 +27,54 @@ export class EmbedService {
     client.commands
       .filter((c) => c.type === type)
       .forEach((func) => embed.addField(`**/${func.name}**`, func.desc));
+
+    return embed;
+  };
+
+  /**
+   * Generate an embed that contains all the emojis to roles in a category.
+   * @param category Category to parse roles from.
+   * @param client RoleBot to find emojis.
+   * @returns built embed.
+   */
+  public static categoryReactRoleEmbed = (
+    category: ICategory,
+    client: RoleBot
+  ) => {
+    const embed = new MessageEmbed();
+
+    const reactRoles = category.roles.length
+      ? category.roles.map(
+          (r) =>
+            `<@&${r.roleId}> - ${client.emojis.resolve(r.emojiId) ?? r.emojiId}`
+        )
+      : `Empty! Add some react roles to this category by using \`/category-add\`!`;
+
+    embed
+      .setTitle(category.name)
+      .setDescription(`${category.description}\n\n${reactRoles}`)
+      .setColor(COLOR.DEFAULT);
+
+    return embed;
+  };
+
+  public static reactRoleListEmbed = (
+    reactRoles: IReactRole[],
+    client: RoleBot
+  ) => {
+    const embed = new MessageEmbed();
+
+    const reactRolesFormattedString = reactRoles.map((r, i) => {
+      const tabOrNewline = i % 2 === 0 ? '\n' : '\t';
+      return `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${
+        r.roleId
+      }>${tabOrNewline}`;
+    });
+
+    embed
+      .setTitle(`All your reaction roles!`)
+      .setDescription(reactRolesFormattedString.join(''))
+      .setColor(COLOR.DEFAULT);
 
     return embed;
   };
