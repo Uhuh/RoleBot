@@ -1,9 +1,27 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, Interaction } from 'discord.js';
-import { LogService } from '../src/services/logService';
+import {
+  ButtonInteraction,
+  CommandInteraction,
+  Interaction,
+  Permissions,
+  SelectMenuInteraction,
+} from 'discord.js';
 import { Category, DataCommand } from '../utilities/types/commands';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { LogService } from '../src/services/logService';
 import { SlashBase } from './slashBase';
+import RoleBot from '../src/bot';
 
+const PermissionMappings: Map<bigint, string> = new Map([
+  [Permissions.FLAGS.BAN_MEMBERS, 'BAN_MEMBERS'],
+  [Permissions.FLAGS.KICK_MEMBERS, 'KICK_MEMBERS'],
+  [Permissions.FLAGS.MANAGE_GUILD, 'MANAGE_GUILD'],
+  [Permissions.FLAGS.MANAGE_ROLES, 'MANAGE_ROLES'],
+  [Permissions.FLAGS.MANAGE_MESSAGES, 'MANAGE_MESSAGES'],
+  [Permissions.FLAGS.ATTACH_FILES, 'ATTACH_FILES'],
+  [Permissions.FLAGS.EMBED_LINKS, 'EMBED_LINKS'],
+]);
+
+// Basic command metadata for now. Want to learn how users are utilizing the bot.
 interface CommandData {
   time: Date;
   guildId: string;
@@ -12,28 +30,44 @@ interface CommandData {
   command: string;
 }
 
+/**
+ * @SlashCommand Helps create the JSON for the slash command and handle its execution.
+ */
 export abstract class SlashCommand extends SlashBase implements DataCommand {
   public name: string;
   public desc: string;
   public type: Category;
   private permissions: bigint[];
   private executions: CommandData[] = [];
+  private static totalCommandsRun = 0;
+
+  /**
+   * This is for commands that may need information from the client
+   * Such as needed guild data.
+   */
+  public client: RoleBot;
 
   constructor(
+    _client: RoleBot,
     _name: string,
     _desc: string,
     _type: Category,
     _permissions: bigint[] = []
   ) {
     super(new SlashCommandBuilder().setName(_name).setDescription(_desc));
-    LogService.setPrefix(`SlashCommandConstructor`);
+    this.client = _client;
     this.name = _name;
     this.desc = _desc;
     this.type = _type;
     this.permissions = _permissions;
   }
 
-  public run = (interaction: Interaction) => {
+  /**
+   * This `run` method will never be overwritten and will always check if the `interaction` is a command,
+   * if a user has the correct permissions, log that the command has been used and finally execute the implemented `execute` method
+   * @param interaction Raw interaction, can be command, button, selection etc.
+   */
+  public run = (interaction: Interaction): void => {
     LogService.setPrefix(`command:${this.name}`);
 
     // Ignore interactions that aren't commands.
@@ -43,15 +77,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       );
 
     // Check all user perms.
-    if (!this.canUserRunCommand(interaction)) {
-      interaction.reply({
-        ephemeral: true,
-        content: `You don't have the correct permissions to run this.`,
-      });
-      return LogService.debug(
-        `User doesn't have correct perms to run command.`
-      );
-    }
+    if (!this.canUserRunInteraction(interaction)) return;
 
     this.executions.push({
       channelId: interaction.channelId,
@@ -61,15 +87,80 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       userId: interaction.user.id,
     });
 
-    this.execute(interaction);
+    try {
+      this.execute(interaction);
+    } catch (e) {
+      LogService.error(
+        `Guild[${interaction.guildId}] encountered issue when running command[${this.name}]`
+      );
+      LogService.error(`${e}`);
+
+      interaction.channel?.send(
+        `Hey! Unfortunately I ran into an issue while running that command. Please try again.`
+      );
+    }
   };
 
+  public canUserRunInteraction = (
+    interaction: CommandInteraction | SelectMenuInteraction | ButtonInteraction
+  ): boolean => {
+    // Check all user perms.
+    if (!this.canUserRunCommand(interaction)) {
+      interaction.reply({
+        ephemeral: true,
+        content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
+          (p) => PermissionMappings.get(p)
+        )}\`.`,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * This method should be overwritten by the child class and implement the commands functionality.
+   * @param interaction Command that was ran and handed to this command from the handleInteraction function.
+   */
   public execute = (interaction: CommandInteraction) => {
-    interaction.reply({
-      content: `Hey! Turns out you didn't implemented this command[${this.name}] yet. How about you do that?`,
-    });
+    interaction.reply(
+      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
+    );
   };
 
+  /**
+   * This method should be overwritten by the child class and implement the handling for any option passed.
+   *
+   * All options should be keyed with the commands name followed by any IDs it needs separated by a `_`
+   * `_` because the slash commands have to use `-`
+   * @param interaction SelectMenu option that was clicked.
+   * @param args Essentially all the IDs that are separated with `-`
+   */
+  public handleSelect = (
+    interaction: SelectMenuInteraction,
+    args: string[]
+  ) => {
+    interaction.reply(
+      `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
+    );
+  };
+
+  /**
+   * This method should be overwritten by the child class and implement the handling for any option passed.
+   * @param interaction Button that was clicked
+   * @param args IDs that are inside the buttons customId
+   */
+  public handleButton = (interaction: ButtonInteraction, args: string[]) => {
+    interaction.reply(
+      `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
+    );
+  };
+
+  /**
+   * Check if a user has the required permissions to run the command.
+   * @param interaction User interaction with memberPermissions
+   * @returns True if user can run this command, false otherwise.
+   */
   private canUserRunCommand = (interaction: Interaction) => {
     return interaction.memberPermissions?.has(this.permissions, true);
   };
@@ -78,20 +169,19 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * TypeScript doesn't know what type a value is but I know the types for some commands options as they are setup in the constructor.
    * Instead of adding these checks for every command use this function to parse out all the properties.
    * @param interaction Command ran.
-   * @param args Array of properties. This is because we set options and give them custom IDs.
+   * @param attrs Array of properties. This is because we set options and give them custom IDs.
    * @returns All properties passed in.
    */
   extractStringVariables = (
     interaction: CommandInteraction,
-    ...args: string[]
-  ): string[] => {
-    return args.map((a) => {
+    ...attrs: string[]
+  ): Array<string | undefined> => {
+    return attrs.map((a) => {
       const val = interaction.options.get(a)?.value;
-      if (typeof val !== 'string') {
-        LogService.error(
+      if (typeof val !== 'string' && val !== undefined) {
+        throw Error(
           `Failed to extract string variable from interaction | [${a} : ${val}]`
         );
-        return '';
       }
       return val;
     });
