@@ -13,7 +13,6 @@ import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLE_BY_EMOJI,
 } from '../../src/database/database';
-import { LogService } from '../../src/services/logService';
 import { CLIENT_ID } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
@@ -23,7 +22,7 @@ export class ReactRoleCommand extends SlashCommand {
     super(
       client,
       'react-role',
-      'Create a new reaction role. Give the command a role and an emoji. It really is that simple.',
+      'Create a new react role. Give the command a role and an emoji. It really is that simple.',
       Category.react,
       [Permissions.FLAGS.MANAGE_ROLES]
     );
@@ -34,8 +33,6 @@ export class ReactRoleCommand extends SlashCommand {
 
   execute = async (interaction: CommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
-
-    LogService.setPrefix('ReactionRoleCreate');
 
     const { guild } = interaction;
     if (!guild) return;
@@ -86,7 +83,7 @@ export class ReactRoleCommand extends SlashCommand {
     }
 
     if (!emojiId || emojiId === '') {
-      LogService.error(
+      this.log.error(
         `Failed to extract emoji[${emoji}] with regex from string.`
       );
 
@@ -104,29 +101,29 @@ export class ReactRoleCommand extends SlashCommand {
     if (reactRole) {
       return interaction.reply({
         ephemeral: true,
-        content: `The role \`${reactRole.roleName}\` already has this emoji assigned to them.`,
+        content: `The react role \`${reactRole.name}\` already has this emoji assigned to it.`,
       });
     }
 
     CREATE_REACT_ROLE(role.name, role.id, emojiId, interaction.guildId)
       .then(() => {
-        LogService.debug(
+        this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
         interaction.reply({
           ephemeral: true,
-          content: ':tada: Successfully created the reaction role. :tada:',
+          content: ':tada: Successfully created the react role. :tada:',
         });
       })
       .catch((e) => {
-        LogService.error(
-          `Failed to create reaction role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]`
+        this.log.error(
+          `Failed to create react role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]`
         );
-        LogService.error(e);
+        this.log.error(e);
 
         interaction.reply({
           ephemeral: true,
-          content: 'Reaction role failed to create. Please try again.',
+          content: 'React role failed to create. Please try again.',
         });
       });
   };

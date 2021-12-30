@@ -6,7 +6,6 @@ import {
   SelectMenuInteraction,
 } from 'discord.js';
 import { EmbedService } from '../../src/services/embedService';
-import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
@@ -25,7 +24,7 @@ export class HelpCommand extends SlashCommand {
     interaction
       .reply({ ephemeral: true, embeds: [embed] })
       .catch(() =>
-        LogService.error(
+        this.log.error(
           `Error sending help embed for interaction. [${interaction.guildId}]`
         )
       );

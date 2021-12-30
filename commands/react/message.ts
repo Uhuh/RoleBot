@@ -8,8 +8,10 @@ import {
   TextChannel,
 } from 'discord.js';
 import RoleBot from '../../src/bot';
-import { GET_GUILD_CATEGORIES } from '../../src/database/database';
-import { LogService } from '../../src/services/logService';
+import {
+  GET_GUILD_CATEGORIES,
+  GET_REACT_ROLES_BY_CATEGORY_ID,
+} from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -85,18 +87,24 @@ export class ReactMessageCommand extends SlashCommand {
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
     const guildHasCategories = categories.length;
-    const categoriesHaveRoles = categories.filter((c) => c.roles.length).length;
+
+    const categoryRoles = await Promise.all(
+      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c._id))
+    );
+
+    // Presumably, if all the array of roles for each category is length 0 then this being 0 is "false"
+    const allEmptyCategories = categoryRoles.filter((r) => r.length).length;
 
     if (!guildHasCategories) {
-      LogService.debug(
+      this.log.debug(
         `Guild[${interaction.guildId}] has no categories. Cannot do command[${this.name}]`
       );
 
       return interaction.reply({
         content: guildHasNoCategories,
       });
-    } else if (!categoriesHaveRoles) {
-      LogService.debug(
+    } else if (!allEmptyCategories) {
+      this.log.debug(
         `Guild[${interaction.guildId}] has categories but all of them are empty.`
       );
 
@@ -113,7 +121,7 @@ export class ReactMessageCommand extends SlashCommand {
           categories.map((c, idx) => ({
             label: c.name ?? `Category-${idx}`,
             description: c.description ?? '',
-            value: `message-${c.guildId}-${channelId}-${messageId}-${c._id}`,
+            value: `message-${c.guildId}-${channelId}-${messageId}-${c.id}`,
           }))
         )
     );

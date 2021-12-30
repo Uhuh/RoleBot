@@ -6,6 +6,8 @@ import { LogService } from '../src/services/logService';
 const ROLEBOT_GUILD_ID = '567819334852804626';
 const ROLEBOT_LOG_CHANNEL_ID = '918626628756709387';
 
+const guildUpdateLog = new LogService(`GuildUpdate`);
+
 export const guildUpdate = (
   guild: Guild,
   type: 'Left' | 'Joined',
@@ -13,17 +15,18 @@ export const guildUpdate = (
 ) => {
   const rolebotGuild = client.guilds.cache.get(ROLEBOT_GUILD_ID);
 
-  if (!rolebotGuild) return LogService.error(`Could not get RoleBots guild.`);
+  if (!rolebotGuild)
+    return guildUpdateLog.error(`Could not get RoleBots guild.`);
 
   const rolebotChannel = rolebotGuild.channels.cache.get(
     ROLEBOT_LOG_CHANNEL_ID
   );
 
   if (!rolebotChannel)
-    return LogService.error(`Could not get RoleBots logging channel.`);
+    return guildUpdateLog.error(`Could not get RoleBots logging channel.`);
 
   if (!rolebotChannel.isText)
-    return LogService.error(
+    return guildUpdateLog.error(
       `The fetched logging channel was not a text channel.`
     );
 
@@ -40,8 +43,7 @@ export const guildUpdate = (
     .addField('Guild ID:', `${guild.id}`, true)
     .setFooter(`Guilds I'm in: ${client.guilds.cache.size}`);
 
-  LogService.setPrefix('GuildUpdate');
-  LogService.debug(
+  guildUpdateLog.debug(
     `${type} guild. I am now in ${client.guilds.cache.size} guilds.`
   );
 

@@ -1,5 +1,4 @@
 import { GuildMember, Collection } from 'discord.js';
-import { LogService } from '../src/services/logService';
 
 export default async (
   member: GuildMember,
@@ -9,13 +8,7 @@ export default async (
     await member.guild.roles.fetch(role);
     const joinRole = member.guild.roles.cache.get(role || '');
     if (joinRole) {
-      member.roles
-        .add(joinRole)
-        .catch(() =>
-          LogService.error(
-            `Issue giving user[${member.id}] auto-join role[${joinRole.id}]`
-          )
-        );
+      member.roles.add(joinRole).catch(() => {});
     }
   }
 };

@@ -13,8 +13,8 @@ import * as reactionCommands from './react';
 const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 export default (client: RoleBot) => {
-  LogService.setPrefix('SlashCommandHandler');
-  LogService.info(`Loading all slash commands...`);
+  const log = new LogService('SlashCommandHandler');
+  log.info(`Loading all slash commands...`);
 
   const commandsJson: RESTPostAPIApplicationCommandsJSONBody[] = [];
 
@@ -40,9 +40,9 @@ export default (client: RoleBot) => {
           body: commandsJson,
         }
       );
-      LogService.info(`Created slash commands successfully.`);
+      log.info(`Created slash commands successfully.`);
     } catch (e) {
-      LogService.error(`Errored when trying to create slash commands.\n${e}\n`);
+      log.error(`Errored when trying to create slash commands.\n${e}\n`);
     }
   })();
 };

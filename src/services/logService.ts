@@ -32,46 +32,45 @@ const labelMap: Record<LogLevel, string> = {
 };
 
 export class LogService {
-  static prefix = '[General]';
-  constructor() {}
+  prefix: string;
+  constructor(_prefix: string) {
+    this.prefix = _prefix;
+  }
 
-  /**
-   * Set a prefix to debug which method the Log is from.
-   * @param prefix : Method that the log is currently in;
-   * @returns Nothing
-   */
-  static setPrefix = (prefix: string) => (this.prefix = `[${prefix}]`);
-
-  static log(level: LogLevel, content: string, ...args: any[]) {
+  log(level: LogLevel, content: string, ...args: any[]) {
     console.log(
       colorMap[level],
       '[',
       labelMap[level],
       ']',
-      Color.reset,
-      ' - ',
+      '[',
+      new Date().toLocaleString(),
+      `]${Color.reset}`,
+      '-',
+      '[',
       this.prefix,
+      ']',
       ` ${content}`
     );
   }
 
-  static error(content: string) {
+  error(content: string) {
     this.log(LogLevel.error, content);
   }
 
-  static debug(content: string) {
+  debug(content: string) {
     this.log(LogLevel.debug, content);
   }
 
-  static info(content: string) {
+  info(content: string) {
     this.log(LogLevel.info, content);
   }
 
-  static warning(content: string) {
+  warning(content: string) {
     this.log(LogLevel.warning, content);
   }
 
-  static critical(content: string) {
+  critical(content: string) {
     this.log(LogLevel.critical, content);
   }
 }

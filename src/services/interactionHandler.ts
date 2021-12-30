@@ -9,6 +9,7 @@ import { LogService } from './logService';
 import RoleBot from '../bot';
 
 export class InteractionHandler {
+  public static log = new LogService('InteractionHandler');
   /**
    * Parse raw interactions and ensure they are handled correctly based on their type.
    * @param interaction Raw interaction. Determine what type it is and handle it.
@@ -17,7 +18,7 @@ export class InteractionHandler {
    */
   public static handleInteraction(interaction: Interaction, client: RoleBot) {
     if (!InteractionHandler.isSupportedInteractionType(interaction)) {
-      return LogService.debug(
+      return this.log.debug(
         `Received interaction that is not one of the supported types.`
       );
     }
@@ -49,7 +50,7 @@ export class InteractionHandler {
 
     if (!command) return;
     else if (!command.canUserRunInteraction(interaction)) {
-      return LogService.debug(
+      return this.log.debug(
         `User[${interaction.user.id}] tried to run command[${command.name}] without sufficient permissions.`
       );
     }
@@ -57,10 +58,10 @@ export class InteractionHandler {
     try {
       command.run(interaction);
     } catch (error) {
-      LogService.error(
+      this.log.error(
         `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]`
       );
-      LogService.error(`${error}`);
+      this.log.error(`${error}`);
 
       interaction.reply({
         content: 'There was an error while executing this command!',
@@ -78,21 +79,19 @@ export class InteractionHandler {
     interaction: SelectMenuInteraction,
     client: RoleBot
   ) {
-    LogService.setPrefix('InteractionHandler');
-
     try {
       const [commandName, args] = this.extractCommandInfo(interaction);
       const command = client.commands.get(commandName);
 
       if (!command?.canUserRunInteraction(interaction)) {
-        return LogService.debug(
+        return this.log.debug(
           `User[${interaction.user.id}] selected option but does not have sufficient permissions to execute the commands[${commandName}] handleSelect`
         );
       }
 
       command?.handleSelect(interaction, args);
     } catch {
-      LogService.error(
+      this.log.error(
         `An error occured with select[${''}] in guild[${interaction.guildId}]`
       );
 
@@ -102,7 +101,7 @@ export class InteractionHandler {
           content: `I couldn't find that select option. Try again or report it to the [support server](${SUPPORT_URL}).`,
         })
         .catch(() =>
-          LogService.error(
+          this.log.error(
             `Error telling user that I couldn't use the selected dropdown.`
           )
         );
@@ -120,17 +119,17 @@ export class InteractionHandler {
       const command = client.commands.get(commandName);
 
       if (!command?.canUserRunInteraction(interaction)) {
-        return LogService.debug(
+        return this.log.debug(
           `User[${interaction.user.id}] clicked a button but does not have sufficient permissions to execute the commands[${commandName}] handleButton.`
         );
       }
 
       command.handleButton(interaction, args);
     } catch (e) {
-      LogService.error(
-        `An error occured with button[${''}] in guild[${interaction.guildId}]`
+      this.log.error(
+        `An error occured with button[${interaction.customId}] in guild[${interaction.guildId}]`
       );
-      LogService.error(`${e}`);
+      this.log.error(`${e}`);
 
       interaction
         .reply({
@@ -138,7 +137,7 @@ export class InteractionHandler {
           content: `Hey! I had issues trying to process that button click, please wait a moment and try again.`,
         })
         .catch(() =>
-          LogService.error(
+          this.log.error(
             `Couldn't alert user that there was an error with the handleButton method.`
           )
         );

@@ -39,6 +39,9 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   public type: Category;
   private permissions: bigint[];
   private executions: CommandData[] = [];
+
+  public log: LogService;
+
   private static totalCommandsRun = 0;
 
   /**
@@ -60,6 +63,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     this.desc = _desc;
     this.type = _type;
     this.permissions = _permissions;
+    this.log = new LogService(`command:${this.name}`);
   }
 
   /**
@@ -68,11 +72,9 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param interaction Raw interaction, can be command, button, selection etc.
    */
   public run = (interaction: Interaction): void => {
-    LogService.setPrefix(`command:${this.name}`);
-
     // Ignore interactions that aren't commands.
     if (!interaction.isCommand())
-      return LogService.debug(
+      return this.log.debug(
         `Interaction was not a command. Command that got ran[${this.name}]`
       );
 
@@ -90,10 +92,10 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     try {
       this.execute(interaction);
     } catch (e) {
-      LogService.error(
+      this.log.error(
         `Guild[${interaction.guildId}] encountered issue when running command[${this.name}]`
       );
-      LogService.error(`${e}`);
+      this.log.error(`${e}`);
 
       interaction.channel?.send(
         `Hey! Unfortunately I ran into an issue while running that command. Please try again.`

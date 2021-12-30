@@ -5,16 +5,15 @@ import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
-import { IFolder, IFolderReactEmoji } from './interfaces';
 import * as mongoose from 'mongoose';
 import {
   GET_ALL_JOIN_ROLES,
   GET_ALL_REACT_MESSAGES,
   GET_REACT_ROLE_BY_EMOJI,
 } from './database/database';
-import { LogService } from './services/logService';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
+import { LogService } from './services/logService';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -22,10 +21,9 @@ export default class RoleBot extends Discord.Client {
   reactMessage: string[];
   commands: Discord.Collection<string, SlashCommand>;
   joinRoles: Discord.Collection<string, string[]>;
-  guildFolders: Discord.Collection<string, IFolder[]>;
   reactChannel: Discord.Collection<string, Discord.Message>;
-  folderContents: Discord.Collection<number, IFolderReactEmoji>;
   guildPrefix: Discord.Collection<string, string>;
+  log: LogService;
 
   constructor() {
     super({
@@ -40,18 +38,16 @@ export default class RoleBot extends Discord.Client {
     this.config = config;
     this.reactMessage = [];
     this.commandsRun = 0;
+    this.log = new LogService(`RoleBot`);
 
     this.commands = new Discord.Collection();
     this.reactChannel = new Discord.Collection();
-    this.guildFolders = new Discord.Collection<string, IFolder[]>();
-    this.folderContents = new Discord.Collection<number, IFolderReactEmoji>();
     this.joinRoles = new Discord.Collection<string, string[]>();
     this.guildPrefix = new Discord.Collection();
 
     this.on('ready', (): void => {
-      LogService.setPrefix('BotReady');
-      LogService.debug(`[Started]: ${new Date()}`);
-      LogService.info(
+      this.log.debug(`[Started]: ${new Date()}`);
+      this.log.info(
         `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
 
@@ -82,7 +78,7 @@ export default class RoleBot extends Discord.Client {
 
   private updatePresence = () => {
     if (!this.user)
-      return LogService.error(`Can't set presence due to client user missing.`);
+      return this.log.error(`Can't set presence due to client user missing.`);
 
     this.user.setPresence({
       activities: [
@@ -101,8 +97,6 @@ export default class RoleBot extends Discord.Client {
     type: 'add' | 'remove'
   ) => {
     try {
-      LogService.setPrefix('HandleReaction');
-
       if (!reaction || user.bot) return;
       const { message, emoji } = reaction;
       const { guild } = message;
@@ -110,36 +104,36 @@ export default class RoleBot extends Discord.Client {
         const emojiId = emoji.id || emoji.name;
 
         if (!emojiId) {
-          return LogService.error(`Couldn't get emoji ID from reaction event.`);
+          return this.log.error(`Couldn't get emoji ID from reaction event.`);
         }
 
         const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
         // Remove reaction since it doesn't exist.
         if (!reactRole && type === 'add') {
-          return reaction.users.remove(user.id).catch(LogService.error);
+          return reaction.users.remove(user.id).catch(this.log.error);
         } else if (!reactRole) return;
 
         const role = guild.roles.cache.get(reactRole.roleId);
         let member = guild.members.cache.get(user.id);
 
         if (!member) {
-          LogService.info(
+          this.log.info(
             `Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${guild.id}] - user[${user.id}]`
           );
           await guild.members.fetch(user.id);
           member = guild.members.cache.get(user.id);
-          LogService.info(
+          this.log.info(
             `Did member fectch successfully?. Does member exist: ${!!member}`
           );
         }
 
         if (!role) {
-          return LogService.error(
+          return this.log.error(
             `Could not find GuildRole from stored ReactRole: roleID[${reactRole.id}]. Possibly deleted.`
           );
         } else if (!member) {
-          return LogService.error(
+          return this.log.error(
             `Could not find GuildMember from ReactionUser: username[${user.username}] | ID[${user.id}]`
           );
         }
@@ -149,7 +143,7 @@ export default class RoleBot extends Discord.Client {
             member.roles
               .add(role)
               .catch(() =>
-                LogService.error(
+                this.log.error(
                   `Error issuing role[${role.id}] to user[${member?.id}]. Perhaps a permission issue.`
                 )
               );
@@ -158,14 +152,14 @@ export default class RoleBot extends Discord.Client {
             member.roles
               .remove(role)
               .catch(() =>
-                LogService.error(
+                this.log.error(
                   `Error removing role[${role.id}] from user[${member?.id}]. Perhaps a permission issue.`
                 )
               );
         }
       }
     } catch (e) {
-      LogService.error(
+      this.log.error(
         `Error thrown when tryingg to [${type}] a reaction role to user.`
       );
     }
@@ -185,24 +179,21 @@ export default class RoleBot extends Discord.Client {
   }
 
   public start = async () => {
-    LogService.setPrefix('BotStart');
-
-    LogService.info(`Connecting to MONGODB: ${config.DATABASE_TYPE}`);
+    this.log.info(`Connecting to MONGODB: ${config.DATABASE_TYPE}`);
     await mongoose.connect(`mongodb://localhost/rolebotBeta`);
 
-    LogService.info(`Connecting to Discord with bot token.`);
+    this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
-    LogService.info('Bot connected.');
+    this.log.info('Bot connected.');
 
     // Slash commands can only load once the bot is connected?
     commandHandler(this);
 
-    LogService.setPrefix('BotStart');
-    LogService.info(
+    this.log.info(
       `Loading basic data.\n\t\t-\tGuild auto-join roles\n\t\t-\tMessage IDs`
     );
     await Promise.all([this.loadGuildJoinRoles(), this.loadReactMessageIds()]);
 
-    LogService.info(`Successfully loaded all data and logged in.`);
+    this.log.info(`Successfully loaded all data and logged in.`);
   };
 }

@@ -4,7 +4,6 @@ import {
   CREATE_GUILD_CATEGORY,
   GET_CATEGORY_BY_NAME,
 } from '../../src/database/database';
-import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -44,16 +43,16 @@ export class CreateCategoryCommand extends SlashCommand {
 
     CREATE_GUILD_CATEGORY(interaction.guildId, categoryName, categoryDesc)
       .then(() => {
-        LogService.debug(
+        this.log.debug(
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
         );
         interaction.reply(`Hey! I successfully created the category for you!`);
       })
       .catch((e) => {
-        LogService.error(
+        this.log.error(
           `Issue creating category[${categoryName}] for guild[${interaction.guildId}]`
         );
-        LogService.error(e);
+        this.log.error(e);
 
         interaction.reply(
           `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`

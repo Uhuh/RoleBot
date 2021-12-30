@@ -6,7 +6,6 @@ import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_NAME,
 } from '../../src/database/database';
-import { LogService } from '../../src/services/logService';
 
 export class RemoveCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -32,7 +31,7 @@ export class RemoveCategoryCommand extends SlashCommand {
     );
 
     if (!categoryName) {
-      LogService.debug(
+      this.log.debug(
         `Required option was empty for categoryName[${categoryName}] on guild[${interaction.guildId}]`
       );
       return interaction.reply(
@@ -46,7 +45,7 @@ export class RemoveCategoryCommand extends SlashCommand {
     );
 
     if (!category) {
-      LogService.debug(
+      this.log.debug(
         `Category[${categoryName}] does not exist on guild[${interaction.guildId}]. Most likely name typo.`
       );
       return interaction.reply(
@@ -56,7 +55,7 @@ export class RemoveCategoryCommand extends SlashCommand {
 
     DELETE_CATEGORY_BY_ID(category.id)
       .then(() => {
-        LogService.debug(
+        this.log.debug(
           `Successfully deleted category[${categoryName}] for guild[${interaction.guildId}]`
         );
 
@@ -65,10 +64,10 @@ export class RemoveCategoryCommand extends SlashCommand {
         );
       })
       .catch((e) => {
-        LogService.error(
+        this.log.error(
           `Issues deleting category[${categoryName}] for guild[${interaction.guildId}]`
         );
-        LogService.error(e);
+        this.log.error(e);
 
         interaction.reply(
           `Hey! I had an issue deleting the category. Please wait a second and try again.`

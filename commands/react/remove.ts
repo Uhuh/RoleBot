@@ -4,7 +4,6 @@ import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/database';
-import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -25,7 +24,7 @@ export class ReactDeleteCommand extends SlashCommand {
     const role = interaction.options.get('role')?.role;
 
     if (!role) {
-      LogService.error(
+      this.log.error(
         `Interaction was missing role property despite it being required.`
       );
 
@@ -38,7 +37,7 @@ export class ReactDeleteCommand extends SlashCommand {
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
 
     if (!reactRole) {
-      LogService.debug(
+      this.log.debug(
         `User passed in role[${role.id}] that isn't in guilds reactRoles list.`
       );
 
@@ -50,7 +49,7 @@ export class ReactDeleteCommand extends SlashCommand {
 
     DELETE_REACT_ROLE_BY_ROLE_ID(role.id)
       .then(() => {
-        LogService.debug(
+        this.log.debug(
           `Successfully removed guilds[${interaction.guildId}] react role[${role.id}]`
         );
 
@@ -60,7 +59,7 @@ export class ReactDeleteCommand extends SlashCommand {
         });
       })
       .catch((e) => {
-        LogService.error(
+        this.log.error(
           `Error'd when trying to delete react role[${role.id}] on guild[${interaction.guildId}]\n\t\t${e}`
         );
 

@@ -2,7 +2,6 @@ import { CommandInteraction, MessageEmbed, Permissions } from 'discord.js';
 import { GET_GUILD_CATEGORIES } from '../../src/database/database';
 import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
-import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 import RoleBot from '../../src/bot';
 
@@ -20,15 +19,15 @@ export class ListCategoryCommand extends SlashCommand {
   execute = async (interaction: CommandInteraction) => {
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) => {
-        LogService.error(
+        this.log.error(
           `Failed to get categories for guild[${interaction.guildId}]`
         );
-        LogService.error(e);
+        this.log.error(e);
       }
     );
 
     if (!categories || !categories.length) {
-      LogService.debug(
+      this.log.debug(
         `Guild[${interaction.guildId}] did not have any categories.`
       );
 
@@ -44,7 +43,7 @@ export class ListCategoryCommand extends SlashCommand {
     const embeds: MessageEmbed[] = [];
 
     for (const cat of categories) {
-      embeds.push(EmbedService.categoryReactRoleEmbed(cat, this.client));
+      embeds.push(await EmbedService.categoryReactRoleEmbed(cat, this.client));
     }
 
     interaction.channel?.send({
