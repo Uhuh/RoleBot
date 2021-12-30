@@ -1,8 +1,9 @@
 import { MessageEmbed, User } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
-import { ICategory } from '../database/category';
+import { ICategoryDoc } from '../database/category';
 import { IReactRole } from '../database/reactRole';
 import RoleBot from '../../src/bot';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/database';
 
 export class EmbedService {
   constructor() {}
@@ -37,18 +38,23 @@ export class EmbedService {
    * @param client RoleBot to find emojis.
    * @returns built embed.
    */
-  public static categoryReactRoleEmbed = (
-    category: ICategory,
+  public static categoryReactRoleEmbed = async (
+    category: ICategoryDoc,
     client: RoleBot
   ) => {
     const embed = new MessageEmbed();
+    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
-    const reactRoles = category.roles.length
-      ? category.roles.map(
-          (r) =>
-            `<@&${r.roleId}> - ${client.emojis.resolve(r.emojiId) ?? r.emojiId}`
-        )
-      : `Empty! Add some react roles to this category by using \`/category-add\`!`;
+    const reactRoles = categoryRoles.length
+      ? categoryRoles
+          .map(
+            (r) =>
+              `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${
+                r.roleId
+              }>`
+          )
+          .join('\n')
+      : `This category has no react roles! Add some react roles to this category by using \`/category-add\`!`;
 
     embed
       .setTitle(category.name)

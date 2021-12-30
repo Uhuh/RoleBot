@@ -5,14 +5,14 @@ import ReactModel from './reactRole';
 
 // React role related
 export const CREATE_REACT_ROLE = (
-  roleName: string,
+  name: string,
   roleId: string,
   emojiId: string,
   guildId: string
 ) => {
   return ReactModel.create({
     roleId,
-    roleName,
+    name,
     emojiId,
     guildId,
   });
@@ -34,8 +34,16 @@ export const GET_REACT_ROLE_BY_ROLE_ID = (_id: string) => {
   return ReactModel.findOne({ _id });
 };
 
+export const GET_REACT_ROLES_BY_CATEGORY_ID = (categoryId: string) => {
+  return ReactModel.find({ categoryId });
+};
+
 export const GET_REACT_ROLE_BY_EMOJI = (emojiId: string, guildId: string) => {
   return ReactModel.findOne({ emojiId, guildId });
+};
+
+export const UPDATE_REACT_ROLE_CATEGORY = (_id: string, categoryId: string) => {
+  return ReactModel.findOneAndUpdate({ _id }, { categoryId });
 };
 
 // React role messages

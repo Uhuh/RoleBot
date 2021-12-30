@@ -10,14 +10,16 @@ import {
 import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
+  GET_REACT_ROLES_BY_CATEGORY_ID,
   GET_REACT_ROLES_NOT_IN_CATEGORIES,
   GET_REACT_ROLE_BY_ROLE_ID,
+  UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/database';
 import { SlashCommand } from '../slashCommand';
-import { LogService } from '../../src/services/logService';
 import { Category } from '../../utilities/types/commands';
 import { spliceIntoChunks } from '../../utilities/functions/spliceChunks';
 import RoleBot from '../../src/bot';
+import { IReactRoleDoc } from '../../src/database/reactRole';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -41,8 +43,15 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactRoleId);
     const category = await GET_CATEGORY_BY_ID(categoryId);
 
+    // To edit our butotn message with the updated list of react roles.
+    const categorilessRoles = (
+      (await GET_REACT_ROLES_NOT_IN_CATEGORIES(interaction.guildId)) ?? []
+    ).filter((r) => r.id !== reactRoleId);
+
+    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(categoryId);
+
     if (!reactRole) {
-      LogService.error(
+      this.log.error(
         `React role[${reactRoleId}] was not found with the given ID.`
       );
 
@@ -52,7 +61,7 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     if (!category) {
-      LogService.error(
+      this.log.error(
         `Category[${categoryId}] was not found with the given ID.`
       );
 
@@ -64,7 +73,7 @@ export class AddCategoryCommand extends SlashCommand {
     if (reactRole.categoryId) {
       const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.categoryId);
 
-      LogService.debug(
+      this.log.debug(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`
       );
 
@@ -73,12 +82,40 @@ export class AddCategoryCommand extends SlashCommand {
       );
     }
 
-    if (category.roles.find((r) => r.roleId === reactRole.roleId)) {
-      LogService.debug(
+    if (categoryRoles.find((r) => r.roleId === reactRoleId)) {
+      this.log.debug(
         `Category[${categoryId}] already contains role[${reactRoleId}]`
       );
 
       return interaction.reply(`Hey! This role is already in this category.`);
+    }
+
+    const roleButtons = await this.buildReactRoleButtons(
+      categorilessRoles,
+      categoryId
+    );
+
+    try {
+      await UPDATE_REACT_ROLE_CATEGORY(reactRoleId, categoryId);
+      const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
+      const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
+
+      interaction.update({
+        content: roleButtons.length ? moreRoles : noRolesLeft,
+        components: roleButtons,
+      });
+
+      this.log.debug(
+        `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`
+      );
+    } catch (e) {
+      this.log.error(
+        `Failed to update roles[${reactRoleId}] categoryId[${categoryId}]`
+      );
+      this.log.error(`${e}`);
+      interaction.update({
+        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+      });
     }
 
     /**
@@ -103,7 +140,7 @@ export class AddCategoryCommand extends SlashCommand {
 
     // I have no clue how this could happen after it just passed the categories ID.
     if (!category) {
-      LogService.error(
+      this.log.error(
         `Could not find category[${categoryId}] after it was selected in dropdown.`
       );
       return interaction.reply(
@@ -112,30 +149,42 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
+
+    const roleButtons = await this.buildReactRoleButtons(
+      reactRoles,
+      category.id
+    );
+
+    interaction.update({
+      content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
+      components: roleButtons,
+    });
+  };
+
+  /**
+   * Build react roles without a category into buttons to send to the user.
+   * @param guildId Needed to get the correct react roles.
+   * @param categoryId Needed to help creating the buttons customId to parse later.
+   * @returns All the react roles as buttons.
+   */
+  private buildReactRoleButtons = async (
+    reactRoles: IReactRoleDoc[],
+    categoryId: string
+  ) => {
     const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
 
-    const roleButtons: MessageActionRow[] = [];
-
-    reactRoleChunks.map((chunk) =>
-      roleButtons.push(
-        new MessageActionRow().addComponents(
-          chunk.map((r, i) =>
-            new MessageButton()
-              // commandName_reactMongoId-categoryMongoId
-              .setCustomId(`${this.name}_${r.id}-${category.id}`)
-              .setEmoji(r.emojiId)
-              .setLabel(r.roleName)
-              .setStyle(i % 2 ? 'SECONDARY' : 'PRIMARY')
-          )
+    return reactRoleChunks.map((chunk) =>
+      new MessageActionRow().addComponents(
+        chunk.map((r, i) =>
+          new MessageButton()
+            // commandName_reactMongoId-categoryMongoId
+            .setCustomId(`${this.name}_${r.id}-${categoryId}`)
+            .setEmoji(r.emojiId)
+            .setLabel(r.name)
+            .setStyle(i % 2 ? 'SECONDARY' : 'PRIMARY')
         )
       )
     );
-
-    interaction.reply({
-      ephemeral: true,
-      content: `Let's see how this looks with buttons.`,
-      components: roleButtons,
-    });
   };
 
   execute = async (interaction: CommandInteraction) => {
@@ -146,7 +195,7 @@ export class AddCategoryCommand extends SlashCommand {
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
 
     if (!categories.length) {
-      LogService.debug(
+      this.log.debug(
         `Guild[${interaction.guildId}] has no categories to add react roles to.`
       );
       return interaction.reply(
@@ -159,7 +208,7 @@ export class AddCategoryCommand extends SlashCommand {
     ).length;
 
     if (!hasReactRoles) {
-      LogService.debug(
+      this.log.debug(
         `Guild[${interaction.guildId}] has no react roles to add to category.`
       );
       return interaction.reply(
@@ -181,7 +230,7 @@ export class AddCategoryCommand extends SlashCommand {
     );
 
     interaction.reply({
-      ephemeral: true,
+      // temp hide ephemeral: true,
       content: `Hey! Select *one* category from below and then we'll move to adding react roles to it.`,
       components: [selectMenu],
     });
