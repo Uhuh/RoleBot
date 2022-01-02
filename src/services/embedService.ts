@@ -70,16 +70,18 @@ export class EmbedService {
   ) => {
     const embed = new MessageEmbed();
 
-    const reactRolesFormattedString = reactRoles.map((r, i) => {
-      const tabOrNewline = i % 2 === 0 ? '\n' : '\t';
-      return `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${
-        r.roleId
-      }>${tabOrNewline}`;
-    });
+    const reactRolesFormattedString = reactRoles
+      .map(
+        (r) =>
+          `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${r.roleId}>\n`
+      )
+      .join('');
 
     embed
       .setTitle(`All your reaction roles!`)
-      .setDescription(reactRolesFormattedString.join(''))
+      .setDescription(
+        `This doesn't show what categories these roles are in. Check out \`/category-list\` for more in-depth listing.\n\n${reactRolesFormattedString}`
+      )
       .setColor(COLOR.DEFAULT);
 
     return embed;
