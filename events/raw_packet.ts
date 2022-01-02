@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import RoleBot from '../src/bot';
 
-const handle_packet = async (packet: any, client: RoleBot) => {
+export const handle_packet = async (packet: any, client: RoleBot) => {
   if (
     !packet.t ||
     (packet.t !== 'MESSAGE_REACTION_ADD' &&
@@ -44,5 +44,3 @@ const handle_packet = async (packet: any, client: RoleBot) => {
     client.emit('messageReactionRemove', react, user);
   }
 };
-
-export { handle_packet };
