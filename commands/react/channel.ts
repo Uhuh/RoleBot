@@ -43,28 +43,26 @@ export class ReactChannelCommand extends SlashCommand {
     categoryRoles: IReactRoleDoc[],
     channelId: string
   ) => {
-    Promise.all(
-      categoryRoles.map((r) => {
-        message
-          .react(r.emojiId)
-          .then((mr) => {
-            SAVE_MSG_REACT({
-              messageId: mr.message.id,
-              emojiId: r.emojiId,
-              roleId: r.roleId,
-              guildId: interaction.guildId,
-              categoryId: r.categoryId,
-              channelId,
-            });
-          })
-          .catch((e) => {
-            this.log.error(
-              `Failed to react to message[${message.id}] for guild[${interaction.guildId}]`
-            );
-            this.log.error(`${e}`);
+    categoryRoles.map((r) => {
+      message
+        .react(r.emojiId)
+        .then((mr) => {
+          SAVE_MSG_REACT({
+            messageId: mr.message.id,
+            emojiId: r.emojiId,
+            roleId: r.roleId,
+            guildId: interaction.guildId,
+            categoryId: r.categoryId,
+            channelId,
           });
-      })
-    );
+        })
+        .catch((e) => {
+          this.log.error(
+            `Failed to react to message[${message.id}] for guild[${interaction.guildId}]`
+          );
+          this.log.error(`${e}`);
+        });
+    });
   };
 
   public execute = async (interaction: CommandInteraction) => {
