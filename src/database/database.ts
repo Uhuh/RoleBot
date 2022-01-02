@@ -1,6 +1,6 @@
 import CategoryModel from './category';
 import ConfigModel from './guild';
-import MessageModel from './reactMessage';
+import MessageModel, { IReactMessage } from './reactMessage';
 import ReactModel from './reactRole';
 
 // React role related
@@ -47,12 +47,22 @@ export const UPDATE_REACT_ROLE_CATEGORY = (_id: string, categoryId: string) => {
 };
 
 // React role messages
+export const SAVE_MSG_REACT = (reactMessage: IReactMessage) => {
+  return MessageModel.create({
+    ...reactMessage,
+  });
+};
+
 export const GET_ALL_REACT_MESSAGES = () => {
   return MessageModel.find({});
 };
 
 export const GET_ALL_JOIN_ROLES = () => {
   return ConfigModel.find().select('guildId joinRoles -_id');
+};
+
+export const GET_REACT_MSG = (messageId: string, emojiId: string) => {
+  return MessageModel.findOne({ messageId, emojiId });
 };
 
 // Guild categories
