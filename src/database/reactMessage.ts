@@ -6,7 +6,7 @@ const ReactMessage = new Schema({
   channelId: { type: String, required: true },
   roleId: { type: String, required: true },
   emojiId: { type: String, required: true },
-  categoryId: { type: Number },
+  categoryId: { type: String },
 });
 
 export interface IReactMessage {
@@ -15,7 +15,7 @@ export interface IReactMessage {
   channelId: string;
   roleId: string;
   emojiId: string;
-  categoryId?: number;
+  categoryId?: string;
 }
 
 export interface IReactMessageDoc extends IReactMessage, Document {}
