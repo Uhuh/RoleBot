@@ -230,7 +230,7 @@ export class AddCategoryCommand extends SlashCommand {
     );
 
     interaction.reply({
-      // temp hide ephemeral: true,
+      ephemeral: true,
       content: `Hey! Select *one* category from below and then we'll move to adding react roles to it.`,
       components: [selectMenu],
     });
