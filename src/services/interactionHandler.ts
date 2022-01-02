@@ -92,7 +92,7 @@ export class InteractionHandler {
       command?.handleSelect(interaction, args);
     } catch {
       this.log.error(
-        `An error occured with select[${''}] in guild[${interaction.guildId}]`
+        `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]`
       );
 
       interaction
