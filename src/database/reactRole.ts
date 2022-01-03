@@ -8,14 +8,22 @@ const ReactRole = new Schema({
    * Emojis can be either a real Id or unicode if it's not a custom emoji on a server
    */
   emojiId: { type: String, required: true },
+  type: { type: Number, required: true },
   categoryId: { type: String },
 });
+
+enum IReactRoleType {
+  normal = 1,
+  addOnly,
+  removeOnly,
+}
 
 export interface IReactRole {
   guildId: string;
   roleId: string;
   name: string;
   emojiId: string;
+  type: IReactRoleType;
   categoryId?: string;
 }
 
