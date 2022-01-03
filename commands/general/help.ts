@@ -22,7 +22,7 @@ export class HelpCommand extends SlashCommand {
     const embed = EmbedService.helpEmbed(type, this.client);
 
     interaction
-      .reply({ ephemeral: true, embeds: [embed] })
+      .update({ embeds: [embed] })
       .catch(() =>
         this.log.error(
           `Error sending help embed for interaction. [${interaction.guildId}]`
