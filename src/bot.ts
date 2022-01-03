@@ -6,12 +6,12 @@ import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
 import * as mongoose from 'mongoose';
-import { GET_REACT_MSG } from './database/database';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { handle_packet } from '../events/raw_packet';
+import { ReactionHandler } from './services/reactionHandler';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -22,6 +22,7 @@ export default class RoleBot extends Discord.Client {
   // "Services"
   log: LogService;
   permissionService: PermissionService;
+  reactHandler: ReactionHandler;
 
   constructor() {
     super({
@@ -40,6 +41,7 @@ export default class RoleBot extends Discord.Client {
 
     this.log = new LogService(`RoleBot`);
     this.permissionService = new PermissionService(this);
+    this.reactHandler = new ReactionHandler();
 
     this.commands = new Discord.Collection();
 
@@ -101,60 +103,7 @@ export default class RoleBot extends Discord.Client {
     user: Discord.User | Discord.PartialUser,
     type: 'add' | 'remove'
   ) => {
-    try {
-      if (!reaction || user.bot) return;
-      const { message, emoji } = reaction;
-      const { guild } = message;
-
-      if (!guild) return;
-
-      const emojiId = emoji.id || emoji.name;
-
-      if (!emojiId) {
-        return this.log.debug(
-          `Emoji doesn't exist on message[${message.id}] reaction for guild[${guild.id}].`
-        );
-      }
-
-      const reactRole = await GET_REACT_MSG(message.id, emojiId);
-
-      if (!reactRole) return;
-
-      const member = await guild.members
-        .fetch(user.id)
-        .catch(() =>
-          this.log.error(`Fetching user[${user.id}] threw an error.`)
-        );
-
-      if (!member) {
-        return this.log.debug(
-          `Failed to fetch member with user[${user.id}] for reaction[${type}] on guild[${guild.id}]`
-        );
-      }
-
-      switch (type) {
-        case 'add':
-          member.roles
-            .add(reactRole.roleId)
-            .catch(() =>
-              this.log.error(
-                `Cannot give role[${reactRole.roleId}] to user[${member?.id}]`
-              )
-            );
-          break;
-        case 'remove':
-          member.roles
-            .remove(reactRole.roleId)
-            .catch(() =>
-              this.log.error(
-                `Cannot remove role[${reactRole.roleId}] from user[${member?.id}]`
-              )
-            );
-      }
-    } catch (e) {
-      this.log.error(`[HandleReaction] threw an error on reaction[${type}]`);
-      this.log.error(`${e}`);
-    }
+    return this.reactHandler.handleReaction(reaction, user, type);
   };
 
   public start = async () => {
