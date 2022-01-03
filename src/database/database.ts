@@ -1,4 +1,4 @@
-import CategoryModel from './category';
+import CategoryModel, { ICategory } from './category';
 import ConfigModel from './guild';
 import MessageModel, { IReactMessage } from './reactMessage';
 import ReactModel from './reactRole';
@@ -88,6 +88,13 @@ export const CREATE_GUILD_CATEGORY = (
     name,
     description,
   });
+};
+
+export const EDIT_CATEGORY_BY_ID = (
+  _id: string,
+  category: Partial<ICategory>
+) => {
+  return CategoryModel.findOneAndUpdate({ _id }, { ...category });
 };
 
 export const GET_CATEGORY_BY_NAME = (guildId: string, name: string) => {
