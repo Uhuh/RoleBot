@@ -13,6 +13,12 @@ export abstract class SlashBase {
     );
   };
 
+  addBoolOption = (name: string, desc: string, required = false) => {
+    this.data.addBooleanOption((option) =>
+      option.setName(name).setDescription(desc).setRequired(required)
+    );
+  };
+
   addChannelOption = (name: string, desc: string, required = false) => {
     this.data.addChannelOption((option) =>
       option
