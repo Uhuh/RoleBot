@@ -34,7 +34,7 @@ export default (client: RoleBot) => {
       await rest.put(
         Routes.applicationGuildCommands(
           client.user?.id || '',
-          '567819334852804626'
+          '647960154079232041'
         ),
         {
           body: commandsJson,
