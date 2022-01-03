@@ -58,7 +58,9 @@ export class EmbedService {
 
     embed
       .setTitle(category.name)
-      .setDescription(`${category.description}\n\n${reactRoles}`)
+      .setDescription(
+        `Mutually exclusive: **${category.mutuallyExclusive}**\n\n${category.description}\n\n${reactRoles}`
+      )
       .setColor(COLOR.DEFAULT);
 
     return embed;
