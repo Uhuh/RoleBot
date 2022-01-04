@@ -65,14 +65,12 @@ export class PermissionService {
      * @param Permissions.FLAGS.MANAGE_MESSAGES - To update the embeds react role list.
      * @param Permissions.FLAGS.MANAGE_ROLES    - To update users roles.
      */
-    const hasCorrectPerms = channel
-      .permissionsFor(clientMember, true)
-      .has([
-        Permissions.FLAGS.ADD_REACTIONS,
-        Permissions.FLAGS.SEND_MESSAGES,
-        Permissions.FLAGS.MANAGE_MESSAGES,
-        Permissions.FLAGS.MANAGE_ROLES,
-      ]);
+    const hasCorrectPerms = clientMember.permissions.has([
+      Permissions.FLAGS.ADD_REACTIONS,
+      Permissions.FLAGS.SEND_MESSAGES,
+      Permissions.FLAGS.MANAGE_MESSAGES,
+      Permissions.FLAGS.MANAGE_ROLES,
+    ]);
 
     return hasCorrectPerms;
   };
