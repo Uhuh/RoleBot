@@ -20,7 +20,7 @@ export class EditCategoryCommand extends SlashCommand {
 
     this.addStringOption(
       'name',
-      'Change the name of the category. This is the title of the embed.',
+      'The name of the category, this is case sensitive and used to find your category.',
       true
     );
     this.addStringOption(
