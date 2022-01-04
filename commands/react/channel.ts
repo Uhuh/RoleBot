@@ -43,6 +43,9 @@ export class ReactChannelCommand extends SlashCommand {
     categoryRoles: IReactRoleDoc[],
     channelId: string
   ) => {
+    /**
+     * @TODO determine if we should alert the user to failed reactions.
+     */
     categoryRoles.map((r) => {
       message
         .react(r.emojiId)
@@ -51,7 +54,7 @@ export class ReactChannelCommand extends SlashCommand {
             messageId: mr.message.id,
             emojiId: r.emojiId,
             roleId: r.roleId,
-            guildId: interaction.guildId,
+            guildId: interaction.guildId ?? '',
             categoryId: r.categoryId,
             channelId,
           });
@@ -66,6 +69,9 @@ export class ReactChannelCommand extends SlashCommand {
   };
 
   public execute = async (interaction: CommandInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
     // Verify everything exist, this gets very repetitive.
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId);

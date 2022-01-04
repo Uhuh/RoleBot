@@ -38,6 +38,10 @@ export class AddCategoryCommand extends SlashCommand {
    * @param args A tuple of the [reactRoleId, categoryId] respectively.
    */
   handleButton = async (interaction: ButtonInteraction, args: string[]) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
     const [reactRoleId, categoryId] = args;
 
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactRoleId);
@@ -188,6 +192,9 @@ export class AddCategoryCommand extends SlashCommand {
   };
 
   execute = async (interaction: CommandInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
     /** Discords SelectMenu limitations
      *  As far as I'm aware, according to the API docs we're only allowed to have 25 options inside a select menu.
      *  Because of this, I will limit users to a MAXIMUM of 25 categories. Which is a lot to have to begin with.

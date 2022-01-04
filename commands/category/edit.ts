@@ -38,6 +38,10 @@ export class EditCategoryCommand extends SlashCommand {
   }
 
   execute = async (interaction: CommandInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
     const [name, newName, newDesc] = this.extractStringVariables(
       interaction,
       'name',

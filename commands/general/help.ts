@@ -65,7 +65,7 @@ export class HelpCommand extends SlashCommand {
       .setColor(COLOR.DEFAULT)
       .setAuthor(user.username, user.avatarURL() || '')
       .setThumbnail(user.avatarURL() || '')
-      .setFooter(`Replying to: ${interaction.member.user.username}`)
+      .setFooter(`Replying to: ${interaction.member?.user.username}`)
       .setTimestamp(new Date());
 
     embed.setDescription(

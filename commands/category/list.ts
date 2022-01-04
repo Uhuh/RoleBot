@@ -17,6 +17,10 @@ export class ListCategoryCommand extends SlashCommand {
   }
 
   execute = async (interaction: CommandInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) => {
         this.log.error(
