@@ -56,14 +56,15 @@ export class EmbedService {
           .join('\n')
       : `This category has no react roles! Add some react roles to this category by using \`/category-add\`!`;
 
+    const desc =
+      category.description === '' || !category.description
+        ? 'Description not set. Set it in `/category-edit`'
+        : category.description;
+
     embed
       .setTitle(category.name)
       .setDescription(
-        `Mutually exclusive: **${category.mutuallyExclusive}**\n\nDesc: **${
-          category.description === '' || !category.description
-            ? 'Description not set. Set it in `/category-edit`'
-            : category.description
-        }**\n\n${reactRoles}`
+        `Mutually exclusive: **${category.mutuallyExclusive}**\n\nDesc: **${desc}**\n\n${reactRoles}`
       )
       .setColor(COLOR.DEFAULT);
 
