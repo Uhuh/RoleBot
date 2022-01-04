@@ -1,20 +1,22 @@
 import CategoryModel, { ICategory } from './category';
 import ConfigModel from './guild';
 import MessageModel, { IReactMessage } from './reactMessage';
-import ReactModel from './reactRole';
+import ReactModel, { IReactRoleType } from './reactRole';
 
 // React role related
 export const CREATE_REACT_ROLE = (
   name: string,
   roleId: string,
   emojiId: string,
-  guildId: string
+  guildId: string,
+  type: IReactRoleType
 ) => {
   return ReactModel.create({
     roleId,
     name,
     emojiId,
     guildId,
+    type,
   });
 };
 

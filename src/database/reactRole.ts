@@ -12,7 +12,7 @@ const ReactRole = new Schema({
   categoryId: { type: String },
 });
 
-enum IReactRoleType {
+export enum IReactRoleType {
   normal = 1,
   addOnly,
   removeOnly,
