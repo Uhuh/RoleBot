@@ -72,6 +72,10 @@ export class PermissionService {
       Permissions.FLAGS.MANAGE_ROLES,
     ]);
 
+    /**
+     * @TODO - Check user perms and then check CHANNEL perms because they CAN be different
+     */
+
     return hasCorrectPerms;
   };
 }
