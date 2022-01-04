@@ -13,7 +13,7 @@ export class InfoCommand extends SlashCommand {
     const embed = new MessageEmbed();
 
     embed
-      .setTitle('General info for Vivi')
+      .setTitle('General Info')
       .setColor(COLOR.AQUA)
       .setDescription(
         `
