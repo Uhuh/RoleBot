@@ -1,11 +1,8 @@
 import * as Discord from 'discord.js';
-import * as dotenv from 'dotenv';
-dotenv.config();
 import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
-import * as mongoose from 'mongoose';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
@@ -107,9 +104,6 @@ export default class RoleBot extends Discord.Client {
   };
 
   public start = async () => {
-    this.log.info(`Connecting to MONGODB: ${config.DATABASE_TYPE}`);
-    await mongoose.connect(`mongodb://localhost/rolebotBeta`);
-
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
