@@ -19,7 +19,7 @@ import { SlashCommand } from '../slashCommand';
 import { Category } from '../../utilities/types/commands';
 import { spliceIntoChunks } from '../../utilities/functions/spliceChunks';
 import RoleBot from '../../src/bot';
-import { IReactRoleDoc } from '../../src/database/reactRole';
+import { ReactRole } from '../../src/database/entities';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -52,7 +52,21 @@ export class AddCategoryCommand extends SlashCommand {
       (await GET_REACT_ROLES_NOT_IN_CATEGORIES(interaction.guildId)) ?? []
     ).filter((r) => r.id !== reactRoleId);
 
-    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(categoryId);
+    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      categoryId
+    ).catch((e) => {
+      this.log.critical(
+        `Failed to get react roles with categoryId[${categoryId}] for guild[${interaction.guildId}]`
+      );
+      this.log.critical(`${e}`);
+    });
+
+    // Should only get here if typeorm throws.
+    if (!categoryRoles) {
+      return interaction.reply(
+        `Hey! Something broke. But I'm working on it, please be patient!`
+      );
+    }
 
     if (!reactRole) {
       this.log.error(
@@ -84,8 +98,8 @@ export class AddCategoryCommand extends SlashCommand {
         });
     }
 
-    if (reactRole.categoryId) {
-      const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.categoryId);
+    if (reactRole.category) {
+      const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.category.id);
 
       this.log.debug(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`
@@ -197,7 +211,7 @@ export class AddCategoryCommand extends SlashCommand {
    * @returns All the react roles as buttons.
    */
   private buildReactRoleButtons = async (
-    reactRoles: IReactRoleDoc[],
+    reactRoles: ReactRole[],
     categoryId: string
   ) => {
     const reactRoleChunks = spliceIntoChunks(reactRoles, 5);

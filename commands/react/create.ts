@@ -13,7 +13,7 @@ import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLE_BY_EMOJI,
 } from '../../src/database/database';
-import { IReactRoleType } from '../../src/database/reactRole';
+import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { CLIENT_ID } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
@@ -131,7 +131,7 @@ export class ReactRoleCommand extends SlashCommand {
       role.id,
       emojiId,
       interaction.guildId,
-      IReactRoleType.normal
+      ReactRoleType.normal
     )
       .then(() => {
         this.log.debug(

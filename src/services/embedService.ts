@@ -1,7 +1,7 @@
 import { MessageEmbed, User } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
-import { ICategoryDoc } from '../database/category';
-import { IReactRole } from '../database/reactRole';
+import { Category } from '../database/entities/category.entity';
+import { ReactRole } from '../database/entities/reactRole.entity';
 import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/database';
 
@@ -39,7 +39,7 @@ export class EmbedService {
    * @returns built embed.
    */
   public static categoryReactRoleEmbed = async (
-    category: ICategoryDoc,
+    category: Category,
     client: RoleBot
   ) => {
     const embed = new MessageEmbed();
@@ -78,7 +78,7 @@ export class EmbedService {
    * @returns Built embed for caller command to send.
    */
   public static reactRoleListEmbed = (
-    reactRoles: IReactRole[],
+    reactRoles: ReactRole[],
     client: RoleBot
   ) => {
     const embed = new MessageEmbed();

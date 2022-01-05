@@ -1,6 +1,6 @@
 import { CommandInteraction, Permissions } from 'discord.js';
 import RoleBot from '../../src/bot';
-import { ICategory } from '../../src/database/category';
+import { Category as ICategory } from '../../src/database/entities/category.entity';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_NAME,
@@ -103,20 +103,27 @@ export class EditCategoryCommand extends SlashCommand {
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
     };
 
-    EDIT_CATEGORY_BY_ID(category.id, updatedCategory).then(() => {
-      this.log.info(
-        `Updated category[${category.id}] in guild[${interaction.guildId}] successfully.`
-      );
+    EDIT_CATEGORY_BY_ID(category.id, updatedCategory)
+      .then(() => {
+        this.log.info(
+          `Updated category[${category.id}] in guild[${interaction.guildId}] successfully.`
+        );
 
-      interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! I successfully updated the category for you.`,
-        })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
-    });
+        interaction
+          .reply({
+            ephemeral: true,
+            content: `Hey! I successfully updated the category for you.`,
+          })
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
+      })
+      .catch((e) => {
+        this.log.critical(
+          `Failed to edit category[${category.id}] for guild[${interaction.guildId}]`
+        );
+        this.log.critical(`${e}`);
+      });
   };
 }

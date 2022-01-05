@@ -17,13 +17,19 @@ export class ReactListCommand extends SlashCommand {
   }
 
   execute = async (interaction: CommandInteraction) => {
-    const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
+    const reactRoles = await GET_REACT_ROLES_BY_GUILD(
+      interaction.guildId
+    ).catch((e) => {
+      this.log.critical(
+        `Failed to fetch react roles for guild[${interaction.guildId}]`
+      );
+      this.log.critical(`${e}`);
+    });
 
-    if (!reactRoles.length) {
+    if (!reactRoles || !reactRoles.length) {
       return interaction
         .reply({
-          ephemeral: true,
-          content: `Hey! Turns out this server doesn't have any react roles setup. How about you get to creating some?`,
+          content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
         })
         .catch((e) => {
           this.log.error(`Interaction failed.`);

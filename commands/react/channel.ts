@@ -10,11 +10,11 @@ import {
 } from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
+  CREATE_REACT_MESSAGE,
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
-  SAVE_MSG_REACT,
 } from '../../src/database/database';
-import { IReactRoleDoc } from '../../src/database/reactRole';
+import { ReactRole } from '../../src/database/entities';
 import { HasPerms } from '../../src/services/permissionService';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
@@ -40,7 +40,7 @@ export class ReactChannelCommand extends SlashCommand {
   private reactToMessage = (
     interaction: CommandInteraction,
     message: Message,
-    categoryRoles: IReactRoleDoc[],
+    categoryRoles: ReactRole[],
     channelId: string
   ) => {
     /**
@@ -50,12 +50,12 @@ export class ReactChannelCommand extends SlashCommand {
       message
         .react(r.emojiId)
         .then((mr) => {
-          SAVE_MSG_REACT({
+          CREATE_REACT_MESSAGE({
             messageId: mr.message.id,
             emojiId: r.emojiId,
             roleId: r.roleId,
             guildId: interaction.guildId ?? '',
-            categoryId: r.categoryId,
+            categoryId: r.category?.id || '',
             channelId,
           });
         })
@@ -74,7 +74,14 @@ export class ReactChannelCommand extends SlashCommand {
     }
     // Verify everything exist, this gets very repetitive.
 
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
+      (e) => {
+        this.log.error(
+          `Failed to get categories for guild[${interaction.guildId}]`
+        );
+        this.log.error(e);
+      }
+    );
 
     if (!categories) {
       this.log.debug(`Guild[${interaction.guildId}] has no categories.`);
@@ -92,7 +99,7 @@ export class ReactChannelCommand extends SlashCommand {
     // Stolen from @react/message execute function
     const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
     const categoryRoles = await Promise.all(
-      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c._id))
+      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c.id))
     );
 
     // Presumably, if all the array of roles for each category is length 0 then this being 0 is "false"

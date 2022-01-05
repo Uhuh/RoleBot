@@ -10,7 +10,7 @@ import {
   GET_REACT_MSG,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../database/database';
-import { IReactMessageDoc } from '../database/reactMessage';
+import { ReactMessage } from '../database/entities';
 import { LogService } from './logService';
 
 export class ReactionHandler {
@@ -38,10 +38,14 @@ export class ReactionHandler {
       );
     }
 
-    const reactRole = await GET_REACT_MSG(message.id, emojiId);
+    const reactRole = await GET_REACT_MSG(message.id, emojiId).catch((e) => {
+      this.log.error(`Failed to query for react message.`);
+      this.log.error(`${e}`);
+    });
+
     if (!reactRole) return;
 
-    if (!reactRole.categoryId) {
+    if (!reactRole.category) {
       return this.log.error(
         `React role[${reactRole.id}] in guild[${guild.id}] does NOT have a category set.`
       );
@@ -57,11 +61,11 @@ export class ReactionHandler {
       );
     }
 
-    const category = await GET_CATEGORY_BY_ID(reactRole.categoryId);
+    const category = await GET_CATEGORY_BY_ID(reactRole.category.id);
 
     if (!category) {
       return this.log.error(
-        `Category[${reactRole.categoryId}] does not exist for guild[${guild.id}]`
+        `Category[${reactRole.category.id}] does not exist for guild[${guild.id}]`
       );
     }
 
@@ -91,42 +95,42 @@ export class ReactionHandler {
   };
 
   mutuallyExclusive = async (
-    reactRole: IReactMessageDoc,
+    reactMessage: ReactMessage,
     member: GuildMember,
     type: 'add' | 'remove'
   ) => {
     // If it's removing it's pretty simple.
     if (type === 'remove') {
       return member.roles
-        .remove(reactRole.roleId)
+        .remove(reactMessage.roleId)
         .catch(() =>
           this.log.debug(
-            `Failed to remove role[${reactRole.roleId}] from user[${member.id}] because they unreacted.`
+            `Failed to remove role[${reactMessage.roleId}] from user[${member.id}] because they unreacted.`
           )
         );
     }
 
     // If we're ADDING a role then we need to figure out what out one they had.
 
-    if (!reactRole.categoryId) {
+    if (!reactMessage.category) {
       return this.log.error(
-        `React role[${reactRole.id}] category is undefined.`
+        `React role[${reactMessage.id}] category is undefined.`
       );
     }
 
     const categoryRoles = (
-      await GET_REACT_ROLES_BY_CATEGORY_ID(reactRole.categoryId)
+      await GET_REACT_ROLES_BY_CATEGORY_ID(reactMessage.category.id)
     ).map((r) => r.roleId);
 
     const rolesToRemove = member.roles.cache.filter(
-      (r) => r.id !== reactRole.roleId && categoryRoles.includes(r.id)
+      (r) => r.id !== reactMessage.roleId && categoryRoles.includes(r.id)
     );
 
     member.roles
-      .add(reactRole.roleId)
+      .add(reactMessage.roleId)
       .catch(() =>
         this.log.debug(
-          `Could not add role[${reactRole.roleId}] to member[${member.id}] in guild[${member.guild.id}]`
+          `Could not add role[${reactMessage.roleId}] to member[${member.id}] in guild[${member.guild.id}]`
         )
       );
 

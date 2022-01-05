@@ -1,112 +1,137 @@
-import CategoryModel, { ICategory } from './category';
-import ConfigModel from './guild';
-import MessageModel, { IReactMessage } from './reactMessage';
-import ReactModel, { IReactRoleType } from './reactRole';
+import { Category, ReactMessage, ReactRole } from './entities';
+import { ICategory } from './entities/category.entity';
+import { IReactMessage } from './entities/reactMessage.entity';
+import { ReactRoleType } from './entities/reactRole.entity';
 
 // React role related
-export const CREATE_REACT_ROLE = (
+export const CREATE_REACT_ROLE = async (
   name: string,
   roleId: string,
   emojiId: string,
   guildId: string,
-  type: IReactRoleType
+  type: ReactRoleType
 ) => {
-  return ReactModel.create({
-    roleId,
-    name,
-    emojiId,
-    guildId,
-    type,
+  const reactRole = new ReactRole();
+
+  reactRole.emojiId = emojiId;
+  reactRole.roleId = roleId;
+  reactRole.guildId = guildId;
+  reactRole.name = name;
+  reactRole.type = type;
+
+  return await reactRole.save();
+};
+
+export const DELETE_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
+  return await ReactRole.delete({ roleId });
+};
+
+export const GET_REACT_ROLES_BY_GUILD = async (guildId: string) => {
+  return await ReactRole.find({ where: { guildId } });
+};
+
+export const GET_REACT_ROLES_NOT_IN_CATEGORIES = async (guildId: string) => {
+  return await ReactRole.find({
+    where: { guildId, category: null },
   });
 };
 
-export const DELETE_REACT_ROLE_BY_ROLE_ID = (roleId: string) => {
-  return ReactModel.findOneAndDelete({ roleId });
+export const GET_REACT_ROLE_BY_ROLE_ID = async (id: string) => {
+  return await ReactRole.findOne({
+    where: {
+      id,
+    },
+  });
 };
 
-export const GET_REACT_ROLES_BY_GUILD = (guildId: string) => {
-  return ReactModel.find({ guildId });
+export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: string) => {
+  return await ReactRole.find({
+    where: {
+      category: {
+        id: categoryId,
+      },
+    },
+  });
 };
 
-export const GET_REACT_ROLES_NOT_IN_CATEGORIES = (guildId: string) => {
-  return ReactModel.find({ guildId, categoryId: undefined });
+export const GET_REACT_ROLE_BY_EMOJI = async (
+  emojiId: string,
+  guildId: string
+) => {
+  return await ReactRole.findOne({ where: { emojiId, guildId } });
 };
 
-export const GET_REACT_ROLE_BY_ROLE_ID = (_id: string) => {
-  return ReactModel.findOne({ _id });
-};
+export const UPDATE_REACT_ROLE_CATEGORY = async (
+  id: string,
+  categoryId: string
+) => {
+  const reactRole = await ReactRole.findOne({
+    where: { id },
+  });
 
-export const GET_REACT_ROLES_BY_CATEGORY_ID = (categoryId: string) => {
-  return ReactModel.find({ categoryId });
-};
+  if (!reactRole) return;
 
-export const GET_REACT_ROLE_BY_EMOJI = (emojiId: string, guildId: string) => {
-  return ReactModel.findOne({ emojiId, guildId });
-};
+  const category = await Category.findOne({ where: { id: categoryId } });
 
-export const UPDATE_REACT_ROLE_CATEGORY = (_id: string, categoryId: string) => {
-  return ReactModel.findOneAndUpdate({ _id }, { categoryId });
+  reactRole.category = category;
+  return reactRole.save();
 };
 
 // React role messages
-export const SAVE_MSG_REACT = (reactMessage: IReactMessage) => {
-  return MessageModel.create({
-    ...reactMessage,
-  });
+export const CREATE_REACT_MESSAGE = (reactMessageOptions: IReactMessage) => {
+  const reactMessage = new ReactMessage();
+
+  reactMessage.channelId = reactMessageOptions.channelId;
+  reactMessage.messageId = reactMessageOptions.messageId;
+  reactMessage.emojiId = reactMessageOptions.emojiId;
+  reactMessage.guildId = reactMessageOptions.guildId;
+  reactMessage.roleId = reactMessageOptions.roleId;
+
+  return reactMessage.save();
 };
 
-export const GET_ALL_REACT_MESSAGES = () => {
-  return MessageModel.find({});
-};
-
-export const GET_ALL_JOIN_ROLES = () => {
-  return ConfigModel.find().select('guildId joinRoles -_id');
-};
-
-export const GET_REACT_MSG = (messageId: string, emojiId: string) => {
-  return MessageModel.findOne({ messageId, emojiId });
+export const GET_REACT_MSG = async (messageId: string, emojiId: string) => {
+  return await ReactMessage.findOne({ where: { messageId, emojiId } });
 };
 
 // Guild categories
-export const GET_GUILD_CATEGORIES = (guildId: string) => {
-  return CategoryModel.find({ guildId });
+export const GET_GUILD_CATEGORIES = async (guildId: string) => {
+  return await Category.find({ where: { guildId } });
 };
 
-export const GET_ALL_GUILD_CATEGORIES = () => {
-  return CategoryModel.find();
+export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: string) => {
+  return await ReactRole.find({ where: { category: { id: categoryId } } });
 };
 
-export const GET_ROLES_BY_CATEGORY_ID = (categoryId: string) => {
-  return ReactModel.find({ categoryId });
-};
-
-export const CREATE_GUILD_CATEGORY = (
+export const CREATE_GUILD_CATEGORY = async (
   guildId: string,
   name: string,
   description: string | undefined
 ) => {
-  return CategoryModel.create({
-    guildId,
-    name,
-    description,
-  });
+  const category = new Category();
+
+  category.guildId = guildId;
+  category.name = name;
+  category.description = description;
+
+  return await category.save();
 };
 
 export const EDIT_CATEGORY_BY_ID = (
-  _id: string,
+  id: string,
   category: Partial<ICategory>
 ) => {
-  return CategoryModel.findOneAndUpdate({ _id }, { ...category });
+  return Category.update({ id }, category);
 };
 
-export const GET_CATEGORY_BY_NAME = (guildId: string, name: string) => {
-  return CategoryModel.findOne({ guildId, name });
+export const GET_CATEGORY_BY_NAME = async (guildId: string, name: string) => {
+  return await Category.findOne({ where: { guildId, name } });
 };
 
-export const GET_CATEGORY_BY_ID = (_id: string) => {
-  return CategoryModel.findOne({ _id });
+export const GET_CATEGORY_BY_ID = (id: string) => {
+  return Category.findOne({ where: { id } });
 };
 
-export const DELETE_CATEGORY_BY_ID = (_id: string) => {
-  return CategoryModel.findOneAndDelete({ _id });
+export const DELETE_CATEGORY_BY_ID = (id: string) => {
+  return Category.delete({ id });
 };

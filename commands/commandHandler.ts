@@ -4,7 +4,7 @@ import {
   RESTPostAPIApplicationCommandsJSONBody,
   Routes,
 } from 'discord-api-types/v9';
-import { TOKEN } from '../src/vars';
+import { CLIENT_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
 import * as categoryCommands from './category';
 import * as generalCommands from './general';
@@ -28,14 +28,18 @@ export default (client: RoleBot) => {
     commandsJson.push(cmd.data.toJSON());
   }
 
+  // generateSlashCommands(commandsJson);
+};
+
+async function generateSlashCommands(
+  commandsJson: RESTPostAPIApplicationCommandsJSONBody[]
+) {
+  const log = new LogService('GenerateSlashCommands');
   // Make a request to Discord to create all the slash commands.
   (async () => {
     try {
       await rest.put(
-        Routes.applicationGuildCommands(
-          client.user?.id || '',
-          '647960154079232041'
-        ),
+        Routes.applicationGuildCommands(CLIENT_ID || '', '647960154079232041'),
         {
           body: commandsJson,
         }
@@ -45,4 +49,4 @@ export default (client: RoleBot) => {
       log.error(`Errored when trying to create slash commands.\n${e}\n`);
     }
   })();
-};
+}

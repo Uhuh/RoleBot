@@ -105,11 +105,26 @@ export class ReactMessageCommand extends SlashCommand {
     const guildHasNoCategories = `It appears there are no categories! Try out \`/category-create\` to create a category reaction pack to store and manage your roles much easier.`;
     const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
 
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
+      (e) => {
+        this.log.error(
+          `Failed to get categories for guild[${interaction.guildId}]`
+        );
+        this.log.error(e);
+      }
+    );
+
+    // This should only happen if typeorm throws an error.
+    if (!categories) {
+      return interaction.reply(
+        `Hey! I'm encountering an issue trying to access the servers categories. Please be patient.`
+      );
+    }
+
     const guildHasCategories = categories.length;
 
     const categoryRoles = await Promise.all(
-      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c._id))
+      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c.id))
     );
 
     // Presumably, if all the array of roles for each category is length 0 then this being 0 is "false"
