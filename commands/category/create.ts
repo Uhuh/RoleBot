@@ -33,16 +33,26 @@ export class CreateCategoryCommand extends SlashCommand {
     );
 
     if (!categoryName) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
-      return await interaction.reply(
-        `Hey! It turns out you already have a category with that name made. Try checking it out.`
-      );
+      return await interaction
+        .reply(
+          `Hey! It turns out you already have a category with that name made. Try checking it out.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     CREATE_GUILD_CATEGORY(interaction.guildId, categoryName, categoryDesc)
@@ -50,7 +60,12 @@ export class CreateCategoryCommand extends SlashCommand {
         this.log.debug(
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
         );
-        interaction.reply(`Hey! I successfully created the category for you!`);
+        interaction
+          .reply(`Hey! I successfully created the category for you!`)
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       })
       .catch((e) => {
         this.log.error(
@@ -58,9 +73,14 @@ export class CreateCategoryCommand extends SlashCommand {
         );
         this.log.error(e);
 
-        interaction.reply(
-          `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
-        );
+        interaction
+          .reply(
+            `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
+          )
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       });
   };
 }

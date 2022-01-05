@@ -38,10 +38,15 @@ export class ReactMessageCommand extends SlashCommand {
     const channel = await this.client.channels.fetch(channelId);
 
     if (!channel || !isTextChannel(channel)) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I had an issue handling the option you selected for \`/${this.name}\`. Please wait a moment and try again.`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! I had an issue handling the option you selected for \`/${this.name}\`. Please wait a moment and try again.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const message = await channel.messages.fetch(messageId);
@@ -58,9 +63,14 @@ export class ReactMessageCommand extends SlashCommand {
     );
 
     if (!messageLink) {
-      return await interaction.reply(
-        `Hmm, I'm not what happened but I can't see the message link. Please try again.`
-      );
+      return await interaction
+        .reply(
+          `Hmm, I'm not what happened but I can't see the message link. Please try again.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
@@ -68,17 +78,27 @@ export class ReactMessageCommand extends SlashCommand {
     const channel = await interaction.guild?.channels.fetch(channelId);
 
     if (!channel || !isTextChannel(channel)) {
-      return await interaction.reply(
-        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
-      );
+      return await interaction
+        .reply(
+          `Hey! I couldn't find that channel, make sure you're copying the message link right.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const message = await channel.messages.fetch(messageId);
 
     if (!message) {
-      return await interaction.reply(
-        `Hey! I couldn't find that message, make sure you're copying the message link right.`
-      );
+      return await interaction
+        .reply(
+          `Hey! I couldn't find that message, make sure you're copying the message link right.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     // Trying to be as detailed as possible to user if categories don't exist or if they are all empty.
@@ -100,17 +120,27 @@ export class ReactMessageCommand extends SlashCommand {
         `Guild[${interaction.guildId}] has no categories. Cannot do command[${this.name}]`
       );
 
-      return interaction.reply({
-        content: guildHasNoCategories,
-      });
+      return interaction
+        .reply({
+          content: guildHasNoCategories,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     } else if (!allEmptyCategories) {
       this.log.debug(
         `Guild[${interaction.guildId}] has categories but all of them are empty.`
       );
 
-      return interaction.reply({
-        content: allCategoriesAreEmpty,
-      });
+      return interaction
+        .reply({
+          content: allCategoriesAreEmpty,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const selectMenu = new MessageActionRow().addComponents(
@@ -126,10 +156,15 @@ export class ReactMessageCommand extends SlashCommand {
         )
     );
 
-    await interaction.reply({
-      content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
-      components: [selectMenu],
-    });
+    await interaction
+      .reply({
+        content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
+        components: [selectMenu],
+      })
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 }
 

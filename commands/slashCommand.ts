@@ -75,10 +75,11 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    */
   public run = (interaction: Interaction): void => {
     // Ignore interactions that aren't commands.
-    if (!interaction.isCommand())
+    if (!interaction.isCommand()) {
       return this.log.debug(
         `Interaction was not a command. Command that got ran[${this.name}]`
       );
+    }
 
     // Check all user perms.
     if (!this.canUserRunInteraction(interaction)) return;
@@ -110,12 +111,17 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
-      interaction.reply({
-        ephemeral: true,
-        content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
-          (p) => PermissionMappings.get(p)
-        )}\`.`,
-      });
+      interaction
+        .reply({
+          ephemeral: true,
+          content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
+            (p) => PermissionMappings.get(p)
+          )}\`.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
       return false;
     }
 
@@ -127,9 +133,14 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
    */
   public execute = (interaction: CommandInteraction) => {
-    interaction.reply(
-      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
-    );
+    interaction
+      .reply(
+        `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
+      )
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 
   /**
@@ -144,9 +155,14 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     interaction: SelectMenuInteraction,
     args: string[]
   ) => {
-    interaction.reply(
-      `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
-    );
+    interaction
+      .reply(
+        `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
+      )
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 
   /**
@@ -155,9 +171,14 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param args IDs that are inside the buttons customId
    */
   public handleButton = (interaction: ButtonInteraction, args: string[]) => {
-    interaction.reply(
-      `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
-    );
+    interaction
+      .reply(
+        `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
+      )
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 
   /**

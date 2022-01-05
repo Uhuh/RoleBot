@@ -28,10 +28,15 @@ export class ReactDeleteCommand extends SlashCommand {
         `Interaction was missing role property despite it being required.`
       );
 
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! For some reason I was unable to get the role that you told me to delete. Is it already deleted? Please try again. :)`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! For some reason I was unable to get the role that you told me to delete. Is it already deleted? Please try again. :)`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
@@ -41,10 +46,15 @@ export class ReactDeleteCommand extends SlashCommand {
         `User passed in role[${role.id}] that isn't in guilds reactRoles list.`
       );
 
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! That role isn't in my system, perhaps you meant to pass in a different role?`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! That role isn't in my system, perhaps you meant to pass in a different role?`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     DELETE_REACT_ROLE_BY_ROLE_ID(role.id)
@@ -53,20 +63,30 @@ export class ReactDeleteCommand extends SlashCommand {
           `Successfully removed guilds[${interaction.guildId}] react role[${role.id}]`
         );
 
-        interaction.reply({
-          ephemeral: true,
-          content: `I successfully removed that react role! You can add it back at any time if you wish.`,
-        });
+        interaction
+          .reply({
+            ephemeral: true,
+            content: `I successfully removed that react role! You can add it back at any time if you wish.`,
+          })
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       })
       .catch((e) => {
         this.log.error(
           `Error'd when trying to delete react role[${role.id}] on guild[${interaction.guildId}]\n\t\t${e}`
         );
 
-        interaction.reply({
-          ephemeral: true,
-          content: `Hey! I had an issue deleting that react role. Please wait a moment and try again.`,
-        });
+        interaction
+          .reply({
+            ephemeral: true,
+            content: `Hey! I had an issue deleting that react role. Please wait a moment and try again.`,
+          })
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       });
   };
 }

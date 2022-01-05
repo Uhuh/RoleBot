@@ -42,11 +42,16 @@ export class ReactRoleCommand extends SlashCommand {
     const [emoji] = this.extractStringVariables(interaction, 'emoji');
 
     if (!role || !emoji) {
-      return interaction.reply({
-        ephemeral: true,
-        content:
-          'I had some issues finding that role or emoji. Please try again.',
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content:
+            'I had some issues finding that role or emoji. Please try again.',
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const isValidPosition = isValidRolePosition(interaction, role);
@@ -67,11 +72,16 @@ export class ReactRoleCommand extends SlashCommand {
           .setStyle('LINK')
       );
 
-      return interaction.reply({
-        ephemeral: true,
-        embeds: [embed],
-        components: [button],
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          embeds: [embed],
+          components: [button],
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const emojiRegex = /\d+/g.exec(emoji);
@@ -88,10 +98,15 @@ export class ReactRoleCommand extends SlashCommand {
         `Failed to extract emoji[${emoji}] with regex from string.`
       );
 
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I had an issue trying to use that emoji. Please wait a moment and try again.`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! I had an issue trying to use that emoji. Please wait a moment and try again.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     /**
@@ -100,10 +115,15 @@ export class ReactRoleCommand extends SlashCommand {
     const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
     if (reactRole) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `The react role \`${reactRole.name}\` already has this emoji assigned to it.`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `The react role \`${reactRole.name}\` already has this emoji assigned to it.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     CREATE_REACT_ROLE(
@@ -117,10 +137,15 @@ export class ReactRoleCommand extends SlashCommand {
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
-        interaction.reply({
-          ephemeral: true,
-          content: ':tada: Successfully created the react role. :tada:',
-        });
+        interaction
+          .reply({
+            ephemeral: true,
+            content: ':tada: Successfully created the react role. :tada:',
+          })
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       })
       .catch((e) => {
         this.log.error(
@@ -128,10 +153,15 @@ export class ReactRoleCommand extends SlashCommand {
         );
         this.log.error(e);
 
-        interaction.reply({
-          ephemeral: true,
-          content: 'React role failed to create. Please try again.',
-        });
+        interaction
+          .reply({
+            ephemeral: true,
+            content: 'React role failed to create. Please try again.',
+          })
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       });
   };
 }

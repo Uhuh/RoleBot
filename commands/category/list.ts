@@ -35,14 +35,24 @@ export class ListCategoryCommand extends SlashCommand {
         `Guild[${interaction.guildId}] did not have any categories.`
       );
 
-      return interaction.reply(
-        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
-      );
+      return interaction
+        .reply(
+          `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
-    interaction.reply(
-      `Hey! Let me build these embeds for you real quick and send them...`
-    );
+    interaction
+      .reply(
+        `Hey! Let me build these embeds for you real quick and send them...`
+      )
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
 
     const embeds: MessageEmbed[] = [];
 

@@ -29,9 +29,14 @@ Latency is ${
       )
       .setThumbnail(AVATAR_URL);
 
-    interaction.reply({
-      content: `Here's some info about me.`,
-      embeds: [embed],
-    });
+    interaction
+      .reply({
+        content: `Here's some info about me.`,
+        embeds: [embed],
+      })
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 }

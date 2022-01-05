@@ -47,9 +47,14 @@ export class AutoJoinCommand extends SlashCommand {
   }
 
   execute = (interaction: CommandInteraction) => {
-    interaction.reply({
-      ephemeral: true,
-      content: `Hey! This command is currently under development to work with the new slash command style. Thank you for being patient.`,
-    });
+    interaction
+      .reply({
+        ephemeral: true,
+        content: `Hey! This command is currently under development to work with the new slash command style. Thank you for being patient.`,
+      })
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
   };
 }

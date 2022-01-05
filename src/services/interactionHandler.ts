@@ -63,10 +63,15 @@ export class InteractionHandler {
       );
       this.log.error(`${error}`);
 
-      interaction.reply({
-        content: 'There was an error while executing this command!',
-        ephemeral: true,
-      });
+      interaction
+        .reply({
+          content: 'There was an error while executing this command!',
+          ephemeral: true,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
   }
 

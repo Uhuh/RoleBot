@@ -72,10 +72,19 @@ export class HelpCommand extends SlashCommand {
       `Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!${''}\nI've broken them up by category for your convenience.`
     );
 
-    interaction.reply({
-      ephemeral: true,
-      embeds: [embed],
-      components: [selectMenu],
-    });
+    interaction
+      .reply({
+        ephemeral: true,
+        embeds: [embed],
+        components: [selectMenu],
+      })
+      .catch((e) => {
+        this.log.error(
+          `Failed to defer interaction. Interaction timestamp: ${new Date(
+            interaction.createdTimestamp
+          )}`
+        );
+        this.log.error(`${e}`);
+      });
   };
 }

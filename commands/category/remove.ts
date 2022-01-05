@@ -38,9 +38,14 @@ export class RemoveCategoryCommand extends SlashCommand {
       this.log.debug(
         `Required option was empty for categoryName[${categoryName}] on guild[${interaction.guildId}]`
       );
-      return interaction.reply(
-        `Hey! I don't think you passed in a name. Could you please try again?`
-      );
+      return interaction
+        .reply(
+          `Hey! I don't think you passed in a name. Could you please try again?`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const category = await GET_CATEGORY_BY_NAME(
@@ -52,9 +57,14 @@ export class RemoveCategoryCommand extends SlashCommand {
       this.log.debug(
         `Category[${categoryName}] does not exist on guild[${interaction.guildId}]. Most likely name typo.`
       );
-      return interaction.reply(
-        `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`
-      );
+      return interaction
+        .reply(
+          `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
@@ -63,9 +73,14 @@ export class RemoveCategoryCommand extends SlashCommand {
           `Successfully deleted category[${categoryName}] for guild[${interaction.guildId}]`
         );
 
-        interaction.reply(
-          `Hey! I successfully deleted the category for you and freed all the roles on it.`
-        );
+        interaction
+          .reply(
+            `Hey! I successfully deleted the category for you and freed all the roles on it.`
+          )
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       })
       .catch((e) => {
         this.log.error(
@@ -73,9 +88,14 @@ export class RemoveCategoryCommand extends SlashCommand {
         );
         this.log.error(e);
 
-        interaction.reply(
-          `Hey! I had an issue deleting the category. Please wait a second and try again.`
-        );
+        interaction
+          .reply(
+            `Hey! I had an issue deleting the category. Please wait a second and try again.`
+          )
+          .catch((e) => {
+            this.log.error(`Interaction failed.`);
+            this.log.error(`${e}`);
+          });
       });
   };
 }

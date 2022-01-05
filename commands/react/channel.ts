@@ -79,9 +79,14 @@ export class ReactChannelCommand extends SlashCommand {
     if (!categories) {
       this.log.debug(`Guild[${interaction.guildId}] has no categories.`);
 
-      return interaction.reply(
-        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
-      );
+      return interaction
+        .reply(
+          `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     // Stolen from @react/message execute function
@@ -98,9 +103,14 @@ export class ReactChannelCommand extends SlashCommand {
         `Guild[${interaction.guildId}] has categories but all of them are empty.`
       );
 
-      return interaction.reply({
-        content: allCategoriesAreEmpty,
-      });
+      return interaction
+        .reply({
+          content: allCategoriesAreEmpty,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     const channel = interaction.options.getChannel('channel');
@@ -110,17 +120,25 @@ export class ReactChannelCommand extends SlashCommand {
         `Could not find channel on interaction for guild[${interaction.guildId}]`
       );
 
-      return interaction.reply(
-        `Hey! I failed to find the channel from the command. Please wait a second and try again.`
-      );
+      return interaction
+        .reply(
+          `Hey! I failed to find the channel from the command. Please wait a second and try again.`
+        )
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     } else if (!isTextChannel(channel)) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel for guild[${interaction.guildId}]`
       );
 
-      return interaction.reply(
-        `Hey! I only support sending embeds to text channels!`
-      );
+      return interaction
+        .reply(`Hey! I only support sending embeds to text channels!`)
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     // Verify that the client has the correct perms for the channel.
@@ -131,10 +149,15 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
     if (canClientSendEmbeds === HasPerms.error) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I ran into some issues. Could you please wait a second and try again?`,
-      });
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! I ran into some issues. Could you please wait a second and try again?`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     if (!canClientSendEmbeds) {
@@ -147,11 +170,12 @@ export class ReactChannelCommand extends SlashCommand {
         .map((p) => `\`${PermissionMappings.get(p)}\``)
         .join(' ');
 
-      return interaction.reply({
-        ephemeral: true,
-        content:
-          `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
-          `
+      return interaction
+        .reply({
+          ephemeral: true,
+          content:
+            `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
+            `
 Why do I need these permissions in this channel?
 \`\`\`
 - Have to be able to react, it is a react role bot.
@@ -159,7 +183,11 @@ Why do I need these permissions in this channel?
 - To update the embeds react role list.
 - To update users roles.
 \`\`\``,
-      });
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     interaction.deferReply({
