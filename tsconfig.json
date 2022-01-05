@@ -6,6 +6,9 @@
     "target": "es2020",
     "outDir": "build",
 
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
