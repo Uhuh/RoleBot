@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -16,7 +17,7 @@ export enum ReactRoleType {
 @Entity()
 export class ReactRole extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: string;
+  id!: number;
 
   @Column()
   name!: string;
@@ -33,6 +34,10 @@ export class ReactRole extends BaseEntity {
   @Column()
   type!: ReactRoleType;
 
-  @ManyToOne(() => Category)
+  @Column('int', { nullable: true })
+  categoryId?: number;
+
+  @ManyToOne(() => Category, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'categoryId' })
   category?: Category;
 }

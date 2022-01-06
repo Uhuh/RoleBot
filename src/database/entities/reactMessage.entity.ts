@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -13,13 +14,13 @@ export interface IReactMessage {
   channelId: string;
   roleId: string;
   emojiId: string;
-  categoryId: string;
+  categoryId: number;
 }
 
 @Entity()
 export class ReactMessage extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: string;
+  id!: number;
 
   @Column()
   messageId!: string;
@@ -30,8 +31,12 @@ export class ReactMessage extends BaseEntity {
   @Column()
   emojiId!: string;
 
-  @ManyToOne(() => Category)
-  category!: Category;
+  @Column('int', { nullable: true })
+  categoryId?: number;
+
+  @ManyToOne(() => Category, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'categoryId' })
+  category?: Category;
 
   @Column()
   roleId!: string;

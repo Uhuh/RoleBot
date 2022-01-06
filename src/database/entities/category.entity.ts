@@ -14,10 +14,9 @@ export interface ICategory {
 }
 
 @Entity()
-@Unique(['guildId'])
 export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: string;
+  id!: number;
 
   @Column()
   guildId!: string;
