@@ -9,6 +9,13 @@ import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { handle_packet } from '../events/raw_packet';
 import { ReactionHandler } from './services/reactionHandler';
+import { createConnection } from 'typeorm';
+import {
+  Category,
+  GuildConfig,
+  ReactMessage,
+  ReactRole,
+} from './database/entities';
 
 export default class RoleBot extends Discord.Client {
   config: any;
@@ -104,6 +111,20 @@ export default class RoleBot extends Discord.Client {
   };
 
   public start = async () => {
+    await createConnection({
+      type: 'postgres',
+      url: config.POSTGRES_URL,
+      synchronize: config.SYNC_DB,
+      entities: [ReactMessage, ReactRole, Category, GuildConfig],
+    })
+      .then(() => {
+        this.log.debug(`Successfully connected to postgres DB.`);
+      })
+      .catch((e) => {
+        this.log.critical(`Failed to connect to postgres.`);
+        this.log.critical(`${e}`);
+      });
+
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
