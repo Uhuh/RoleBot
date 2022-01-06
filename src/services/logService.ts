@@ -18,7 +18,7 @@ enum Color {
 const colorMap: Record<LogLevel, string> = {
   [LogLevel.debug]: Color.purple,
   [LogLevel.info]: Color.yellow,
-  [LogLevel.warning]: Color.yellow,
+  [LogLevel.warning]: Color.red,
   [LogLevel.error]: Color.red,
   [LogLevel.critical]: Color.bold_red,
 };
