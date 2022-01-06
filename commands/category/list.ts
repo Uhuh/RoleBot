@@ -1,5 +1,8 @@
 import { CommandInteraction, MessageEmbed, Permissions } from 'discord.js';
-import { GET_GUILD_CATEGORIES } from '../../src/database/database';
+import {
+  GET_GUILD_CATEGORIES,
+  GET_REACT_ROLES_NOT_IN_CATEGORIES,
+} from '../../src/database/database';
 import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
@@ -55,6 +58,17 @@ export class ListCategoryCommand extends SlashCommand {
       });
 
     const embeds: MessageEmbed[] = [];
+
+    // Let's show the user the free react roles and encourage them to add them to a category.
+    const rolesNotInCategory = await GET_REACT_ROLES_NOT_IN_CATEGORIES(
+      interaction.guildId
+    );
+
+    if (rolesNotInCategory.length) {
+      embeds.push(
+        await EmbedService.freeReactRoles(rolesNotInCategory, this.client)
+      );
+    }
 
     for (const cat of categories) {
       embeds.push(await EmbedService.categoryReactRoleEmbed(cat, this.client));
