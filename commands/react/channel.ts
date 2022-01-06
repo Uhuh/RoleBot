@@ -41,7 +41,8 @@ export class ReactChannelCommand extends SlashCommand {
     interaction: CommandInteraction,
     message: Message,
     categoryRoles: ReactRole[],
-    channelId: string
+    channelId: string,
+    categoryId: number
   ) => {
     /**
      * @TODO determine if we should alert the user to failed reactions.
@@ -55,7 +56,7 @@ export class ReactChannelCommand extends SlashCommand {
             emojiId: r.emojiId,
             roleId: r.roleId,
             guildId: interaction.guildId ?? '',
-            categoryId: r.category?.id || '',
+            categoryId: categoryId,
             channelId,
           });
         })
@@ -226,7 +227,13 @@ Why do I need these permissions in this channel?
           embeds: [embed],
         })
         .then((m) => {
-          this.reactToMessage(interaction, m, categoryRoles, channel.id);
+          this.reactToMessage(
+            interaction,
+            m,
+            categoryRoles,
+            channel.id,
+            category.id
+          );
         })
         .catch((e) => {
           this.log.error(

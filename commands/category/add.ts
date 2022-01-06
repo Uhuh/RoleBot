@@ -12,7 +12,7 @@ import {
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
   GET_REACT_ROLES_NOT_IN_CATEGORIES,
-  GET_REACT_ROLE_BY_ROLE_ID,
+  GET_REACT_ROLE_BY_ID,
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/database';
 import { SlashCommand } from '../slashCommand';
@@ -44,16 +44,16 @@ export class AddCategoryCommand extends SlashCommand {
 
     const [reactRoleId, categoryId] = args;
 
-    const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactRoleId);
-    const category = await GET_CATEGORY_BY_ID(categoryId);
+    const reactRole = await GET_REACT_ROLE_BY_ID(Number(reactRoleId));
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     // To edit our butotn message with the updated list of react roles.
     const categorilessRoles = (
       (await GET_REACT_ROLES_NOT_IN_CATEGORIES(interaction.guildId)) ?? []
-    ).filter((r) => r.id !== reactRoleId);
+    ).filter((r) => r.roleId !== reactRole?.roleId);
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
-      categoryId
+      Number(categoryId)
     ).catch((e) => {
       this.log.critical(
         `Failed to get react roles with categoryId[${categoryId}] for guild[${interaction.guildId}]`
@@ -98,14 +98,14 @@ export class AddCategoryCommand extends SlashCommand {
         });
     }
 
-    if (reactRole.category) {
-      const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.category.id);
+    if (reactRole.categoryId) {
+      const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.categoryId);
 
       this.log.debug(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`
       );
 
-      return interaction
+      interaction
         .reply(
           `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`
         )
@@ -115,33 +115,22 @@ export class AddCategoryCommand extends SlashCommand {
         });
     }
 
-    if (categoryRoles.find((r) => r.roleId === reactRoleId)) {
-      this.log.debug(
-        `Category[${categoryId}] already contains role[${reactRoleId}]`
-      );
-
-      return interaction
-        .reply(`Hey! This role is already in this category.`)
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
-    }
-
     const roleButtons = await this.buildReactRoleButtons(
       categorilessRoles,
-      categoryId
+      Number(categoryId)
     );
 
     try {
-      await UPDATE_REACT_ROLE_CATEGORY(reactRoleId, categoryId);
+      await UPDATE_REACT_ROLE_CATEGORY(Number(reactRoleId), Number(categoryId));
       const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
       const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
 
-      interaction.update({
-        content: roleButtons.length ? moreRoles : noRolesLeft,
-        components: roleButtons,
-      });
+      interaction
+        .update({
+          content: roleButtons.length ? moreRoles : noRolesLeft,
+          components: roleButtons,
+        })
+        .catch(() => this.log.warning(`Failed to update interaction`));
 
       this.log.debug(
         `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`
@@ -174,7 +163,7 @@ export class AddCategoryCommand extends SlashCommand {
   handleSelect = async (interaction: SelectMenuInteraction, args: string[]) => {
     const [guildId, categoryId] = args;
 
-    const category = await GET_CATEGORY_BY_ID(categoryId);
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     // I have no clue how this could happen after it just passed the categories ID.
     if (!category) {
@@ -212,7 +201,7 @@ export class AddCategoryCommand extends SlashCommand {
    */
   private buildReactRoleButtons = async (
     reactRoles: ReactRole[],
-    categoryId: string
+    categoryId: number
   ) => {
     const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
 
