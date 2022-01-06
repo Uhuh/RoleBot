@@ -9,8 +9,11 @@ export class InfoCommand extends SlashCommand {
   constructor(client: RoleBot) {
     super(client, 'info', `RoleBot's invite, ping, etc.`, Category.general);
   }
-  execute = (interaction: CommandInteraction) => {
+  execute = async (interaction: CommandInteraction) => {
     const embed = new MessageEmbed();
+    const size = (
+      await this.client.shard?.fetchClientValues('guilds.cache.size')
+    )?.reduce<number>((a, b) => a + Number(b), 0);
 
     embed
       .setTitle('General Info')
@@ -18,7 +21,8 @@ export class InfoCommand extends SlashCommand {
       .setDescription(
         `
 Thanks for using RoleBot!
-Server count: ${this.client.guilds.cache.size} servers.
+This servers shard ID: ${interaction.guild?.shardId}
+Server count: ${size} servers.
 Latency is ${
           Date.now() - interaction.createdTimestamp
         }ms. API Latency is ${Math.round(this.client.ws.ping)}ms.
