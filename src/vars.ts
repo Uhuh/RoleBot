@@ -9,3 +9,4 @@ export const AVATAR_URL =
   'https://cdn.discordapp.com/avatars/471811409886314496/e46c68a64b88316435adf4e1ac0402d0.webp?size=2048';
 export const VOTE_URL = `https://top.gg/bot/${CLIENT_ID}/vote`;
 export const POSTGRES_URL = process.env.POSTGRES_URL || '';
+export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 3;
