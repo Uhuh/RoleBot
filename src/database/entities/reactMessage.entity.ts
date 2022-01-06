@@ -28,10 +28,13 @@ export class ReactMessage extends BaseEntity {
   @Column()
   channelId!: string;
 
+  @Column({ nullable: true })
+  emojiName?: string;
+
   @Column()
   emojiId!: string;
 
-  @Column('int', { nullable: true })
+  @Column({ nullable: true })
   categoryId?: number;
 
   @ManyToOne(() => Category, { onDelete: 'CASCADE' })

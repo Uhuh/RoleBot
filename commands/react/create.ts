@@ -84,13 +84,18 @@ export class ReactRoleCommand extends SlashCommand {
         });
     }
 
-    const emojiRegex = /\d+/g.exec(emoji);
+    // Custom emojis Look like this: <:name:id>
+    const emojiRegex = /[a-zA-Z]+:[0-9]+/g.exec(emoji);
+    let emojiName = undefined;
+
+    // Default set the "emojiId" as the input. It's most likely just unicode.
     let emojiId = emoji;
 
+    // This is only matched if a custom discord emoji was used.
     if (emojiRegex) {
       const id = emojiRegex[0];
 
-      emojiId = id;
+      [emojiName, emojiId] = id.split(':');
     }
 
     if (!emojiId || emojiId === '') {
@@ -130,6 +135,7 @@ export class ReactRoleCommand extends SlashCommand {
       role.name,
       role.id,
       emojiId,
+      emojiName,
       interaction.guildId,
       ReactRoleType.normal
     )

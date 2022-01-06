@@ -25,6 +25,9 @@ export class ReactRole extends BaseEntity {
   @Column()
   roleId!: string;
 
+  @Column({ nullable: true })
+  emojiName?: string;
+
   @Column()
   emojiId!: string;
 
