@@ -9,6 +9,7 @@ import {
 } from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
+  GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
@@ -51,7 +52,57 @@ export class ReactMessageCommand extends SlashCommand {
 
     const message = await channel.messages.fetch(messageId);
 
-    console.log(message);
+    if (!message) {
+      this.log.debug(
+        `User gave message[${messageId}] that doesn't exist in channel[${channelId}] in guild[${guildId}]`
+      );
+
+      return interaction.reply(
+        `Hey! I had an issue finding that message. Give me a sec and try again.`
+      );
+    }
+
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+
+    if (!category) {
+      this.log.error(
+        `Category[${categoryId}] is missing for guild[${guildId}] despite having passed previous check.`
+      );
+
+      return interaction.reply(
+        `Hey! I had an issue finding that category. Please wait a second and try again.`
+      );
+    }
+
+    const reactRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(Number(categoryId));
+
+    if (!reactRoles.length) {
+      this.log.error(
+        `Category[${categoryId}] in guild[${guildId}] somehow has no react roles associated with it.`
+      );
+
+      return interaction.reply(
+        `Hey! I had issues getting the react roles for the category. Can you wait a sec and try again?`
+      );
+    }
+
+    interaction.reply({
+      ephemeral: true,
+      content: `I'm reacting to the message with all react roles associated with ${category.name}. Please give me a moment to react fully before obtaining roles.`,
+    });
+
+    for (const reactRole of reactRoles) {
+      const reaction = await message.react(
+        reactRole.emojiName
+          ? `<:${reactRole.emojiName}:${reactRole.emojiId}`
+          : reactRole.emojiId
+      );
+      if (!reaction) {
+        return interaction.editReply(
+          `Hey! I had an issue reacting to the message. Do I have the permission to add reactions?`
+        );
+      }
+    }
   };
 
   execute = async (interaction: CommandInteraction) => {
@@ -166,7 +217,7 @@ export class ReactMessageCommand extends SlashCommand {
           categories.map((c, idx) => ({
             label: c.name ?? `Category-${idx}`,
             description: c.description ?? '',
-            value: `message-${c.guildId}-${channelId}-${messageId}-${c.id}`,
+            value: `${this.name}_${c.guildId}-${channelId}-${messageId}-${c.id}`,
           }))
         )
     );
