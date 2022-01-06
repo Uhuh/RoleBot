@@ -46,14 +46,7 @@ export class EmbedService {
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
     const reactRoles = categoryRoles.length
-      ? categoryRoles
-          .map(
-            (r) =>
-              `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${
-                r.roleId
-              }>`
-          )
-          .join('\n')
+      ? this.reactRolesFormattedString(client, categoryRoles)
       : `This category has no react roles! Add some react roles to this category by using \`/category-add\`!`;
 
     const desc =
@@ -78,7 +71,9 @@ export class EmbedService {
     return reactRoles
       .map(
         (r) =>
-          `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${r.roleId}>\n`
+          `${r.emojiName ? `<:${r.emojiName}:${r.emojiId}>` : r.emojiId} - <@&${
+            r.roleId
+          }>\n`
       )
       .join('');
   };
