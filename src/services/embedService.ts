@@ -71,6 +71,18 @@ export class EmbedService {
     return embed;
   };
 
+  public static reactRolesFormattedString = (
+    client: RoleBot,
+    reactRoles: ReactRole[]
+  ) => {
+    return reactRoles
+      .map(
+        (r) =>
+          `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${r.roleId}>\n`
+      )
+      .join('');
+  };
+
   /**
    * Build a single embed to list all roles and their associated emoji.
    * @param reactRoles List of all react roles in a guild.
@@ -83,19 +95,47 @@ export class EmbedService {
   ) => {
     const embed = new MessageEmbed();
 
-    const reactRolesFormattedString = reactRoles
-      .map(
-        (r) =>
-          `${client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${r.roleId}>\n`
-      )
-      .join('');
+    const rolesNotInCategory = reactRoles.filter((r) => !r.categoryId);
+    const rolesInCategory = reactRoles.filter((r) => r.categoryId);
+
+    const inCategory = rolesInCategory.length
+      ? `**In a category:**\n${this.reactRolesFormattedString(
+          client,
+          rolesInCategory
+        )}\n`
+      : '';
+
+    const notInCategory = rolesNotInCategory.length
+      ? `**Not in a category:**\n${this.reactRolesFormattedString(
+          client,
+          rolesNotInCategory
+        )}`
+      : '';
 
     embed
       .setTitle(`All your reaction roles!`)
       .setDescription(
-        `This doesn't show what categories these roles are in. Check out \`/category-list\` for more in-depth listing.\n\n${reactRolesFormattedString}`
+        `This doesn't show what categories these roles are in.\nCheck out \`/category-list\` for more in-depth listing.\n\n${inCategory}${notInCategory}`
       )
       .setColor(COLOR.DEFAULT);
+
+    return embed;
+  };
+
+  public static freeReactRoles = async (
+    reactRoles: ReactRole[],
+    client: RoleBot
+  ) => {
+    const embed = new MessageEmbed();
+
+    embed.setTitle(`React roles not in a category`).setColor(COLOR.DEFAULT);
+
+    embed.setDescription(
+      `These roles are up for grabs!\nCheck out \`/category-add\` if you want to add these to a category.\n\n${this.reactRolesFormattedString(
+        client,
+        reactRoles
+      )}`
+    );
 
     return embed;
   };
