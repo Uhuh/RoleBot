@@ -57,11 +57,11 @@ export class InteractionHandler {
 
     try {
       command.run(interaction);
-    } catch (error) {
+    } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]`
       );
-      this.log.error(`${error}`);
+      this.log.critical(`${e}`);
 
       interaction
         .reply({
@@ -95,10 +95,11 @@ export class InteractionHandler {
       }
 
       command?.handleSelect(interaction, args);
-    } catch {
+    } catch (e) {
       this.log.error(
         `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]`
       );
+      this.log.critical(`${e}`);
 
       interaction
         .reply({
