@@ -19,6 +19,10 @@ export class CreateCategoryCommand extends SlashCommand {
 
     this.addStringOption('category-name', 'The name of the category', true);
     this.addStringOption('category-desc', 'Give your category a description.');
+    this.addBoolOption(
+      'mutually-exclusive',
+      `Make roles from this category mutually exclusive.`
+    );
   }
 
   execute = async (interaction: CommandInteraction) => {
@@ -31,6 +35,9 @@ export class CreateCategoryCommand extends SlashCommand {
       'category-name',
       'category-desc'
     );
+
+    const mutuallyExclusive =
+      interaction.options.get('mutually-exclusive')?.value;
 
     if (!categoryName) {
       return interaction
@@ -55,7 +62,12 @@ export class CreateCategoryCommand extends SlashCommand {
         });
     }
 
-    CREATE_GUILD_CATEGORY(interaction.guildId, categoryName, categoryDesc)
+    CREATE_GUILD_CATEGORY(
+      interaction.guildId,
+      categoryName,
+      categoryDesc,
+      !!mutuallyExclusive
+    )
       .then(() => {
         this.log.debug(
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
