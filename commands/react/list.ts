@@ -37,11 +37,7 @@ export class ReactListCommand extends SlashCommand {
         });
     }
 
-    /**
-     * @TODO - This is NOT a good solution because I want to also display what category each role belongs too.
-     * Also also???? Something something one big embed character limit (4k chars?)
-     */
-    const embed = EmbedService.reactRoleListEmbed(reactRoles, this.client);
+    const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
     interaction
       .reply({

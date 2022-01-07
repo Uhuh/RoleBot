@@ -8,14 +8,12 @@ export const CREATE_REACT_ROLE = async (
   name: string,
   roleId: string,
   emojiId: string,
-  emojiName: string | undefined,
   guildId: string,
   type: ReactRoleType
 ) => {
   const reactRole = new ReactRole();
 
   reactRole.emojiId = emojiId;
-  reactRole.emojiName = emojiName;
   reactRole.roleId = roleId;
   reactRole.guildId = guildId;
   reactRole.name = name;

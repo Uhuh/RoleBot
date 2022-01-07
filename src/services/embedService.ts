@@ -38,15 +38,12 @@ export class EmbedService {
    * @param client RoleBot to find emojis.
    * @returns built embed.
    */
-  public static categoryReactRoleEmbed = async (
-    category: Category,
-    client: RoleBot
-  ) => {
+  public static categoryReactRoleEmbed = async (category: Category) => {
     const embed = new MessageEmbed();
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
     const reactRoles = categoryRoles.length
-      ? this.reactRolesFormattedString(client, categoryRoles)
+      ? this.reactRolesFormattedString(categoryRoles)
       : `This category has no react roles! Add some react roles to this category by using \`/category-add\`!`;
 
     const desc =
@@ -64,14 +61,11 @@ export class EmbedService {
     return embed;
   };
 
-  public static reactRolesFormattedString = (
-    client: RoleBot,
-    reactRoles: ReactRole[]
-  ) => {
+  public static reactRolesFormattedString = (reactRoles: ReactRole[]) => {
     return reactRoles
       .map(
         (r) =>
-          `${r.emojiName ? `<:${r.emojiName}:${r.emojiId}>` : r.emojiId} - <@&${
+          `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
             r.roleId
           }>\n`
       )
@@ -84,10 +78,7 @@ export class EmbedService {
    * @param client Client used to grab emojis from.
    * @returns Built embed for caller command to send.
    */
-  public static reactRoleListEmbed = (
-    reactRoles: ReactRole[],
-    client: RoleBot
-  ) => {
+  public static reactRoleListEmbed = (reactRoles: ReactRole[]) => {
     const embed = new MessageEmbed();
 
     const rolesNotInCategory = reactRoles.filter((r) => !r.categoryId);
@@ -95,14 +86,12 @@ export class EmbedService {
 
     const inCategory = rolesInCategory.length
       ? `**In a category:**\n${this.reactRolesFormattedString(
-          client,
           rolesInCategory
         )}\n`
       : '';
 
     const notInCategory = rolesNotInCategory.length
       ? `**Not in a category:**\n${this.reactRolesFormattedString(
-          client,
           rolesNotInCategory
         )}`
       : '';
@@ -117,17 +106,13 @@ export class EmbedService {
     return embed;
   };
 
-  public static freeReactRoles = async (
-    reactRoles: ReactRole[],
-    client: RoleBot
-  ) => {
+  public static freeReactRoles = async (reactRoles: ReactRole[]) => {
     const embed = new MessageEmbed();
 
-    embed.setTitle(`React roles not in a category`).setColor(COLOR.DEFAULT);
+    embed.setTitle(`React roles not in a category`).setColor(COLOR.YELLOW);
 
     embed.setDescription(
       `These roles are up for grabs!\nCheck out \`/category-add\` if you want to add these to a category.\n\n${this.reactRolesFormattedString(
-        client,
         reactRoles
       )}`
     );

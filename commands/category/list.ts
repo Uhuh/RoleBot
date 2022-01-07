@@ -65,13 +65,11 @@ export class ListCategoryCommand extends SlashCommand {
     );
 
     if (rolesNotInCategory.length) {
-      embeds.push(
-        await EmbedService.freeReactRoles(rolesNotInCategory, this.client)
-      );
+      embeds.push(await EmbedService.freeReactRoles(rolesNotInCategory));
     }
 
     for (const cat of categories) {
-      embeds.push(await EmbedService.categoryReactRoleEmbed(cat, this.client));
+      embeds.push(await EmbedService.categoryReactRoleEmbed(cat));
     }
 
     interaction.channel?.send({

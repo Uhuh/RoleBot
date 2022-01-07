@@ -85,8 +85,7 @@ export class ReactRoleCommand extends SlashCommand {
     }
 
     // Custom emojis Look like this: <:name:id>
-    const emojiRegex = /[a-zA-Z]+:[0-9]+/g.exec(emoji);
-    let emojiName = undefined;
+    const emojiRegex = /[0-9]+/g.exec(emoji);
 
     // Default set the "emojiId" as the input. It's most likely just unicode.
     let emojiId = emoji;
@@ -95,7 +94,7 @@ export class ReactRoleCommand extends SlashCommand {
     if (emojiRegex) {
       const id = emojiRegex[0];
 
-      [emojiName, emojiId] = id.split(':');
+      emojiId = id;
     }
 
     if (!emojiId || emojiId === '') {
@@ -135,7 +134,6 @@ export class ReactRoleCommand extends SlashCommand {
       role.name,
       role.id,
       emojiId,
-      emojiName,
       interaction.guildId,
       ReactRoleType.normal
     )
