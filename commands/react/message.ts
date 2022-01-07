@@ -93,8 +93,8 @@ export class ReactMessageCommand extends SlashCommand {
 
     for (const reactRole of reactRoles) {
       const reaction = await message.react(
-        reactRole.emojiName
-          ? `<:${reactRole.emojiName}:${reactRole.emojiId}>`
+        reactRole.emojiId.length > 3
+          ? `n:${reactRole.emojiId}`
           : reactRole.emojiId
       );
       if (!reaction) {

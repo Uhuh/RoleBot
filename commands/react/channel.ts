@@ -44,15 +44,12 @@ export class ReactChannelCommand extends SlashCommand {
     channelId: string,
     categoryId: number
   ) => {
-    /**
-     * @TODO determine if we should alert the user to failed reactions.
-     */
     categoryRoles.map((r) => {
       message
-        .react(r.emojiId)
-        .then((mr) => {
+        .react(r.emojiId.length > 3 ? `n:${r.emojiId}` : r.emojiId)
+        .then(() => {
           CREATE_REACT_MESSAGE({
-            messageId: mr.message.id,
+            messageId: message.id,
             emojiId: r.emojiId,
             roleId: r.roleId,
             guildId: interaction.guildId ?? '',
@@ -209,7 +206,7 @@ Why do I need these permissions in this channel?
       const reactRoles = categoryRoles
         .map(
           (r) =>
-            `${this.client.emojis.resolve(r.emojiId) ?? r.emojiId} - <@&${
+            `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
               r.roleId
             }>`
         )
