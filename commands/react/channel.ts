@@ -2,22 +2,19 @@ import { APIInteractionDataResolvedChannel } from 'discord-api-types';
 import {
   CommandInteraction,
   GuildChannel,
-  Message,
-  MessageEmbed,
   Permissions,
   TextChannel,
   ThreadChannel,
 } from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
-  CREATE_REACT_MESSAGE,
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
-import { ReactRole } from '../../src/database/entities';
+import { EmbedService } from '../../src/services/embedService';
 import { HasPerms } from '../../src/services/permissionService';
+import { reactToMessage } from '../../utilities/functions/reactions';
 import { Category } from '../../utilities/types/commands';
-import { COLOR } from '../../utilities/types/globals';
 import { PermissionMappings, SlashCommand } from '../slashCommand';
 
 export class ReactChannelCommand extends SlashCommand {
@@ -36,35 +33,6 @@ export class ReactChannelCommand extends SlashCommand {
       true
     );
   }
-
-  private reactToMessage = (
-    interaction: CommandInteraction,
-    message: Message,
-    categoryRoles: ReactRole[],
-    channelId: string,
-    categoryId: number
-  ) => {
-    categoryRoles.map((r) => {
-      message
-        .react(r.emojiId.length > 3 ? `n:${r.emojiId}` : r.emojiId)
-        .then(() => {
-          CREATE_REACT_MESSAGE({
-            messageId: message.id,
-            emojiId: r.emojiId,
-            roleId: r.roleId,
-            guildId: interaction.guildId ?? '',
-            categoryId: categoryId,
-            channelId,
-          });
-        })
-        .catch((e) => {
-          this.log.error(
-            `Failed to react to message[${message.id}] for guild[${interaction.guildId}]`
-          );
-          this.log.error(`${e}`);
-        });
-    });
-  };
 
   public execute = async (interaction: CommandInteraction) => {
     if (!interaction.guildId) {
@@ -203,33 +171,20 @@ Why do I need these permissions in this channel?
       const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
       if (!categoryRoles.length) continue;
 
-      const reactRoles = categoryRoles
-        .map(
-          (r) =>
-            `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
-              r.roleId
-            }>`
-        )
-        .join('\n');
-
-      const embed = new MessageEmbed();
-
-      embed
-        .setTitle(category.name)
-        .setDescription(`${category.description}\n\n${reactRoles}`)
-        .setColor(COLOR.DEFAULT);
+      const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
       channel
         .send({
           embeds: [embed],
         })
         .then((m) => {
-          this.reactToMessage(
-            interaction,
+          reactToMessage(
             m,
             categoryRoles,
             channel.id,
-            category.id
+            category.id,
+            false,
+            this.log
           );
         })
         .catch((e) => {
