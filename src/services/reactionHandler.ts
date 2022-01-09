@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import {
   GET_CATEGORY_BY_ID,
-  GET_REACT_MSG,
+  GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../database/database';
 import { ReactMessage } from '../database/entities';
@@ -38,7 +38,10 @@ export class ReactionHandler {
       );
     }
 
-    const reactMessage = await GET_REACT_MSG(message.id, emojiId).catch((e) => {
+    const reactMessage = await GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID(
+      message.id,
+      emojiId
+    ).catch((e) => {
       this.log.error(`Failed to query for react message.`);
       this.log.error(`${e}`);
     });
