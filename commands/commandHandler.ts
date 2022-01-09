@@ -28,7 +28,7 @@ export default (client: RoleBot) => {
     commandsJson.push(cmd.data.toJSON());
   }
 
-  // generateSlashCommands(commandsJson);
+  //generateSlashCommands(commandsJson);
 };
 
 async function generateSlashCommands(
@@ -39,7 +39,7 @@ async function generateSlashCommands(
   (async () => {
     try {
       await rest.put(
-        Routes.applicationGuildCommands(CLIENT_ID || '', '647960154079232041'),
+        Routes.applicationGuildCommands(CLIENT_ID || '', '756395872811483177'),
         {
           body: commandsJson,
         }
