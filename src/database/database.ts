@@ -98,6 +98,7 @@ export const CREATE_REACT_MESSAGE = async (
   reactMessage.emojiId = reactMessageOptions.emojiId;
   reactMessage.guildId = reactMessageOptions.guildId;
   reactMessage.roleId = reactMessageOptions.roleId;
+  reactMessage.isCustomMessage = reactMessageOptions.isCustomMessage;
 
   const category = await Category.findOne({
     where: { id: reactMessageOptions.categoryId },
@@ -113,8 +114,25 @@ export const CREATE_REACT_MESSAGE = async (
   return reactMessage.save();
 };
 
-export const GET_REACT_MSG = async (messageId: string, emojiId: string) => {
+export const GET_REACT_MESSAGE_BY_ROLE_ID = async (roleId: string) => {
+  return await ReactMessage.findOne({ where: { roleId } });
+};
+
+export const GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID = async (
+  messageId: string,
+  emojiId: string
+) => {
   return await ReactMessage.findOne({ where: { messageId, emojiId } });
+};
+
+export const DELETE_REACT_MESSAGE_BY_ROLE_ID = async (roleId: string) => {
+  return await ReactMessage.delete({ roleId });
+};
+
+export const DELETE_REACT_MESSAGES_BY_MESSAGE_ID = async (
+  messageId: string
+) => {
+  return await ReactMessage.delete({ messageId });
 };
 
 // Guild categories
@@ -122,7 +140,7 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
   return await Category.find({ where: { guildId } });
 };
 
-export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: string) => {
+export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
   return await ReactRole.find({ where: { category: { id: categoryId } } });
 };
 
