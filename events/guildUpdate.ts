@@ -1,36 +1,24 @@
 import RoleBot from '../src/bot';
-import { Guild, MessageEmbed, TextChannel } from 'discord.js';
+import { Guild, MessageEmbed, WebhookClient } from 'discord.js';
 import { Colors } from '../src/interfaces';
-import { LogService } from '../src/services/logService';
+import { WEBHOOK_ID, WEBHOOK_TOKEN } from '../src/vars';
 
-const ROLEBOT_GUILD_ID = '567819334852804626';
-const ROLEBOT_LOG_CHANNEL_ID = '918626628756709387';
+// Because of sharding we can't reliably get the guild channel. Also this is actually so much easier!
+const webhookClient = new WebhookClient({
+  id: WEBHOOK_ID,
+  token: WEBHOOK_TOKEN,
+});
 
-const guildUpdateLog = new LogService(`GuildUpdate`);
-
-export const guildUpdate = (
+export const guildUpdate = async (
   guild: Guild,
   type: 'Left' | 'Joined',
   client: RoleBot
 ) => {
-  const rolebotGuild = client.guilds.cache.get(ROLEBOT_GUILD_ID);
-
-  if (!rolebotGuild)
-    return guildUpdateLog.error(`Could not get RoleBots guild.`);
-
-  const rolebotChannel = rolebotGuild.channels.cache.get(
-    ROLEBOT_LOG_CHANNEL_ID
-  );
-
-  if (!rolebotChannel)
-    return guildUpdateLog.error(`Could not get RoleBots logging channel.`);
-
-  if (!rolebotChannel.isText)
-    return guildUpdateLog.error(
-      `The fetched logging channel was not a text channel.`
-    );
-
   const color = type === 'Joined' ? Colors.green : Colors.red;
+
+  const size = (
+    await client.shard?.fetchClientValues('guilds.cache.size')
+  )?.reduce<number>((a, b) => a + Number(b), 0);
 
   const embed = new MessageEmbed();
 
@@ -41,11 +29,9 @@ export const guildUpdate = (
     .setDescription(guild.name)
     .addField('Member size:', `${guild.memberCount}`, true)
     .addField('Guild ID:', `${guild.id}`, true)
-    .setFooter(`Guilds I'm in: ${client.guilds.cache.size}`);
+    .setFooter(`Guilds I'm in: ${size}`);
 
-  guildUpdateLog.debug(
-    `${type} guild. I am now in ${client.guilds.cache.size} guilds.`
-  );
-
-  (rolebotChannel as TextChannel).send({ embeds: [embed] });
+  webhookClient.send({
+    embeds: [embed],
+  });
 };

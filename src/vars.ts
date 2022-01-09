@@ -12,3 +12,5 @@ export const POSTGRES_URL = `${process.env.POSTGRES_URL}${DB_NAME}` || '';
 export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 3;
 // Only sync when in dev
 export const SYNC_DB = Boolean(Number(process.env.SYNC_DB)) || false;
+export const WEBHOOK_ID = process.env.WEBHOOK_ID || '';
+export const WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN || '';
