@@ -16,6 +16,6 @@
     "noImplicitThis": true,
     "strictNullChecks": true
   },
-  "include": ["src/", "events/", "commands/"],
+  "include": ["src/", "events/", "commands/", "utilities/"],
   "compileOnSave": true
 }
