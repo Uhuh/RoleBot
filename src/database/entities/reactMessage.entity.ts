@@ -14,6 +14,7 @@ export interface IReactMessage {
   channelId: string;
   roleId: string;
   emojiId: string;
+  isCustomMessage: boolean;
   categoryId: number;
 }
 
@@ -21,6 +22,9 @@ export interface IReactMessage {
 export class ReactMessage extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column()
+  isCustomMessage!: boolean;
 
   @Column()
   messageId!: string;
@@ -31,8 +35,8 @@ export class ReactMessage extends BaseEntity {
   @Column()
   emojiId!: string;
 
-  @Column({ nullable: true })
-  categoryId?: number;
+  @Column()
+  categoryId!: number;
 
   @ManyToOne(() => Category, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'categoryId' })
