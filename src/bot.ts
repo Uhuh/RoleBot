@@ -115,6 +115,9 @@ export default class RoleBot extends Discord.Client {
       type: 'postgres',
       url: config.POSTGRES_URL,
       synchronize: config.SYNC_DB,
+      cache: {
+        duration: 30000,
+      },
       entities: [ReactMessage, ReactRole, Category, GuildConfig],
     })
       .then(() => {
