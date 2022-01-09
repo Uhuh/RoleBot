@@ -27,7 +27,7 @@ export class EmbedService {
 
     client.commands
       .filter((c) => c.type === type)
-      .forEach((func) => embed.addField(`**/${func.name}**`, func.desc));
+      .forEach((func) => embed.addField(`/${func.name}`, func.desc));
 
     return embed;
   };
@@ -116,6 +116,29 @@ export class EmbedService {
         reactRoles
       )}`
     );
+
+    return embed;
+  };
+
+  public static reactRoleEmbed = (
+    reactRoles: ReactRole[],
+    category: Category
+  ) => {
+    const reactRolesString = reactRoles
+      .map(
+        (r) =>
+          `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
+            r.roleId
+          }>`
+      )
+      .join('\n');
+
+    const embed = new MessageEmbed();
+
+    embed
+      .setTitle(category.name)
+      .setDescription(`${category.description}\n\n${reactRolesString}`)
+      .setColor(COLOR.DEFAULT);
 
     return embed;
   };
