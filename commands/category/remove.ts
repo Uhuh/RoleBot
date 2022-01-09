@@ -75,7 +75,7 @@ export class RemoveCategoryCommand extends SlashCommand {
 
         interaction
           .reply(
-            `Hey! I successfully deleted the category for you and freed all the roles on it.`
+            `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`
           )
           .catch((e) => {
             this.log.error(`Interaction failed.`);

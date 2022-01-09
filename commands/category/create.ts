@@ -73,7 +73,9 @@ export class CreateCategoryCommand extends SlashCommand {
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
         );
         interaction
-          .reply(`Hey! I successfully created the category for you!`)
+          .reply(
+            `Hey! I successfully created the category \`${categoryName}\` for you!`
+          )
           .catch((e) => {
             this.log.error(`Interaction failed.`);
             this.log.error(`${e}`);

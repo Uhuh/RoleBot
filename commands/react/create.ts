@@ -12,6 +12,7 @@ import RoleBot from '../../src/bot';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLE_BY_EMOJI,
+  GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/database';
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { CLIENT_ID } from '../../src/vars';
@@ -85,7 +86,7 @@ export class ReactRoleCommand extends SlashCommand {
     }
 
     // Custom emojis Look like this: <:name:id>
-    const emojiRegex = /[0-9]+/g.exec(emoji);
+    const emojiRegex = /[0-9]{10,}/g.exec(emoji);
 
     // Default set the "emojiId" as the input. It's most likely just unicode.
     let emojiId = emoji;
@@ -116,13 +117,27 @@ export class ReactRoleCommand extends SlashCommand {
     /**
      * For now RoleBot doesn't allow two roles to share the same emoji.
      */
-    const reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
+    let reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
     if (reactRole) {
       return interaction
         .reply({
           ephemeral: true,
           content: `The react role \`${reactRole.name}\` already has this emoji assigned to it.`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
+    }
+
+    reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
+
+    if (reactRole) {
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `There's react role already using the role \`${reactRole.name}\`.`,
         })
         .catch((e) => {
           this.log.error(`Interaction failed.`);
@@ -138,13 +153,15 @@ export class ReactRoleCommand extends SlashCommand {
       ReactRoleType.normal
     )
       .then(() => {
+        const emojiMention = emojiId.length > 3 ? `<:n:${emojiId}>` : emojiId;
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
+
         interaction
           .reply({
             ephemeral: true,
-            content: ':tada: Successfully created the react role. :tada:',
+            content: `:tada: Successfully created the react role (${emojiMention} - <@${role.id}>) :tada:`,
           })
           .catch((e) => {
             this.log.error(`Interaction failed.`);
