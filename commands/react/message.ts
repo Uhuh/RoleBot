@@ -13,6 +13,7 @@ import {
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
+import { reactToMessage } from '../../utilities/functions/reactions';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -91,18 +92,14 @@ export class ReactMessageCommand extends SlashCommand {
       content: `I'm reacting to the message with all react roles associated with ${category.name}. Please give me a moment to react fully before obtaining roles.`,
     });
 
-    for (const reactRole of reactRoles) {
-      const reaction = await message.react(
-        reactRole.emojiId.length > 3
-          ? `n:${reactRole.emojiId}`
-          : reactRole.emojiId
-      );
-      if (!reaction) {
-        return interaction.editReply(
-          `Hey! I had an issue reacting to the message. Do I have the permission to add reactions?`
-        );
-      }
-    }
+    reactToMessage(
+      message,
+      reactRoles,
+      channel.id,
+      category.id,
+      true,
+      this.log
+    );
   };
 
   execute = async (interaction: CommandInteraction) => {
