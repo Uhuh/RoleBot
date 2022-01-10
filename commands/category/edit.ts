@@ -52,7 +52,7 @@ export class EditCategoryCommand extends SlashCommand {
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
 
-    if (!newName && !newDesc && !mutuallyExclusive) {
+    if (!newName && !newDesc && mutuallyExclusive === null) {
       this.log.debug(`User didn't change anything about the category`);
 
       return interaction
