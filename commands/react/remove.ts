@@ -153,7 +153,7 @@ export class ReactDeleteCommand extends SlashCommand {
       interaction
         .reply({
           ephemeral: true,
-          content: `I successfully removed the react role (${emojiMention} - <@${role.id}>)! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`,
+          content: `I successfully removed the react role (${emojiMention} - <@&${role.id}>)! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`,
         })
         .catch((e) => {
           this.log.error(`Interaction failed.`);

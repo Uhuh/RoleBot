@@ -161,7 +161,7 @@ export class ReactRoleCommand extends SlashCommand {
         interaction
           .reply({
             ephemeral: true,
-            content: `:tada: Successfully created the react role (${emojiMention} - <@${role.id}>) :tada:`,
+            content: `:tada: Successfully created the react role (${emojiMention} - <@&${role.id}>) :tada:`,
           })
           .catch((e) => {
             this.log.error(`Interaction failed.`);
