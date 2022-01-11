@@ -112,7 +112,7 @@ export class EditCategoryCommand extends SlashCommand {
         interaction
           .reply({
             ephemeral: true,
-            content: `Hey! I successfully updated the category for you.`,
+            content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
           })
           .catch((e) => {
             this.log.error(`Interaction failed.`);
