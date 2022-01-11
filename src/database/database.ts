@@ -114,8 +114,18 @@ export const CREATE_REACT_MESSAGE = async (
   return reactMessage.save();
 };
 
+export const GET_REACT_MESSAGE_BY_CATEGORY_ID = async (categoryId: number) => {
+  return await ReactMessage.findOne({
+    where: { categoryId },
+  });
+};
+
 export const GET_REACT_MESSAGE_BY_ROLE_ID = async (roleId: string) => {
   return await ReactMessage.findOne({ where: { roleId } });
+};
+
+export const GET_REACT_MESSAGE_BY_MESSAGE_ID = async (messageId: string) => {
+  return (await ReactMessage.find({ where: { messageId } }))[0];
 };
 
 export const GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID = async (
