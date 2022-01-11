@@ -28,7 +28,7 @@ export default (client: RoleBot) => {
     commandsJson.push(cmd.data.toJSON());
   }
 
-  //generateSlashCommands(commandsJson);
+  generateSlashCommands(commandsJson);
 };
 
 async function generateSlashCommands(
