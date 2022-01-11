@@ -120,10 +120,15 @@ export class ReactRoleCommand extends SlashCommand {
     let reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
     if (reactRole) {
+      const emojiMention =
+        reactRole?.emojiId.length > 3
+          ? `<:n:${reactRole?.emojiId}>`
+          : reactRole?.emojiId;
+
       return interaction
         .reply({
           ephemeral: true,
-          content: `The react role \`${reactRole.name}\` already has this emoji assigned to it.`,
+          content: `The react role (${emojiMention} - <@&${reactRole.roleId}>) already has this emoji assigned to it.`,
         })
         .catch((e) => {
           this.log.error(`Interaction failed.`);
@@ -134,10 +139,15 @@ export class ReactRoleCommand extends SlashCommand {
     reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
 
     if (reactRole) {
+      const emojiMention =
+        reactRole?.emojiId.length > 3
+          ? `<:n:${reactRole?.emojiId}>`
+          : reactRole?.emojiId;
+
       return interaction
         .reply({
           ephemeral: true,
-          content: `There's react role already using the role \`${reactRole.name}\`.`,
+          content: `There's a react role already using the role \`${reactRole.name}\` (${emojiMention} - <@&${reactRole.roleId}>).`,
         })
         .catch((e) => {
           this.log.error(`Interaction failed.`);
@@ -153,10 +163,11 @@ export class ReactRoleCommand extends SlashCommand {
       ReactRoleType.normal
     )
       .then(() => {
-        const emojiMention = emojiId.length > 3 ? `<:n:${emojiId}>` : emojiId;
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
+
+        const emojiMention = emojiId.length > 3 ? `<:n:${emojiId}>` : emojiId;
 
         interaction
           .reply({
