@@ -54,9 +54,10 @@ export class ReactionHandler {
       );
     }
 
-    const member = await guild.members
-      .fetch(user.id)
-      .catch(() => this.log.error(`Fetching user[${user.id}] threw an error.`));
+    const member = await guild.members.fetch(user.id).catch((e) => {
+      this.log.error(`Fetching user[${user.id}] threw an error.`);
+      this.log.critical(`${e}`);
+    });
 
     if (!member) {
       return this.log.debug(
