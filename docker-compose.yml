@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  rolebot-docker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/home/panku/RoleBot/src
+    container_name: rolebot-docker
+    command: node build/src/index.js
+
