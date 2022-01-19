@@ -2,20 +2,21 @@
   "compilerOptions": {
     "module": "commonjs",
     "strict": true,
-    "target": "es2017",
-    "lib": ["es2017", "dom"],
+    "sourceMap": true,
+    "target": "es2020",
     "outDir": "build",
+
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
 
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "resolveJsonModule": true
   },
-  "include": ["src/", "events/", "commands/", "server/"],
+  "include": ["src/", "events/", "commands/", "utilities/"],
   "compileOnSave": true
 }

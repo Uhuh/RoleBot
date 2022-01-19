@@ -1,10 +1,8 @@
-import RB from "./bot"
-import * as logger from "log-to-file"
+import { ShardHandler } from './shardHandler';
+import * as dotenv from 'dotenv';
+import { SHARD_COUNT } from './vars';
+dotenv.config();
 
-const RoleBot = new RB()
+const shardHandler = new ShardHandler();
 
-RoleBot.start().catch(e => {
-  logger(`Error occurred during bot runtime: ${e}`, 'errors.log')
-});
-
-export default RoleBot;
+shardHandler.startShards(SHARD_COUNT);

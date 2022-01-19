@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import RoleBot from '../src/bot';
 
-const handle_packet = async (packet: any, client: RoleBot) => {
+export const handle_packet = async (packet: any, client: RoleBot) => {
   if (
     !packet.t ||
     (packet.t !== 'MESSAGE_REACTION_ADD' &&
@@ -9,8 +9,10 @@ const handle_packet = async (packet: any, client: RoleBot) => {
   ) {
     return;
   }
-  const channel = await client.channels.fetch(packet.d.channel_id, false);
-  if (channel.type !== 'text') {
+  const channel = await client.channels.fetch(packet.d.channel_id, {
+    cache: false,
+  });
+  if (!channel || channel.type !== 'GUILD_TEXT') {
     return;
   }
   //Ignore if messages are cached already
@@ -20,7 +22,9 @@ const handle_packet = async (packet: any, client: RoleBot) => {
 
   const message = await (channel as TextChannel).messages.fetch(
     packet.d.message_id,
-    false
+    {
+      cache: false,
+    }
   );
 
   const react = message.reactions.cache.get(
@@ -40,5 +44,3 @@ const handle_packet = async (packet: any, client: RoleBot) => {
     client.emit('messageReactionRemove', react, user);
   }
 };
-
-export { handle_packet };

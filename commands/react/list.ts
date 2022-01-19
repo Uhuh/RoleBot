@@ -1,0 +1,52 @@
+import { CommandInteraction, Permissions } from 'discord.js';
+import RoleBot from '../../src/bot';
+import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
+import { EmbedService } from '../../src/services/embedService';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
+
+export class ReactListCommand extends SlashCommand {
+  constructor(client: RoleBot) {
+    super(
+      client,
+      'react-list',
+      'List all reaction roles that are currently active.',
+      Category.react,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+  }
+
+  execute = async (interaction: CommandInteraction) => {
+    const reactRoles = await GET_REACT_ROLES_BY_GUILD(
+      interaction.guildId
+    ).catch((e) => {
+      this.log.critical(
+        `Failed to fetch react roles for guild[${interaction.guildId}]`
+      );
+      this.log.critical(`${e}`);
+    });
+
+    if (!reactRoles || !reactRoles.length) {
+      return interaction
+        .reply({
+          content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
+    }
+
+    const embed = EmbedService.reactRoleListEmbed(reactRoles);
+
+    interaction
+      .reply({
+        content: `Hey! Here's your react roles.`,
+        embeds: [embed],
+      })
+      .catch((e) => {
+        this.log.error(`Interaction failed.`);
+        this.log.error(`${e}`);
+      });
+  };
+}

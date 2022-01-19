@@ -1,7 +1,7 @@
 .env
 node*
 *.js
-build/
+build
 *.log
 .idea/
 .vscode

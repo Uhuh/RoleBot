@@ -1,254 +1,140 @@
 import * as Discord from 'discord.js';
-import * as dotenv from 'dotenv';
-dotenv.config();
 import * as config from './vars';
-import msg from '../events/message';
 import commandHandler from '../commands/commandHandler';
 import joinRole from '../events/joinRoles';
-import removed from '../events/removed';
-import * as logger from 'log-to-file';
-import {
-  getRoleByReaction,
-  getReactMessages,
-  getJoinRoles,
-  guildFolders,
-  folderContent,
-} from './setup_table';
+import { guildUpdate } from '../events/guildUpdate';
+import { SlashCommand } from '../commands/slashCommand';
+import { InteractionHandler } from './services/interactionHandler';
+import { LogService } from './services/logService';
+import { PermissionService } from './services/permissionService';
 import { handle_packet } from '../events/raw_packet';
-import { IFolder, IJoinRole, IFolderReactEmoji } from './interfaces';
-import { roleDelete, roleUpdate } from '../events/roleupdate';
-
-export interface Command {
-  desc: string;
-  args: string;
-  name: string;
-  type: string;
-  run: Function;
-}
-
-export interface CommandCollection extends Command {
-  commands: Discord.Collection<string, Command[]>;
-}
+import { ReactionHandler } from './services/reactionHandler';
+import { createConnection } from 'typeorm';
+import {
+  Category,
+  GuildConfig,
+  ReactMessage,
+  ReactRole,
+} from './database/entities';
 
 export default class RoleBot extends Discord.Client {
   config: any;
-  reactMessage: string[];
-  commands: Discord.Collection<string, Command>;
   commandsRun: number;
-  reactChannel: Discord.Collection<string, Discord.Message>;
-  guildFolders: Discord.Collection<string, IFolder[]>;
-  folderContents: Discord.Collection<number, IFolderReactEmoji>;
-  joinRoles: Discord.Collection<string, Partial<IJoinRole>[]>;
+  reactMessage: string[];
+  commands: Discord.Collection<string, SlashCommand>;
+
+  // "Services"
+  log: LogService;
+  permissionService: PermissionService;
+  reactHandler: ReactionHandler;
 
   constructor() {
     super({
-      partials: ['REACTION'],
+      partials: ['REACTION', 'MESSAGE'],
+      intents: [
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.DIRECT_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
     });
     this.config = config;
-    this.commands = new Discord.Collection();
     this.reactMessage = [];
     this.commandsRun = 0;
-    this.reactChannel = new Discord.Collection();
-    this.guildFolders = new Discord.Collection<string, IFolder[]>();
-    this.folderContents = new Discord.Collection<number, IFolderReactEmoji>();
-    this.joinRoles = new Discord.Collection<string, Partial<IJoinRole>[]>();
 
-    commandHandler(this);
-    /**
-     * V12 is a pain and now we have to handle all the packets ourselves since nothing is cahced.
-     * Fun. The bot is about roles so I better handle add/remove
-     */
-    this.on('raw', (packet) => handle_packet(packet, this));
+    this.log = new LogService(`RoleBot`);
+    this.permissionService = new PermissionService(this);
+    this.reactHandler = new ReactionHandler();
+
+    this.commands = new Discord.Collection();
 
     this.on('ready', (): void => {
-      console.log(`[Started]: ${new Date()}`);
-
-      if (this.user) {
-        this.user
-          .setPresence({
-            activity: { name: `rb help`, type: 'WATCHING' },
-            status: 'dnd',
-          })
-          .catch(console.error);
-      }
-    });
-    this.on('message', (message): void =>
-      msg(this, message as Discord.Message)
-    );
-    this.on('guildMemberAdd', (member) =>
-      joinRole(member as Discord.GuildMember, this.joinRoles)
-    );
-    this.on('guildCreate', (guild): void => {
-      // const G_ID = "567819334852804626"; - Support guild id
-      const C_ID = '661410527309856827';
-      const embed = new Discord.MessageEmbed();
-
-      embed
-        .setColor(3066993)
-        .setTitle('**Joined Guild**')
-        .setThumbnail(guild.iconURL() || '')
-        .setDescription(guild.name)
-        .addField('Member size:', guild.memberCount)
-        .addField('Guilds:', this.guilds.cache.size)
-        .addField('Guild ID:', guild.id);
-
-      (this.channels.cache.get(C_ID) as Discord.TextChannel).send(embed);
-
-      logger(
-        `Joined - { guildId: ${guild.id}, guildName: ${guild.name}, ownerId: ${guild.ownerID}, numMembers: ${guild.memberCount}}`,
-        'guilds.log'
+      this.log.debug(`[Started]: ${new Date()}`);
+      this.log.info(
+        `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
+
+      // Discord will eventually drop the presence if it's not "updated" periodically.
+      setInterval(() => this.updatePresence(), 10000);
     });
-    this.on('guildDelete', (guild): void => removed(guild, this));
+
+    this.on('interactionCreate', async (interaction) =>
+      InteractionHandler.handleInteraction(interaction, this)
+    );
+
+    /**
+     * Have to handle raw packets and parse out the reaction ones.
+     * This is required because if the bot restarts it has no memory of old messages, especially
+     * its own messages that are monitored for role management.
+     */
+    this.on('raw', (r) => handle_packet(r, this));
+    this.on('guildMemberAdd', (member) => joinRole(member, this));
+    this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
+    this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
     // React role handling
-    this.on('messageReactionAdd', (reaction, user) =>
-      this.handleReaction(reaction, user, 'add')
-    );
-    this.on('messageReactionRemove', (reaction, user) =>
-      this.handleReaction(reaction, user, 'remove')
-    );
+    this.on('messageReactionAdd', (...r) => {
+      this.handleReaction(...r, 'add');
+    });
+    this.on('messageReactionRemove', (...r) => {
+      this.handleReaction(...r, 'remove');
+    });
     /**
      * Whenever roles get deleted or changed let's update RoleBots DB.
      * Remove roles deleted and update role names.
      */
-    this.on('roleDelete', (role) => roleDelete(role, this));
-    this.on('roleUpdate', (oldRole, newRole) =>
-      roleUpdate(oldRole, newRole, this)
-    );
+    //this.on('roleDelete', (role) => roleDelete(role, this));
+    //this.on('roleUpdate', (...r) => roleUpdate(...r, this));
   }
 
-  handleReaction = async (
-    reaction: Discord.MessageReaction,
-    user: Discord.User | Discord.PartialUser,
-    type: string
-  ) => {
-    try {
-      if (!reaction || user.bot) return;
-      const { message, emoji } = reaction;
-      const { guild } = message;
-      if (this.reactMessage.includes(message.id) && guild) {
-        const id = emoji.id || emoji.name;
-        const emoji_role = getRoleByReaction(id, guild.id);
-        // Remove reaction since it doesn't exist.
-        if (!emoji_role && type === 'add') {
-          reaction.users.remove(user.id).catch(console.error);
-          return;
-        } else if (!emoji_role) return;
+  private updatePresence = () => {
+    if (!this.user)
+      return this.log.error(`Can't set presence due to client user missing.`);
 
-        const { role_id } = emoji_role;
-
-        if (!role_id) return;
-
-        const role = guild.roles.cache.get(role_id);
-        let member = guild.members.cache.get(user.id);
-
-        if (!member) {
-          console.log(
-            `Role Exist: ${Boolean(
-              role
-            )} Role ${type} - Failed to get member from cache. Going to fetch and retry.... guild[${
-              guild.id
-            }] - user[${user.id}]`
-          );
-          await guild.members.fetch(user.id);
-          member = guild.members.cache.get(user.id);
-        }
-
-        if (!role)
-          throw new Error(`Role does not exist. Possibly deleted from server.`);
-        if (!member)
-          throw new Error(`Member not found: ${user.username} - ${user.id}`);
-
-        switch (type) {
-          case 'add':
-            member.roles.add(role).catch(console.error);
-            break;
-          case 'remove':
-            member.roles.remove(role).catch(console.error);
-        }
-
-        return;
-      }
-
-      return;
-    } catch (e) {
-      logger(`Error occured trying to ${type} react-role: ${e}`, 'errors.log');
-    }
-  };
-
-  randomPres = (): void => {
-    const user = this.user;
-    if (!user) return console.log('Client dead?');
-
-    user
-      .setPresence({
-        activity: { name: `rb help`, type: 'WATCHING' },
-        status: 'dnd',
-      })
-      .catch(console.error);
-  };
-
-  /**
-   * Hmm, the issue currently is being limited by Discords API
-   * Need to find out how clear guilds messages by bot vs custom.
-   * Maybe a new system is in place
-   */
-  async loadReactMessage(): Promise<void> {
-    const rows = getReactMessages();
-
-    for (const r of rows) {
-      const M_ID = r.message_id;
-      this.reactMessage.push(M_ID);
-    }
-  }
-
-  /**
-   * I might kill this role system off.
-   */
-  async loadRoles(): Promise<void> {
-    const GUILD_IDS = this.guilds.cache.keys();
-
-    for (const g_id of GUILD_IDS) {
-      const joinRoles = getJoinRoles(g_id);
-
-      const roles: Partial<IJoinRole>[] = joinRoles.map((r) => ({
-        role_name: r.role_name,
-        role_id: r.role_id,
-      }));
-
-      this.joinRoles.set(g_id, roles);
-    }
-  }
-
-  async loadFolders(): Promise<void> {
-    this.guilds.cache.forEach((g) => {
-      const FOLDERS = guildFolders(g.id);
-      if (!FOLDERS || !FOLDERS.length) return;
-      this.guildFolders.set(g.id, FOLDERS);
-      for (const f of FOLDERS) {
-        const roles = folderContent(f.id);
-        let r = roles.map((r) => ({
-          role_id: r.role_id,
-          role_name: r.role_name,
-          emoji_id: r.emoji_id,
-        }));
-
-        if (r.length === 1 && r[0].role_id === null) r = [];
-
-        this.folderContents.set(f.id, {
-          id: f.id,
-          label: f.label,
-          guild_id: g.id,
-          roles: r,
-        });
-      }
+    this.user.setPresence({
+      activities: [
+        {
+          name: 'Use /help for commands!',
+          type: 'LISTENING',
+        },
+      ],
+      status: 'dnd',
     });
-  }
+  };
 
-  async start() {
+  private handleReaction = async (
+    reaction: Discord.MessageReaction | Discord.PartialMessageReaction,
+    user: Discord.User | Discord.PartialUser,
+    type: 'add' | 'remove'
+  ) => {
+    return this.reactHandler.handleReaction(reaction, user, type);
+  };
+
+  public start = async () => {
+    /**
+     * Connect to postgres with all the entities.
+     * URL points to my home server.
+     * SYNC_DB should only be true if on dev.
+     */
+    await createConnection({
+      type: 'postgres',
+      url: config.POSTGRES_URL,
+      synchronize: config.SYNC_DB,
+      entities: [ReactMessage, ReactRole, Category, GuildConfig],
+    })
+      .then(() => {
+        this.log.debug(`Successfully connected to postgres DB.`);
+      })
+      .catch((e) => {
+        this.log.critical(`Failed to connect to postgres.`);
+        this.log.critical(`${e}`);
+      });
+
+    this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
-    await this.loadRoles();
-    await this.loadFolders();
-    await this.loadReactMessage();
-  }
+    this.log.info('Bot connected.');
+
+    // Slash commands can only load once the bot is connected?
+    commandHandler(this);
+  };
 }

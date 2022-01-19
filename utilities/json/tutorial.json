@@ -1,0 +1,32 @@
+{
+  "embeds": [
+    {
+      "title": "Where to start. | Page 1",
+      "description": "RoleBot's been reworked quite a bit! With this new :tada:cleanup:tada: RoleBot can help manage your react roles a lot easier now!\n\n**Firstly**, RoleBot used to have a thing called \"folders\". That's been renamed to \"category\". It just felt right, yknow?\n\n**Secondly**, RoleBot now forces you to use categories as a way to manage all of your react roles. It's easier to track things with a category.\n\n**To start off** let's create a category with the `/category-create` command. I'm going to make a **Colors** category and store color react roles in it later.",
+      "images": [
+        ""
+      ]
+    },
+    {
+      "title": "Creating React Roles. | Page 2",
+      "description": "Creating react roles is easy! Simply do `/react-role` and pass in the role and emoji you want paired together.\n\nReact roles aren't very useful by themselves. They need to be placed into a `category`. Again these are also easy to make using the `/category-create` command. You can make react roles inside a category `mutually exclusive`. This means a user can only have one react role from that category at a time when reacting.",
+      "images": [
+        ""
+      ]
+    },
+    {
+      "title": "Adding React Roles to Categories. | Page 3",
+      "description": "Now we're getting to the most important part, adding react roles to a category. Again it's fairly simple! Just use the `/category-add` command, this will give you a dropdown menu to select a category from.\nWhen you select your category RoleBot will then show you all categoriless react roles as buttons where you can then click on them to add them to the category! *Pretty simple huh?*",
+      "images": [
+        ""
+      ]
+    },
+    {
+      "title": "Setting up the React Role messages. | Page 4",
+      "description": "So now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n\nThere are **two** different ways we can have RoleBot work for us. RoleBot can use its own messages in the `/react-channel` command, where it will create am embed for each category and list the react roles inside it and thenr eact to it, thus watching all reactions on it, or.\n\nWe can have RoleBot monitor custom messages. Do you have a cutely formatted message you want to use instead of RoleBot's embeds? Use `/react-message` and give the command a message link. This will allow youu to select which category RoleBot uses for that message. ",
+      "images": [
+        ""
+      ]
+    }
+  ]
+}
