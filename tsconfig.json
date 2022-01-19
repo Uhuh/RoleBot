@@ -14,7 +14,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "resolveJsonModule": true
   },
   "include": ["src/", "events/", "commands/", "utilities/"],
   "compileOnSave": true
