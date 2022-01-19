@@ -47,7 +47,8 @@ export const handle_packet = async (packet: any, client: RoleBot) => {
     } else if (packet.t === 'MESSAGE_REACTION_REMOVE') {
       client.emit('messageReactionRemove', react, user);
     }
-  } catch {
-    log.error(`Issue handling packet.`);
+  } catch (e) {
+    log.error(`Issue handling packet for guild[${packet.d.guild_id}].`);
+    log.critical(`${e}`);
   }
 };
