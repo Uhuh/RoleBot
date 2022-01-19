@@ -70,7 +70,7 @@ export class ReactDeleteCommand extends SlashCommand {
       );
 
       const emojiMention =
-        reactRole.emojiId.length > 3
+        reactRole.emojiId.length > 6
           ? `<:n:${reactRole.emojiId}>`
           : reactRole.emojiId;
 

@@ -7,6 +7,7 @@ import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import RoleBot from '../../src/bot';
+import { spliceIntoChunks } from '../../utilities/functions/spliceChunks';
 
 export class ListCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -72,9 +73,10 @@ export class ListCategoryCommand extends SlashCommand {
       embeds.push(await EmbedService.categoryReactRoleEmbed(cat));
     }
 
-    interaction.channel?.send({
-      content: `And here they are!`,
-      embeds,
-    });
+    for (const chunk of spliceIntoChunks(embeds, 10)) {
+      interaction.channel?.send({
+        embeds: chunk,
+      });
+    }
   };
 }

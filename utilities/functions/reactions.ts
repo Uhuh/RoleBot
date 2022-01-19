@@ -92,7 +92,7 @@ export const updateReactMessages = async (
    * Make sure this is not their message. We cannot edit user messages.
    */
   if (!reactMessage.isCustomMessage) {
-    return await message
+    await message
       .edit({
         embeds: [embed],
       })

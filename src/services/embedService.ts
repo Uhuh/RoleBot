@@ -4,6 +4,7 @@ import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
 import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/database';
+import * as tutorialJson from '../../utilities/json/tutorial.json';
 
 export class EmbedService {
   constructor() {}
@@ -65,11 +66,11 @@ export class EmbedService {
     return reactRoles
       .map(
         (r) =>
-          `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
+          `${r.emojiId.length > 6 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
             r.roleId
-          }>\n`
+          }>`
       )
-      .join('');
+      .join('\n');
   };
 
   /**
@@ -124,14 +125,7 @@ export class EmbedService {
     reactRoles: ReactRole[],
     category: Category
   ) => {
-    const reactRolesString = reactRoles
-      .map(
-        (r) =>
-          `${r.emojiId.length > 3 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
-            r.roleId
-          }>`
-      )
-      .join('\n');
+    const reactRolesString = this.reactRolesFormattedString(reactRoles);
 
     const embed = new MessageEmbed();
 
@@ -139,6 +133,19 @@ export class EmbedService {
       .setTitle(category.name)
       .setDescription(`${category.description}\n\n${reactRolesString}`)
       .setColor(COLOR.DEFAULT);
+
+    return embed;
+  };
+
+  public static tutorialEmbed = (pageId: number) => {
+    /* Extract out all of the embed info needed to make this. Should be simple. */
+    const embedJson = tutorialJson['embeds'][pageId];
+    const embed = new MessageEmbed();
+
+    embed
+      .setColor(COLOR.DEFAULT)
+      .setTitle(embedJson.title)
+      .setDescription(embedJson.description);
 
     return embed;
   };

@@ -94,8 +94,8 @@ export default class RoleBot extends Discord.Client {
     this.user.setPresence({
       activities: [
         {
-          name: 'reactions...',
-          type: 'WATCHING',
+          name: 'Use /help for commands!',
+          type: 'LISTENING',
         },
       ],
       status: 'dnd',
@@ -111,13 +111,15 @@ export default class RoleBot extends Discord.Client {
   };
 
   public start = async () => {
+    /**
+     * Connect to postgres with all the entities.
+     * URL points to my home server.
+     * SYNC_DB should only be true if on dev.
+     */
     await createConnection({
       type: 'postgres',
       url: config.POSTGRES_URL,
       synchronize: config.SYNC_DB,
-      cache: {
-        duration: 30000,
-      },
       entities: [ReactMessage, ReactRole, Category, GuildConfig],
     })
       .then(() => {

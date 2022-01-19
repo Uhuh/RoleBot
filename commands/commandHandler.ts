@@ -28,6 +28,10 @@ export default (client: RoleBot) => {
     commandsJson.push(cmd.data.toJSON());
   }
 
+  // Deleting global commands. (:
+  //deleteSlashCommands();
+
+  // Generate global slash commands
   generateSlashCommands(commandsJson);
 };
 
@@ -36,17 +40,39 @@ async function generateSlashCommands(
 ) {
   const log = new LogService('GenerateSlashCommands');
   // Make a request to Discord to create all the slash commands.
-  (async () => {
-    try {
-      await rest.put(
-        Routes.applicationGuildCommands(CLIENT_ID || '', '756395872811483177'),
-        {
-          body: commandsJson,
-        }
-      );
-      log.info(`Created slash commands successfully.`);
-    } catch (e) {
-      log.error(`Errored when trying to create slash commands.\n${e}\n`);
-    }
-  })();
+  try {
+    await rest.put(
+      Routes.applicationGuildCommands(CLIENT_ID, '930471371128061962'),
+      {
+        body: commandsJson,
+      }
+    );
+    log.info(`Created slash commands successfully.`);
+  } catch (e) {
+    log.error(`Errored when trying to create slash commands.\n${e}\n`);
+  }
+}
+
+/**
+ * I just need a simple way to delete all the stupid global commands.
+ */
+async function deleteSlashCommands() {
+  const log = new LogService('DeleteSlashCommands');
+
+  try {
+    rest.get(Routes.applicationCommands(CLIENT_ID)).then((data) => {
+      const promises = [];
+      //@ts-ignore
+      for (const command of data) {
+        promises.push(
+          rest.delete(`${Routes.applicationCommands(CLIENT_ID)}/${command.id}`)
+        );
+      }
+
+      console.log(data);
+      return Promise.all(promises);
+    });
+  } catch (e) {
+    log.error(`Errored when trying to delete global slash commands.\n${e}\n`);
+  }
 }
