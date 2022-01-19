@@ -121,7 +121,7 @@ export class ReactRoleCommand extends SlashCommand {
 
     if (reactRole) {
       const emojiMention =
-        reactRole?.emojiId.length > 6
+        reactRole?.emojiId.length > 15
           ? `<:n:${reactRole?.emojiId}>`
           : reactRole?.emojiId;
 
@@ -140,7 +140,7 @@ export class ReactRoleCommand extends SlashCommand {
 
     if (reactRole) {
       const emojiMention =
-        reactRole?.emojiId.length > 6
+        reactRole?.emojiId.length > 15
           ? `<:n:${reactRole?.emojiId}>`
           : reactRole?.emojiId;
 
@@ -167,7 +167,7 @@ export class ReactRoleCommand extends SlashCommand {
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
 
-        const emojiMention = emojiId.length > 6 ? `<:n:${emojiId}>` : emojiId;
+        const emojiMention = emojiId.length > 15 ? `<:n:${emojiId}>` : emojiId;
 
         interaction
           .reply({

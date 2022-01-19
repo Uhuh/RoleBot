@@ -66,7 +66,7 @@ export class EmbedService {
     return reactRoles
       .map(
         (r) =>
-          `${r.emojiId.length > 6 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
+          `${r.emojiId.length > 15 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
             r.roleId
           }>`
       )

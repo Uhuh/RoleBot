@@ -4,7 +4,6 @@ import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/database';
-import { EmbedService } from '../../src/services/embedService';
 import {
   ReactMessageUpdate,
   updateReactMessages,
@@ -70,7 +69,7 @@ export class ReactDeleteCommand extends SlashCommand {
       );
 
       const emojiMention =
-        reactRole.emojiId.length > 6
+        reactRole.emojiId.length > 15
           ? `<:n:${reactRole.emojiId}>`
           : reactRole.emojiId;
 
