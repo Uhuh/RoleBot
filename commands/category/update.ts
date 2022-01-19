@@ -102,7 +102,7 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     if (!category) {
       this.log.debug(
-        `Category not found with name[${name}] in guild[${interaction.guildId}]`
+        `Category not found with categoryId[${reactMessage.categoryId}]] in guild[${interaction.guildId}]`
       );
 
       return interaction
