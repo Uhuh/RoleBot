@@ -69,7 +69,7 @@ export class HelpCommand extends SlashCommand {
       .setTimestamp(new Date());
 
     embed.setDescription(
-      `Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!${''}\nI've broken them up by category for your convenience.`
+      `Hey! I got a new look. **If you're unsure what to do check out \`/tutorial\`!!**\n\n\nThanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!${''}\nI've broken them up by category for your convenience.`
     );
 
     interaction

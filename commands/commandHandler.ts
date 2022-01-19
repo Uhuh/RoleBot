@@ -32,7 +32,7 @@ export default (client: RoleBot) => {
   //deleteSlashCommands();
 
   // Generate global slash commands
-  generateSlashCommands(commandsJson);
+  // generateSlashCommands(commandsJson);
 };
 
 async function generateSlashCommands(
@@ -41,12 +41,9 @@ async function generateSlashCommands(
   const log = new LogService('GenerateSlashCommands');
   // Make a request to Discord to create all the slash commands.
   try {
-    await rest.put(
-      Routes.applicationGuildCommands(CLIENT_ID, '930471371128061962'),
-      {
-        body: commandsJson,
-      }
-    );
+    await rest.put(Routes.applicationCommands(CLIENT_ID), {
+      body: commandsJson,
+    });
     log.info(`Created slash commands successfully.`);
   } catch (e) {
     log.error(`Errored when trying to create slash commands.\n${e}\n`);
