@@ -6,11 +6,13 @@ import {
 } from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
+  DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
   GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_MESSAGE_ID,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
+import { reactToMessage } from '../../utilities/functions/reactions';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -128,26 +130,51 @@ export class UpdateCategoryCommand extends SlashCommand {
       });
     }
 
-    const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
+    try {
+      const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
-    message
-      .edit({ embeds: [embed] })
-      .then(() => {
-        this.log.debug(`Updated category[${category.id}] embed.`);
+      // Remove all react messages since they are created and depend on RoleBots reactions
+      await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
 
-        interaction.reply({
-          ephemeral: true,
-          content: `Hey! I updated the react role embed message related to this category.`,
+      // Clear all reactions to remove and old incorrect reactions.
+      await message.reactions.removeAll();
+
+      await message
+        .edit({ embeds: [embed] })
+        .then(() => {
+          this.log.debug(`Updated category[${category.id}] embed.`);
+
+          interaction.reply({
+            ephemeral: true,
+            content: `Hey! I updated the react role embed message related to this category.`,
+          });
+        })
+        .catch((e) => {
+          this.log.error(
+            `Failed to update message for category[${category.id}]`
+          );
+
+          interaction.reply({
+            ephemeral: true,
+            content: `Hey! I wasn't able to update the message for some reason.`,
+          });
         });
-      })
-      .catch((e) => {
-        this.log.error(`Failed to update message for category[${category.id}]`);
 
-        interaction.reply({
-          ephemeral: true,
-          content: `Hey! I wasn't able to update the message for some reason.`,
-        });
-      });
+      // Re-react to the message with the updated react role list.
+      reactToMessage(
+        message,
+        categoryRoles,
+        channel.id,
+        reactMessage.categoryId,
+        reactMessage.isCustomMessage,
+        this.log
+      );
+    } catch (e) {
+      this.log.error(
+        `Failed to edit category[${category.id}] embed and re-react to it for guild[${interaction.guildId}]`
+      );
+      this.log.critical(`${e}`);
+    }
   };
 }
 
