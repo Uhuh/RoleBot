@@ -18,6 +18,7 @@ import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { CLIENT_ID } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import emojiReg from 'emoji-regex';
 
 export class ReactRoleCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -32,6 +33,8 @@ export class ReactRoleCommand extends SlashCommand {
     this.addRoleOption('role', 'The role you want to use.', true);
     this.addStringOption('emoji', 'The emoji you want to use.', true);
   }
+
+  emojiRegex = emojiReg();
 
   execute = async (interaction: CommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
@@ -85,17 +88,35 @@ export class ReactRoleCommand extends SlashCommand {
         });
     }
 
-    // Custom emojis Look like this: <:name:id>
-    const emojiRegex = /[0-9]{10,}/g.exec(emoji);
+    // Custom emojis Look like this: <a?:name:id>
+    const customEmoji = /(a?):\w+:(\d{10,20})/g.exec(emoji);
 
     // Default set the "emojiId" as the input. It's most likely just unicode.
     let emojiId = emoji;
+    // I need this information for when the emoji is mentioned.
+    let isEmojiAnimated = false;
 
     // This is only matched if a custom discord emoji was used.
-    if (emojiRegex) {
-      const id = emojiRegex[0];
+    if (customEmoji) {
+      /**
+       * 0 - Matched regex
+       * 1 - 'a' if it is animated. Otherwise it's empty.
+       * 2 - ID
+       */
+      isEmojiAnimated = customEmoji[1] === 'a';
+      emojiId = customEmoji[2];
+    } else {
+      const unicodeEmoji = emoji.match(this.emojiRegex);
 
-      emojiId = id;
+      // Please make sure that no NON unicode emojis gets pass.
+      if (!unicodeEmoji) {
+        return interaction.reply({
+          ephemeral: true,
+          content: `Hey! You didn't pass in a proper emoji. You need to either pass in a Discord emoji or a servers custom emoji.`,
+        });
+      }
+
+      emojiId = unicodeEmoji[0];
     }
 
     if (!emojiId || emojiId === '') {
@@ -120,10 +141,7 @@ export class ReactRoleCommand extends SlashCommand {
     let reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
 
     if (reactRole) {
-      const emojiMention =
-        reactRole?.emojiId.length > 15
-          ? `<:n:${reactRole?.emojiId}>`
-          : reactRole?.emojiId;
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
       return interaction
         .reply({
@@ -136,14 +154,13 @@ export class ReactRoleCommand extends SlashCommand {
         });
     }
 
+    /**
+     * Also check that the role isn't used already.
+     */
     reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
 
     if (reactRole) {
-      const emojiMention =
-        reactRole?.emojiId.length > 15
-          ? `<:n:${reactRole?.emojiId}>`
-          : reactRole?.emojiId;
-
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
       return interaction
         .reply({
           ephemeral: true,
@@ -155,19 +172,25 @@ export class ReactRoleCommand extends SlashCommand {
         });
     }
 
+    /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
+    const emojiTag = customEmoji
+      ? `<${isEmojiAnimated ? 'a' : ''}:n:${emojiId}>`
+      : undefined;
+
     CREATE_REACT_ROLE(
       role.name,
       role.id,
       emojiId,
+      emojiTag,
       interaction.guildId,
       ReactRoleType.normal
     )
-      .then(() => {
+      .then((reactRole) => {
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
         );
 
-        const emojiMention = emojiId.length > 15 ? `<:n:${emojiId}>` : emojiId;
+        const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
         interaction
           .reply({
