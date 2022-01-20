@@ -64,12 +64,7 @@ export class EmbedService {
 
   public static reactRolesFormattedString = (reactRoles: ReactRole[]) => {
     return reactRoles
-      .map(
-        (r) =>
-          `${r.emojiId.length > 15 ? `<:n:${r.emojiId}>` : r.emojiId} - <@&${
-            r.roleId
-          }>`
-      )
+      .map((r) => `${r.emojiTag ?? r.emojiId} - <@&${r.roleId}>`)
       .join('\n');
   };
 

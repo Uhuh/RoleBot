@@ -8,12 +8,14 @@ export const CREATE_REACT_ROLE = async (
   name: string,
   roleId: string,
   emojiId: string,
+  emojiTag: string | undefined,
   guildId: string,
   type: ReactRoleType
 ) => {
   const reactRole = new ReactRole();
 
   reactRole.emojiId = emojiId;
+  reactRole.emojiTag = emojiTag;
   reactRole.roleId = roleId;
   reactRole.guildId = guildId;
   reactRole.name = name;
@@ -60,6 +62,22 @@ export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
       },
     },
   });
+};
+
+export const UPDATE_REACT_ROLE_EMOJI_TAG = async (
+  roleId: string,
+  emojiTag: string
+) => {
+  const reactRole = await ReactRole.findOne({
+    where: { roleId },
+  });
+
+  if (!reactRole)
+    throw Error(`Role[${roleId}] doesn't exist despite having just found it.`);
+
+  reactRole.emojiTag = emojiTag;
+
+  return await reactRole.save();
 };
 
 export const GET_REACT_ROLE_BY_EMOJI = async (

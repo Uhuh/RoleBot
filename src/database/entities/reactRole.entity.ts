@@ -25,8 +25,13 @@ export class ReactRole extends BaseEntity {
   @Column()
   roleId!: string;
 
+  /* If it's a custom emoji this will be the 16 character ID, otherwise it'll be the unicode. */
   @Column()
   emojiId!: string;
+
+  /* If the emoji is custom this will be the emoji mention. <(a?):name:id> Because emojis can be animated and Discord sucks. */
+  @Column({ nullable: true })
+  emojiTag?: string;
 
   @Column()
   guildId!: string;

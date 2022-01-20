@@ -68,10 +68,7 @@ export class ReactDeleteCommand extends SlashCommand {
         `Successfully removed guilds[${interaction.guildId}] react role[${role.id}]`
       );
 
-      const emojiMention =
-        reactRole.emojiId.length > 15
-          ? `<:n:${reactRole.emojiId}>`
-          : reactRole.emojiId;
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
       interaction
         .reply({

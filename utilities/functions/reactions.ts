@@ -21,7 +21,7 @@ export const reactToMessage = (
 ) => {
   categoryRoles.map((r) => {
     message
-      .react(r.emojiId.length > 15 ? `n:${r.emojiId}` : r.emojiId)
+      .react(r?.emojiTag ? `n:${r.emojiId}` : r.emojiId)
       .then(() => {
         CREATE_REACT_MESSAGE({
           messageId: message.id,
