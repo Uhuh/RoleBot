@@ -187,10 +187,19 @@ export class AddCategoryCommand extends SlashCommand {
       category.id
     );
 
-    interaction.update({
-      content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
-      components: roleButtons,
-    });
+    interaction
+      .update({
+        content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
+        components: roleButtons,
+      })
+      .catch((e) => {
+        this.log.error(
+          `Failed to send category[${category.id}] buttons for guild[${interaction.guildId}]`
+        );
+        interaction.update(
+          `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`
+        );
+      });
   };
 
   /**
