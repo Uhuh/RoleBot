@@ -113,7 +113,7 @@ export class ReactMessageCommand extends SlashCommand {
     if (!messageLink) {
       return await interaction
         .reply(
-          `Hmm, I'm not what happened but I can't see the message link. Please try again.`
+          `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`
         )
         .catch((e) => {
           this.log.error(`Interaction failed.`);

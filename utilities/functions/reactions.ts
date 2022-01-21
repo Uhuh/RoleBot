@@ -35,7 +35,9 @@ export const reactToMessage = (
       })
       .catch((e) => {
         log.error(
-          `Failed to react to message[${message.id}] for guild[${message.guildId}]`
+          `Failed to react to message[${message.id}] with emoji[${
+            r.emojiTag ?? r.emojiId
+          }] in guild[${message.guildId}]`
         );
         log.error(`${e}`);
       });
