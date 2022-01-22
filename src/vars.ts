@@ -1,6 +1,6 @@
 // Wonderfully hardcoded things.
 export const CLIENT_ID: string = '493668628361904139';
-export const SUPPORT_URL = 'https://discord.gg/2fEpJTWzAU';
+export const SUPPORT_URL = 'https://discord.gg/9BYN266sC4';
 export const AVATAR_URL =
   'https://cdn.discordapp.com/avatars/471811409886314496/e46c68a64b88316435adf4e1ac0402d0.webp?size=2048';
 export const VOTE_URL = `https://top.gg/bot/${CLIENT_ID}/vote`;
