@@ -74,9 +74,15 @@ export class ListCategoryCommand extends SlashCommand {
     }
 
     for (const chunk of spliceIntoChunks(embeds, 10)) {
-      interaction.channel?.send({
-        embeds: chunk,
-      });
+      interaction.channel
+        ?.send({
+          embeds: chunk,
+        })
+        .catch(() =>
+          this.log.error(
+            `Failed to send category embeds to channel[${interaction.channel?.id}] in guild[${interaction.guildId}]`
+          )
+        );
     }
   };
 }

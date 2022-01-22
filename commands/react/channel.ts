@@ -192,6 +192,13 @@ Why do I need these permissions in this channel?
             `Failed to send category[${category.id}] react embed to channel[${channel.id}] for guild[${interaction.guildId}]`
           );
           this.log.error(`${e}`);
+          interaction.channel
+            ?.send(
+              `Hey! I failed to send those embeds to <#${channel.id}>. Do I have send **embed** and message permissions for it?`
+            )
+            .catch(() =>
+              this.log.error(`Failed to warn user aboput message perms.`)
+            );
         });
 
       await new Promise((res) => {

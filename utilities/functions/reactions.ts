@@ -19,29 +19,31 @@ export const reactToMessage = (
   isCustomMessage: boolean,
   log: LogService
 ) => {
-  categoryRoles.map((r) => {
-    message
-      .react(r?.emojiTag ? `n:${r.emojiId}` : r.emojiId)
-      .then(() => {
-        CREATE_REACT_MESSAGE({
-          messageId: message.id,
-          emojiId: r.emojiId,
-          roleId: r.roleId,
-          guildId: message.guildId ?? '',
-          categoryId: categoryId,
-          isCustomMessage,
-          channelId,
+  return Promise.all(
+    categoryRoles.map((r) => {
+      message
+        .react(r?.emojiTag ? `n:${r.emojiId}` : r.emojiId)
+        .then(() => {
+          CREATE_REACT_MESSAGE({
+            messageId: message.id,
+            emojiId: r.emojiId,
+            roleId: r.roleId,
+            guildId: message.guildId ?? '',
+            categoryId: categoryId,
+            isCustomMessage,
+            channelId,
+          });
+        })
+        .catch((e) => {
+          log.error(
+            `Failed to react to message[${message.id}] with emoji[${
+              r.emojiTag ?? r.emojiId
+            }] in guild[${message.guildId}]`
+          );
+          log.error(`${e}`);
         });
-      })
-      .catch((e) => {
-        log.error(
-          `Failed to react to message[${message.id}] with emoji[${
-            r.emojiTag ?? r.emojiId
-          }] in guild[${message.guildId}]`
-        );
-        log.error(`${e}`);
-      });
-  });
+    })
+  );
 };
 
 export enum ReactMessageUpdate {
