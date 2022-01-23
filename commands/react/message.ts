@@ -123,7 +123,14 @@ export class ReactMessageCommand extends SlashCommand {
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
-    const channel = await interaction.guild?.channels.fetch(channelId);
+    const channel = await interaction.guild?.channels
+      .fetch(channelId)
+      .catch((e) => {
+        this.log.error(
+          `Failed to fetch channel[${channelId}] in guild[${interaction.guildId}]`
+        );
+        this.log.critical(e);
+      });
 
     if (!channel || !isTextChannel(channel)) {
       return await interaction
@@ -136,7 +143,12 @@ export class ReactMessageCommand extends SlashCommand {
         });
     }
 
-    const message = await channel.messages.fetch(messageId);
+    const message = await channel.messages.fetch(messageId).catch((e) => {
+      this.log.error(
+        `Failed to fetch message[${messageId}] for channel[${channel.id}]`
+      );
+      this.log.critical(`${e}`);
+    });
 
     if (!message) {
       return await interaction

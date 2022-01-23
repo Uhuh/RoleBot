@@ -13,9 +13,16 @@ export const handle_packet = async (packet: any, client: RoleBot) => {
     ) {
       return;
     }
-    const channel = await client.channels.fetch(packet.d.channel_id, {
-      cache: false,
-    });
+
+    const channel = await client.channels
+      .fetch(packet.d.channel_id, {
+        cache: false,
+      })
+      .catch((e) => {
+        log.error(`Failed to fetch channel[${packet.d.channel_id}]`);
+        log.critical(`${e}`);
+      });
+
     if (!channel || channel.type !== 'GUILD_TEXT') {
       return;
     }
@@ -35,10 +42,13 @@ export const handle_packet = async (packet: any, client: RoleBot) => {
       //Emojis without a unicode name must be referenced
       packet.d.emoji.id || packet.d.emoji.name
     );
-    const user = await client.users.fetch(packet.d.user_id);
+    const user = await client.users.fetch(packet.d.user_id).catch((e) => {
+      log.error(`Failed to fetch user[${packet.d.user_id}]`);
+      log.critical(`${e}`);
+    });
 
     // Just... ignore react if it doesn't exist anymore????
-    if (user.bot || !react) {
+    if (!user || user.bot || !react) {
       return; // Ignore bots. >:((((
     }
 
