@@ -110,10 +110,15 @@ export class ReactRoleCommand extends SlashCommand {
 
       // Please make sure that no NON unicode emojis gets pass.
       if (!unicodeEmoji) {
-        return interaction.reply({
-          ephemeral: true,
-          content: `Hey! You didn't pass in a proper emoji. You need to either pass in a Discord emoji or a servers custom emoji.`,
-        });
+        return interaction
+          .reply({
+            ephemeral: true,
+            content: `Hey! You didn't pass in a proper emoji. You need to either pass in a Discord emoji or a servers custom emoji.`,
+          })
+          .catch((e) => {
+            this.log.error(`Failed to alert user of invalid emojis.`);
+            this.log.critical(`${e}`);
+          });
       }
 
       emojiId = unicodeEmoji[0];
