@@ -38,7 +38,11 @@ export class ReactChannelCommand extends SlashCommand {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
-    // Verify everything exist, this gets very repetitive.
+
+    // Defer because of Discord rate limits.
+    interaction.deferReply({
+      ephemeral: true,
+    });
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) => {
@@ -163,8 +167,13 @@ Why do I need these permissions in this channel?
         });
     }
 
-    interaction.deferReply({
-      ephemeral: true,
+    /* There might be a better solution to this. Potentially reply first, then update the interaction later. Discord interactions feel so incredibly inconsistent though. So for now force users to WAIT the whole 3 seconds so that Discord doesn't cry. */
+    await new Promise((res) => {
+      setTimeout(
+        () =>
+          res(`I have to wait at least 3 seconds before Discord goes crazy.`),
+        3000
+      );
     });
 
     for (const category of categories) {
