@@ -39,10 +39,16 @@ export class ReactChannelCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    // Defer because of Discord rate limits.
-    interaction.deferReply({
-      ephemeral: true,
-    });
+    try {
+      // Defer because of Discord rate limits.
+      interaction.deferReply({
+        ephemeral: true,
+      });
+    } catch (e) {
+      this.log.error(`Failed to defer interaction`);
+      this.log.critical(`${e}`);
+      return;
+    }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) => {

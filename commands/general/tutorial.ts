@@ -43,10 +43,15 @@ export class TutorialCommand extends SlashCommand {
     const embed = EmbedService.tutorialEmbed(pageId);
     const buttons = this.makeButtons(pageId);
 
-    interaction.update({
-      embeds: [embed],
-      components: [buttons],
-    });
+    interaction
+      .update({
+        embeds: [embed],
+        components: [buttons],
+      })
+      .catch((e) => {
+        this.log.error(`Failed to update tutorial interaction`);
+        this.log.critical(`${e}`);
+      });
   };
 
   execute = async (interaction: CommandInteraction) => {
@@ -54,11 +59,16 @@ export class TutorialCommand extends SlashCommand {
 
     const buttons = this.makeButtons(0);
 
-    interaction.reply({
-      ephemeral: true,
-      content: `Hey! Let's get to learning.`,
-      embeds: [embed],
-      components: [buttons],
-    });
+    interaction
+      .reply({
+        ephemeral: true,
+        content: `Hey! Let's get to learning.`,
+        embeds: [embed],
+        components: [buttons],
+      })
+      .catch((e) => {
+        this.log.error(`Failed to send tutorial embeds.`);
+        this.log.critical(`${e}`);
+      });
   };
 }

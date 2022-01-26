@@ -130,7 +130,10 @@ export class AddCategoryCommand extends SlashCommand {
           content: roleButtons.length ? moreRoles : noRolesLeft,
           components: roleButtons,
         })
-        .catch(() => this.log.warning(`Failed to update interaction`));
+        .catch((e) => {
+          this.log.error(`Failed to update interaction`);
+          this.log.critical(`${e}`);
+        });
 
       this.log.debug(
         `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`
