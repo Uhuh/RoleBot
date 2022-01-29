@@ -15,23 +15,27 @@ export const guildUpdate = async (
   client: RoleBot
 ) => {
   const color = type === 'Joined' ? Colors.green : Colors.red;
+  try {
+    const size = (
+      await client.shard?.fetchClientValues('guilds.cache.size')
+    )?.reduce<number>((a, b) => a + Number(b), 0);
 
-  const size = (
-    await client.shard?.fetchClientValues('guilds.cache.size')
-  )?.reduce<number>((a, b) => a + Number(b), 0);
+    const embed = new MessageEmbed();
 
-  const embed = new MessageEmbed();
+    embed
+      .setColor(color)
+      .setTitle(`**${type} Guild**`)
+      .setThumbnail(guild.iconURL() || '')
+      .setDescription(guild.name)
+      .addField('Member size:', `${guild.memberCount}`, true)
+      .addField('Guild ID:', `${guild.id}`, true)
+      .setFooter(`Guilds I'm in: ${size}`);
 
-  embed
-    .setColor(color)
-    .setTitle(`**${type} Guild**`)
-    .setThumbnail(guild.iconURL() || '')
-    .setDescription(guild.name)
-    .addField('Member size:', `${guild.memberCount}`, true)
-    .addField('Guild ID:', `${guild.id}`, true)
-    .setFooter(`Guilds I'm in: ${size}`);
-
-  webhookClient.send({
-    embeds: [embed],
-  });
+    webhookClient.send({
+      embeds: [embed],
+    });
+  } catch (e) {
+    console.error(`Failed to send guild update webhook`);
+    console.error(`${e}`);
+  }
 };

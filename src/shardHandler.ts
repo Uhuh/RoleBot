@@ -18,8 +18,13 @@ export class ShardHandler {
 
   startShards = async (numShards: number) => {
     this.log.info(`Spawning ${numShards} shards...`);
-    this.manager.spawn({
-      amount: numShards,
-    });
+    this.manager
+      .spawn({
+        amount: numShards,
+      })
+      .catch((e) => {
+        this.log.error(`Failed to spawn shard...`);
+        this.log.critical(`${e}`);
+      });
   };
 }
