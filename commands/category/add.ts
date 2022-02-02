@@ -63,6 +63,9 @@ export class AddCategoryCommand extends SlashCommand {
 
     // Should only get here if typeorm throws.
     if (!categoryRoles) {
+      this.log.critical(
+        `Unable to find category roles for category[${categoryId}] in guild[${interaction.guildId}]`
+      );
       return interaction.reply(
         `Hey! Something broke. But I'm working on it, please be patient!`
       );
@@ -96,6 +99,15 @@ export class AddCategoryCommand extends SlashCommand {
           this.log.error(`Interaction failed.`);
           this.log.error(`${e}`);
         });
+    }
+
+    if (categoryRoles.length >= 20) {
+      this.log.debug(
+        `Category[${categoryId}] already has 20 react roles in it.`
+      );
+      return interaction.reply(
+        `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
+      );
     }
 
     if (reactRole.categoryId) {
