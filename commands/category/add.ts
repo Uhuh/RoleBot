@@ -211,9 +211,15 @@ export class AddCategoryCommand extends SlashCommand {
         this.log.error(
           `Failed to send category[${category.id}] buttons for guild[${interaction.guildId}]`
         );
-        interaction.channel?.send(
-          `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`
-        );
+        this.log.critical(`${e}`);
+        interaction.channel
+          ?.send(
+            `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`
+          )
+          .catch((e) => {
+            this.log.error(`Failed to warn user about emojis buttons`);
+            this.log.critical(`${e}`);
+          });
       });
   };
 
