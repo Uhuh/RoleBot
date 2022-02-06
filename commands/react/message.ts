@@ -87,10 +87,15 @@ export class ReactMessageCommand extends SlashCommand {
       );
     }
 
-    interaction.reply({
-      ephemeral: true,
-      content: `I'm reacting to the message with all react roles associated with ${category.name}. Please give me a moment to react fully before obtaining roles.`,
-    });
+    interaction
+      .reply({
+        ephemeral: true,
+        content: `I'm reacting to the message with all react roles associated with ${category.name}. Please give me a moment to react fully before obtaining roles.`,
+      })
+      .catch((e) => {
+        this.log.error(`Failed to tell user we're reacting`);
+        this.log.critical(`${e}`);
+      });
 
     reactToMessage(
       message,
@@ -122,6 +127,17 @@ export class ReactMessageCommand extends SlashCommand {
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
+
+    if (!channelId || !messageId) {
+      return interaction
+        .reply(
+          `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``
+        )
+        .catch((e) => {
+          this.log.error(`Failed to alert user about invalid message link`);
+          this.log.critical(`${e}`);
+        });
+    }
 
     const channel = await interaction.guild?.channels
       .fetch(channelId)

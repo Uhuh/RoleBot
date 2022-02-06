@@ -41,9 +41,16 @@ export class ReactChannelCommand extends SlashCommand {
 
     try {
       // Defer because of Discord rate limits.
-      interaction.deferReply({
-        ephemeral: true,
-      });
+      interaction
+        .deferReply({
+          ephemeral: true,
+        })
+        .catch((e) => {
+          this.log.error(
+            `Failed to defer interaction and the try/catch didn't catch it`
+          );
+          this.log.critical(`${e}`);
+        });
     } catch (e) {
       this.log.error(`Failed to defer interaction`);
       this.log.critical(`${e}`);
