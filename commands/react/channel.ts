@@ -41,7 +41,7 @@ export class ReactChannelCommand extends SlashCommand {
 
     try {
       // Defer because of Discord rate limits.
-      interaction
+      await interaction
         .deferReply({
           ephemeral: true,
         })
@@ -70,7 +70,7 @@ export class ReactChannelCommand extends SlashCommand {
       this.log.debug(`Guild[${interaction.guildId}] has no categories.`);
 
       return interaction
-        .reply(
+        .editReply(
           `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
         )
         .catch((e) => {
@@ -94,7 +94,7 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
       return interaction
-        .reply({
+        .editReply({
           content: allCategoriesAreEmpty,
         })
         .catch((e) => {
@@ -111,7 +111,7 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
       return interaction
-        .reply(
+        .editReply(
           `Hey! I failed to find the channel from the command. Please wait a second and try again.`
         )
         .catch((e) => {
@@ -124,7 +124,7 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
       return interaction
-        .reply(`Hey! I only support sending embeds to text channels!`)
+        .editReply(`Hey! I only support sending embeds to text channels!`)
         .catch((e) => {
           this.log.error(`Interaction failed.`);
           this.log.error(`${e}`);
@@ -140,8 +140,7 @@ export class ReactChannelCommand extends SlashCommand {
 
     if (canClientSendEmbeds === HasPerms.error) {
       return interaction
-        .reply({
-          ephemeral: true,
+        .editReply({
           content: `Hey! I ran into some issues. Could you please wait a second and try again?`,
         })
         .catch((e) => {
@@ -161,8 +160,7 @@ export class ReactChannelCommand extends SlashCommand {
         .join(' ');
 
       return interaction
-        .reply({
-          ephemeral: true,
+        .editReply({
           content:
             `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
             `
