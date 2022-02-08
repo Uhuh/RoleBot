@@ -21,6 +21,9 @@ export class InfoCommand extends SlashCommand {
       .setDescription(
         `
 Thanks for using RoleBot!
+
+Check out my site! https://rolebot.gg
+
 This servers shard ID: ${interaction.guild?.shardId}
 Server count: ${size} servers.
 Latency is ${
