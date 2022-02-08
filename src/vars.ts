@@ -9,7 +9,7 @@ export const VOTE_URL = `https://top.gg/bot/${CLIENT_ID}/vote`;
 export const TOKEN: string = process.env.TOKEN || '';
 export const DB_NAME = process.env.DB_NAME || 'rolebotBeta';
 export const POSTGRES_URL = `${process.env.POSTGRES_URL}${DB_NAME}` || '';
-export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 3;
+export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 5;
 // Only sync when in dev
 export const SYNC_DB = Boolean(Number(process.env.SYNC_DB)) || false;
 export const WEBHOOK_ID = process.env.WEBHOOK_ID || '';
