@@ -32,7 +32,7 @@ export default (client: RoleBot) => {
   //deleteSlashCommands();
 
   // Generate global slash commands
-  // generateSlashCommands(commandsJson);
+  generateSlashCommands(commandsJson);
 };
 
 async function generateSlashCommands(
