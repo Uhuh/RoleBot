@@ -1,0 +1,66 @@
+import {
+  ButtonInteraction,
+  CommandInteraction,
+  MessageActionRow,
+  MessageButton,
+  Permissions,
+} from 'discord.js';
+import RoleBot from '../../src/bot';
+import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
+
+export class ReactNukeCommand extends SlashCommand {
+  constructor(client: RoleBot) {
+    super(
+      client,
+      'react-nuke',
+      'This will remove ALL react roles for this server.',
+      Category.react,
+      [Permissions.FLAGS.MANAGE_ROLES]
+    );
+  }
+
+  handleButton = (interaction: ButtonInteraction, args: string[]) => {
+    interaction.reply(
+      `Okay well, you, ${interaction.member.user} asked for all react-roles to be deleted.`
+    );
+
+    DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
+      .then(() => {
+        this.log.debug(
+          `User[${interaction.user.id}] removed ALL reactroles for guild[${interaction.guildId}]`
+        );
+        interaction
+          .followUp(
+            `Hey! I deleted all your react roles. Any categories you had should still stand.`
+          )
+          .catch(() => this.log.error(`Failed to send interaction follwup`));
+      })
+      .catch((e) => {
+        this.log.error(
+          `Failed to delete reactroles for guild[${interaction.guildId}]`
+        );
+        this.log.critical(`${e}`);
+
+        interaction
+          .followUp(`Hey! I had an issue deleting all the react roles.`)
+          .catch(() => this.log.error(`Failed to send interaction follwup`));
+      });
+  };
+
+  execute = (interaction: CommandInteraction) => {
+    const buttons = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId(`${this.name}_confirm`)
+        .setLabel('Confirm Nuke')
+        .setStyle('PRIMARY')
+    );
+
+    interaction.reply({
+      ephemeral: true,
+      components: [buttons],
+      content: `ARE YOU SURE YOU WANT TO DELETE ALL YOUR REACT ROLES?`,
+    });
+  };
+}

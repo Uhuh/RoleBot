@@ -28,6 +28,10 @@ export const DELETE_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
   return await ReactRole.delete({ roleId });
 };
 
+export const DELETE_ALL_REACT_ROLES_BY_GUILD_ID = async (guildId: string) => {
+  return await ReactRole.delete({ guildId });
+};
+
 export const GET_REACT_ROLES_BY_GUILD = async (guildId: string) => {
   return await ReactRole.find({ where: { guildId } });
 };
