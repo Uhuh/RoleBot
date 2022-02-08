@@ -226,9 +226,15 @@ Why do I need these permissions in this channel?
       });
     }
 
-    interaction.editReply({
-      content: 'Hey! I sent those embeds and am currently reacting to them.',
-    });
+    interaction
+      .editReply({
+        content: 'Hey! I sent those embeds and am currently reacting to them.',
+      })
+      .catch((e) => {
+        // Defer can fail
+        this.log.error(`Failed to edit interaction reply.`);
+        this.log.critical(`${e}`);
+      });
   };
 }
 
