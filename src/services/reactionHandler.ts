@@ -79,22 +79,20 @@ export class ReactionHandler {
 
     switch (type) {
       case 'add':
-        member.roles
-          .add(reactMessage.roleId)
-          .catch(() =>
-            this.log.error(
-              `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]`
-            )
+        member.roles.add(reactMessage.roleId).catch((e) => {
+          this.log.error(
+            `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]`
           );
+          this.log.critical(`${e}`);
+        });
         break;
       case 'remove':
-        member.roles
-          .remove(reactMessage.roleId)
-          .catch(() =>
-            this.log.error(
-              `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]`
-            )
+        member.roles.remove(reactMessage.roleId).catch((e) => {
+          this.log.error(
+            `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]`
           );
+          this.log.critical(`${e}`);
+        });
     }
   };
 
