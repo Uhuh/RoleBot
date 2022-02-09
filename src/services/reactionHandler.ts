@@ -1,10 +1,11 @@
 import {
+  Guild,
   GuildMember,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
   User,
-} from 'discord.js';
+} from 'discord.js-light';
 import {
   GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID,
@@ -74,7 +75,7 @@ export class ReactionHandler {
     }
 
     if (category.mutuallyExclusive) {
-      return this.mutuallyExclusive(reactMessage, member, type);
+      return this.mutuallyExclusive(reactMessage, member, guild, type);
     }
 
     switch (type) {
@@ -99,6 +100,7 @@ export class ReactionHandler {
   mutuallyExclusive = async (
     reactMessage: ReactMessage,
     member: GuildMember,
+    guild: Guild,
     type: 'add' | 'remove'
   ) => {
     // If it's removing it's pretty simple.
@@ -128,7 +130,12 @@ export class ReactionHandler {
       (r) => r.id !== reactMessage.roleId && categoryRoles.includes(r.id)
     );
 
-    member.roles
+    /**
+     * @TODO Find a way to deal with DJS non caching?
+     * Turns out when adding a member it doesn't cache the role. So when invoking .remove later it overwrites the just added role
+     * with the old cached roles. lol
+     */
+    await member.roles
       .add(reactMessage.roleId)
       .catch(() =>
         this.log.debug(
@@ -136,9 +143,27 @@ export class ReactionHandler {
         )
       );
 
-    await new Promise((res) => setTimeout(() => res(`why`), 1000));
+    await new Promise((res) =>
+      setTimeout(() => res(`Force role management wait time.`), 1000)
+    );
 
-    member.roles
+    /**
+     * So to get around the cache issue from above... literally fetch the member again. Yeah that's how to get the role cache updated
+     * This is most likely due to using d.js-light
+     */
+    const newMember = await guild.members.fetch(member.id).catch((e) => {
+      this.log.error(`Fetching user[${member.id}] threw an error.`);
+      this.log.critical(`${e}`);
+    });
+
+    // Hopefully this will never fire but...
+    if (!newMember) {
+      return this.log.error(
+        `Failed to fetch member[${member.id}] to update role cache for guild[${guild.id}]`
+      );
+    }
+
+    await newMember.roles
       .remove(rolesToRemove)
       .catch(() =>
         this.log.debug(
