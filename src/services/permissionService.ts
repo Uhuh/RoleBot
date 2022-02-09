@@ -1,4 +1,5 @@
-import { Permissions } from 'discord.js';
+import { Permissions } from 'discord.js-light';
+import { PermissionMappings } from '../../commands/slashCommand';
 import Rolebot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';
@@ -65,16 +66,16 @@ export class PermissionService {
      * @param Permissions.FLAGS.MANAGE_MESSAGES - To update the embeds react role list.
      * @param Permissions.FLAGS.MANAGE_ROLES    - To update users roles.
      */
-    const hasCorrectPerms = clientMember.permissions.has([
-      Permissions.FLAGS.ADD_REACTIONS,
-      Permissions.FLAGS.SEND_MESSAGES,
-      Permissions.FLAGS.MANAGE_MESSAGES,
-      Permissions.FLAGS.MANAGE_ROLES,
-    ]);
-
-    /**
-     * @TODO - Check user perms and then check CHANNEL perms because they CAN be different
-     */
+    const hasCorrectPerms = clientMember.permissions.has(
+      [
+        Permissions.FLAGS.READ_MESSAGE_HISTORY,
+        Permissions.FLAGS.ADD_REACTIONS,
+        Permissions.FLAGS.SEND_MESSAGES,
+        Permissions.FLAGS.MANAGE_MESSAGES,
+        Permissions.FLAGS.MANAGE_ROLES,
+      ],
+      true
+    );
 
     return hasCorrectPerms;
   };
