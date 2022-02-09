@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 
 export enum Category {

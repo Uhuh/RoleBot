@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   CREATE_REACT_MESSAGE,
@@ -13,6 +13,7 @@ import { LogService } from '../../src/services/logService';
 
 export const reactToMessage = (
   message: Message,
+  guildId: string,
   categoryRoles: ReactRole[],
   channelId: string,
   categoryId: number,
@@ -28,7 +29,7 @@ export const reactToMessage = (
             messageId: message.id,
             emojiId: r.emojiId,
             roleId: r.roleId,
-            guildId: message.guildId ?? '',
+            guildId,
             categoryId: categoryId,
             isCustomMessage,
             channelId,
@@ -38,7 +39,7 @@ export const reactToMessage = (
           log.error(
             `Failed to react to message[${message.id}] with emoji[${
               r.emojiTag ?? r.emojiId
-            }] in guild[${message.guildId}]`
+            }] in guild[${guildId}]`
           );
           log.error(`${e}`);
         });
@@ -64,8 +65,7 @@ export const updateReactMessages = async (
       return log.debug(`No react messages exist with category[${categoryId}]`);
     }
 
-    const guild = await client.guilds.fetch(reactMessage.guildId);
-    const channel = await guild.channels.fetch(reactMessage.channelId);
+    const channel = await client.channels.fetch(reactMessage.channelId);
 
     if (!channel?.isText()) {
       return log.debug(
@@ -86,7 +86,7 @@ export const updateReactMessages = async (
 
     if (!category) {
       return log.critical(
-        `Category[${reactMessage.categoryId}] does not exist in guild[${guild.id}]`
+        `Category[${reactMessage.categoryId}] does not exist in guild[${reactMessage.guildId}]`
       );
     }
 
@@ -103,7 +103,7 @@ export const updateReactMessages = async (
         })
         .catch(() =>
           log.error(
-            `Failed to edit message[${reactMessage.messageId}] with updated react role embed in guild[${guild.id}]`
+            `Failed to edit message[${reactMessage.messageId}] with updated react role embed in guild[${reactMessage.guildId}]`
           )
         );
     }
@@ -119,6 +119,7 @@ export const updateReactMessages = async (
       // Re-react to the message with the updated react role list.
       reactToMessage(
         message,
+        reactMessage.guildId,
         categoryRoles,
         channel.id,
         reactMessage.categoryId,
