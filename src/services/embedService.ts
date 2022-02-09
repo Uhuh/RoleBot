@@ -1,4 +1,4 @@
-import { MessageEmbed, User } from 'discord.js';
+import { MessageEmbed, User } from 'discord.js-light';
 import { COLOR } from '../../utilities/types/globals';
 import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';

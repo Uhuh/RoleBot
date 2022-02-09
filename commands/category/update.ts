@@ -3,7 +3,7 @@ import {
   CommandInteraction,
   Permissions,
   TextChannel,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
@@ -153,16 +153,18 @@ export class UpdateCategoryCommand extends SlashCommand {
           this.log.error(
             `Failed to update message for category[${category.id}]`
           );
+          this.log.critical(`${e}`);
 
           interaction.reply({
             ephemeral: true,
-            content: `Hey! I wasn't able to update the message for some reason.`,
+            content: `Hey! I wasn't able to update the message for some reason. Most likely a message history / manage permission issue.`,
           });
         });
 
       // Re-react to the message with the updated react role list.
       reactToMessage(
         message,
+        interaction.guildId,
         categoryRoles,
         channel.id,
         reactMessage.categoryId,

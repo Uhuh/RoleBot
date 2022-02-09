@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js-light';
 import { AVATAR_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';

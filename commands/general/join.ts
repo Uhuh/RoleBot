@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js';
+import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';

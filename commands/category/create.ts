@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js';
+import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   CREATE_GUILD_CATEGORY,

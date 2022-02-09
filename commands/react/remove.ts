@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js';
+import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   DELETE_REACT_ROLE_BY_ROLE_ID,

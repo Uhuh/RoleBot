@@ -6,7 +6,7 @@ import {
   MessageSelectMenu,
   Permissions,
   SelectMenuInteraction,
-} from 'discord.js';
+} from 'discord.js-light';
 import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,

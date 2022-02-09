@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js';
+import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
@@ -17,6 +17,8 @@ export class ReactListCommand extends SlashCommand {
   }
 
   execute = async (interaction: CommandInteraction) => {
+    if (!interaction.isCommand() || !interaction.guildId) return;
+
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(
       interaction.guildId
     ).catch((e) => {
