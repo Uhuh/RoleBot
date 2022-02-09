@@ -7,10 +7,11 @@ import {
   MessageEmbed,
   Permissions,
   Role,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   CREATE_REACT_ROLE,
+  GET_REACT_ROLES_BY_GUILD,
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/database';
@@ -56,6 +57,19 @@ export class ReactRoleCommand extends SlashCommand {
           this.log.error(`Interaction failed.`);
           this.log.error(`${e}`);
         });
+    }
+
+    const reactRolesNotInCategory = (
+      await GET_REACT_ROLES_BY_GUILD(guild.id)
+    ).filter((r) => !r.categoryId).length;
+
+    /**
+     * Discord button row limitation is 5x5 so only a max of 25 buttons.
+     */
+    if (reactRolesNotInCategory >= 24) {
+      return interaction.reply(
+        `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responded please *remove* some react roles to get below 25 **not ina  category**. This is due to a Discord limitation!`
+      );
     }
 
     const isValidPosition = isValidRolePosition(interaction, role);
@@ -230,8 +244,11 @@ export class ReactRoleCommand extends SlashCommand {
  * Check that RoleBot has a role above the one the user wants to hand out.
  * @returns true if the bot has a role above the users role.
  */
-function isValidRolePosition(interaction: Interaction, role: Role | APIRole) {
-  const clientUser = interaction.guild?.members.cache.get(CLIENT_ID);
+async function isValidRolePosition(
+  interaction: Interaction,
+  role: Role | APIRole
+) {
+  const clientUser = await interaction.guild?.members.fetch(CLIENT_ID);
   if (!clientUser) return false;
 
   return clientUser.roles.cache.some((r) => r.position > role.position);
