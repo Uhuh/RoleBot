@@ -22,7 +22,7 @@ export const reactToMessage = (
   return Promise.all(
     categoryRoles.map((r) => {
       message
-        .react(r?.emojiTag ? `n:${r.emojiId}` : r.emojiId)
+        .react(r?.emojiTag ? `nn:${r.emojiId}` : r.emojiId)
         .then(() => {
           CREATE_REACT_MESSAGE({
             messageId: message.id,
