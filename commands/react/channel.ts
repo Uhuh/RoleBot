@@ -1,18 +1,16 @@
-import { APIInteractionDataResolvedChannel } from 'discord-api-types';
+import { APIInteractionDataResolvedChannel } from 'discord.js-light/node_modules/discord-api-types/v9';
 import {
   CommandInteraction,
-  GuildChannel,
+  GuildBasedChannel,
   Permissions,
   TextChannel,
-  ThreadChannel,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
-import { HasPerms } from '../../src/services/permissionService';
 import { reactToMessage } from '../../utilities/functions/reactions';
 import { Category } from '../../utilities/types/commands';
 import { PermissionMappings, SlashCommand } from '../slashCommand';
@@ -131,52 +129,27 @@ export class ReactChannelCommand extends SlashCommand {
         });
     }
 
-    // Verify that the client has the correct perms for the channel.
-    const canClientSendEmbeds =
-      await this.client.permissionService.canClientPrepareReactMessage(
-        interaction.guildId,
-        channel.id
-      );
+    const permissions = [
+      Permissions.FLAGS.READ_MESSAGE_HISTORY,
+      Permissions.FLAGS.ADD_REACTIONS,
+      Permissions.FLAGS.SEND_MESSAGES,
+      Permissions.FLAGS.MANAGE_MESSAGES,
+      Permissions.FLAGS.MANAGE_ROLES,
+    ]
+      .map((p) => `\`${PermissionMappings.get(p)}\``)
+      .join(' ');
 
-    if (canClientSendEmbeds === HasPerms.error) {
-      return interaction
-        .editReply({
-          content: `Hey! I ran into some issues. Could you please wait a second and try again?`,
-        })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
-    }
-
-    if (!canClientSendEmbeds) {
-      const permissions = [
-        Permissions.FLAGS.ADD_REACTIONS,
-        Permissions.FLAGS.SEND_MESSAGES,
-        Permissions.FLAGS.MANAGE_MESSAGES,
-        Permissions.FLAGS.MANAGE_ROLES,
-      ]
-        .map((p) => `\`${PermissionMappings.get(p)}\``)
-        .join(' ');
-
-      return interaction
-        .editReply({
-          content:
-            `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
-            `
+    const permissionError =
+      `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
+      `
 Why do I need these permissions in this channel?
 \`\`\`
+- To be able to react I have to be able to see the message so I need the history for the channel.
 - Have to be able to react, it is a react role bot.
 - Have to be able to send embeds.
 - To update the embeds react role list.
 - To update users roles.
-\`\`\``,
-        })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
-    }
+\`\`\``;
 
     /* There might be a better solution to this. Potentially reply first, then update the interaction later. Discord interactions feel so incredibly inconsistent though. So for now force users to WAIT the whole 3 seconds so that Discord doesn't cry. */
     await new Promise((res) => {
@@ -193,33 +166,36 @@ Why do I need these permissions in this channel?
 
       const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
-      channel
-        .send({
+      try {
+        const reactEmbedMessage = await channel.send({
           embeds: [embed],
-        })
-        .then((m) => {
-          reactToMessage(
-            m,
-            categoryRoles,
-            channel.id,
-            category.id,
-            false,
-            this.log
-          );
-        })
-        .catch((e) => {
-          this.log.error(
-            `Failed to send category[${category.id}] react embed to channel[${channel.id}] for guild[${interaction.guildId}]`
-          );
-          this.log.error(`${e}`);
-          interaction.channel
-            ?.send(
-              `Hey! I failed to send those embeds to <#${channel.id}>. Do I have send **embed** and message permissions for it?`
-            )
-            .catch(() =>
-              this.log.error(`Failed to warn user aboput message perms.`)
-            );
         });
+
+        reactToMessage(
+          reactEmbedMessage,
+          interaction.guildId,
+          categoryRoles,
+          channel.id,
+          category.id,
+          false,
+          this.log
+        );
+      } catch (e: any) {
+        this.log.error(`Failed to send embeds`);
+        this.log.critical(`${e}`);
+
+        /**
+         * Somehow the type DiscordAPIError DOES NOT include the httpStatus code despite the returned error here having it.
+         * They also only set their "status" property as undefined. Lol?
+         */
+        if (e?.httpStatus === 403) {
+          return interaction.editReply(permissionError);
+        }
+
+        return interaction.editReply(
+          `Hey! I encounted an error. Report this to the support server. \`${e}\``
+        );
+      }
 
       await new Promise((res) => {
         setTimeout(() => res(`Send next category message.`), 1000);
@@ -239,7 +215,7 @@ Why do I need these permissions in this channel?
 }
 
 function isTextChannel(
-  channel: GuildChannel | ThreadChannel | APIInteractionDataResolvedChannel
+  channel: APIInteractionDataResolvedChannel | GuildBasedChannel
 ): channel is TextChannel {
-  return channel instanceof GuildChannel || channel instanceof ThreadChannel;
+  return channel?.type === 'GUILD_TEXT';
 }

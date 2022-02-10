@@ -1,12 +1,12 @@
 import {
-  Channel,
+  AnyChannel,
   CommandInteraction,
   MessageActionRow,
   MessageSelectMenu,
   Permissions,
   SelectMenuInteraction,
   TextChannel,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   GET_CATEGORY_BY_ID,
@@ -99,6 +99,7 @@ export class ReactMessageCommand extends SlashCommand {
 
     reactToMessage(
       message,
+      interaction.guildId || guildId,
       reactRoles,
       channel.id,
       category.id,
@@ -108,7 +109,7 @@ export class ReactMessageCommand extends SlashCommand {
   };
 
   execute = async (interaction: CommandInteraction) => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() || !interaction.guildId) return;
 
     const [messageLink] = this.extractStringVariables(
       interaction,
@@ -259,6 +260,6 @@ export class ReactMessageCommand extends SlashCommand {
   };
 }
 
-function isTextChannel(channel: Channel): channel is TextChannel {
+function isTextChannel(channel: AnyChannel): channel is TextChannel {
   return channel.type === 'GUILD_TEXT';
 }

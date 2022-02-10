@@ -3,7 +3,7 @@ import {
   CommandInteraction,
   MessageActionRow,
   MessageButton,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';

@@ -4,7 +4,7 @@ import {
   Interaction,
   Permissions,
   SelectMenuInteraction,
-} from 'discord.js';
+} from 'discord.js-light';
 import { Category, DataCommand } from '../utilities/types/commands';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { LogService } from '../src/services/logService';
@@ -12,6 +12,7 @@ import { SlashBase } from './slashBase';
 import RoleBot from '../src/bot';
 
 export const PermissionMappings: Map<bigint, string> = new Map([
+  [Permissions.FLAGS.READ_MESSAGE_HISTORY, 'READ_MESSAGE_HISTORY'],
   [Permissions.FLAGS.BAN_MEMBERS, 'BAN_MEMBERS'],
   [Permissions.FLAGS.KICK_MEMBERS, 'KICK_MEMBERS'],
   [Permissions.FLAGS.MANAGE_GUILD, 'MANAGE_GUILD'],
@@ -87,7 +88,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     this.executions.push({
       channelId: interaction.channelId,
       command: interaction.commandName,
-      guildId: interaction.guildId,
+      guildId: interaction.guildId || 'DM',
       time: new Date(),
       userId: interaction.user.id,
     });

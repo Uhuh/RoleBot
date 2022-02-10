@@ -1,13 +1,10 @@
-import * as Discord from 'discord.js';
 import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
-import joinRole from '../events/joinRoles';
 import { guildUpdate } from '../events/guildUpdate';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
-import { handle_packet } from '../events/raw_packet';
 import { ReactionHandler } from './services/reactionHandler';
 import { createConnection } from 'typeorm';
 import {
@@ -17,10 +14,11 @@ import {
   ReactRole,
 } from './database/entities';
 
+import * as Discord from 'discord.js-light';
+
 export default class RoleBot extends Discord.Client {
   config: any;
   commandsRun: number;
-  reactMessage: string[];
   commands: Discord.Collection<string, SlashCommand>;
 
   // "Services"
@@ -30,16 +28,12 @@ export default class RoleBot extends Discord.Client {
 
   constructor() {
     super({
-      partials: ['REACTION', 'MESSAGE'],
       intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_MESSAGES,
         Discord.Intents.FLAGS.GUILD_MEMBERS,
         Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
       ],
     });
     this.config = config;
-    this.reactMessage = [];
     this.commandsRun = 0;
 
     this.log = new LogService(`RoleBot`);
@@ -58,6 +52,11 @@ export default class RoleBot extends Discord.Client {
       setInterval(() => this.updatePresence(), 10000);
     });
 
+    this.on('shardError', (e) => {
+      this.log.error(`Encounted shard error.`);
+      this.log.critical(`${e}`);
+    });
+
     this.on('interactionCreate', async (interaction) =>
       InteractionHandler.handleInteraction(interaction, this)
     );
@@ -67,16 +66,15 @@ export default class RoleBot extends Discord.Client {
      * This is required because if the bot restarts it has no memory of old messages, especially
      * its own messages that are monitored for role management.
      */
-    this.on('raw', (r) => handle_packet(r, this));
-    this.on('guildMemberAdd', (member) => joinRole(member, this));
+    // this.on('raw', (r) => handle_packet(r, this));
     this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
     this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
     // React role handling
     this.on('messageReactionAdd', (...r) => {
-      this.handleReaction(...r, 'add');
+      this.reactHandler.handleReaction(...r, 'add');
     });
     this.on('messageReactionRemove', (...r) => {
-      this.handleReaction(...r, 'remove');
+      this.reactHandler.handleReaction(...r, 'remove');
     });
     /**
      * Whenever roles get deleted or changed let's update RoleBots DB.
@@ -99,14 +97,6 @@ export default class RoleBot extends Discord.Client {
       ],
       status: 'dnd',
     });
-  };
-
-  private handleReaction = async (
-    reaction: Discord.MessageReaction | Discord.PartialMessageReaction,
-    user: Discord.User | Discord.PartialUser,
-    type: 'add' | 'remove'
-  ) => {
-    return this.reactHandler.handleReaction(reaction, user, type);
   };
 
   public start = async () => {

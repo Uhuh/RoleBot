@@ -1,10 +1,11 @@
 import {
+  Guild,
   GuildMember,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
   User,
-} from 'discord.js';
+} from 'discord.js-light';
 import {
   GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID,
@@ -74,7 +75,7 @@ export class ReactionHandler {
     }
 
     if (category.mutuallyExclusive) {
-      return this.mutuallyExclusive(reactMessage, member, type);
+      return this.mutuallyExclusive(reactMessage, member, guild, type);
     }
 
     switch (type) {
@@ -96,9 +97,17 @@ export class ReactionHandler {
     }
   };
 
+  /**
+   * Handle categories mutually exclusive role management
+   * @param reactMessage ReactRole info related to the react message
+   * @param member Member whos roles we want to update
+   * @param guild Guild that has roles we need to fetch
+   * @param type Are we adding or removing a role
+   */
   mutuallyExclusive = async (
     reactMessage: ReactMessage,
     member: GuildMember,
+    guild: Guild,
     type: 'add' | 'remove'
   ) => {
     // If it's removing it's pretty simple.
@@ -112,8 +121,6 @@ export class ReactionHandler {
         );
     }
 
-    // If we're ADDING a role then we need to figure out what out one they had.
-
     if (!reactMessage.categoryId) {
       return this.log.error(
         `React role[${reactMessage.id}] category is undefined.`
@@ -124,26 +131,36 @@ export class ReactionHandler {
       await GET_REACT_ROLES_BY_CATEGORY_ID(reactMessage.categoryId)
     ).map((r) => r.roleId);
 
-    const rolesToRemove = member.roles.cache.filter(
-      (r) => r.id !== reactMessage.roleId && categoryRoles.includes(r.id)
+    /**
+     * This is to filter out any react roles in the same category since it's mutually exclusive.
+     * However, to edit the member we need all the OTHER roles even non RoleBot related.
+     */
+    const updatedRoleList = member.roles.cache.filter(
+      (r) => r.id === reactMessage.roleId || !categoryRoles.includes(r.id)
     );
 
-    member.roles
-      .add(reactMessage.roleId)
-      .catch(() =>
-        this.log.debug(
-          `Could not add role[${reactMessage.roleId}] to member[${member.id}] in guild[${member.guild.id}]`
-        )
+    // Fetch the role we want to ADD to the user.
+    const role = await guild.roles.fetch(reactMessage.roleId).catch((e) => {
+      this.log.error(
+        `Failed to fetch role[${reactMessage.roleId}] for guild[${guild.id}]`
       );
+      this.log.critical(`${e}`);
+    });
 
-    await new Promise((res) => setTimeout(() => res(`why`), 1000));
+    if (!role) {
+      return this.log.debug(`Role not found.`);
+    }
 
-    member.roles
-      .remove(rolesToRemove)
-      .catch(() =>
-        this.log.debug(
-          `Could not remove role(s)[${rolesToRemove}] from member[${member.id}] in guild[${member.guild.id}]`
-        )
-      );
+    // Because this is the role we want to give the user we need to set it.
+    updatedRoleList.set(role.id, role);
+
+    member
+      .edit({
+        roles: updatedRoleList,
+      })
+      .catch((e) => {
+        this.log.error(`Failed to update members roles.`);
+        this.log.critical(`${e}`);
+      });
   };
 }

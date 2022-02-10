@@ -66,7 +66,6 @@ async function deleteSlashCommands() {
         );
       }
 
-      console.log(data);
       return Promise.all(promises);
     });
   } catch (e) {

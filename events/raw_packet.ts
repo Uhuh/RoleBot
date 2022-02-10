@@ -1,4 +1,4 @@
-import { TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js-light';
 import RoleBot from '../src/bot';
 import { LogService } from '../src/services/logService';
 
@@ -42,10 +42,8 @@ export const handle_packet = async (packet: any, client: RoleBot) => {
       //Emojis without a unicode name must be referenced
       packet.d.emoji.id || packet.d.emoji.name
     );
-    const user = await client.users.fetch(packet.d.user_id).catch((e) => {
-      log.error(`Failed to fetch user[${packet.d.user_id}]`);
-      log.critical(`${e}`);
-    });
+
+    const user = packet.d.member.user;
 
     // Just... ignore react if it doesn't exist anymore????
     if (!user || user.bot || !react) {

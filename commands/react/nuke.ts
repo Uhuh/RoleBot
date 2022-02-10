@@ -4,7 +4,7 @@ import {
   MessageActionRow,
   MessageButton,
   Permissions,
-} from 'discord.js';
+} from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
@@ -22,8 +22,16 @@ export class ReactNukeCommand extends SlashCommand {
   }
 
   handleButton = (interaction: ButtonInteraction, args: string[]) => {
+    if (!interaction.guildId) {
+      return interaction.followUp(
+        `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
+      );
+    }
+
     interaction.reply(
-      `Okay well, you, ${interaction.member.user} asked for all react-roles to be deleted.`
+      `Okay well, you, ${
+        interaction.member?.user || '[REDACTED]'
+      } asked for all react-roles to be deleted.`
     );
 
     DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
