@@ -4,7 +4,7 @@ import {
   MessageEmbed,
   MessageSelectMenu,
   SelectMenuInteraction,
-} from 'discord.js';
+} from 'discord.js-light';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
@@ -63,9 +63,15 @@ export class HelpCommand extends SlashCommand {
     embed
       .setTitle('Command Help')
       .setColor(COLOR.DEFAULT)
-      .setAuthor(user.username, user.avatarURL() || '')
+      .setAuthor({
+        name: user.username,
+        iconURL: user.avatarURL() || '',
+        url: 'https://rolebot.gg',
+      })
       .setThumbnail(user.avatarURL() || '')
-      .setFooter(`Replying to: ${interaction.member?.user.username}`)
+      .setFooter({
+        text: `Replying to: ${interaction.member?.user.username}`,
+      })
       .setTimestamp(new Date());
 
     embed.setDescription(

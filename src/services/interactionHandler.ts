@@ -3,7 +3,7 @@ import {
   CommandInteraction,
   Interaction,
   SelectMenuInteraction,
-} from 'discord.js';
+} from 'discord.js-light';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
 import RoleBot from '../bot';

@@ -1,4 +1,8 @@
-import { CommandInteraction, MessageEmbed, Permissions } from 'discord.js';
+import {
+  CommandInteraction,
+  MessageEmbed,
+  Permissions,
+} from 'discord.js-light';
 import {
   GET_GUILD_CATEGORIES,
   GET_REACT_ROLES_NOT_IN_CATEGORIES,
