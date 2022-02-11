@@ -188,7 +188,9 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @returns True if user can run this command, false otherwise.
    */
   private canUserRunCommand = (interaction: Interaction) => {
-    return interaction.memberPermissions?.has(this.permissions, true);
+    return this.permissions.length
+      ? interaction.memberPermissions?.has(this.permissions, true)
+      : true;
   };
 
   /**
