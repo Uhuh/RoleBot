@@ -50,7 +50,7 @@ export class CreateCategoryCommand extends SlashCommand {
           this.log.error(`${e}`);
         });
     } else if (categoryName.length > 90) {
-      // Discord max embed title is 100 so let's be safe and maybe it smaller.
+      // Discord max embed title is 100 so let's be safe and make it smaller.
       return interaction
         .reply({
           ephemeral: true,
