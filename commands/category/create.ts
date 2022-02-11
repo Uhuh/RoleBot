@@ -49,6 +49,17 @@ export class CreateCategoryCommand extends SlashCommand {
           this.log.error(`Interaction failed.`);
           this.log.error(`${e}`);
         });
+    } else if (categoryName.length > 90) {
+      // Discord max embed title is 100 so let's be safe and maybe it smaller.
+      return interaction
+        .reply({
+          ephemeral: true,
+          content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
+        })
+        .catch((e) => {
+          this.log.error(`Interaction failed.`);
+          this.log.error(`${e}`);
+        });
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
