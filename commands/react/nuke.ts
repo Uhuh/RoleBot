@@ -28,11 +28,16 @@ export class ReactNukeCommand extends SlashCommand {
       );
     }
 
-    interaction.reply(
-      `Okay well, you, ${
-        interaction.member?.user || '[REDACTED]'
-      } asked for all react-roles to be deleted.`
-    );
+    interaction
+      .followUp(
+        `Okay well, you, ${
+          interaction.member?.user || '[REDACTED]'
+        } asked for all react-roles to be deleted.`
+      )
+      .catch((e) => {
+        this.log.error(`Interaction failed`);
+        this.log.critical(`${e}`);
+      });
 
     DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
       .then(() => {
