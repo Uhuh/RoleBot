@@ -242,7 +242,8 @@ export class ReactMessageCommand extends SlashCommand {
         .addOptions(
           categories.map((c, idx) => ({
             label: c.name ?? `Category-${idx}`,
-            description: c.description ?? '',
+            // Discord has a 100 character limit for select menus.
+            description: c.description?.slice(0, 99) ?? '',
             value: `${this.name}_${c.guildId}-${channelId}-${messageId}-${c.id}`,
           }))
         )
