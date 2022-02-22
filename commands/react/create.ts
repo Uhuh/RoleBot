@@ -103,7 +103,7 @@ export class ReactRoleCommand extends SlashCommand {
     }
 
     // Custom emojis Look like this: <a?:name:id>
-    const customEmoji = /(a?):\w+:(\d{10,20})/g.exec(emoji);
+    const customEmoji = /(a?):\w+:(\d{17,19})/g.exec(emoji);
 
     // Default set the "emojiId" as the input. It's most likely just unicode.
     let emojiId = emoji;
@@ -193,7 +193,7 @@ export class ReactRoleCommand extends SlashCommand {
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
     const emojiTag = customEmoji
-      ? `<${isEmojiAnimated ? 'a' : ''}:n:${emojiId}>`
+      ? `<${isEmojiAnimated ? 'a' : ''}:nn:${emojiId}>`
       : undefined;
 
     CREATE_REACT_ROLE(
