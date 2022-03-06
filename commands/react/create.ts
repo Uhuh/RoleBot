@@ -72,7 +72,7 @@ export class ReactRoleCommand extends SlashCommand {
       );
     }
 
-    const isValidPosition = isValidRolePosition(interaction, role);
+    const isValidPosition = await isValidRolePosition(interaction, role);
 
     if (!isValidPosition) {
       const embed = new MessageEmbed()
@@ -250,6 +250,8 @@ async function isValidRolePosition(
 ) {
   const clientUser = await interaction.guild?.members.fetch(CLIENT_ID);
   if (!clientUser) return false;
+
+  console.log(clientUser.roles.cache.some((r) => r.position > role.position));
 
   return clientUser.roles.cache.some((r) => r.position > role.position);
 }
