@@ -29,6 +29,7 @@ export default class RoleBot extends Discord.Client {
   constructor() {
     super({
       intents: [
+        Discord.Intents.FLAGS.GUILDS,
         Discord.Intents.FLAGS.GUILD_MEMBERS,
         Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
       ],
