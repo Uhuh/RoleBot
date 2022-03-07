@@ -29,7 +29,9 @@ export const guildUpdate = async (
       .setDescription(guild.name)
       .addField('Member size:', `${guild.memberCount}`, true)
       .addField('Guild ID:', `${guild.id}`, true)
-      .setFooter(`Guilds I'm in: ${size}`);
+      .setFooter({
+        text: `Guilds I'm in: ${size}`,
+      });
 
     webhookClient.send({
       embeds: [embed],
