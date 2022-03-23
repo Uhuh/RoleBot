@@ -1,5 +1,5 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js-light';
-import { AVATAR_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
+import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
@@ -32,6 +32,7 @@ Latency is ${
 
 [Click to Vote!](${VOTE_URL})
 [Join the support server!](${SUPPORT_URL})
+[Click to invite!](${INVITE_URL})
 `
       )
       .setThumbnail(AVATAR_URL);
