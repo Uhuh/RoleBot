@@ -5,4 +5,4 @@ dotenv.config();
 
 const shardHandler = new ShardHandler();
 
-shardHandler.startShards(SHARD_COUNT);
+shardHandler.startShards(Number(process.env.SHARD_COUNT) ?? SHARD_COUNT);

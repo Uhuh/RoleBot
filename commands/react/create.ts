@@ -78,7 +78,7 @@ export class ReactRoleCommand extends SlashCommand {
       const embed = new MessageEmbed()
         .setTitle('Reaction Roles Setup')
         .setDescription(
-          `The role <@&${role.id}> is above me in the role list so I can't hand it out.\nPlease make sure I have a role that is above it.`
+          `The role <@&${role.id}> is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
         );
 
       const button = new MessageActionRow().addComponents(
@@ -248,8 +248,11 @@ async function isValidRolePosition(
   interaction: Interaction,
   role: Role | APIRole
 ) {
-  const clientUser = await interaction.guild?.members.fetch(CLIENT_ID);
+  const clientUser = await interaction.guild?.members
+    .fetch(CLIENT_ID)
+    .catch(() => console.log(`Failed to fetch client user for guild.`));
+
   if (!clientUser) return false;
 
-  return clientUser.roles.cache.some((r) => r.position > role.position);
+  return clientUser.roles.highest.position > role.position;
 }
