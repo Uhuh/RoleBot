@@ -112,13 +112,12 @@ export class ReactionHandler {
   ) => {
     // If it's removing it's pretty simple.
     if (type === 'remove') {
-      return member.roles
-        .remove(reactMessage.roleId)
-        .catch(() =>
-          this.log.debug(
-            `Failed to remove role[${reactMessage.roleId}] from user[${member.id}] because they unreacted.`
-          )
+      return member.roles.remove(reactMessage.roleId).catch((e) => {
+        this.log.error(
+          `Failed to remove role[${reactMessage.roleId}] from user[${member.id}].`
         );
+        this.log.critical(`${e}`);
+      });
     }
 
     if (!reactMessage.categoryId) {
