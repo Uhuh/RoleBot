@@ -23,7 +23,7 @@
     },
     {
       "title": "Setting up the React Role messages. | Page 4",
-      "description": "So now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n\nThere are **two** different ways we can have RoleBot work for us. RoleBot can use its own messages in the `/react-channel` command, where it will create am embed for each category and list the react roles inside it and thenr eact to it, thus watching all reactions on it, or.\n\nWe can have RoleBot monitor custom messages. Do you have a cutely formatted message you want to use instead of RoleBot's embeds? Use `/react-message` and give the command a message link. This will allow youu to select which category RoleBot uses for that message. ",
+      "description": "So now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n\nThere are **two** different ways we can have RoleBot work for us. RoleBot can use its own messages in the `/react-channel` command, where it will create am embed for each category and list the react roles inside it and then react to it, thus watching all reactions on it, or.\n\nWe can have RoleBot monitor custom messages. Do you have a cutely formatted message you want to use instead of RoleBot's embeds? Use `/react-message` and give the command a message link. This will allow you to select which category RoleBot uses for that message. ",
       "images": [
         ""
       ]
