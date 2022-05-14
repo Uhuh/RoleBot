@@ -59,7 +59,6 @@ export class LogService {
 
     if (level == LogLevel.critical || level == LogLevel.error) {
       RolebotEventsWebhook.send({
-        content: `<@${OWNER_ID}>`,
         embeds: [EmbedService.errorEmbed(content)],
       });
     }
