@@ -1,13 +1,7 @@
 import RoleBot from '../src/bot';
-import { Guild, MessageEmbed, WebhookClient } from 'discord.js-light';
+import { Guild, MessageEmbed } from 'discord.js-light';
 import { Colors } from '../src/interfaces';
-import { WEBHOOK_ID, WEBHOOK_TOKEN } from '../src/vars';
-
-// Because of sharding we can't reliably get the guild channel. Also this is actually so much easier!
-const webhookClient = new WebhookClient({
-  id: WEBHOOK_ID,
-  token: WEBHOOK_TOKEN,
-});
+import { RolebotEventsWebhook } from '../utilities/types/globals';
 
 export const guildUpdate = async (
   guild: Guild,
@@ -33,7 +27,7 @@ export const guildUpdate = async (
         text: `Guilds I'm in: ${size}`,
       });
 
-    webhookClient.send({
+    RolebotEventsWebhook.send({
       embeds: [embed],
     });
   } catch (e) {

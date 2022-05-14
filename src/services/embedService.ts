@@ -5,6 +5,9 @@ import { ReactRole } from '../database/entities/reactRole.entity';
 import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/database';
 import * as tutorialJson from '../../utilities/json/tutorial.json';
+import { Colors } from '../interfaces';
+import { codeBlock } from '@discordjs/builders';
+import { AVATAR_URL } from '../vars';
 
 export class EmbedService {
   constructor() {}
@@ -141,6 +144,19 @@ export class EmbedService {
       .setColor(COLOR.DEFAULT)
       .setTitle(embedJson.title)
       .setDescription(embedJson.description);
+
+    return embed;
+  };
+
+  public static errorEmbed = (content: string) => {
+    const embed = new MessageEmbed();
+
+    embed
+      .setColor(Colors.red)
+      .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
+      .setTitle(`Encountered an error`)
+      .setDescription(codeBlock(content))
+      .setTimestamp(new Date());
 
     return embed;
   };
