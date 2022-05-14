@@ -1,4 +1,3 @@
-import { APIInteractionDataResolvedChannel } from 'discord.js-light/node_modules/discord-api-types/v9';
 import {
   CommandInteraction,
   GuildBasedChannel,
@@ -116,7 +115,7 @@ export class ReactChannelCommand extends SlashCommand {
           this.log.error(`Interaction failed.`);
           this.log.error(`${e}`);
         });
-    } else if (!isTextChannel(channel)) {
+    } else if (!(channel?.type === 'GUILD_TEXT')) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel for guild[${interaction.guildId}]`
       );
@@ -212,10 +211,4 @@ Why do I need these permissions in this channel?
         this.log.critical(`${e}`);
       });
   };
-}
-
-function isTextChannel(
-  channel: APIInteractionDataResolvedChannel | GuildBasedChannel
-): channel is TextChannel {
-  return channel?.type === 'GUILD_TEXT';
 }
