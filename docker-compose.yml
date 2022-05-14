@@ -8,6 +8,7 @@ services:
       target: base
     volumes:
       - ./src:/home/panku/RoleBot/src
+    restart: always
     container_name: rolebot-docker
     command: node build/src/index.js
 
