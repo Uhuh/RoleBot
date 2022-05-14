@@ -1,5 +1,5 @@
 import RoleBot from '../src/bot';
-import { Guild, MessageEmbed } from 'discord.js-light';
+import { Guild, MessageEmbed } from 'discord.js';
 import { Colors } from '../src/interfaces';
 import { RolebotEventsWebhook } from '../utilities/types/globals';
 
