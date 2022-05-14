@@ -1,3 +1,7 @@
+import { RolebotEventsWebhook } from '../../utilities/types/globals';
+import { OWNER_ID } from '../vars';
+import { EmbedService } from './embedService';
+
 enum LogLevel {
   debug = 1,
   info,
@@ -52,6 +56,13 @@ export class LogService {
       ']',
       ` ${content}`
     );
+
+    if (level == LogLevel.critical || level == LogLevel.error) {
+      RolebotEventsWebhook.send({
+        content: `<@${OWNER_ID}>`,
+        embeds: [EmbedService.errorEmbed(content)],
+      });
+    }
   }
 
   error(content: string) {
