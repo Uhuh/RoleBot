@@ -22,9 +22,6 @@ export class ShardHandler {
       .spawn({
         amount: numShards,
       })
-      .catch((e) => {
-        this.log.error(`Failed to spawn shard...`);
-        this.log.critical(`${e}`);
-      });
+      .catch((e) => this.log.error(`Failed to spawn shard.\n${e}`));
   };
 }

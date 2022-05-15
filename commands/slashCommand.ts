@@ -119,10 +119,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
             (p) => PermissionMappings.get(p)
           )}\`.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       return false;
     }
 
@@ -138,10 +135,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       .reply(
         `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
       )
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
   };
 
   /**
@@ -160,10 +154,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       .reply(
         `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
       )
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
   };
 
   /**
@@ -176,10 +167,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       .reply(
         `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
       )
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
   };
 
   /**

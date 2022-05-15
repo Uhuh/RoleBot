@@ -1,9 +1,4 @@
-import {
-  CommandInteraction,
-  GuildBasedChannel,
-  Permissions,
-  TextChannel,
-} from 'discord.js-light';
+import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
   GET_GUILD_CATEGORIES,
@@ -42,25 +37,21 @@ export class ReactChannelCommand extends SlashCommand {
         .deferReply({
           ephemeral: true,
         })
-        .catch((e) => {
+        .catch((e) =>
           this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it`
-          );
-          this.log.critical(`${e}`);
-        });
+            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`
+          )
+        );
     } catch (e) {
-      this.log.error(`Failed to defer interaction`);
-      this.log.critical(`${e}`);
+      this.log.error(`Failed to defer interaction.\n${e}`);
       return;
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
-      (e) => {
+      (e) =>
         this.log.error(
-          `Failed to get categories for guild[${interaction.guildId}]`
-        );
-        this.log.error(e);
-      }
+          `Failed to get categories for guild[${interaction.guildId}]\n${e}`
+        )
     );
 
     if (!categories) {
@@ -70,10 +61,7 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply(
           `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     // Stolen from @react/message execute function
@@ -94,16 +82,13 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply({
           content: allCategoriesAreEmpty,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const channel = interaction.options.getChannel('channel');
 
     if (!channel) {
-      this.log.error(
+      this.log.info(
         `Could not find channel on interaction for guild[${interaction.guildId}]`
       );
 
@@ -111,10 +96,7 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply(
           `Hey! I failed to find the channel from the command. Please wait a second and try again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     } else if (!(channel?.type === 'GUILD_TEXT')) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel for guild[${interaction.guildId}]`
@@ -122,10 +104,7 @@ export class ReactChannelCommand extends SlashCommand {
 
       return interaction
         .editReply(`Hey! I only support sending embeds to text channels!`)
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const permissions = [
@@ -180,8 +159,7 @@ Why do I need these permissions in this channel?
           this.log
         );
       } catch (e: any) {
-        this.log.error(`Failed to send embeds`);
-        this.log.critical(`${e}`);
+        this.log.error(`Failed to send embeds.\n${e}`);
 
         /**
          * Somehow the type DiscordAPIError DOES NOT include the httpStatus code despite the returned error here having it.
@@ -205,10 +183,6 @@ Why do I need these permissions in this channel?
       .editReply({
         content: 'Hey! I sent those embeds and am currently reacting to them.',
       })
-      .catch((e) => {
-        // Defer can fail
-        this.log.error(`Failed to edit interaction reply.`);
-        this.log.critical(`${e}`);
-      });
+      .catch((e) => this.log.error(`Failed to edit interaction reply.\n${e}`));
   };
 }

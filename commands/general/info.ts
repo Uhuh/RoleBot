@@ -42,9 +42,6 @@ Latency is ${
         content: `Here's some info about me.`,
         embeds: [embed],
       })
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
   };
 }

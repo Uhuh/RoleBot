@@ -53,17 +53,14 @@ export class EditCategoryCommand extends SlashCommand {
       interaction.options.getBoolean('mutually-exclusive');
 
     if (!newName && !newDesc && mutuallyExclusive === null) {
-      this.log.debug(`User didn't change anything about the category`);
+      this.log.info(`User didn't change anything about the category`);
 
       return interaction
         .reply({
           ephemeral: true,
           content: `Hey! You need to pass at _least_ one updated field about the category.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     if (!name) {
@@ -74,16 +71,13 @@ export class EditCategoryCommand extends SlashCommand {
           ephemeral: true,
           content: `Hey! I had an issue finding the category. Please wait a second and try again.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const category = await GET_CATEGORY_BY_NAME(interaction.guildId, name);
 
     if (!category) {
-      this.log.debug(
+      this.log.info(
         `Category not found with name[${name}] in guild[${interaction.guildId}]`
       );
 
@@ -91,10 +85,7 @@ export class EditCategoryCommand extends SlashCommand {
         .reply(
           `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const updatedCategory: Partial<ICategory> = {
@@ -114,16 +105,12 @@ export class EditCategoryCommand extends SlashCommand {
             ephemeral: true,
             content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
           })
-          .catch((e) => {
-            this.log.error(`Interaction failed.`);
-            this.log.error(`${e}`);
-          });
+          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       })
-      .catch((e) => {
+      .catch((e) =>
         this.log.critical(
-          `Failed to edit category[${category.id}] for guild[${interaction.guildId}]`
-        );
-        this.log.critical(`${e}`);
-      });
+          `Failed to edit category[${category.id}] for guild[${interaction.guildId}]\n${e}`
+        )
+      );
   };
 }

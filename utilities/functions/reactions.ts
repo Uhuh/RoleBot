@@ -36,12 +36,11 @@ export const reactToMessage = (
           });
         })
         .catch((e) => {
-          log.error(
+          log.debug(
             `Failed to react to message[${message.id}] with emoji[${
               r.emojiTag ?? r.emojiId
-            }] in guild[${guildId}]`
+            }] in guild[${guildId}]\n${e}`
           );
-          log.error(`${e}`);
         });
     })
   );
@@ -128,7 +127,6 @@ export const updateReactMessages = async (
       );
     }
   } catch (e) {
-    log.error(`Caught an error updating reaction messages.`);
-    log.error(`${e}`);
+    log.error(`Caught an error updating reaction messages.\n${e}`);
   }
 };

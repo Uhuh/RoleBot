@@ -49,7 +49,7 @@ export default class RoleBot extends Discord.Client {
 
     this.on('ready', (): void => {
       this.log.debug(`[Started]: ${new Date()}`);
-      this.log.info(
+      this.log.debug(
         `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
       );
 
@@ -116,13 +116,8 @@ export default class RoleBot extends Discord.Client {
       synchronize: config.SYNC_DB,
       entities: [ReactMessage, ReactRole, Category, GuildConfig],
     })
-      .then(() => {
-        this.log.debug(`Successfully connected to postgres DB.`);
-      })
-      .catch((e) => {
-        this.log.critical(`Failed to connect to postgres.`);
-        this.log.critical(`${e}`);
-      });
+      .then(() => this.log.debug(`Successfully connected to postgres DB.`))
+      .catch((e) => this.log.critical(`Failed to connect to postgres.\n${e}`));
 
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);

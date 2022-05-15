@@ -45,10 +45,7 @@ export class CreateCategoryCommand extends SlashCommand {
           ephemeral: true,
           content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     } else if (categoryName.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
       return interaction
@@ -56,10 +53,7 @@ export class CreateCategoryCommand extends SlashCommand {
           ephemeral: true,
           content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
@@ -67,10 +61,7 @@ export class CreateCategoryCommand extends SlashCommand {
         .reply(
           `Hey! It turns out you already have a category with that name made. Try checking it out.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     CREATE_GUILD_CATEGORY(
@@ -80,32 +71,25 @@ export class CreateCategoryCommand extends SlashCommand {
       !!mutuallyExclusive
     )
       .then(() => {
-        this.log.debug(
+        this.log.info(
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
         );
         interaction
           .reply(
             `Hey! I successfully created the category \`${categoryName}\` for you!`
           )
-          .catch((e) => {
-            this.log.error(`Interaction failed.`);
-            this.log.error(`${e}`);
-          });
+          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       })
       .catch((e) => {
         this.log.error(
-          `Issue creating category[${categoryName}] for guild[${interaction.guildId}]`
+          `Issue creating category[${categoryName}] for guild[${interaction.guildId}]\n${e}`
         );
-        this.log.error(e);
 
         interaction
           .reply(
             `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
           )
-          .catch((e) => {
-            this.log.error(`Interaction failed.`);
-            this.log.error(`${e}`);
-          });
+          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       });
   };
 }

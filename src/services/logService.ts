@@ -1,5 +1,4 @@
 import { RolebotEventsWebhook } from '../../utilities/types/globals';
-import { OWNER_ID } from '../vars';
 import { EmbedService } from './embedService';
 
 enum LogLevel {

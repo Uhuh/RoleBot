@@ -30,16 +30,14 @@ export class ListCategoryCommand extends SlashCommand {
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
-      (e) => {
+      (e) =>
         this.log.error(
-          `Failed to get categories for guild[${interaction.guildId}]`
-        );
-        this.log.error(e);
-      }
+          `Failed to get categories for guild[${interaction.guildId}]\n${e}`
+        )
     );
 
     if (!categories || !categories.length) {
-      this.log.debug(
+      this.log.info(
         `Guild[${interaction.guildId}] did not have any categories.`
       );
 
@@ -47,20 +45,14 @@ export class ListCategoryCommand extends SlashCommand {
         .reply(
           `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     interaction
       .reply(
         `Hey! Let me build these embeds for you real quick and send them...`
       )
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
 
     const embeds: MessageEmbed[] = [];
 

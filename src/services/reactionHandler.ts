@@ -42,10 +42,7 @@ export class ReactionHandler {
     const reactMessage = await GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID(
       message.id,
       emojiId
-    ).catch((e) => {
-      this.log.error(`Failed to query for react message.`);
-      this.log.error(`${e}`);
-    });
+    ).catch((e) => this.log.error(`Failed to query for react message.\n${e}`));
 
     if (!reactMessage) return;
 
@@ -55,10 +52,11 @@ export class ReactionHandler {
       );
     }
 
-    const member = await guild.members.fetch(user.id).catch((e) => {
-      this.log.error(`Fetching user[${user.id}] threw an error.`);
-      this.log.critical(`${e}`);
-    });
+    const member = await guild.members
+      .fetch(user.id)
+      .catch((e) =>
+        this.log.error(`Fetching user[${user.id}] threw an error.\n${e}`)
+      );
 
     if (!member) {
       return this.log.debug(
@@ -80,20 +78,22 @@ export class ReactionHandler {
 
     switch (type) {
       case 'add':
-        member.roles.add(reactMessage.roleId).catch((e) => {
-          this.log.error(
-            `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]`
+        member.roles
+          .add(reactMessage.roleId)
+          .catch((e) =>
+            this.log.error(
+              `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`
+            )
           );
-          this.log.critical(`${e}`);
-        });
         break;
       case 'remove':
-        member.roles.remove(reactMessage.roleId).catch((e) => {
-          this.log.error(
-            `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]`
+        member.roles
+          .remove(reactMessage.roleId)
+          .catch((e) =>
+            this.log.error(
+              `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`
+            )
           );
-          this.log.critical(`${e}`);
-        });
     }
   };
 
@@ -110,14 +110,14 @@ export class ReactionHandler {
     guild: Guild,
     type: 'add' | 'remove'
   ) => {
-    // If it's removing it's pretty simple.
     if (type === 'remove') {
-      return member.roles.remove(reactMessage.roleId).catch((e) => {
-        this.log.error(
-          `Failed to remove role[${reactMessage.roleId}] from user[${member.id}].`
+      return member.roles
+        .remove(reactMessage.roleId)
+        .catch((e) =>
+          this.log.error(
+            `Failed to remove role[${reactMessage.roleId}] from user[${member.id}]\n${e}`
+          )
         );
-        this.log.critical(`${e}`);
-      });
     }
 
     if (!reactMessage.categoryId) {
@@ -139,15 +139,18 @@ export class ReactionHandler {
     );
 
     // Fetch the role we want to ADD to the user.
-    const role = await guild.roles.fetch(reactMessage.roleId).catch((e) => {
-      this.log.error(
-        `Failed to fetch role[${reactMessage.roleId}] for guild[${guild.id}]`
+    const role = await guild.roles
+      .fetch(reactMessage.roleId)
+      .catch((e) =>
+        this.log.error(
+          `Failed to fetch role[${reactMessage.roleId}] for guild[${guild.id}]\n${e}`
+        )
       );
-      this.log.critical(`${e}`);
-    });
 
     if (!role) {
-      return this.log.debug(`Role not found.`);
+      return this.log.debug(
+        `Role[${reactMessage.roleId}] could not be found for guild[${guild.id}]`
+      );
     }
 
     // Because this is the role we want to give the user we need to set it.
@@ -157,9 +160,6 @@ export class ReactionHandler {
       .edit({
         roles: updatedRoleList,
       })
-      .catch((e) => {
-        this.log.error(`Failed to update members roles.`);
-        this.log.critical(`${e}`);
-      });
+      .catch((e) => this.log.error(`Failed to update members roles.\n${e}`));
   };
 }

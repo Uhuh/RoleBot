@@ -59,9 +59,8 @@ export class InteractionHandler {
       command.run(interaction);
     } catch (e) {
       this.log.error(
-        `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]`
+        `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]\n${e}`
       );
-      this.log.critical(`${e}`);
 
       interaction
         .reply({
@@ -69,8 +68,7 @@ export class InteractionHandler {
           ephemeral: true,
         })
         .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
+          this.log.error(`Interaction failed.\n${e}`);
         });
     }
   }
@@ -97,9 +95,8 @@ export class InteractionHandler {
       command?.handleSelect(interaction, args);
     } catch (e) {
       this.log.error(
-        `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]`
+        `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
       );
-      this.log.critical(`${e}`);
 
       interaction
         .reply({
@@ -133,9 +130,8 @@ export class InteractionHandler {
       command.handleButton(interaction, args);
     } catch (e) {
       this.log.error(
-        `An error occured with button[${interaction.customId}] in guild[${interaction.guildId}]`
+        `An error occured with button[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
       );
-      this.log.error(`${e}`);
 
       interaction
         .reply({

@@ -84,13 +84,12 @@ export class HelpCommand extends SlashCommand {
         embeds: [embed],
         components: [selectMenu],
       })
-      .catch((e) => {
+      .catch((e) =>
         this.log.error(
           `Failed to defer interaction. Interaction timestamp: ${new Date(
             interaction.createdTimestamp
-          )}`
-        );
-        this.log.error(`${e}`);
-      });
+          )}\n${e}`
+        )
+      );
   };
 }

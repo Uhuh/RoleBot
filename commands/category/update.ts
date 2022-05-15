@@ -53,10 +53,7 @@ export class UpdateCategoryCommand extends SlashCommand {
           ephemeral: true,
           content: `Hey! Something happened and I can't see the passed in emssage link. Could you try again?`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
@@ -68,10 +65,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         .reply(
           `Hey! I couldn't find that channel, make sure you're copying the message link right.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const message = await channel.messages.fetch(messageId);
@@ -81,16 +75,13 @@ export class UpdateCategoryCommand extends SlashCommand {
         .reply(
           `Hey! I couldn't find that message, make sure you're copying the message link right.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MESSAGE_ID(messageId);
 
     if (!reactMessage) {
-      this.log.debug(
+      this.log.info(
         `No react messages exist with messageId[${messageId}] in guild[${interaction.guildId}]`
       );
 
@@ -103,7 +94,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
 
     if (!category) {
-      this.log.debug(
+      this.log.info(
         `Category not found with categoryId[${reactMessage.categoryId}]] in guild[${interaction.guildId}]`
       );
 
@@ -111,16 +102,13 @@ export class UpdateCategoryCommand extends SlashCommand {
         .reply(
           `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
     if (!categoryRoles || !categoryRoles.length) {
-      this.log.debug(
+      this.log.info(
         `Category[${category.id}] in guild[${category.guildId}] has no react roles associated with it.`
       );
 
@@ -142,7 +130,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       await message
         .edit({ embeds: [embed] })
         .then(() => {
-          this.log.debug(`Updated category[${category.id}] embed.`);
+          this.log.info(`Updated category[${category.id}] embed.`);
 
           interaction.reply({
             ephemeral: true,
@@ -151,9 +139,8 @@ export class UpdateCategoryCommand extends SlashCommand {
         })
         .catch((e) => {
           this.log.error(
-            `Failed to update message for category[${category.id}]`
+            `Failed to update message for category[${category.id}]\n${e}`
           );
-          this.log.critical(`${e}`);
 
           interaction.reply({
             ephemeral: true,
@@ -173,9 +160,8 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     } catch (e) {
       this.log.error(
-        `Failed to edit category[${category.id}] embed and re-react to it for guild[${interaction.guildId}]`
+        `Failed to edit category[${category.id}] embed and re-react to it for guild[${interaction.guildId}]\n${e}`
       );
-      this.log.critical(`${e}`);
     }
   };
 }

@@ -47,23 +47,22 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRole = await GET_REACT_ROLE_BY_ID(Number(reactRoleId));
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
-    // To edit our butotn message with the updated list of react roles.
+    // To edit our button message with the updated list of react roles.
     const categorilessRoles = (
       (await GET_REACT_ROLES_NOT_IN_CATEGORIES(interaction.guildId)) ?? []
     ).filter((r) => r.roleId !== reactRole?.roleId);
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       Number(categoryId)
-    ).catch((e) => {
+    ).catch((e) =>
       this.log.critical(
-        `Failed to get react roles with categoryId[${categoryId}] for guild[${interaction.guildId}]`
-      );
-      this.log.critical(`${e}`);
-    });
+        `Failed to get react roles with categoryId[${categoryId}] for guild[${interaction.guildId}]\n${e}`
+      )
+    );
 
     // Should only get here if typeorm throws.
     if (!categoryRoles) {
-      this.log.critical(
+      this.log.error(
         `Unable to find category roles for category[${categoryId}] in guild[${interaction.guildId}]`
       );
       return interaction.reply(
@@ -72,7 +71,7 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     if (!reactRole) {
-      this.log.error(
+      this.log.debug(
         `React role[${reactRoleId}] was not found with the given ID.`
       );
 
@@ -80,14 +79,11 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     if (!category) {
-      this.log.error(
+      this.log.debug(
         `Category[${categoryId}] was not found with the given ID.`
       );
 
@@ -95,25 +91,24 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     if (categoryRoles.length >= 20) {
-      this.log.debug(
+      this.log.info(
         `Category[${categoryId}] already has 20 react roles in it.`
       );
-      return interaction.reply(
-        `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
-      );
+      return interaction
+        .reply(
+          `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
+        )
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     if (reactRole.categoryId) {
       const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.categoryId);
 
-      this.log.debug(
+      this.log.info(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`
       );
 
@@ -121,10 +116,7 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const roleButtons = await this.buildReactRoleButtons(
@@ -142,22 +134,20 @@ export class AddCategoryCommand extends SlashCommand {
           content: roleButtons.length ? moreRoles : noRolesLeft,
           components: roleButtons,
         })
-        .catch((e) => {
-          this.log.error(`Failed to update interaction`);
-          this.log.critical(`${e}`);
-        });
+        .catch((e) => this.log.error(`Failed to update interaction\n${e}`));
 
-      this.log.debug(
+      this.log.info(
         `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`
       );
     } catch (e) {
       this.log.error(
-        `Failed to update roles[${reactRoleId}] categoryId[${categoryId}]`
+        `Failed to update roles[${reactRoleId}] categoryId[${categoryId}]\n${e}`
       );
-      this.log.error(`${e}`);
-      interaction.update({
-        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
-      });
+      interaction
+        .update({
+          content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+        })
+        .catch((e) => this.log.error(`Failed to update interaction\n${e}`));
     }
 
     /**
@@ -189,10 +179,7 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! The category you selected... I can't find it. Does it exist anymore? Please wait a second and try running \`/${this.name}\` again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
@@ -209,17 +196,17 @@ export class AddCategoryCommand extends SlashCommand {
       })
       .catch((e) => {
         this.log.error(
-          `Failed to send category[${category.id}] buttons for guild[${interaction.guildId}]`
+          `Failed to send category[${category.id}] buttons for guild[${interaction.guildId}]\n${e}`
         );
-        this.log.critical(`${e}`);
         interaction.channel
           ?.send(
             `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`
           )
-          .catch((e) => {
-            this.log.error(`Failed to warn user about emojis buttons`);
-            this.log.critical(`${e}`);
-          });
+          .catch((e) =>
+            this.log.error(
+              `Failed to send message to channel[${interaction.channelId}].\n${e}`
+            )
+          );
       });
   };
 
@@ -267,10 +254,7 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! There are no categories, go create one with \`/category-create\` and then try again.`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const hasReactRoles = (
@@ -285,10 +269,7 @@ export class AddCategoryCommand extends SlashCommand {
         .reply(
           `Hey! Before trying to add react roles to a category, make sure you created some. Try out \`/react-role\` to create some!`
         )
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     // Value format: `commandName_guildID-categoryId`
@@ -310,9 +291,6 @@ export class AddCategoryCommand extends SlashCommand {
         content: `Hey! Select *one* category from below and then we'll move to adding react roles to it.`,
         components: [selectMenu],
       })
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
   };
 }

@@ -53,10 +53,7 @@ export class ReactRoleCommand extends SlashCommand {
           content:
             'I had some issues finding that role or emoji. Please try again.',
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     const reactRolesNotInCategory = (
@@ -96,10 +93,7 @@ export class ReactRoleCommand extends SlashCommand {
           embeds: [embed],
           components: [button],
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     // Custom emojis Look like this: <a?:name:id>
@@ -129,10 +123,9 @@ export class ReactRoleCommand extends SlashCommand {
             ephemeral: true,
             content: `Hey! You didn't pass in a proper emoji. You need to either pass in a Discord emoji or a servers custom emoji.`,
           })
-          .catch((e) => {
-            this.log.error(`Failed to alert user of invalid emojis.`);
-            this.log.critical(`${e}`);
-          });
+          .catch((e) =>
+            this.log.error(`Failed to alert user of invalid emojis.\n${e}`)
+          );
       }
 
       emojiId = unicodeEmoji[0];
@@ -148,10 +141,7 @@ export class ReactRoleCommand extends SlashCommand {
           ephemeral: true,
           content: `Hey! I had an issue trying to use that emoji. Please wait a moment and try again.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     /**
@@ -167,10 +157,7 @@ export class ReactRoleCommand extends SlashCommand {
           ephemeral: true,
           content: `The react role (${emojiMention} - <@&${reactRole.roleId}>) already has this emoji assigned to it.`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     /**
@@ -185,10 +172,7 @@ export class ReactRoleCommand extends SlashCommand {
           ephemeral: true,
           content: `There's a react role already using the role \`${reactRole.name}\` (${emojiMention} - <@&${reactRole.roleId}>).`,
         })
-        .catch((e) => {
-          this.log.error(`Interaction failed.`);
-          this.log.error(`${e}`);
-        });
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
     }
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
@@ -216,26 +200,19 @@ export class ReactRoleCommand extends SlashCommand {
             ephemeral: true,
             content: `:tada: Successfully created the react role (${emojiMention} - <@&${role.id}>) :tada:`,
           })
-          .catch((e) => {
-            this.log.error(`Interaction failed.`);
-            this.log.error(`${e}`);
-          });
+          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       })
       .catch((e) => {
         this.log.error(
-          `Failed to create react role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]`
+          `Failed to create react role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]\n${e}`
         );
-        this.log.error(e);
 
         interaction
           .reply({
             ephemeral: true,
             content: 'React role failed to create. Please try again.',
           })
-          .catch((e) => {
-            this.log.error(`Interaction failed.`);
-            this.log.error(`${e}`);
-          });
+          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
       });
   };
 }

@@ -48,10 +48,9 @@ export class TutorialCommand extends SlashCommand {
         embeds: [embed],
         components: [buttons],
       })
-      .catch((e) => {
-        this.log.error(`Failed to update tutorial interaction`);
-        this.log.critical(`${e}`);
-      });
+      .catch((e) =>
+        this.log.error(`Failed to update tutorial interaction.\n${e}`)
+      );
   };
 
   execute = async (interaction: CommandInteraction) => {
@@ -66,9 +65,6 @@ export class TutorialCommand extends SlashCommand {
         embeds: [embed],
         components: [buttons],
       })
-      .catch((e) => {
-        this.log.error(`Failed to send tutorial embeds.`);
-        this.log.critical(`${e}`);
-      });
+      .catch((e) => this.log.error(`Failed to send tutorial embed.\n${e}`));
   };
 }
