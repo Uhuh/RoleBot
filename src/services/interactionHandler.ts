@@ -23,17 +23,12 @@ export class InteractionHandler {
       );
     }
 
-    if (interaction.isCommand()) {
-      return InteractionHandler.handleCommand(interaction, client);
-    }
-
-    if (interaction.isSelectMenu()) {
-      return InteractionHandler.handleSelect(interaction, client);
-    }
-
-    if (interaction.isButton()) {
-      return InteractionHandler.handleButton(interaction, client);
-    }
+    if (interaction.isCommand())
+      InteractionHandler.handleCommand(interaction, client);
+    else if (interaction.isSelectMenu())
+      InteractionHandler.handleSelect(interaction, client);
+    else if (interaction.isButton())
+      InteractionHandler.handleButton(interaction, client);
   }
 
   /**

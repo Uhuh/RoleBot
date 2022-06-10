@@ -1,3 +1,4 @@
+import { codeBlock } from '@discordjs/builders';
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import {
@@ -119,15 +120,14 @@ export class ReactChannelCommand extends SlashCommand {
 
     const permissionError =
       `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
-      `
-Why do I need these permissions in this channel?
-\`\`\`
-- To be able to react I have to be able to see the message so I need the history for the channel.
-- Have to be able to react, it is a react role bot.
-- Have to be able to send embeds.
-- To update the embeds react role list.
-- To update users roles.
-\`\`\``;
+      'Why do I need these permissions in this channel?\n' +
+      codeBlock(`
+      - To be able to react I have to be able to see the message so I need the history for the channel.
+      - Have to be able to react, it is a react role bot.
+      - Have to be able to send embeds.
+      - To update the embeds react role list.
+      - To update users roles.
+      `);
 
     /* There might be a better solution to this. Potentially reply first, then update the interaction later. Discord interactions feel so incredibly inconsistent though. So for now force users to WAIT the whole 3 seconds so that Discord doesn't cry. */
     await new Promise((res) => {
