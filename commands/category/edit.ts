@@ -7,6 +7,7 @@ import {
 } from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import { handleInteractionReply } from '../../utilities/utils';
 
 export class EditCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -55,23 +56,19 @@ export class EditCategoryCommand extends SlashCommand {
     if (!newName && !newDesc && mutuallyExclusive === null) {
       this.log.info(`User didn't change anything about the category`);
 
-      return interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! You need to pass at _least_ one updated field about the category.`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! You need to pass at _least_ one updated field about the category.`,
+      });
     }
 
     if (!name) {
       this.log.error(`Required option name was undefined.`);
 
-      return interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! I had an issue finding the category. Please wait a second and try again.`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I had an issue finding the category. Please wait a second and try again.`,
+      });
     }
 
     const category = await GET_CATEGORY_BY_NAME(interaction.guildId, name);
@@ -81,11 +78,7 @@ export class EditCategoryCommand extends SlashCommand {
         `Category not found with name[${name}] in guild[${interaction.guildId}]`
       );
 
-      return interaction
-        .reply(
-          `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
     }
 
     const updatedCategory: Partial<ICategory> = {
@@ -100,12 +93,10 @@ export class EditCategoryCommand extends SlashCommand {
           `Updated category[${category.id}] in guild[${interaction.guildId}] successfully.`
         );
 
-        interaction
-          .reply({
-            ephemeral: true,
-            content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
-          })
-          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
+        });
       })
       .catch((e) =>
         this.log.critical(

@@ -1,5 +1,4 @@
 import { Permissions } from 'discord.js-light';
-import { PermissionMappings } from '../../commands/slashCommand';
 import Rolebot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';

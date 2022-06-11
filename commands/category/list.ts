@@ -11,7 +11,7 @@ import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import RoleBot from '../../src/bot';
-import { spliceIntoChunks } from '../../utilities/functions/spliceChunks';
+import { handleInteractionReply, spliceIntoChunks } from '../../utilities/utils';
 
 export class ListCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -41,18 +41,10 @@ export class ListCategoryCommand extends SlashCommand {
         `Guild[${interaction.guildId}] did not have any categories.`
       );
 
-      return interaction
-        .reply(
-          `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`);
     }
 
-    interaction
-      .reply(
-        `Hey! Let me build these embeds for you real quick and send them...`
-      )
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+    handleInteractionReply(this.log, interaction, `Hey! Let me build these embeds for you real quick and send them...`);
 
     const embeds: MessageEmbed[] = [];
 

@@ -3,6 +3,7 @@ import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
+import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactListCommand extends SlashCommand {
@@ -28,11 +29,7 @@ export class ReactListCommand extends SlashCommand {
     );
 
     if (!reactRoles || !reactRoles.length) {
-      return interaction
-        .reply({
-          content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`);
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);

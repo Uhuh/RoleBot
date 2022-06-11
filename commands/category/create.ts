@@ -5,6 +5,7 @@ import {
   GET_CATEGORY_BY_NAME,
 } from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
+import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class CreateCategoryCommand extends SlashCommand {
@@ -40,28 +41,20 @@ export class CreateCategoryCommand extends SlashCommand {
       interaction.options.get('mutually-exclusive')?.value;
 
     if (!categoryName) {
-      return interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
+      });
     } else if (categoryName.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
-      return interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
+      });
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
-      return await interaction
-        .reply(
-          `Hey! It turns out you already have a category with that name made. Try checking it out.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! It turns out you already have a category with that name made. Try checking it out.`);
     }
 
     CREATE_GUILD_CATEGORY(
@@ -74,22 +67,13 @@ export class CreateCategoryCommand extends SlashCommand {
         this.log.info(
           `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
         );
-        interaction
-          .reply(
-            `Hey! I successfully created the category \`${categoryName}\` for you!`
-          )
-          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        handleInteractionReply(this.log, interaction, `Hey! I successfully created the category \`${categoryName}\` for you!`);
       })
       .catch((e) => {
         this.log.error(
           `Issue creating category[${categoryName}] for guild[${interaction.guildId}]\n${e}`
         );
-
-        interaction
-          .reply(
-            `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
-          )
-          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        handleInteractionReply(this.log, interaction, `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`);
       });
   };
 }

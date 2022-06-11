@@ -40,7 +40,7 @@ export class LogService {
     this.prefix = _prefix;
   }
 
-  log(level: LogLevel, content: string, ...args: any[]) {
+  log(level: LogLevel, content: string) {
     console.log(
       colorMap[level],
       '[',

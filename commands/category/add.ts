@@ -17,7 +17,7 @@ import {
 } from '../../src/database/database';
 import { SlashCommand } from '../slashCommand';
 import { Category } from '../../utilities/types/commands';
-import { spliceIntoChunks } from '../../utilities/functions/spliceChunks';
+import { handleInteractionReply, spliceIntoChunks } from '../../utilities/utils';
 import RoleBot from '../../src/bot';
 import { ReactRole } from '../../src/database/entities';
 
@@ -65,21 +65,17 @@ export class AddCategoryCommand extends SlashCommand {
       this.log.error(
         `Unable to find category roles for category[${categoryId}] in guild[${interaction.guildId}]`
       );
-      return interaction.reply(
-        `Hey! Something broke. But I'm working on it, please be patient!`
-      );
+      return handleInteractionReply(this.log, interaction, `Hey! Something broke. But I'm working on it, please be patient!`);
     }
+
+    const unknownErrorMessage = `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`;
 
     if (!reactRole) {
       this.log.debug(
         `React role[${reactRoleId}] was not found with the given ID.`
       );
 
-      return interaction
-        .reply(
-          `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, unknownErrorMessage);
     }
 
     if (!category) {
@@ -87,22 +83,14 @@ export class AddCategoryCommand extends SlashCommand {
         `Category[${categoryId}] was not found with the given ID.`
       );
 
-      return interaction
-        .reply(
-          `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, unknownErrorMessage);
     }
 
     if (categoryRoles.length >= 20) {
       this.log.info(
         `Category[${categoryId}] already has 20 react roles in it.`
       );
-      return interaction
-        .reply(
-          `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`);
     }
 
     if (reactRole.categoryId) {
@@ -112,11 +100,7 @@ export class AddCategoryCommand extends SlashCommand {
         `React role[${reactRoleId}] is already in a category[${categoryId}]`
       );
 
-      interaction
-        .reply(
-          `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      handleInteractionReply(this.log, interaction, `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`);
     }
 
     const roleButtons = await this.buildReactRoleButtons(
@@ -175,11 +159,7 @@ export class AddCategoryCommand extends SlashCommand {
       this.log.error(
         `Could not find category[${categoryId}] after it was selected in dropdown.`
       );
-      return interaction
-        .reply(
-          `Hey! The category you selected... I can't find it. Does it exist anymore? Please wait a second and try running \`/${this.name}\` again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! The category you selected... I can't find it. Does it exist anymore? Please wait a second and try running \`/${this.name}\` again.`);
     }
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
@@ -198,15 +178,7 @@ export class AddCategoryCommand extends SlashCommand {
         this.log.error(
           `Failed to send category[${category.id}] buttons for guild[${interaction.guildId}]\n${e}`
         );
-        interaction.channel
-          ?.send(
-            `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`
-          )
-          .catch((e) =>
-            this.log.error(
-              `Failed to send message to channel[${interaction.channelId}].\n${e}`
-            )
-          );
+        handleInteractionReply(this.log, interaction, `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.`);
       });
   };
 
@@ -250,11 +222,7 @@ export class AddCategoryCommand extends SlashCommand {
       this.log.debug(
         `Guild[${interaction.guildId}] has no categories to add react roles to.`
       );
-      return interaction
-        .reply(
-          `Hey! There are no categories, go create one with \`/category-create\` and then try again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! There are no categories, go create one with \`/category-create\` and then try again.`);
     }
 
     const hasReactRoles = (
@@ -265,11 +233,7 @@ export class AddCategoryCommand extends SlashCommand {
       this.log.debug(
         `Guild[${interaction.guildId}] has no react roles to add to category.`
       );
-      return interaction
-        .reply(
-          `Hey! Before trying to add react roles to a category, make sure you created some. Try out \`/react-role\` to create some!`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! Before trying to add react roles to a category, make sure you created some. Try out \`/react-role\` to create some!`);
     }
 
     // Value format: `commandName_guildID-categoryId`

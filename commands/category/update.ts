@@ -12,7 +12,7 @@ import {
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
-import { reactToMessage } from '../../utilities/functions/reactions';
+import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
@@ -48,12 +48,10 @@ export class UpdateCategoryCommand extends SlashCommand {
         `Undefined message-link despite being required in guild[${interaction.guildId}].`
       );
 
-      return interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! Something happened and I can't see the passed in emssage link. Could you try again?`,
-        })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! Something happened and I can't see the passed in emssage link. Could you try again?`,
+      });
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
@@ -61,21 +59,13 @@ export class UpdateCategoryCommand extends SlashCommand {
     const channel = await interaction.guild?.channels.fetch(channelId);
 
     if (!channel || !isTextChannel(channel)) {
-      return await interaction
-        .reply(
-          `Hey! I couldn't find that channel, make sure you're copying the message link right.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that channel, make sure you're copying the message link right.`);
     }
 
     const message = await channel.messages.fetch(messageId);
 
     if (!message) {
-      return await interaction
-        .reply(
-          `Hey! I couldn't find that message, make sure you're copying the message link right.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that message, make sure you're copying the message link right.`);
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MESSAGE_ID(messageId);
@@ -85,7 +75,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         `No react messages exist with messageId[${messageId}] in guild[${interaction.guildId}]`
       );
 
-      return interaction.reply({
+      return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
         content: `Hey! I looked and didn't see any react roles saved that are associated with that message.`,
       });
@@ -98,11 +88,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         `Category not found with categoryId[${reactMessage.categoryId}]] in guild[${interaction.guildId}]`
       );
 
-      return interaction
-        .reply(
-          `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
@@ -112,7 +98,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         `Category[${category.id}] in guild[${category.guildId}] has no react roles associated with it.`
       );
 
-      return interaction.reply({
+      return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
         content: `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.`,
       });
@@ -132,7 +118,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         .then(() => {
           this.log.info(`Updated category[${category.id}] embed.`);
 
-          interaction.reply({
+          handleInteractionReply(this.log, interaction, {
             ephemeral: true,
             content: `Hey! I updated the react role embed message related to this category.`,
           });
@@ -142,7 +128,7 @@ export class UpdateCategoryCommand extends SlashCommand {
             `Failed to update message for category[${category.id}]\n${e}`
           );
 
-          interaction.reply({
+          handleInteractionReply(this.log, interaction, {
             ephemeral: true,
             content: `Hey! I wasn't able to update the message for some reason. Most likely a message history / manage permission issue.`,
           });

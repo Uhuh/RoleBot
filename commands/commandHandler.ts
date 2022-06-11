@@ -35,6 +35,7 @@ export default (client: RoleBot) => {
   // generateSlashCommands(commandsJson);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function generateSlashCommands(
   commandsJson: RESTPostAPIApplicationCommandsJSONBody[]
 ) {
@@ -53,14 +54,14 @@ async function generateSlashCommands(
 /**
  * I just need a simple way to delete all the stupid global commands.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteSlashCommands() {
   const log = new LogService('DeleteSlashCommands');
 
   try {
     rest.get(Routes.applicationCommands(CLIENT_ID)).then((data) => {
       const promises = [];
-      //@ts-ignore
-      for (const command of data) {
+      for (const command of data as {id: string}[]) {
         promises.push(
           rest.delete(`${Routes.applicationCommands(CLIENT_ID)}/${command.id}`)
         );

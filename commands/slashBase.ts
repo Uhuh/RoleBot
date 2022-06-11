@@ -5,7 +5,7 @@ import { ChannelType } from 'discord-api-types';
  * @SlashBase Helps add options to the Discord Slash commands as they are unreasonable large to type out.
  */
 export abstract class SlashBase {
-  constructor(public data: SlashCommandBuilder) {}
+  constructor(public data: SlashCommandBuilder) { }
 
   addStringOption = (name: string, desc: string, required = false) => {
     this.data.addStringOption((option) =>

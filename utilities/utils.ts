@@ -1,15 +1,15 @@
-import { Message } from 'discord.js-light';
-import RoleBot from '../../src/bot';
+import { ButtonInteraction, CommandInteraction, Message, SelectMenuInteraction } from 'discord.js-light';
+import RoleBot from '../src/bot';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
   GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_CATEGORY_ID,
   GET_ROLES_BY_CATEGORY_ID,
-} from '../../src/database/database';
-import { ReactRole } from '../../src/database/entities';
-import { EmbedService } from '../../src/services/embedService';
-import { LogService } from '../../src/services/logService';
+} from '../src/database/database';
+import { ReactRole } from '../src/database/entities';
+import { EmbedService } from '../src/services/embedService';
+import { LogService } from '../src/services/logService';
 
 export const reactToMessage = (
   message: Message,
@@ -37,8 +37,7 @@ export const reactToMessage = (
         })
         .catch((e) => {
           log.debug(
-            `Failed to react to message[${message.id}] with emoji[${
-              r.emojiTag ?? r.emojiId
+            `Failed to react to message[${message.id}] with emoji[${r.emojiTag ?? r.emojiId
             }] in guild[${guildId}]\n${e}`
           );
         });
@@ -129,4 +128,26 @@ export const updateReactMessages = async (
   } catch (e) {
     log.error(`Caught an error updating reaction messages.\n${e}`);
   }
+};
+
+export const spliceIntoChunks = <T>(
+  arr: readonly T[],
+  chunkSize: number
+): T[][] => {
+  const result: T[][] = [];
+  const arrCopy = [...arr];
+  while (arrCopy.length > 0) result.push(arrCopy.splice(0, chunkSize));
+  return result;
+};
+
+export const handleInteractionReply = (
+  logger: LogService,
+  interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction,
+  content: { content: string, ephemeral?: boolean } | string
+) => {
+  interaction.reply(content)
+    .catch((interactionError) => {
+      interaction.channel?.send(typeof content === 'string' ? content : content.content)
+        .catch((channelError) => logger.error(`Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`));
+    });
 };

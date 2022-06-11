@@ -1,6 +1,7 @@
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { Category } from '../../utilities/types/commands';
+import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class AutoJoinCommand extends SlashCommand {
@@ -47,14 +48,9 @@ export class AutoJoinCommand extends SlashCommand {
   }
 
   execute = (interaction: CommandInteraction) => {
-    interaction
-      .reply({
-        ephemeral: true,
-        content: `Hey! This command is currently under development to work with the new slash command style. Thank you for being patient.`,
-      })
-      .catch((e) => {
-        this.log.error(`Interaction failed.`);
-        this.log.error(`${e}`);
-      });
+    handleInteractionReply(this.log, interaction, {
+      ephemeral: true,
+      content: `Hey! This command is currently under development to work with the new slash command style. Thank you for being patient.`,
+    });
   };
 }

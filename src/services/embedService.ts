@@ -10,12 +10,9 @@ import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
 
 export class EmbedService {
-  constructor() {}
-
   private static userTagInfo = (user: User | string): string => {
-    return `${typeof user === 'string' ? user : user?.tag} (<@${
-      typeof user === 'string' ? user : user.id
-    }>)`;
+    return `${typeof user === 'string' ? user : user?.tag} (<@${typeof user === 'string' ? user : user.id
+      }>)`;
   };
 
   /**
@@ -85,14 +82,14 @@ export class EmbedService {
 
     const inCategory = rolesInCategory.length
       ? `**In a category:**\n${this.reactRolesFormattedString(
-          rolesInCategory
-        )}\n`
+        rolesInCategory
+      )}\n`
       : '';
 
     const notInCategory = rolesNotInCategory.length
       ? `**Not in a category:**\n${this.reactRolesFormattedString(
-          rolesNotInCategory
-        )}`
+        rolesNotInCategory
+      )}`
       : '';
 
     embed

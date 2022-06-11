@@ -6,6 +6,7 @@ import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_NAME,
 } from '../../src/database/database';
+import { handleInteractionReply } from '../../utilities/utils';
 
 export class RemoveCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -38,11 +39,7 @@ export class RemoveCategoryCommand extends SlashCommand {
       this.log.debug(
         `Required option was empty for categoryName[${categoryName}] on guild[${interaction.guildId}]`
       );
-      return interaction
-        .reply(
-          `Hey! I don't think you passed in a name. Could you please try again?`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I don't think you passed in a name. Could you please try again?`);
     }
 
     const category = await GET_CATEGORY_BY_NAME(
@@ -55,11 +52,7 @@ export class RemoveCategoryCommand extends SlashCommand {
         `Category[${categoryName}] does not exist on guild[${interaction.guildId}]. Most likely name typo.`
       );
 
-      return interaction
-        .reply(
-          `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`
-        )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      return handleInteractionReply(this.log, interaction, `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`);
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
@@ -68,22 +61,14 @@ export class RemoveCategoryCommand extends SlashCommand {
           `Successfully deleted category[${categoryName}] for guild[${interaction.guildId}]`
         );
 
-        interaction
-          .reply(
-            `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`
-          )
-          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        handleInteractionReply(this.log, interaction, `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`);
       })
       .catch((e) => {
         this.log.error(
           `Issues deleting category[${categoryName}] for guild[${interaction.guildId}]\n${e}`
         );
 
-        interaction
-          .reply(
-            `Hey! I had an issue deleting the category. Please wait a second and try again.`
-          )
-          .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        handleInteractionReply(this.log, interaction, `Hey! I had an issue deleting the category. Please wait a second and try again.`);
       });
   };
 }

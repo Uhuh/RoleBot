@@ -26,8 +26,7 @@ Check out my site! https://rolebot.gg
 
 This servers shard ID: ${interaction.guild?.shardId}
 Server count: ${size} servers.
-Latency is ${
-          Date.now() - interaction.createdTimestamp
+Latency is ${Date.now() - interaction.createdTimestamp
         }ms. API Latency is ${Math.round(this.client.ws.ping)}ms.
 
 [Click to Vote!](${VOTE_URL})

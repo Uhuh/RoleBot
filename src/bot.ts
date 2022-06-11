@@ -17,7 +17,7 @@ import {
 import * as Discord from 'discord.js-light';
 
 export default class RoleBot extends Discord.Client {
-  config: any;
+  config: typeof config;
   commandsRun: number;
   commands: Discord.Collection<string, SlashCommand>;
 

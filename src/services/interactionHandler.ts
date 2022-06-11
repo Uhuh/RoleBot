@@ -7,6 +7,7 @@ import {
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
 import RoleBot from '../bot';
+import { handleInteractionReply } from '../../utilities/utils';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
@@ -57,14 +58,10 @@ export class InteractionHandler {
         `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]\n${e}`
       );
 
-      interaction
-        .reply({
-          content: 'There was an error while executing this command!',
-          ephemeral: true,
-        })
-        .catch((e) => {
-          this.log.error(`Interaction failed.\n${e}`);
-        });
+      handleInteractionReply(this.log, interaction, {
+        content: 'There was an error while executing this command!',
+        ephemeral: true,
+      });
     }
   }
 
@@ -93,16 +90,10 @@ export class InteractionHandler {
         `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
       );
 
-      interaction
-        .reply({
-          ephemeral: true,
-          content: `I couldn't find that select option. Try again or report it to the [support server](${SUPPORT_URL}).`,
-        })
-        .catch(() =>
-          this.log.error(
-            `Error telling user that I couldn't use the selected dropdown.`
-          )
-        );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `I couldn't find that select option. Try again or report it to the [support server](${SUPPORT_URL}).`,
+      });
     }
   }
 
@@ -128,16 +119,10 @@ export class InteractionHandler {
         `An error occured with button[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
       );
 
-      interaction
-        .reply({
-          ephemeral: true,
-          content: `Hey! I had issues trying to process that button click, please wait a moment and try again.`,
-        })
-        .catch(() =>
-          this.log.error(
-            `Couldn't alert user that there was an error with the handleButton method.`
-          )
-        );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I had issues trying to process that button click, please wait a moment and try again.`,
+      });
     }
   }
 

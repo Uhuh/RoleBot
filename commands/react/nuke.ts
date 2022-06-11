@@ -21,7 +21,7 @@ export class ReactNukeCommand extends SlashCommand {
     );
   }
 
-  handleButton = (interaction: ButtonInteraction, args: string[]) => {
+  handleButton = (interaction: ButtonInteraction) => {
     if (!interaction.guildId) {
       return interaction.followUp(
         `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`

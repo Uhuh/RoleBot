@@ -6,7 +6,7 @@ import {
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/database';
 import { EmbedService } from '../../src/services/embedService';
-import { reactToMessage } from '../../utilities/functions/reactions';
+import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { PermissionMappings, SlashCommand } from '../slashCommand';
 
@@ -158,6 +158,7 @@ export class ReactChannelCommand extends SlashCommand {
           false,
           this.log
         );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         this.log.error(`Failed to send embeds.\n${e}`);
 
