@@ -12,7 +12,12 @@ export class ShardHandler {
     });
 
     this.manager.on('shardCreate', (shard) => {
-      this.log.info(`Launched new shard[${shard.id}]`);
+      this.log.info(`Launching new shard[${shard.id}]`);
+      
+      shard.on('death', () => this.log.critical(`Shard[${shard.id}] died.`));
+      shard.on('spawn', () => this.log.info(`Shard[${shard.id}] successfully spawned`));
+      shard.on('disconnect', () => this.log.critical(`Shard[${shard.id}] disconnected.`));
+      shard.on('reconnection', () => this.log.debug(`Shard[${shard.id}] attempting to reconnect.`));
     });
   }
 

@@ -59,7 +59,7 @@ export class LogService {
     if (level == LogLevel.critical || level == LogLevel.error) {
       RolebotEventsWebhook.send({
         embeds: [EmbedService.errorEmbed(content)],
-      });
+      }).catch((e) => console.log(logTypeDate, `- [ LogService ] RolebotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`));
     }
   }
 
