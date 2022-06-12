@@ -35,32 +35,35 @@ export class ReactionHandler {
 
     if (!emojiId) {
       return this.log.debug(
-        `Emoji doesn't exist on message[${message.id}] reaction for guild[${guild.id}].`
+        `Emoji doesn't exist on message[${message.id}] reaction`,
+        guild.id
       );
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID(
       message.id,
       emojiId
-    ).catch((e) => this.log.error(`Failed to query for react message.\n${e}`));
+    ).catch((e) => this.log.error(`Failed to query for react message.\n${e}`, guild.id));
 
     if (!reactMessage) return;
 
     if (!reactMessage.categoryId) {
       return this.log.error(
-        `React role[${reactMessage.id}] in guild[${guild.id}] does NOT have a category set.`
+        `React role[${reactMessage.id}] in guild[${guild.id}] does NOT have a category set.`,
+        guild.id
       );
     }
 
     const member = await guild.members
       .fetch(user.id)
       .catch((e) =>
-        this.log.error(`Fetching user[${user.id}] threw an error.\n${e}`)
+        this.log.error(`Fetching user[${user.id}] threw an error.\n${e}`, guild.id)
       );
 
     if (!member) {
       return this.log.debug(
-        `Failed to fetch member with user[${user.id}] for reaction[${type}] on guild[${guild.id}]`
+        `Failed to fetch member with user[${user.id}] for reaction[${type}]`,
+        guild.id
       );
     }
 
@@ -68,7 +71,8 @@ export class ReactionHandler {
 
     if (!category) {
       return this.log.error(
-        `Category[${reactMessage.categoryId}] does not exist for guild[${guild.id}]`
+        `Category[${reactMessage.categoryId}] does not exist`,
+        guild.id
       );
     }
 
@@ -82,7 +86,8 @@ export class ReactionHandler {
           .add(reactMessage.roleId)
           .catch((e) =>
             this.log.error(
-              `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`
+              `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`,
+              guild.id
             )
           );
         break;
@@ -91,7 +96,8 @@ export class ReactionHandler {
           .remove(reactMessage.roleId)
           .catch((e) =>
             this.log.error(
-              `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`
+              `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`,
+              guild.id
             )
           );
     }
@@ -115,14 +121,16 @@ export class ReactionHandler {
         .remove(reactMessage.roleId)
         .catch((e) =>
           this.log.error(
-            `Failed to remove role[${reactMessage.roleId}] from user[${member.id}]\n${e}`
+            `Failed to remove role[${reactMessage.roleId}] from user[${member.id}]\n${e}`,
+            guild.id
           )
         );
     }
 
     if (!reactMessage.categoryId) {
       return this.log.error(
-        `React role[${reactMessage.id}] category is undefined.`
+        `React role[${reactMessage.id}] category is undefined.`,
+        guild.id
       );
     }
 
@@ -143,13 +151,15 @@ export class ReactionHandler {
       .fetch(reactMessage.roleId)
       .catch((e) =>
         this.log.error(
-          `Failed to fetch role[${reactMessage.roleId}] for guild[${guild.id}]\n${e}`
+          `Failed to fetch role[${reactMessage.roleId}]\n${e}`,
+          guild.id
         )
       );
 
     if (!role) {
       return this.log.debug(
-        `Role[${reactMessage.roleId}] could not be found for guild[${guild.id}]`
+        `Role[${reactMessage.roleId}] could not be found`,
+        guild.id
       );
     }
 
@@ -160,6 +170,6 @@ export class ReactionHandler {
       .edit({
         roles: updatedRoleList,
       })
-      .catch((e) => this.log.error(`Failed to update members roles.\n${e}`));
+      .catch((e) => this.log.error(`Failed to update members roles.\n${e}`, guild.id));
   };
 }
