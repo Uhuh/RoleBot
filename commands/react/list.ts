@@ -24,7 +24,8 @@ export class ReactListCommand extends SlashCommand {
       interaction.guildId
     ).catch((e) =>
       this.log.critical(
-        `Failed to fetch react roles for guild[${interaction.guildId}]\n${e}`
+        `Failed to fetch react roles\n${e}`,
+        interaction.guildId
       )
     );
 
@@ -39,6 +40,6 @@ export class ReactListCommand extends SlashCommand {
         content: `Hey! Here's your react roles.`,
         embeds: [embed],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
   };
 }

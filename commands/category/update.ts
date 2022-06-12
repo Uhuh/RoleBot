@@ -45,7 +45,8 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     if (!messageLink) {
       this.log.critical(
-        `Undefined message-link despite being required in guild[${interaction.guildId}].`
+        `Undefined message-link despite being required in guild.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -72,7 +73,8 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     if (!reactMessage) {
       this.log.info(
-        `No react messages exist with messageId[${messageId}] in guild[${interaction.guildId}]`
+        `No react messages exist with messageId[${messageId}]`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -85,7 +87,8 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     if (!category) {
       this.log.info(
-        `Category not found with categoryId[${reactMessage.categoryId}]] in guild[${interaction.guildId}]`
+        `Category not found with categoryId[${reactMessage.categoryId}]]`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
@@ -95,7 +98,8 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     if (!categoryRoles || !categoryRoles.length) {
       this.log.info(
-        `Category[${category.id}] in guild[${category.guildId}] has no react roles associated with it.`
+        `Category[${category.id}] has no react roles associated with it.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -116,7 +120,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       await message
         .edit({ embeds: [embed] })
         .then(() => {
-          this.log.info(`Updated category[${category.id}] embed.`);
+          this.log.info(`Updated category[${category.id}] embed.`,interaction.guildId);
 
           handleInteractionReply(this.log, interaction, {
             ephemeral: true,
@@ -125,7 +129,8 @@ export class UpdateCategoryCommand extends SlashCommand {
         })
         .catch((e) => {
           this.log.error(
-            `Failed to update message for category[${category.id}]\n${e}`
+            `Failed to update message for category[${category.id}]\n${e}`,
+            interaction.guildId
           );
 
           handleInteractionReply(this.log, interaction, {
@@ -146,7 +151,8 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     } catch (e) {
       this.log.error(
-        `Failed to edit category[${category.id}] embed and re-react to it for guild[${interaction.guildId}]\n${e}`
+        `Failed to edit category[${category.id}] embed and re-react to it\n${e}`,
+        interaction.guildId
       );
     }
   };

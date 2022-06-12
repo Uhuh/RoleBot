@@ -20,7 +20,8 @@ export class InteractionHandler {
   public static handleInteraction(interaction: Interaction, client: RoleBot) {
     if (!InteractionHandler.isSupportedInteractionType(interaction)) {
       return this.log.debug(
-        `Received interaction that is not one of the supported types.`
+        `Received interaction that is not one of the supported types.`,
+        interaction.guildId
       );
     }
 
@@ -47,7 +48,8 @@ export class InteractionHandler {
     if (!command) return;
     else if (!command.canUserRunInteraction(interaction)) {
       return this.log.debug(
-        `User[${interaction.user.id}] tried to run command[${command.name}] without sufficient permissions.`
+        `User[${interaction.user.id}] tried to run command[${command.name}] without sufficient permissions.`,
+        interaction.guildId
       );
     }
 
@@ -55,7 +57,8 @@ export class InteractionHandler {
       command.run(interaction);
     } catch (e) {
       this.log.error(
-        `Encountered an error trying to run command[${command.name}] for guild[${interaction.guildId}]\n${e}`
+        `Encountered an error trying to run command[${command.name}]\n${e}`,
+        interaction.guildId
       );
 
       handleInteractionReply(this.log, interaction, {
@@ -80,14 +83,16 @@ export class InteractionHandler {
 
       if (!command?.canUserRunInteraction(interaction)) {
         return this.log.debug(
-          `User[${interaction.user.id}] selected option but does not have sufficient permissions to execute the commands[${commandName}] handleSelect`
+          `User[${interaction.user.id}] selected option but does not have sufficient permissions to execute the commands[${commandName}] handleSelect`,
+          interaction.guildId
         );
       }
 
       command?.handleSelect(interaction, args);
     } catch (e) {
       this.log.error(
-        `An error occured with select[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
+        `An error occured with select[${interaction.customId}]\n${e}`,
+        interaction.guildId
       );
 
       handleInteractionReply(this.log, interaction, {
@@ -109,14 +114,16 @@ export class InteractionHandler {
 
       if (!command?.canUserRunInteraction(interaction)) {
         return this.log.debug(
-          `User[${interaction.user.id}] clicked a button but does not have sufficient permissions to execute the commands[${commandName}] handleButton.`
+          `User[${interaction.user.id}] clicked a button but does not have sufficient permissions to execute the commands[${commandName}] handleButton.`,
+          interaction.guildId
         );
       }
 
       command.handleButton(interaction, args);
     } catch (e) {
       this.log.error(
-        `An error occured with button[${interaction.customId}] in guild[${interaction.guildId}]\n${e}`
+        `An error occured with button[${interaction.customId}]\n${e}`,
+        interaction.guildId
       );
 
       handleInteractionReply(this.log, interaction, {

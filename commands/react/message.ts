@@ -50,7 +50,8 @@ export class ReactMessageCommand extends SlashCommand {
 
     if (!message) {
       this.log.debug(
-        `User gave message[${messageId}] that doesn't exist in channel[${channelId}] in guild[${guildId}]`
+        `User gave message[${messageId}] that doesn't exist in channel[${channelId}]`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! I had an issue finding that message. Give me a sec and try again.`);
@@ -60,7 +61,8 @@ export class ReactMessageCommand extends SlashCommand {
 
     if (!category) {
       this.log.info(
-        `Category[${categoryId}] is missing for guild[${guildId}] despite having passed previous check.`
+        `Category[${categoryId}] is missing for guild despite having passed previous check.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! I had an issue finding that category. Please wait a second and try again.`);
@@ -70,7 +72,8 @@ export class ReactMessageCommand extends SlashCommand {
 
     if (!reactRoles.length) {
       this.log.error(
-        `Category[${categoryId}] in guild[${guildId}] somehow has no react roles associated with it.`
+        `Category[${categoryId}] in guild somehow has no react roles associated with it.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! I had issues getting the react roles for the category. Can you wait a sec and try again?`);
@@ -114,7 +117,8 @@ export class ReactMessageCommand extends SlashCommand {
       .fetch(channelId)
       .catch((e) =>
         this.log.error(
-          `Failed to fetch channel[${channelId}] in guild[${interaction.guildId}]\n${e}`
+          `Failed to fetch channel[${channelId}]\n${e}`,
+          interaction.guildId
         )
       );
 
@@ -126,7 +130,8 @@ export class ReactMessageCommand extends SlashCommand {
       .fetch(messageId)
       .catch((e) =>
         this.log.error(
-          `Failed to fetch message[${messageId}] for channel[${channel.id}]\n${e}`
+          `Failed to fetch message[${messageId}] for channel[${channel.id}]\n${e}`,
+          interaction.guildId
         )
       );
 
@@ -141,7 +146,8 @@ export class ReactMessageCommand extends SlashCommand {
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
         this.log.error(
-          `Failed to get categories for guild[${interaction.guildId}]\n${e}`
+          `Failed to get categories\n${e}`,
+          interaction.guildId
         )
     );
 
@@ -161,13 +167,15 @@ export class ReactMessageCommand extends SlashCommand {
 
     if (!guildHasCategories) {
       this.log.info(
-        `Guild[${interaction.guildId}] has no categories. Cannot do command[${this.name}]`
+        `Guild has no categories.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, guildHasNoCategories);
     } else if (!allEmptyCategories) {
       this.log.debug(
-        `Guild[${interaction.guildId}] has categories but all of them are empty.`
+        `Guild has categories but all of them are empty.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, allCategoriesAreEmpty);
@@ -192,7 +200,7 @@ export class ReactMessageCommand extends SlashCommand {
         content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
         components: [selectMenu],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
   };
 }
 

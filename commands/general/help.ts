@@ -25,7 +25,8 @@ export class HelpCommand extends SlashCommand {
       .update({ embeds: [embed] })
       .catch(() =>
         this.log.error(
-          `Error sending help embed for interaction. [${interaction.guildId}]`
+          `Error sending help embed for interaction.`,
+          interaction.guildId
         )
       );
   };
@@ -88,7 +89,8 @@ export class HelpCommand extends SlashCommand {
         this.log.error(
           `Failed to defer interaction. Interaction timestamp: ${new Date(
             interaction.createdTimestamp
-          )}\n${e}`
+          )}\n${e}`,
+          interaction.guildId
         )
       );
   };

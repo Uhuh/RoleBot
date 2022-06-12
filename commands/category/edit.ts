@@ -54,7 +54,7 @@ export class EditCategoryCommand extends SlashCommand {
       interaction.options.getBoolean('mutually-exclusive');
 
     if (!newName && !newDesc && mutuallyExclusive === null) {
-      this.log.info(`User didn't change anything about the category`);
+      this.log.info(`User didn't change anything about the category`, interaction.guildId);
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
@@ -63,7 +63,7 @@ export class EditCategoryCommand extends SlashCommand {
     }
 
     if (!name) {
-      this.log.error(`Required option name was undefined.`);
+      this.log.error(`Required option name was undefined.`, interaction.guildId);
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
@@ -75,7 +75,8 @@ export class EditCategoryCommand extends SlashCommand {
 
     if (!category) {
       this.log.info(
-        `Category not found with name[${name}] in guild[${interaction.guildId}]`
+        `Category not found with name[${name}]`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
@@ -90,7 +91,8 @@ export class EditCategoryCommand extends SlashCommand {
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)
       .then(() => {
         this.log.info(
-          `Updated category[${category.id}] in guild[${interaction.guildId}] successfully.`
+          `Updated category[${category.id}] successfully.`,
+          interaction.guildId
         );
 
         handleInteractionReply(this.log, interaction, {
@@ -100,7 +102,8 @@ export class EditCategoryCommand extends SlashCommand {
       })
       .catch((e) =>
         this.log.critical(
-          `Failed to edit category[${category.id}] for guild[${interaction.guildId}]\n${e}`
+          `Failed to edit category[${category.id}]\n${e}`,
+          interaction.guildId
         )
       );
   };

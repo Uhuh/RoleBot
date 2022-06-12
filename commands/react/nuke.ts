@@ -39,22 +39,24 @@ export class ReactNukeCommand extends SlashCommand {
     DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
       .then(() => {
         this.log.debug(
-          `User[${interaction.user.id}] removed ALL reactroles for guild[${interaction.guildId}]`
+          `User[${interaction.user.id}] removed ALL reactroles`,
+          interaction.guildId
         );
         interaction
           .followUp(
             `Hey! I deleted all your react roles. Any categories you had should still stand.`
           )
-          .catch(() => this.log.error(`Failed to send interaction followup`));
+          .catch(() => this.log.error(`Failed to send interaction followup`, interaction.guildId));
       })
       .catch((e) => {
         this.log.error(
-          `Failed to delete reactroles for guild[${interaction.guildId}]\n${e}`
+          `Failed to delete reactroles\n${e}`,
+          interaction.guildId
         );
 
         interaction
           .followUp(`Hey! I had an issue deleting all the react roles.`)
-          .catch(() => this.log.error(`Failed to send interaction followup`));
+          .catch(() => this.log.error(`Failed to send interaction followup`, interaction.guildId));
       });
   };
 

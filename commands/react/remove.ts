@@ -30,7 +30,8 @@ export class ReactDeleteCommand extends SlashCommand {
 
     if (!role) {
       this.log.error(
-        `Interaction was missing role property despite it being required.`
+        `Interaction was missing role property despite it being required.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -43,7 +44,8 @@ export class ReactDeleteCommand extends SlashCommand {
 
     if (!reactRole) {
       this.log.debug(
-        `User passed in role[${role.id}] that isn't in guilds reactRoles list.`
+        `User passed in role[${role.id}] that isn't in guilds reactRoles list.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -56,7 +58,8 @@ export class ReactDeleteCommand extends SlashCommand {
       await DELETE_REACT_ROLE_BY_ROLE_ID(role.id);
 
       this.log.info(
-        `Successfully removed guilds[${interaction.guildId}] react role[${role.id}]`
+        `Successfully removed guilds react role[${role.id}]`,
+        interaction.guildId
       );
 
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
@@ -77,7 +80,8 @@ export class ReactDeleteCommand extends SlashCommand {
       }
     } catch (e) {
       this.log.error(
-        `Error'd when trying to delete react role[${role.id}] on guild[${interaction.guildId}]\n${e}`
+        `Error'd when trying to delete react role[${role.id}]\n${e}`,
+        interaction.guildId
       );
 
       handleInteractionReply(this.log, interaction, {

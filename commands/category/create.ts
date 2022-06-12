@@ -65,13 +65,15 @@ export class CreateCategoryCommand extends SlashCommand {
     )
       .then(() => {
         this.log.info(
-          `Successfully created category[${categoryName}] for guild[${interaction.guildId}]`
+          `Successfully created category[${categoryName}]`,
+          interaction.guildId
         );
         handleInteractionReply(this.log, interaction, `Hey! I successfully created the category \`${categoryName}\` for you!`);
       })
       .catch((e) => {
         this.log.error(
-          `Issue creating category[${categoryName}] for guild[${interaction.guildId}]\n${e}`
+          `Issue creating category[${categoryName}]\n${e}`,
+          interaction.guildId
         );
         handleInteractionReply(this.log, interaction, `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`);
       });

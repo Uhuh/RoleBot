@@ -35,24 +35,23 @@ const labelMap: Record<LogLevel, string> = {
 };
 
 export class LogService {
-  prefix: string;
-  constructor(_prefix: string) {
-    this.prefix = _prefix;
+  _prefix: string;
+  constructor(prefix: string) {
+    this._prefix = prefix;
   }
 
-  log(level: LogLevel, content: string) {
+  get prefix() {
+    return `[ ${this._prefix} ]`;
+  }
+
+  log(level: LogLevel, content: string, guildId?: string | null) {
+    const logTypeDate = `${colorMap[level]}[ ${labelMap[level]} - ${new Date().toLocaleString()} ]${Color.reset}`;
+    const guildString = guildId ? `- [ guild:${guildId} ]` : '-';
+
     console.log(
-      colorMap[level],
-      '[',
-      labelMap[level],
-      ']',
-      '[',
-      new Date().toLocaleString(),
-      `]${Color.reset}`,
-      '-',
-      '[',
+      logTypeDate,
+      guildString,
       this.prefix,
-      ']',
       ` ${content}`
     );
 
@@ -63,23 +62,23 @@ export class LogService {
     }
   }
 
-  error(content: string) {
-    this.log(LogLevel.error, content);
+  error(content: string, guildId?: string | null) {
+    this.log(LogLevel.error, content, guildId);
   }
 
-  debug(content: string) {
-    this.log(LogLevel.debug, content);
+  debug(content: string, guildId?: string | null) {
+    this.log(LogLevel.debug, content, guildId);
   }
 
-  info(content: string) {
-    this.log(LogLevel.info, content);
+  info(content: string, guildId?: string | null) {
+    this.log(LogLevel.info, content, guildId);
   }
 
-  warning(content: string) {
-    this.log(LogLevel.warning, content);
+  warning(content: string, guildId?: string | null) {
+    this.log(LogLevel.warning, content, guildId);
   }
 
-  critical(content: string) {
-    this.log(LogLevel.critical, content);
+  critical(content: string, guildId?: string | null) {
+    this.log(LogLevel.critical, content, guildId);
   }
 }

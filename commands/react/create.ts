@@ -90,7 +90,7 @@ export class ReactRoleCommand extends SlashCommand {
           embeds: [embed],
           components: [button],
         })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
     }
 
     // Custom emojis Look like this: <a?:name:id>
@@ -126,7 +126,8 @@ export class ReactRoleCommand extends SlashCommand {
 
     if (!emojiId || emojiId === '') {
       this.log.error(
-        `Failed to extract emoji[${emoji}] with regex from string.`
+        `Failed to extract emoji[${emoji}] with regex from string.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
@@ -177,7 +178,8 @@ export class ReactRoleCommand extends SlashCommand {
     )
       .then((reactRole) => {
         this.log.debug(
-          `Successfully created the react role[${role.id}] with emoji[${emojiId}]`
+          `Successfully created the react role[${role.id}] with emoji[${emojiId}]`,
+          interaction.guildId
         );
 
         const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
@@ -189,7 +191,8 @@ export class ReactRoleCommand extends SlashCommand {
       })
       .catch((e) => {
         this.log.error(
-          `Failed to create react role[${role.id}] | guild[${interaction.guildId}] | emoji[id: ${emojiId} : string: ${emoji}]\n${e}`
+          `Failed to create react role[${role.id}] | emoji[id: ${emojiId} : string: ${emoji}]\n${e}`,
+          interaction.guildId
         );
 
         handleInteractionReply(this.log, interaction, {

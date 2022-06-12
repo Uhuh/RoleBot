@@ -49,7 +49,7 @@ export class TutorialCommand extends SlashCommand {
         components: [buttons],
       })
       .catch((e) =>
-        this.log.error(`Failed to update tutorial interaction.\n${e}`)
+        this.log.error(`Failed to update tutorial interaction.\n${e}`, interaction.guildId)
       );
   };
 
@@ -65,6 +65,6 @@ export class TutorialCommand extends SlashCommand {
         embeds: [embed],
         components: [buttons],
       })
-      .catch((e) => this.log.error(`Failed to send tutorial embed.\n${e}`));
+      .catch((e) => this.log.error(`Failed to send tutorial embed.\n${e}`, interaction.guildId));
   };
 }

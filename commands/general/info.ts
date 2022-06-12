@@ -41,6 +41,6 @@ Latency is ${Date.now() - interaction.createdTimestamp
         content: `Here's some info about me.`,
         embeds: [embed],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
   };
 }

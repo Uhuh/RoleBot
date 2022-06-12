@@ -32,13 +32,15 @@ export class ListCategoryCommand extends SlashCommand {
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
         this.log.error(
-          `Failed to get categories for guild[${interaction.guildId}]\n${e}`
+          `Failed to get categories\n${e}`,
+          interaction.guildId
         )
     );
 
     if (!categories || !categories.length) {
       this.log.info(
-        `Guild[${interaction.guildId}] did not have any categories.`
+        `Guild has no categories.`,
+        interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`);
@@ -68,7 +70,8 @@ export class ListCategoryCommand extends SlashCommand {
         })
         .catch(() =>
           this.log.error(
-            `Failed to send category embeds to channel[${interaction.channel?.id}] in guild[${interaction.guildId}]`
+            `Failed to send category embeds to channel[${interaction.channel?.id}]`,
+            interaction.guildId
           )
         );
     }

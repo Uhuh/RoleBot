@@ -98,9 +98,9 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       this.execute(interaction);
     } catch (e) {
       this.log.error(
-        `Guild[${interaction.guildId}] encountered issue when running command[${this.name}]`
+        `Guild encountered issue when running command[${this.name}]\n${e}`,
+        interaction.guildId
       );
-      this.log.error(`${e}`);
 
       interaction.channel?.send(
         `Hey! Unfortunately I ran into an issue while running that command. Please try again.`

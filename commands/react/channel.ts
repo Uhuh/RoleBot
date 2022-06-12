@@ -40,29 +40,31 @@ export class ReactChannelCommand extends SlashCommand {
         })
         .catch((e) =>
           this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`
+            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
+            interaction.guildId
           )
         );
     } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`);
+      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
       return;
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
         this.log.error(
-          `Failed to get categories for guild[${interaction.guildId}]\n${e}`
+          `Failed to get categories\n${e}`,
+          interaction.guildId
         )
     );
 
     if (!categories) {
-      this.log.debug(`Guild[${interaction.guildId}] has no categories.`);
+      this.log.debug(`Guild has no categories.`, interaction.guildId);
 
       return interaction
         .editReply(
           `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
         )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
     }
 
     // Stolen from @react/message execute function
@@ -76,36 +78,39 @@ export class ReactChannelCommand extends SlashCommand {
 
     if (!allEmptyCategories) {
       this.log.debug(
-        `Guild[${interaction.guildId}] has categories but all of them are empty.`
+        `Guild has categories but all of them are empty.`,
+        interaction.guildId
       );
 
       return interaction
         .editReply({
           content: allCategoriesAreEmpty,
         })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
     }
 
     const channel = interaction.options.getChannel('channel');
 
     if (!channel) {
       this.log.info(
-        `Could not find channel on interaction for guild[${interaction.guildId}]`
+        `Could not find channel on interaction.`,
+        interaction.guildId
       );
 
       return interaction
         .editReply(
           `Hey! I failed to find the channel from the command. Please wait a second and try again.`
         )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
     } else if (!(channel?.type === 'GUILD_TEXT')) {
       this.log.error(
-        `Passed in channel[${channel.id}] was not a text channel for guild[${interaction.guildId}]`
+        `Passed in channel[${channel.id}] was not a text channel`,
+        interaction.guildId
       );
 
       return interaction
         .editReply(`Hey! I only support sending embeds to text channels!`)
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
     }
 
     const permissions = [
@@ -160,7 +165,7 @@ export class ReactChannelCommand extends SlashCommand {
         );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
-        this.log.error(`Failed to send embeds.\n${e}`);
+        this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
 
         /**
          * Somehow the type DiscordAPIError DOES NOT include the httpStatus code despite the returned error here having it.
@@ -184,6 +189,6 @@ export class ReactChannelCommand extends SlashCommand {
       .editReply({
         content: 'Hey! I sent those embeds and am currently reacting to them.',
       })
-      .catch((e) => this.log.error(`Failed to edit interaction reply.\n${e}`));
+      .catch((e) => this.log.error(`Failed to edit interaction reply.\n${e}`, interaction.guildId));
   };
 }
