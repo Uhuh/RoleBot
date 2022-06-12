@@ -46,7 +46,8 @@ export class LogService {
 
   log(level: LogLevel, content: string, guildId?: string | null) {
     const logTypeDate = `${colorMap[level]}[ ${labelMap[level]} - ${new Date().toLocaleString()} ]${Color.reset}`;
-    const guildString = guildId ? `- [ guild:${guildId} ]` : '-';
+    const guildTextColor = guildId ? colorMap[(Number(guildId) % 5 + 1) as LogLevel] : Color.reset;
+    const guildString = guildId ? `- ${guildTextColor}[ guild:${guildId} ]${Color.reset}` : '-';
 
     console.log(
       logTypeDate,
