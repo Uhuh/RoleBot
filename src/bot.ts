@@ -57,6 +57,10 @@ export default class RoleBot extends Discord.Client {
       setInterval(() => this.updatePresence(), 10000);
     });
 
+    this.on('debug', (message) => {
+      this.log.debug(`Client debug: ${message}`);
+    });
+
     this.on('shardError', (e) => {
       this.log.error(`Encounted shard error.`);
       this.log.critical(`${e}`);
