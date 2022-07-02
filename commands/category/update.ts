@@ -57,16 +57,31 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
-    const channel = await interaction.guild?.channels.fetch(channelId);
+    const channel = await interaction.guild?.channels
+      .fetch(channelId)
+      .catch((e) =>
+        this.log.debug(
+          `Failed to find channel[${channelId}]\n${e}`,
+          interaction.guildId
+        )
+      );
 
     if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that channel, make sure you're copying the message link right.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
+      );
     }
 
     const message = await channel.messages.fetch(messageId);
 
     if (!message) {
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that message, make sure you're copying the message link right.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find that message, make sure you're copying the message link right.`
+      );
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MESSAGE_ID(messageId);
@@ -91,7 +106,11 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
+      );
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
@@ -120,7 +139,10 @@ export class UpdateCategoryCommand extends SlashCommand {
       await message
         .edit({ embeds: [embed] })
         .then(() => {
-          this.log.info(`Updated category[${category.id}] embed.`,interaction.guildId);
+          this.log.info(
+            `Updated category[${category.id}] embed.`,
+            interaction.guildId
+          );
 
           handleInteractionReply(this.log, interaction, {
             ephemeral: true,
