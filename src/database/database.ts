@@ -1,7 +1,29 @@
-import { Category, ReactMessage, ReactRole } from './entities';
+import { Category, JoinRole, ReactMessage, ReactRole } from './entities';
 import { ICategory } from './entities/category.entity';
 import { IReactMessage } from './entities/reactMessage.entity';
 import { ReactRoleType } from './entities/reactRole.entity';
+
+export const CREATE_JOIN_ROLE = async (
+  name: string,
+  roleId: string,
+  guildId: string
+) => {
+  const joinRole = new JoinRole();
+
+  joinRole.name = name;
+  joinRole.roleId = roleId;
+  joinRole.guildId = guildId;
+
+  return await joinRole.save();
+};
+
+export const DELETE_JOIN_ROLE = async (roleId: string) => {
+  return await JoinRole.delete({ roleId });
+};
+
+export const GET_GUILD_JOIN_ROLES = async (guildId: string) => {
+  return await JoinRole.find({ where: { guildId } });
+};
 
 // React role related
 export const CREATE_REACT_ROLE = async (

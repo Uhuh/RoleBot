@@ -5,7 +5,11 @@ import {
   Permissions,
   SelectMenuInteraction,
 } from 'discord.js-light';
-import { Category, DataCommand } from '../utilities/types/commands';
+import {
+  Category,
+  DataCommand,
+  SlashCommandTypes,
+} from '../utilities/types/commands';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { LogService } from '../src/services/logService';
 import { SlashBase } from './slashBase';
@@ -59,9 +63,13 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     _name: string,
     _desc: string,
     _type: Category,
-    _permissions: bigint[] = []
+    _permissions: bigint[] = [],
+    _commandOverride: SlashCommandTypes | null = null
   ) {
-    super(new SlashCommandBuilder().setName(_name).setDescription(_desc));
+    const command =
+      _commandOverride ??
+      new SlashCommandBuilder().setName(_name).setDescription(_desc);
+    super(command);
     this.client = _client;
     this.name = _name;
     this.desc = _desc;
@@ -89,7 +97,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     this.executions.push({
       channelId: interaction.channelId,
       command: interaction.commandName,
-      guildId: interaction.guildId || 'DM',
+      guildId: interaction.guildId ?? 'DM',
       time: new Date(),
       userId: interaction.user.id,
     });
@@ -130,7 +138,11 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
    */
   public execute = (interaction: CommandInteraction) => {
-    handleInteractionReply(this.log, interaction, `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`);
+    handleInteractionReply(
+      this.log,
+      interaction,
+      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
+    );
   };
 
   /**
@@ -145,7 +157,11 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     interaction: SelectMenuInteraction,
     _args: string[]
   ) => {
-    handleInteractionReply(this.log, interaction, `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`);
+    handleInteractionReply(
+      this.log,
+      interaction,
+      `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
+    );
   };
 
   /**
@@ -154,7 +170,11 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param args IDs that are inside the buttons customId
    */
   public handleButton = (interaction: ButtonInteraction, _args: string[]) => {
-    handleInteractionReply(this.log, interaction, `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`);
+    handleInteractionReply(
+      this.log,
+      interaction,
+      `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
+    );
   };
 
   /**
