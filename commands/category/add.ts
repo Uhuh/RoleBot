@@ -221,7 +221,7 @@ export class AddCategoryCommand extends SlashCommand {
           this.log,
           interaction,
           `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.` +
-            `\nIf they are all emojis please visit the support server found in the \`/info\` command so wwe can figure out the issue!`
+            `\nIf they are all emojis please visit the support server found in the \`/info\` command so we can figure out the issue!`
         );
       });
   };
