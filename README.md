@@ -11,6 +11,7 @@ It is ***ideal that you do this in a linux environment.*** You can run this bot 
 ## Install nvm
 To install `nvm` you need to use `curl`, incase you don't have `curl` installed here's the command to install
 > `sudo apt install curl`
+
 Now install nvm
 > `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
 
