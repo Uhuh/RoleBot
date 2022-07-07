@@ -27,7 +27,7 @@ Since this version of the bot at time of writing uses `discord.js@13.X` we're re
 
 ## Install yarn with npm
 Now let's install `yarn` globally.
->npm install --global yarn`
+> `npm install --global yarn`
 
 ## **Your environment should be good to go from here**
 If you don't have `git` installed do this..
