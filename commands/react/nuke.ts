@@ -8,6 +8,7 @@ import {
 import RoleBot from '../../src/bot';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/database';
 import { Category } from '../../utilities/types/commands';
+import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactNukeCommand extends SlashCommand {
@@ -23,18 +24,18 @@ export class ReactNukeCommand extends SlashCommand {
 
   handleButton = (interaction: ButtonInteraction) => {
     if (!interaction.guildId) {
-      return interaction.followUp(
+      return interaction.reply(
         `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
       );
     }
 
-    interaction
-      .followUp(
-        `Okay well, you, ${
-          interaction.member?.user || '[REDACTED]'
-        } asked for all react-roles to be deleted.`
-      )
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`));
+    handleInteractionReply(
+      this.log,
+      interaction,
+      `User ${
+        interaction.member?.user || '[REDACTED]'
+      } has confirmed and deleted all react roles for the server.`
+    );
 
     DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
       .then(() => {
@@ -42,11 +43,12 @@ export class ReactNukeCommand extends SlashCommand {
           `User[${interaction.user.id}] removed ALL reactroles`,
           interaction.guildId
         );
-        interaction
-          .followUp(
-            `Hey! I deleted all your react roles. Any categories you had should still stand.`
-          )
-          .catch(() => this.log.error(`Failed to send interaction followup`, interaction.guildId));
+
+        handleInteractionReply(
+          this.log,
+          interaction,
+          `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`
+        );
       })
       .catch((e) => {
         this.log.error(
@@ -54,9 +56,11 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        interaction
-          .followUp(`Hey! I had an issue deleting all the react roles.`)
-          .catch(() => this.log.error(`Failed to send interaction followup`, interaction.guildId));
+        handleInteractionReply(
+          this.log,
+          interaction,
+          `Hey! I had an issue deleting all the react roles.`
+        );
       });
   };
 
@@ -71,7 +75,7 @@ export class ReactNukeCommand extends SlashCommand {
     interaction.reply({
       ephemeral: true,
       components: [buttons],
-      content: `ARE YOU SURE YOU WANT TO DELETE ALL YOUR REACT ROLES?`,
+      content: `This action is irreversable. By confirming you are deleting all react roles currently setup for this server.`,
     });
   };
 }
