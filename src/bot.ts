@@ -90,14 +90,17 @@ export default class RoleBot extends Discord.Client {
     });
     this.on('guildMemberAdd', async (member) => {
       const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
+      const roles: Discord.Role[] = [];
 
       for (const joinRole of joinRoles) {
         const role = await member.guild.roles.fetch(joinRole.roleId);
         if (!role) continue;
-        member.roles.add(role).catch((e) => {
-          this.log.error(`Issue giving member join role[${role.id}]\n${e}`);
-        });
+        roles.push(role);
       }
+
+      member.roles.add(roles).catch((e) => {
+        this.log.error(`Issue giving member join roles\n${e}`);
+      });
     });
     // To help try and prevent unknown role errors
     this.on('roleDelete', (role) => {
