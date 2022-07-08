@@ -10,11 +10,18 @@ import { createConnection } from 'typeorm';
 import {
   Category,
   GuildConfig,
+  JoinRole,
   ReactMessage,
   ReactRole,
 } from './database/entities';
 
 import * as Discord from 'discord.js-light';
+import {
+  DELETE_JOIN_ROLE,
+  GET_GUILD_JOIN_ROLES,
+} from './database/queries/joinRole.query';
+import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
+import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 
 export default class RoleBot extends Discord.Client {
   config: typeof config;
@@ -81,12 +88,23 @@ export default class RoleBot extends Discord.Client {
     this.on('messageReactionRemove', (...r) => {
       this.reactHandler.handleReaction(...r, 'remove');
     });
-    /**
-     * Whenever roles get deleted or changed let's update RoleBots DB.
-     * Remove roles deleted and update role names.
-     */
-    //this.on('roleDelete', (role) => roleDelete(role, this));
-    //this.on('roleUpdate', (...r) => roleUpdate(...r, this));
+    this.on('guildMemberAdd', async (member) => {
+      const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
+
+      for (const joinRole of joinRoles) {
+        const role = await member.guild.roles.fetch(joinRole.roleId);
+        if (!role) continue;
+        member.roles.add(role).catch((e) => {
+          this.log.error(`Issue giving member join role[${role.id}]\n${e}`);
+        });
+      }
+    });
+    // To help try and prevent unknown role errors
+    this.on('roleDelete', (role) => {
+      DELETE_JOIN_ROLE(role.id);
+      DELETE_REACT_MESSAGE_BY_ROLE_ID(role.id);
+      DELETE_REACT_ROLE_BY_ROLE_ID(role.id);
+    });
   }
 
   private updatePresence = () => {
@@ -98,6 +116,10 @@ export default class RoleBot extends Discord.Client {
         {
           name: 'Use /help for commands!',
           type: 'LISTENING',
+        },
+        {
+          name: 'I use slash commands!',
+          type: 'WATCHING',
         },
       ],
       status: 'dnd',
@@ -114,7 +136,7 @@ export default class RoleBot extends Discord.Client {
       type: 'postgres',
       url: config.POSTGRES_URL,
       synchronize: config.SYNC_DB,
-      entities: [ReactMessage, ReactRole, Category, GuildConfig],
+      entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
     })
       .then(() => this.log.debug(`Successfully connected to postgres DB.`))
       .catch((e) => this.log.critical(`Failed to connect to postgres.\n${e}`));

@@ -3,7 +3,8 @@ import RoleBot from '../../src/bot';
 import {
   CREATE_GUILD_CATEGORY,
   GET_CATEGORY_BY_NAME,
-} from '../../src/database/database';
+} from '../../src/database/queries/category.query';
+
 import { Category } from '../../utilities/types/commands';
 import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
@@ -54,7 +55,11 @@ export class CreateCategoryCommand extends SlashCommand {
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
-      return handleInteractionReply(this.log, interaction, `Hey! It turns out you already have a category with that name made. Try checking it out.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! It turns out you already have a category with that name made. Try checking it out.`
+      );
     }
 
     CREATE_GUILD_CATEGORY(
@@ -68,14 +73,22 @@ export class CreateCategoryCommand extends SlashCommand {
           `Successfully created category[${categoryName}]`,
           interaction.guildId
         );
-        handleInteractionReply(this.log, interaction, `Hey! I successfully created the category \`${categoryName}\` for you!`);
+        handleInteractionReply(
+          this.log,
+          interaction,
+          `Hey! I successfully created the category \`${categoryName}\` for you!`
+        );
       })
       .catch((e) => {
         this.log.error(
           `Issue creating category[${categoryName}]\n${e}`,
           interaction.guildId
         );
-        handleInteractionReply(this.log, interaction, `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`);
+        handleInteractionReply(
+          this.log,
+          interaction,
+          `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
+        );
       });
   };
 }

@@ -6,7 +6,9 @@ import {
   Permissions,
 } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/database';
+import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
+import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
+
 import { Category } from '../../utilities/types/commands';
 import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
@@ -36,6 +38,18 @@ export class ReactNukeCommand extends SlashCommand {
         interaction.member?.user || '[REDACTED]'
       } has confirmed and deleted all react roles for the server.`
     );
+
+    // Need to delete all react messages or users will be able to react still and get roles.
+    DELETE_REACT_MESSAGES_BY_GUILD_ID(interaction.guildId)
+      .then(() => {
+        this.log.debug(`Cleared react messages`, interaction.guildId);
+      })
+      .catch((e) => {
+        this.log.error(
+          `Failed to clear react messages\n${e}`,
+          interaction.guildId
+        );
+      });
 
     DELETE_ALL_REACT_ROLES_BY_GUILD_ID(interaction.guildId)
       .then(() => {

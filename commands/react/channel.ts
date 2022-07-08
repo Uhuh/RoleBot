@@ -1,14 +1,13 @@
 import { codeBlock } from '@discordjs/builders';
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import {
-  GET_GUILD_CATEGORIES,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-} from '../../src/database/database';
+
 import { EmbedService } from '../../src/services/embedService';
 import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { PermissionMappings, SlashCommand } from '../slashCommand';
+import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -51,10 +50,7 @@ export class ReactChannelCommand extends SlashCommand {
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
-        this.log.error(
-          `Failed to get categories\n${e}`,
-          interaction.guildId
-        )
+        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
     );
 
     if (!categories) {
@@ -64,7 +60,9 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply(
           `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
         )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
     // Stolen from @react/message execute function
@@ -86,7 +84,9 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply({
           content: allCategoriesAreEmpty,
         })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
     const channel = interaction.options.getChannel('channel');
@@ -101,7 +101,9 @@ export class ReactChannelCommand extends SlashCommand {
         .editReply(
           `Hey! I failed to find the channel from the command. Please wait a second and try again.`
         )
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     } else if (!(channel?.type === 'GUILD_TEXT')) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel`,
@@ -110,7 +112,9 @@ export class ReactChannelCommand extends SlashCommand {
 
       return interaction
         .editReply(`Hey! I only support sending embeds to text channels!`)
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
     const permissions = [
@@ -163,7 +167,7 @@ export class ReactChannelCommand extends SlashCommand {
           false,
           this.log
         );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
 
@@ -189,6 +193,11 @@ export class ReactChannelCommand extends SlashCommand {
       .editReply({
         content: 'Hey! I sent those embeds and am currently reacting to them.',
       })
-      .catch((e) => this.log.error(`Failed to edit interaction reply.\n${e}`, interaction.guildId));
+      .catch((e) =>
+        this.log.error(
+          `Failed to edit interaction reply.\n${e}`,
+          interaction.guildId
+        )
+      );
   };
 }

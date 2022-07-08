@@ -6,12 +6,7 @@ import {
   Permissions,
 } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import {
-  CREATE_REACT_ROLE,
-  GET_REACT_ROLES_BY_GUILD,
-  GET_REACT_ROLE_BY_EMOJI,
-  GET_REACT_ROLE_BY_ROLE_ID,
-} from '../../src/database/database';
+
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
@@ -20,6 +15,12 @@ import {
   handleInteractionReply,
   isValidRolePosition,
 } from '../../utilities/utils';
+import {
+  CREATE_REACT_ROLE,
+  GET_REACT_ROLES_BY_GUILD,
+  GET_REACT_ROLE_BY_EMOJI,
+  GET_REACT_ROLE_BY_ROLE_ID,
+} from '../../src/database/queries/reactRole.query';
 
 export class ReactRoleCommand extends SlashCommand {
   constructor(client: RoleBot) {

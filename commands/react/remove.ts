@@ -1,9 +1,6 @@
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import {
-  DELETE_REACT_ROLE_BY_ROLE_ID,
-  GET_REACT_ROLE_BY_ROLE_ID,
-} from '../../src/database/database';
+
 import {
   handleInteractionReply,
   ReactMessageUpdate,
@@ -11,6 +8,10 @@ import {
 } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import {
+  DELETE_REACT_ROLE_BY_ROLE_ID,
+  GET_REACT_ROLE_BY_ROLE_ID,
+} from '../../src/database/queries/reactRole.query';
 
 export class ReactDeleteCommand extends SlashCommand {
   constructor(client: RoleBot) {

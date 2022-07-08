@@ -1,13 +1,14 @@
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
 import { Category as ICategory } from '../../src/database/entities/category.entity';
-import {
-  EDIT_CATEGORY_BY_ID,
-  GET_CATEGORY_BY_NAME,
-} from '../../src/database/database';
+
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import { handleInteractionReply } from '../../utilities/utils';
+import {
+  EDIT_CATEGORY_BY_ID,
+  GET_CATEGORY_BY_NAME,
+} from '../../src/database/queries/category.query';
 
 export class EditCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -54,7 +55,10 @@ export class EditCategoryCommand extends SlashCommand {
       interaction.options.getBoolean('mutually-exclusive');
 
     if (!newName && !newDesc && mutuallyExclusive === null) {
-      this.log.info(`User didn't change anything about the category`, interaction.guildId);
+      this.log.info(
+        `User didn't change anything about the category`,
+        interaction.guildId
+      );
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
@@ -63,7 +67,10 @@ export class EditCategoryCommand extends SlashCommand {
     }
 
     if (!name) {
-      this.log.error(`Required option name was undefined.`, interaction.guildId);
+      this.log.error(
+        `Required option name was undefined.`,
+        interaction.guildId
+      );
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
@@ -79,7 +86,11 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
+      );
     }
 
     const updatedCategory: Partial<ICategory> = {

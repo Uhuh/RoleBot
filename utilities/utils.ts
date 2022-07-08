@@ -8,14 +8,17 @@ import {
   SelectMenuInteraction,
 } from 'discord.js-light';
 import RoleBot from '../src/bot';
+
+import { ReactRole } from '../src/database/entities';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_ROLES_BY_CATEGORY_ID,
+} from '../src/database/queries/category.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
-  GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_CATEGORY_ID,
-  GET_ROLES_BY_CATEGORY_ID,
-} from '../src/database/database';
-import { ReactRole } from '../src/database/entities';
+} from '../src/database/queries/reactMessage.query';
 import { EmbedService } from '../src/services/embedService';
 import { LogService } from '../src/services/logService';
 import { CLIENT_ID } from '../src/vars';

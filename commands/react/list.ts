@@ -1,6 +1,6 @@
 import { CommandInteraction, Permissions } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/database';
+import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { handleInteractionReply } from '../../utilities/utils';
@@ -30,7 +30,11 @@ export class ReactListCommand extends SlashCommand {
     );
 
     if (!reactRoles || !reactRoles.length) {
-      return handleInteractionReply(this.log, interaction, `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`
+      );
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
@@ -40,6 +44,8 @@ export class ReactListCommand extends SlashCommand {
         content: `Hey! Here's your react roles.`,
         embeds: [embed],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+      .catch((e) =>
+        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+      );
   };
 }

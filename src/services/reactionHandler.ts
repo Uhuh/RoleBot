@@ -6,12 +6,11 @@ import {
   PartialUser,
   User,
 } from 'discord.js-light';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-} from '../database/database';
+
 import { ReactMessage } from '../database/entities';
+import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';
+import { GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID } from '../database/queries/reactMessage.query';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
 import { LogService } from './logService';
 
 export class ReactionHandler {
@@ -43,7 +42,9 @@ export class ReactionHandler {
     const reactMessage = await GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID(
       message.id,
       emojiId
-    ).catch((e) => this.log.error(`Failed to query for react message.\n${e}`, guild.id));
+    ).catch((e) =>
+      this.log.error(`Failed to query for react message.\n${e}`, guild.id)
+    );
 
     if (!reactMessage) return;
 
@@ -57,7 +58,10 @@ export class ReactionHandler {
     const member = await guild.members
       .fetch(user.id)
       .catch((e) =>
-        this.log.error(`Fetching user[${user.id}] threw an error.\n${e}`, guild.id)
+        this.log.error(
+          `Fetching user[${user.id}] threw an error.\n${e}`,
+          guild.id
+        )
       );
 
     if (!member) {
@@ -170,6 +174,8 @@ export class ReactionHandler {
       .edit({
         roles: updatedRoleList,
       })
-      .catch((e) => this.log.error(`Failed to update members roles.\n${e}`, guild.id));
+      .catch((e) =>
+        this.log.error(`Failed to update members roles.\n${e}`, guild.id)
+      );
   };
 }

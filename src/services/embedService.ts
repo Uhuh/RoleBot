@@ -3,16 +3,17 @@ import { COLOR } from '../../utilities/types/globals';
 import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
 import RoleBot from '../../src/bot';
-import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/database';
 import * as tutorialJson from '../../utilities/json/tutorial.json';
 import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
 
 export class EmbedService {
   private static userTagInfo = (user: User | string): string => {
-    return `${typeof user === 'string' ? user : user?.tag} (<@${typeof user === 'string' ? user : user.id
-      }>)`;
+    return `${typeof user === 'string' ? user : user?.tag} (<@${
+      typeof user === 'string' ? user : user.id
+    }>)`;
   };
 
   /**
@@ -82,14 +83,14 @@ export class EmbedService {
 
     const inCategory = rolesInCategory.length
       ? `**In a category:**\n${this.reactRolesFormattedString(
-        rolesInCategory
-      )}\n`
+          rolesInCategory
+        )}\n`
       : '';
 
     const notInCategory = rolesNotInCategory.length
       ? `**Not in a category:**\n${this.reactRolesFormattedString(
-        rolesNotInCategory
-      )}`
+          rolesNotInCategory
+        )}`
       : '';
 
     embed
@@ -141,6 +142,23 @@ export class EmbedService {
       .setColor(COLOR.DEFAULT)
       .setTitle(embedJson.title)
       .setDescription(embedJson.description);
+
+    return embed;
+  };
+
+  public static joinRoleEmbed = (roleIds: string[]) => {
+    const embed = new MessageEmbed();
+
+    embed
+      .setTitle(`Server auto join roles.`)
+      .setColor(Colors.green)
+      .setDescription(
+        `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
+          (roleIds.length > 0
+            ? roleIds.map((r) => `<@&${r}>`).join('\n')
+            : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
+      )
+      .setTimestamp(new Date());
 
     return embed;
   };

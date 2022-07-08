@@ -8,14 +8,15 @@ import {
   TextChannel,
 } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_GUILD_CATEGORIES,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-} from '../../src/database/database';
+
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_GUILD_CATEGORIES,
+} from '../../src/database/queries/category.query';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 
 export class ReactMessageCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -54,7 +55,11 @@ export class ReactMessageCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, `Hey! I had an issue finding that message. Give me a sec and try again.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I had an issue finding that message. Give me a sec and try again.`
+      );
     }
 
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
@@ -65,7 +70,11 @@ export class ReactMessageCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, `Hey! I had an issue finding that category. Please wait a second and try again.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I had an issue finding that category. Please wait a second and try again.`
+      );
     }
 
     const reactRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(Number(categoryId));
@@ -76,7 +85,11 @@ export class ReactMessageCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, `Hey! I had issues getting the react roles for the category. Can you wait a sec and try again?`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I had issues getting the react roles for the category. Can you wait a sec and try again?`
+      );
     }
 
     handleInteractionReply(this.log, interaction, {
@@ -104,13 +117,21 @@ export class ReactMessageCommand extends SlashCommand {
     );
 
     if (!messageLink) {
-      return handleInteractionReply(this.log, interaction, `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`
+      );
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
     if (!channelId || !messageId) {
-      return handleInteractionReply(this.log, interaction, `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``
+      );
     }
 
     const channel = await interaction.guild?.channels
@@ -123,7 +144,11 @@ export class ReactMessageCommand extends SlashCommand {
       );
 
     if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that channel, make sure you're copying the message link right.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
+      );
     }
 
     const message = await channel.messages
@@ -136,7 +161,11 @@ export class ReactMessageCommand extends SlashCommand {
       );
 
     if (!message) {
-      return handleInteractionReply(this.log, interaction, `Hey! I couldn't find that message, make sure you're copying the message link right.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I couldn't find that message, make sure you're copying the message link right.`
+      );
     }
 
     // Trying to be as detailed as possible to user if categories don't exist or if they are all empty.
@@ -145,15 +174,16 @@ export class ReactMessageCommand extends SlashCommand {
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
-        this.log.error(
-          `Failed to get categories\n${e}`,
-          interaction.guildId
-        )
+        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
     );
 
     // This should only happen if typeorm throws an error.
     if (!categories) {
-      return handleInteractionReply(this.log, interaction, `Hey! I'm encountering an issue trying to access the servers categories. Please be patient.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! I'm encountering an issue trying to access the servers categories. Please be patient.`
+      );
     }
 
     const guildHasCategories = categories.length;
@@ -166,19 +196,24 @@ export class ReactMessageCommand extends SlashCommand {
     const allEmptyCategories = categoryRoles.filter((r) => r.length).length;
 
     if (!guildHasCategories) {
-      this.log.info(
-        `Guild has no categories.`,
-        interaction.guildId
-      );
+      this.log.info(`Guild has no categories.`, interaction.guildId);
 
-      return handleInteractionReply(this.log, interaction, guildHasNoCategories);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        guildHasNoCategories
+      );
     } else if (!allEmptyCategories) {
       this.log.debug(
         `Guild has categories but all of them are empty.`,
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, allCategoriesAreEmpty);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        allCategoriesAreEmpty
+      );
     }
 
     const selectMenu = new MessageActionRow().addComponents(
@@ -200,7 +235,9 @@ export class ReactMessageCommand extends SlashCommand {
         content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
         components: [selectMenu],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+      .catch((e) =>
+        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+      );
   };
 }
 
