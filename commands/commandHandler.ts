@@ -29,10 +29,10 @@ export default (client: RoleBot) => {
   }
 
   // Deleting global commands. (:
-  deleteSlashCommands();
+  //deleteSlashCommands();
 
   // Generate global slash commands
-  generateSlashCommands(commandsJson);
+  //generateSlashCommands(commandsJson);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
