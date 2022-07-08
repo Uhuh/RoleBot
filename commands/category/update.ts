@@ -5,16 +5,17 @@ import {
   TextChannel,
 } from 'discord.js-light';
 import RoleBot from '../../src/bot';
-import {
-  DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
-  GET_CATEGORY_BY_ID,
-  GET_REACT_MESSAGE_BY_MESSAGE_ID,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-} from '../../src/database/database';
+
 import { EmbedService } from '../../src/services/embedService';
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import {
+  DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
+  GET_REACT_MESSAGE_BY_MESSAGE_ID,
+} from '../../src/database/queries/reactMessage.query';
+import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 
 export class UpdateCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {

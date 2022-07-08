@@ -3,15 +3,17 @@ import {
   MessageEmbed,
   Permissions,
 } from 'discord.js-light';
-import {
-  GET_GUILD_CATEGORIES,
-  GET_REACT_ROLES_NOT_IN_CATEGORIES,
-} from '../../src/database/database';
+
 import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import RoleBot from '../../src/bot';
-import { handleInteractionReply, spliceIntoChunks } from '../../utilities/utils';
+import {
+  handleInteractionReply,
+  spliceIntoChunks,
+} from '../../utilities/utils';
+import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
+import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
 
 export class ListCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -31,22 +33,24 @@ export class ListCategoryCommand extends SlashCommand {
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
-        this.log.error(
-          `Failed to get categories\n${e}`,
-          interaction.guildId
-        )
+        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
     );
 
     if (!categories || !categories.length) {
-      this.log.info(
-        `Guild has no categories.`,
-        interaction.guildId
-      );
+      this.log.info(`Guild has no categories.`, interaction.guildId);
 
-      return handleInteractionReply(this.log, interaction, `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
+      );
     }
 
-    handleInteractionReply(this.log, interaction, `Hey! Let me build these embeds for you real quick and send them...`);
+    handleInteractionReply(
+      this.log,
+      interaction,
+      `Hey! Let me build these embeds for you real quick and send them...`
+    );
 
     const embeds: MessageEmbed[] = [];
 

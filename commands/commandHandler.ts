@@ -16,7 +16,7 @@ export default (client: RoleBot) => {
   const log = new LogService('SlashCommandHandler');
   log.info(`Loading all slash commands...`);
 
-  const commandsJson: RESTPostAPIApplicationCommandsJSONBody[] = [];
+  const commandsJson: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
 
   // Use the slash commands name generated from their data.
   for (const cmd of [
@@ -32,7 +32,7 @@ export default (client: RoleBot) => {
   //deleteSlashCommands();
 
   // Generate global slash commands
-  // generateSlashCommands(commandsJson);
+  generateSlashCommands(commandsJson);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -61,7 +61,7 @@ async function deleteSlashCommands() {
   try {
     rest.get(Routes.applicationCommands(CLIENT_ID)).then((data) => {
       const promises = [];
-      for (const command of data as {id: string}[]) {
+      for (const command of data as { id: string }[]) {
         promises.push(
           rest.delete(`${Routes.applicationCommands(CLIENT_ID)}/${command.id}`)
         );

@@ -1,26 +1,26 @@
-import { APIRole } from 'discord-api-types';
 import {
   CommandInteraction,
-  Interaction,
   MessageActionRow,
   MessageButton,
   MessageEmbed,
   Permissions,
-  Role,
 } from 'discord.js-light';
 import RoleBot from '../../src/bot';
+
+import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
+import { Category } from '../../utilities/types/commands';
+import { SlashCommand } from '../slashCommand';
+import emojiReg from 'emoji-regex';
+import {
+  handleInteractionReply,
+  isValidRolePosition,
+} from '../../utilities/utils';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLES_BY_GUILD,
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
-} from '../../src/database/database';
-import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
-import { CLIENT_ID } from '../../src/vars';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
-import emojiReg from 'emoji-regex';
-import { handleInteractionReply } from '../../utilities/utils';
+} from '../../src/database/queries/reactRole.query';
 
 export class ReactRoleCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -63,7 +63,11 @@ export class ReactRoleCommand extends SlashCommand {
      * Discord button row limitation is 5x5 so only a max of 25 buttons.
      */
     if (reactRolesNotInCategory >= 24) {
-        return handleInteractionReply(this.log, interaction, `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responded please *remove* some react roles to get below 25 **not ina  category**. This is due to a Discord limitation!`);
+      return handleInteractionReply(
+        this.log,
+        interaction,
+        `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responded please *remove* some react roles to get below 25 **not ina  category**. This is due to a Discord limitation!`
+      );
     }
 
     const isValidPosition = await isValidRolePosition(interaction, role);
@@ -90,7 +94,9 @@ export class ReactRoleCommand extends SlashCommand {
           embeds: [embed],
           components: [button],
         })
-        .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
     // Custom emojis Look like this: <a?:name:id>
@@ -201,21 +207,4 @@ export class ReactRoleCommand extends SlashCommand {
         });
       });
   };
-}
-
-/**
- * Check that RoleBot has a role above the one the user wants to hand out.
- * @returns true if the bot has a role above the users role.
- */
-async function isValidRolePosition(
-  interaction: Interaction,
-  role: Role | APIRole
-) {
-  const clientUser = await interaction.guild?.members
-    .fetch(CLIENT_ID)
-    .catch(() => console.log(`Failed to fetch client user for guild.`));
-
-  if (!clientUser) return false;
-
-  return clientUser.roles.highest.position > role.position;
 }

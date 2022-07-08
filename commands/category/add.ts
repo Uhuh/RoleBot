@@ -10,11 +10,7 @@ import {
 import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-  GET_REACT_ROLES_NOT_IN_CATEGORIES,
-  GET_REACT_ROLE_BY_ID,
-  UPDATE_REACT_ROLE_CATEGORY,
-} from '../../src/database/database';
+} from '../../src/database/queries/category.query';
 import { SlashCommand } from '../slashCommand';
 import { Category } from '../../utilities/types/commands';
 import {
@@ -23,6 +19,12 @@ import {
 } from '../../utilities/utils';
 import RoleBot from '../../src/bot';
 import { ReactRole } from '../../src/database/entities';
+import {
+  GET_REACT_ROLES_BY_CATEGORY_ID,
+  GET_REACT_ROLES_NOT_IN_CATEGORIES,
+  GET_REACT_ROLE_BY_ID,
+  UPDATE_REACT_ROLE_CATEGORY,
+} from '../../src/database/queries/reactRole.query';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {

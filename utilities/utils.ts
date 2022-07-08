@@ -1,15 +1,27 @@
-import { ButtonInteraction, CommandInteraction, Message, SelectMenuInteraction } from 'discord.js-light';
+import { APIRole } from 'discord-api-types';
+import {
+  ButtonInteraction,
+  CommandInteraction,
+  Interaction,
+  Message,
+  Role,
+  SelectMenuInteraction,
+} from 'discord.js-light';
 import RoleBot from '../src/bot';
+
+import { ReactRole } from '../src/database/entities';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_ROLES_BY_CATEGORY_ID,
+} from '../src/database/queries/category.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
-  GET_CATEGORY_BY_ID,
   GET_REACT_MESSAGE_BY_CATEGORY_ID,
-  GET_ROLES_BY_CATEGORY_ID,
-} from '../src/database/database';
-import { ReactRole } from '../src/database/entities';
+} from '../src/database/queries/reactMessage.query';
 import { EmbedService } from '../src/services/embedService';
 import { LogService } from '../src/services/logService';
+import { CLIENT_ID } from '../src/vars';
 
 export const reactToMessage = (
   message: Message,
@@ -37,7 +49,8 @@ export const reactToMessage = (
         })
         .catch((e) => {
           log.debug(
-            `Failed to react to message[${message.id}] with emoji[${r.emojiTag ?? r.emojiId
+            `Failed to react to message[${message.id}] with emoji[${
+              r.emojiTag ?? r.emojiId
             }] in guild[${guildId}]\n${e}`
           );
         });
@@ -130,6 +143,12 @@ export const updateReactMessages = async (
   }
 };
 
+/**
+ * Break up and existing array into multiple chunks.
+ * @param arr - Anything we want to split up.
+ * @param chunkSize - The size of the array chunks.
+ * @returns Array of new chunks.
+ */
 export const spliceIntoChunks = <T>(
   arr: readonly T[],
   chunkSize: number
@@ -140,14 +159,41 @@ export const spliceIntoChunks = <T>(
   return result;
 };
 
+/**
+ * Handle replying to the interaction and error handling if replies fail.
+ * @param logger - Respective slash command
+ * @param interaction - Interaction that was run
+ * @param content - Content to reply to user with
+ */
 export const handleInteractionReply = (
   logger: LogService,
   interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction,
-  content: { content: string, ephemeral?: boolean } | string
+  content: { content: string; ephemeral?: boolean } | string
 ) => {
-  interaction.reply(content)
-    .catch((interactionError) => {
-      interaction.channel?.send(typeof content === 'string' ? content : content.content)
-        .catch((channelError) => logger.error(`Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`));
-    });
+  interaction.reply(content).catch((interactionError) => {
+    interaction.channel
+      ?.send(typeof content === 'string' ? content : content.content)
+      .catch((channelError) =>
+        logger.error(
+          `Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`
+        )
+      );
+  });
 };
+
+/**
+ * Check that RoleBot has a role above the one the user wants to hand out.
+ * @returns true if the bot has a role above the users role.
+ */
+export async function isValidRolePosition(
+  interaction: Interaction,
+  role: Role | APIRole
+) {
+  const clientUser = await interaction.guild?.members
+    .fetch(CLIENT_ID)
+    .catch(() => console.log(`Failed to fetch client user for guild.`));
+
+  if (!clientUser) return false;
+
+  return clientUser.roles.highest.position > role.position;
+}
