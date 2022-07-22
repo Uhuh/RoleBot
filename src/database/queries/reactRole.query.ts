@@ -31,7 +31,12 @@ export const DELETE_ALL_REACT_ROLES_BY_GUILD_ID = async (guildId: string) => {
 };
 
 export const GET_REACT_ROLES_BY_GUILD = async (guildId: string) => {
-  return await ReactRole.find({ where: { guildId } });
+  return await ReactRole.find({
+    where: { guildId },
+    order: {
+      name: 'ASC',
+    },
+  });
 };
 
 export const GET_REACT_ROLES_NOT_IN_CATEGORIES = async (guildId: string) => {
@@ -62,6 +67,9 @@ export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
       category: {
         id: categoryId,
       },
+    },
+    order: {
+      name: 'ASC',
     },
   });
 };

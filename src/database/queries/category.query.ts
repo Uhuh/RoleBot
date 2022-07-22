@@ -3,11 +3,14 @@ import { ICategory } from '../entities/category.entity';
 
 // Guild categories
 export const GET_GUILD_CATEGORIES = async (guildId: string) => {
-  return await Category.find({ where: { guildId } });
+  return await Category.find({ where: { guildId }, order: { name: 'ASC' } });
 };
 
 export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
-  return await ReactRole.find({ where: { category: { id: categoryId } } });
+  return await ReactRole.find({
+    where: { category: { id: categoryId } },
+    order: { name: 'ASC' },
+  });
 };
 
 export const CREATE_GUILD_CATEGORY = async (
