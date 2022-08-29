@@ -22,6 +22,7 @@ import {
 } from './database/queries/joinRole.query';
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
+import { handleRawPacket } from '../events/raw';
 
 export default class RoleBot extends Discord.Client {
   config: typeof config;
@@ -74,7 +75,7 @@ export default class RoleBot extends Discord.Client {
      * This is required because if the bot restarts it has no memory of old messages, especially
      * its own messages that are monitored for role management.
      */
-    // this.on('raw', (r) => handle_packet(r, this));
+    this.on('raw', (r) => handleRawPacket(r, this));
     this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
     this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
     // React role handling
