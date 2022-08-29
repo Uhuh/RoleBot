@@ -41,6 +41,11 @@ export default class RoleBot extends Discord.Client {
         Discord.IntentsBitField.Flags.GuildMembers,
         Discord.IntentsBitField.Flags.GuildMessageReactions,
       ],
+      partials: [
+        Discord.Partials.Message,
+        Discord.Partials.Channel,
+        Discord.Partials.Reaction,
+      ],
     });
     this.config = config;
     this.commandsRun = 0;
@@ -75,7 +80,7 @@ export default class RoleBot extends Discord.Client {
      * This is required because if the bot restarts it has no memory of old messages, especially
      * its own messages that are monitored for role management.
      */
-    this.on('raw', (r) => handleRawPacket(r, this));
+    // this.on('raw', (r) => handleRawPacket(r, this));
     this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
     this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
     // React role handling
