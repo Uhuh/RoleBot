@@ -1,10 +1,10 @@
 import {
-  CommandInteraction,
-  MessageActionRow,
-  MessageEmbed,
-  MessageSelectMenu,
+  ActionRowBuilder,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  SelectMenuBuilder,
   SelectMenuInteraction,
-} from 'discord.js-light';
+} from 'discord.js';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
@@ -31,14 +31,14 @@ export class HelpCommand extends SlashCommand {
       );
   };
 
-  execute = (interaction: CommandInteraction) => {
-    const embed = new MessageEmbed();
+  execute = (interaction: ChatInputCommandInteraction) => {
+    const embed = new EmbedBuilder();
 
     const { user } = interaction.client;
     if (!user) return;
 
-    const selectMenu = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+      new SelectMenuBuilder()
         .setCustomId(`select-${this.name}`)
         .setPlaceholder('Pick a category')
         .addOptions([

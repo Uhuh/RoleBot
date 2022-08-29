@@ -1,10 +1,10 @@
 import {
   ButtonInteraction,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   Interaction,
-  Permissions,
   SelectMenuInteraction,
-} from 'discord.js-light';
+  PermissionsBitField,
+} from 'discord.js';
 import {
   Category,
   DataCommand,
@@ -17,16 +17,16 @@ import RoleBot from '../src/bot';
 import { handleInteractionReply } from '../utilities/utils';
 
 export const PermissionMappings: Map<bigint, string> = new Map([
-  [Permissions.FLAGS.READ_MESSAGE_HISTORY, 'READ_MESSAGE_HISTORY'],
-  [Permissions.FLAGS.BAN_MEMBERS, 'BAN_MEMBERS'],
-  [Permissions.FLAGS.KICK_MEMBERS, 'KICK_MEMBERS'],
-  [Permissions.FLAGS.MANAGE_GUILD, 'MANAGE_GUILD'],
-  [Permissions.FLAGS.MANAGE_ROLES, 'MANAGE_ROLES'],
-  [Permissions.FLAGS.MANAGE_MESSAGES, 'MANAGE_MESSAGES'],
-  [Permissions.FLAGS.ADD_REACTIONS, 'ADD_REACTIONS'],
-  [Permissions.FLAGS.SEND_MESSAGES, 'SEND_MESSAGES'],
-  [Permissions.FLAGS.ATTACH_FILES, 'ATTACH_FILES'],
-  [Permissions.FLAGS.EMBED_LINKS, 'EMBED_LINKS'],
+  [PermissionsBitField.Flags.ReadMessageHistory, 'READ_MESSAGE_HISTORY'],
+  [PermissionsBitField.Flags.BanMembers, 'BAN_MEMBERS'],
+  [PermissionsBitField.Flags.KickMembers, 'KICK_MEMBERS'],
+  [PermissionsBitField.Flags.ManageGuild, 'MANAGE_GUILD'],
+  [PermissionsBitField.Flags.ManageRoles, 'MANAGE_ROLES'],
+  [PermissionsBitField.Flags.ManageMessages, 'MANAGE_MESSAGES'],
+  [PermissionsBitField.Flags.AddReactions, 'ADD_REACTIONS'],
+  [PermissionsBitField.Flags.SendMessages, 'SEND_MESSAGES'],
+  [PermissionsBitField.Flags.AttachFiles, 'ATTACH_FILES'],
+  [PermissionsBitField.Flags.EmbedLinks, 'EMBED_LINKS'],
 ]);
 
 // Basic command metadata for now. Want to learn how users are utilizing the bot.
@@ -85,7 +85,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    */
   public run = (interaction: Interaction): void => {
     // Ignore interactions that aren't commands.
-    if (!interaction.isCommand()) {
+    if (!interaction.isChatInputCommand()) {
       return this.log.debug(
         `Interaction was not a command. Command that got ran[${this.name}]`
       );
@@ -117,7 +117,10 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   };
 
   public canUserRunInteraction = (
-    interaction: CommandInteraction | SelectMenuInteraction | ButtonInteraction
+    interaction:
+      | ChatInputCommandInteraction
+      | ButtonInteraction
+      | SelectMenuInteraction
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
@@ -137,7 +140,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * This method should be overwritten by the child class and implement the commands functionality.
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
    */
-  public execute = (interaction: CommandInteraction) => {
+  public execute = (interaction: ChatInputCommandInteraction) => {
     handleInteractionReply(
       this.log,
       interaction,
@@ -182,7 +185,12 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param interaction User interaction with memberPermissions
    * @returns True if user can run this command, false otherwise.
    */
-  private canUserRunCommand = (interaction: Interaction) => {
+  private canUserRunCommand = (
+    interaction:
+      | ChatInputCommandInteraction
+      | ButtonInteraction
+      | SelectMenuInteraction
+  ) => {
     return this.permissions.length
       ? interaction.memberPermissions?.has(this.permissions, true)
       : true;
@@ -196,7 +204,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @returns All properties passed in.
    */
   extractStringVariables = (
-    interaction: CommandInteraction,
+    interaction: ChatInputCommandInteraction,
     ...attrs: string[]
   ): Array<string | undefined> => {
     return attrs.map((a) => {

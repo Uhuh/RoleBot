@@ -5,7 +5,7 @@ import {
   PartialMessageReaction,
   PartialUser,
   User,
-} from 'discord.js-light';
+} from 'discord.js';
 
 import { ReactMessage } from '../database/entities';
 import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';

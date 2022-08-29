@@ -1,8 +1,8 @@
 import {
-  CommandInteraction,
-  MessageEmbed,
-  Permissions,
-} from 'discord.js-light';
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+  EmbedBuilder,
+} from 'discord.js';
 
 import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
@@ -22,11 +22,11 @@ export class ListCategoryCommand extends SlashCommand {
       'category-list',
       'List all your categories and the roles within them.',
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
@@ -52,7 +52,7 @@ export class ListCategoryCommand extends SlashCommand {
       `Hey! Let me build these embeds for you real quick and send them...`
     );
 
-    const embeds: MessageEmbed[] = [];
+    const embeds: EmbedBuilder[] = [];
 
     // Let's show the user the free react roles and encourage them to add them to a category.
     const rolesNotInCategory = await GET_REACT_ROLES_NOT_IN_CATEGORIES(

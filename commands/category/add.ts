@@ -1,12 +1,13 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageSelectMenu,
-  Permissions,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+  SelectMenuBuilder,
   SelectMenuInteraction,
-} from 'discord.js-light';
+} from 'discord.js';
 import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
@@ -33,7 +34,7 @@ export class AddCategoryCommand extends SlashCommand {
       'category-add',
       'Add reaction roles to a specific category.',
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
   }
 
@@ -241,20 +242,20 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
 
     return reactRoleChunks.map((chunk) =>
-      new MessageActionRow().addComponents(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
         chunk.map((r, i) =>
-          new MessageButton()
+          new ButtonBuilder()
             // commandName_reactMongoId-categoryMongoId
             .setCustomId(`${this.name}_${r.id}-${categoryId}`)
             .setEmoji(r.emojiId)
             .setLabel(r.name)
-            .setStyle(i % 2 ? 'SECONDARY' : 'PRIMARY')
+            .setStyle(i % 2 ? ButtonStyle.Secondary : ButtonStyle.Primary)
         )
       )
     );
   };
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
@@ -293,8 +294,8 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     // Value format: `commandName_guildID-categoryId`
-    const selectMenu = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+      new SelectMenuBuilder()
         .setCustomId(`select-${this.name}`)
         .setPlaceholder('Pick a category')
         .addOptions(

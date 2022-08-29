@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js-light';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
@@ -9,8 +9,8 @@ export class InfoCommand extends SlashCommand {
   constructor(client: RoleBot) {
     super(client, 'info', `RoleBot's invite, ping, etc.`, Category.general);
   }
-  execute = async (interaction: CommandInteraction) => {
-    const embed = new MessageEmbed();
+  execute = async (interaction: ChatInputCommandInteraction) => {
+    const embed = new EmbedBuilder();
     const size = (
       await this.client.shard?.fetchClientValues('guilds.cache.size')
     )?.reduce<number>((a, b) => a + Number(b), 0);
@@ -26,7 +26,8 @@ Check out my site! https://rolebot.gg
 
 This servers shard ID: ${interaction.guild?.shardId}
 Server count: ${size} servers.
-Latency is ${Date.now() - interaction.createdTimestamp
+Latency is ${
+          Date.now() - interaction.createdTimestamp
         }ms. API Latency is ${Math.round(this.client.ws.ping)}ms.
 
 [Click to Vote!](${VOTE_URL})
@@ -41,6 +42,8 @@ Latency is ${Date.now() - interaction.createdTimestamp
         content: `Here's some info about me.`,
         embeds: [embed],
       })
-      .catch((e) => this.log.error(`Interaction failed.\n${e}`, interaction.guildId));
+      .catch((e) =>
+        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+      );
   };
 }

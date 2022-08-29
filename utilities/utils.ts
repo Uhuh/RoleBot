@@ -1,12 +1,13 @@
-import { APIRole } from 'discord-api-types';
 import {
+  APIRole,
+  ChannelType,
   ButtonInteraction,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   Interaction,
   Message,
   Role,
   SelectMenuInteraction,
-} from 'discord.js-light';
+} from 'discord.js';
 import RoleBot from '../src/bot';
 
 import { ReactRole } from '../src/database/entities';
@@ -78,7 +79,7 @@ export const updateReactMessages = async (
 
     const channel = await client.channels.fetch(reactMessage.channelId);
 
-    if (!channel?.isText()) {
+    if (!(channel?.type === ChannelType.GuildText)) {
       return log.debug(
         `Guild[${reactMessage.guildId}] apparently does not have channel[${reactMessage.channelId}]`
       );
@@ -167,7 +168,10 @@ export const spliceIntoChunks = <T>(
  */
 export const handleInteractionReply = (
   logger: LogService,
-  interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction,
+  interaction:
+    | ChatInputCommandInteraction
+    | ButtonInteraction
+    | SelectMenuInteraction,
   content: { content: string; ephemeral?: boolean } | string
 ) => {
   interaction.reply(content).catch((interactionError) => {

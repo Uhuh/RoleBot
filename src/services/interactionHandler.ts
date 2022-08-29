@@ -1,9 +1,9 @@
 import {
   ButtonInteraction,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   Interaction,
   SelectMenuInteraction,
-} from 'discord.js-light';
+} from 'discord.js';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
 import RoleBot from '../bot';
@@ -40,7 +40,7 @@ export class InteractionHandler {
    * @returns void, to exit the function early.
    */
   private static handleCommand(
-    interaction: CommandInteraction,
+    interaction: ChatInputCommandInteraction,
     client: RoleBot
   ) {
     const command = client.commands.get(interaction.commandName.toLowerCase());
@@ -141,7 +141,7 @@ export class InteractionHandler {
   private static isSupportedInteractionType(
     interaction: Interaction
   ): interaction is
-    | CommandInteraction
+    | ChatInputCommandInteraction
     | SelectMenuInteraction
     | ButtonInteraction {
     return (

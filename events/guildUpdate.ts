@@ -1,5 +1,5 @@
 import RoleBot from '../src/bot';
-import { Guild, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, Guild } from 'discord.js';
 import { Colors } from '../src/interfaces';
 import { RolebotEventsWebhook } from '../utilities/types/globals';
 
@@ -14,15 +14,17 @@ export const guildUpdate = async (
       await client.shard?.fetchClientValues('guilds.cache.size')
     )?.reduce<number>((a, b) => a + Number(b), 0);
 
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed
       .setColor(color)
       .setTitle(`**${type} Guild**`)
       .setThumbnail(guild.iconURL() || '')
       .setDescription(guild.name)
-      .addField('Member size:', `${guild.memberCount}`, true)
-      .addField('Guild ID:', `${guild.id}`, true)
+      .addFields(
+        { name: 'Member size:', value: `${guild.memberCount}`, inline: true },
+        { name: 'Guild ID:', value: `${guild.id}`, inline: true }
+      )
       .setFooter({
         text: `Guilds I'm in: ${size}`,
       });

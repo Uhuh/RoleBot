@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { EmbedService } from '../../src/services/embedService';
@@ -13,11 +13,11 @@ export class ReactListCommand extends SlashCommand {
       'react-list',
       'List all reaction roles that are currently active.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(

@@ -1,5 +1,9 @@
 import { codeBlock } from '@discordjs/builders';
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import {
+  ChannelType,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 
 import { EmbedService } from '../../src/services/embedService';
@@ -16,7 +20,7 @@ export class ReactChannelCommand extends SlashCommand {
       'react-channel',
       'Send all categories with react roles to the selected channel.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addChannelOption(
@@ -26,7 +30,7 @@ export class ReactChannelCommand extends SlashCommand {
     );
   }
 
-  public execute = async (interaction: CommandInteraction) => {
+  public execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
@@ -104,7 +108,7 @@ export class ReactChannelCommand extends SlashCommand {
         .catch((e) =>
           this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
         );
-    } else if (!(channel?.type === 'GUILD_TEXT')) {
+    } else if (!(channel?.type === ChannelType.GuildText)) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel`,
         interaction.guildId
@@ -118,11 +122,11 @@ export class ReactChannelCommand extends SlashCommand {
     }
 
     const permissions = [
-      Permissions.FLAGS.READ_MESSAGE_HISTORY,
-      Permissions.FLAGS.ADD_REACTIONS,
-      Permissions.FLAGS.SEND_MESSAGES,
-      Permissions.FLAGS.MANAGE_MESSAGES,
-      Permissions.FLAGS.MANAGE_ROLES,
+      PermissionsBitField.Flags.ReadMessageHistory,
+      PermissionsBitField.Flags.AddReactions,
+      PermissionsBitField.Flags.SendMessages,
+      PermissionsBitField.Flags.ManageMessages,
+      PermissionsBitField.Flags.ManageRoles,
     ]
       .map((p) => `\`${PermissionMappings.get(p)}\``)
       .join(' ');
@@ -147,6 +151,9 @@ export class ReactChannelCommand extends SlashCommand {
       );
     });
 
+    const textChannel = await interaction.guild?.channels.fetch(channel.id);
+    if (textChannel?.type !== ChannelType.GuildText) return;
+
     for (const category of categories) {
       const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
       if (!categoryRoles.length) continue;
@@ -154,7 +161,7 @@ export class ReactChannelCommand extends SlashCommand {
       const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
       try {
-        const reactEmbedMessage = await channel.send({
+        const reactEmbedMessage = await textChannel.send({
           embeds: [embed],
         });
 

@@ -1,9 +1,10 @@
 import {
   Channel,
-  CommandInteraction,
-  Permissions,
+  ChannelType,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
   TextChannel,
-} from 'discord.js-light';
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 
 import { EmbedService } from '../../src/services/embedService';
@@ -24,7 +25,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       'category-update',
       'Have an existing react role embed you want updated? Use this command!',
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
@@ -34,7 +35,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
@@ -182,5 +183,5 @@ export class UpdateCategoryCommand extends SlashCommand {
 }
 
 function isTextChannel(channel: Channel): channel is TextChannel {
-  return channel.type === 'GUILD_TEXT';
+  return channel.type === ChannelType.GuildText;
 }

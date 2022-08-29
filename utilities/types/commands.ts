@@ -2,7 +2,7 @@ import {
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
 } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js-light';
+import { ChatInputCommandInteraction } from 'discord.js';
 import RoleBot from '../../src/bot';
 
 export enum Category {
@@ -21,5 +21,8 @@ export interface DataCommand {
   desc: string;
   type: Category;
   data: SlashCommandTypes;
-  execute: (interaction: CommandInteraction, client: RoleBot) => unknown;
+  execute: (
+    interaction: ChatInputCommandInteraction,
+    client: RoleBot
+  ) => unknown;
 }

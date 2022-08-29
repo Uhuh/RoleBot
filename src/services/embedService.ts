@@ -1,4 +1,4 @@
-import { MessageEmbed, User } from 'discord.js-light';
+import { EmbedBuilder, User } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
 import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
@@ -23,13 +23,15 @@ export class EmbedService {
    * @returns Return built embed
    */
   public static helpEmbed = (type: string, client: RoleBot) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed.setTitle(`**${type.toUpperCase()} commands**`).setColor(COLOR.AQUA);
 
     client.commands
       .filter((c) => c.type === type)
-      .forEach((func) => embed.addField(`/${func.name}`, func.desc));
+      .forEach((func) =>
+        embed.addFields({ name: `/${func.name}`, value: func.desc })
+      );
 
     return embed;
   };
@@ -41,7 +43,7 @@ export class EmbedService {
    * @returns built embed.
    */
   public static categoryReactRoleEmbed = async (category: Category) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
     const reactRoles = categoryRoles.length
@@ -76,7 +78,7 @@ export class EmbedService {
    * @returns Built embed for caller command to send.
    */
   public static reactRoleListEmbed = (reactRoles: ReactRole[]) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     const rolesNotInCategory = reactRoles.filter((r) => !r.categoryId);
     const rolesInCategory = reactRoles.filter((r) => r.categoryId);
@@ -104,7 +106,7 @@ export class EmbedService {
   };
 
   public static freeReactRoles = async (reactRoles: ReactRole[]) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed.setTitle(`React roles not in a category`).setColor(COLOR.YELLOW);
 
@@ -123,7 +125,7 @@ export class EmbedService {
   ) => {
     const reactRolesString = this.reactRolesFormattedString(reactRoles);
 
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed
       .setTitle(category.name)
@@ -136,7 +138,7 @@ export class EmbedService {
   public static tutorialEmbed = (pageId: number) => {
     /* Extract out all of the embed info needed to make this. Should be simple. */
     const embedJson = tutorialJson['embeds'][pageId];
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed
       .setColor(COLOR.DEFAULT)
@@ -147,7 +149,7 @@ export class EmbedService {
   };
 
   public static joinRoleEmbed = (roleIds: string[]) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed
       .setTitle(`Server auto join roles.`)
@@ -164,7 +166,7 @@ export class EmbedService {
   };
 
   public static errorEmbed = (content: string) => {
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
     embed
       .setColor(Colors.red)

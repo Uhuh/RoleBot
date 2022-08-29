@@ -1,10 +1,11 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  Permissions,
-} from 'discord.js-light';
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
@@ -20,7 +21,7 @@ export class ReactNukeCommand extends SlashCommand {
       'react-nuke',
       'This will remove ALL react roles for this server.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
   }
 
@@ -78,12 +79,12 @@ export class ReactNukeCommand extends SlashCommand {
       });
   };
 
-  execute = (interaction: CommandInteraction) => {
-    const buttons = new MessageActionRow().addComponents(
-      new MessageButton()
+  execute = (interaction: ChatInputCommandInteraction) => {
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
         .setCustomId(`${this.name}_confirm`)
         .setLabel('Confirm Nuke')
-        .setStyle('PRIMARY')
+        .setStyle(ButtonStyle.Primary)
     );
 
     interaction.reply({

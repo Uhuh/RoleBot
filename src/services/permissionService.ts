@@ -1,4 +1,4 @@
-import { Permissions } from 'discord.js-light';
+import { ChannelType, PermissionsBitField } from 'discord.js';
 import Rolebot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';
@@ -51,7 +51,7 @@ export class PermissionService {
         `Client could not find channel[${channelId}] on guild[${guildId}].`
       );
       return HasPerms.error;
-    } else if (!channel.isText()) {
+    } else if (channel.type !== ChannelType.GuildText) {
       this.log.error(
         `Channel[${channelId}] on guild[${guildId}] is not a text channel somehow.`
       );
@@ -60,18 +60,18 @@ export class PermissionService {
 
     /**
      * Reason for these perms
-     * @param Permissions.FLAGS.ADD_REACTIONS   - Have to be able to react, it is a react role bot.
-     * @param Permissions.FLAGS.SEND_MESSAGES   - Have to be able to send embeds.
-     * @param Permissions.FLAGS.MANAGE_MESSAGES - To update the embeds react role list.
-     * @param Permissions.FLAGS.MANAGE_ROLES    - To update users roles.
+     * @param PermissionsBitField.Flags.ADD_REACTIONS   - Have to be able to react, it is a react role bot.
+     * @param PermissionsBitField.Flags.SEND_MESSAGES   - Have to be able to send embeds.
+     * @param PermissionsBitField.Flags.MANAGE_MESSAGES - To update the embeds react role list.
+     * @param PermissionsBitField.Flags.ManageRoles    - To update users roles.
      */
     const hasCorrectPerms = clientMember.permissions.has(
       [
-        Permissions.FLAGS.READ_MESSAGE_HISTORY,
-        Permissions.FLAGS.ADD_REACTIONS,
-        Permissions.FLAGS.SEND_MESSAGES,
-        Permissions.FLAGS.MANAGE_MESSAGES,
-        Permissions.FLAGS.MANAGE_ROLES,
+        PermissionsBitField.Flags.ReadMessageHistory,
+        PermissionsBitField.Flags.AddReactions,
+        PermissionsBitField.Flags.SendMessages,
+        PermissionsBitField.Flags.ManageMessages,
+        PermissionsBitField.Flags.ManageRoles,
       ],
       true
     );

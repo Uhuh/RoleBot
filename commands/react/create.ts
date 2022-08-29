@@ -1,10 +1,11 @@
 import {
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-  Permissions,
-} from 'discord.js-light';
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  PermissionsBitField,
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
@@ -29,7 +30,7 @@ export class ReactRoleCommand extends SlashCommand {
       'react-role',
       'Create a new react role. Give the command a role and an emoji. It really is that simple.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addRoleOption('role', 'The role you want to use.', true);
@@ -38,7 +39,7 @@ export class ReactRoleCommand extends SlashCommand {
 
   emojiRegex = emojiReg();
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     const { guild } = interaction;
@@ -73,19 +74,19 @@ export class ReactRoleCommand extends SlashCommand {
     const isValidPosition = await isValidRolePosition(interaction, role);
 
     if (!isValidPosition) {
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setTitle('Reaction Roles Setup')
         .setDescription(
           `The role <@&${role.id}> is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
         );
 
-      const button = new MessageActionRow().addComponents(
-        new MessageButton()
+      const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
           .setLabel('Discord Roles')
           .setURL(
             'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101'
           )
-          .setStyle('LINK')
+          .setStyle(ButtonStyle.Link)
       );
 
       return interaction

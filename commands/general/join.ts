@@ -1,13 +1,14 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { APIRole } from 'discord-api-types';
 import {
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-  Permissions,
+  ActionRowBuilder,
+  APIRole,
+  ButtonBuilder,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  PermissionsBitField,
   Role,
-} from 'discord.js-light';
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
   CREATE_JOIN_ROLE,
@@ -74,12 +75,15 @@ export class AutoJoinCommand extends SlashCommand {
       commandName,
       commandDescription,
       Category.general,
-      [Permissions.FLAGS.MANAGE_ROLES],
+      [PermissionsBitField.Flags.ManageRoles],
       command
     );
   }
 
-  add = async (interaction: CommandInteraction, role: APIRole | Role) => {
+  add = async (
+    interaction: ChatInputCommandInteraction,
+    role: Role | APIRole
+  ) => {
     if (!interaction.guildId) return;
 
     const numJoinRoles = (await GET_GUILD_JOIN_ROLES(interaction.guildId))
@@ -88,11 +92,10 @@ export class AutoJoinCommand extends SlashCommand {
     const doesRoleExist = await GET_JOIN_ROLE_BY_ID(role.id);
 
     if (doesRoleExist.length) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`,
+      });
     }
 
     if (numJoinRoles < 5) {
@@ -104,31 +107,31 @@ export class AutoJoinCommand extends SlashCommand {
           content: `:tada: I successfully added <@&${role.id}> to the auto-join list.`,
         });
       } catch (e) {
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I had an issue adding that role to the servers auto-join list.`
-        );
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `Hey! I had an issue adding that role to the servers auto-join list.`,
+        });
       }
     } else {
-      handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`
-      );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`,
+      });
     }
   };
 
-  remove = async (interaction: CommandInteraction, role: APIRole | Role) => {
+  remove = async (
+    interaction: ChatInputCommandInteraction,
+    role: Role | APIRole
+  ) => {
     const doesRoleExist = await GET_JOIN_ROLE_BY_ID(role.id);
 
     // If the role isn't in the database then no point in trying to remove.
     if (!doesRoleExist) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `That role wasn't found in the auto-join list so nothing was removed.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `That role wasn't found in the auto-join list so nothing was removed.`,
+      });
     }
 
     try {
@@ -144,15 +147,14 @@ export class AutoJoinCommand extends SlashCommand {
         `Failed to remove auto-join role[${role.id}]`,
         interaction.guildId
       );
-      handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`
-      );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`,
+      });
     }
   };
 
-  list = async (interaction: CommandInteraction) => {
+  list = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
 
     const joinRoles = await GET_GUILD_JOIN_ROLES(interaction.guildId);
@@ -165,20 +167,19 @@ export class AutoJoinCommand extends SlashCommand {
         embeds: [embed],
       })
       .catch(() => {
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I had an issue sending the embed.`
-        );
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `Hey! I had an issue sending the embed.`,
+        });
       });
   };
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
 
     const subCommandName = interaction.options.getSubcommand();
     const subCommandOptions = interaction.options.data;
-    let role: APIRole | Role | undefined | null;
+    let role: Role | APIRole | undefined | null;
 
     // Check if the subcommand has options, if it does then it might be add/remove and we can get the role the user passed
     if (
@@ -198,20 +199,20 @@ export class AutoJoinCommand extends SlashCommand {
       const isValidPosition = await isValidRolePosition(interaction, role);
 
       if (!isValidPosition) {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
           .setTitle('Reaction Roles Setup')
           .setDescription(
             `The role <@&${role.id}> is above me in the role list which you can find in \`Server settings > Roles\`.
             \nPlease make sure that my role \`RoleBot\` is higher than the roles you give me in your servers role hierarchy.`
           );
 
-        const button = new MessageActionRow().addComponents(
-          new MessageButton()
+        const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
             .setLabel('Discord Roles')
             .setURL(
               'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101'
             )
-            .setStyle('LINK')
+            .setStyle(ButtonStyle.Link)
         );
 
         return interaction

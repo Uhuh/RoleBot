@@ -1,9 +1,10 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-} from 'discord.js-light';
+  ButtonStyle,
+  ChatInputCommandInteraction,
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
@@ -20,17 +21,17 @@ export class TutorialCommand extends SlashCommand {
   }
 
   makeButtons = (pageId: number) => {
-    const buttons = new MessageActionRow().addComponents(
-      new MessageButton()
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
         .setCustomId(`${this.name}_${pageId - 1}`)
         .setDisabled(pageId === 0)
         .setLabel('Back')
-        .setStyle('SECONDARY'),
-      new MessageButton()
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
         .setCustomId(`${this.name}_${pageId + 1}`)
         .setDisabled(pageId === 3)
         .setLabel('Next')
-        .setStyle('PRIMARY')
+        .setStyle(ButtonStyle.Primary)
     );
 
     return buttons;
@@ -49,11 +50,14 @@ export class TutorialCommand extends SlashCommand {
         components: [buttons],
       })
       .catch((e) =>
-        this.log.error(`Failed to update tutorial interaction.\n${e}`, interaction.guildId)
+        this.log.error(
+          `Failed to update tutorial interaction.\n${e}`,
+          interaction.guildId
+        )
       );
   };
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = EmbedService.tutorialEmbed(0);
 
     const buttons = this.makeButtons(0);
@@ -65,6 +69,11 @@ export class TutorialCommand extends SlashCommand {
         embeds: [embed],
         components: [buttons],
       })
-      .catch((e) => this.log.error(`Failed to send tutorial embed.\n${e}`, interaction.guildId));
+      .catch((e) =>
+        this.log.error(
+          `Failed to send tutorial embed.\n${e}`,
+          interaction.guildId
+        )
+      );
   };
 }

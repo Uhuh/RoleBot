@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChannelType } from 'discord-api-types';
+import { ChannelType } from 'discord.js';
 import { SlashCommandTypes } from '../utilities/types/commands';
 
 /**
@@ -28,7 +28,7 @@ export abstract class SlashBase {
     if (this.data instanceof SlashCommandBuilder) {
       this.data.addChannelOption((option) =>
         option
-          .addChannelType(ChannelType.GuildText)
+          .addChannelTypes(ChannelType.GuildText)
           .setName(name)
           .setDescription(desc)
           .setRequired(required)

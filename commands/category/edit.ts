@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import RoleBot from '../../src/bot';
 import { Category as ICategory } from '../../src/database/entities/category.entity';
 
@@ -17,7 +17,7 @@ export class EditCategoryCommand extends SlashCommand {
       'category-edit',
       `Edit any category's name, description, or if it's mutually exclusive.`,
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
@@ -39,7 +39,7 @@ export class EditCategoryCommand extends SlashCommand {
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }

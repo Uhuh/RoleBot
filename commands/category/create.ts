@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import RoleBot from '../../src/bot';
 import {
   CREATE_GUILD_CATEGORY,
@@ -16,7 +16,7 @@ export class CreateCategoryCommand extends SlashCommand {
       'category-create',
       'Create a new category to categorize your reaction roles in.',
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption('category-name', 'The name of the category', true);
@@ -27,7 +27,7 @@ export class CreateCategoryCommand extends SlashCommand {
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }

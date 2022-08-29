@@ -1,3 +1,4 @@
+import { IsNull } from 'typeorm';
 import { Category, ReactRole } from '../entities';
 import { ReactRoleType } from '../entities/reactRole.entity';
 
@@ -41,7 +42,7 @@ export const GET_REACT_ROLES_BY_GUILD = async (guildId: string) => {
 
 export const GET_REACT_ROLES_NOT_IN_CATEGORIES = async (guildId: string) => {
   return await ReactRole.find({
-    where: { guildId, categoryId: null },
+    where: { guildId, categoryId: IsNull() },
   });
 };
 

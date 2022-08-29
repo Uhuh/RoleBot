@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import RoleBot from '../../src/bot';
 
 import {
@@ -20,13 +20,13 @@ export class ReactDeleteCommand extends SlashCommand {
       'react-remove',
       'Remove an existing reaction role from a drop down menu.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addRoleOption('role', `The reaction role you want to remove.`, true);
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     const role = interaction.options.get('role')?.role;
 
     if (!role) {

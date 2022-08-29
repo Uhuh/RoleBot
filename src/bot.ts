@@ -15,7 +15,7 @@ import {
   ReactRole,
 } from './database/entities';
 
-import * as Discord from 'discord.js-light';
+import * as Discord from 'discord.js';
 import {
   DELETE_JOIN_ROLE,
   GET_GUILD_JOIN_ROLES,
@@ -37,12 +37,12 @@ export default class RoleBot extends Discord.Client {
     super({
       // Can't get role position data without caching the roles.
       makeCache: Discord.Options.cacheWithLimits({
-        RoleManager: Infinity,
+        ReactionManager: Infinity,
       }),
       intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_MEMBERS,
-        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Discord.IntentsBitField.Flags.Guilds,
+        Discord.IntentsBitField.Flags.GuildMembers,
+        Discord.IntentsBitField.Flags.GuildMessageReactions,
       ],
     });
     this.config = config;
@@ -113,11 +113,15 @@ export default class RoleBot extends Discord.Client {
       activities: [
         {
           name: 'Use /help for commands!',
-          type: 'LISTENING',
+          type: Discord.ActivityType.Listening,
+        },
+        {
+          name: 'Check out rolebot.gg!',
+          type: Discord.ActivityType.Streaming,
         },
         {
           name: 'I use slash commands!',
-          type: 'WATCHING',
+          type: Discord.ActivityType.Watching,
         },
       ],
       status: 'dnd',

@@ -1,4 +1,4 @@
-import { CommandInteraction, Permissions } from 'discord.js-light';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import RoleBot from '../../src/bot';
@@ -16,7 +16,7 @@ export class RemoveCategoryCommand extends SlashCommand {
       'category-remove',
       'Delete a category. Deleting a category frees all roles it contains.',
       Category.category,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
@@ -26,7 +26,7 @@ export class RemoveCategoryCommand extends SlashCommand {
     );
   }
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }

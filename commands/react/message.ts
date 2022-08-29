@@ -1,12 +1,14 @@
 import {
-  AnyChannel,
-  CommandInteraction,
-  MessageActionRow,
-  MessageSelectMenu,
-  Permissions,
+  ActionRowBuilder,
+  Channel,
+  ChannelType,
+  ChatInputCommandInteraction,
+  NonThreadGuildBasedChannel,
+  PermissionsBitField,
+  SelectMenuBuilder,
   SelectMenuInteraction,
   TextChannel,
-} from 'discord.js-light';
+} from 'discord.js';
 import RoleBot from '../../src/bot';
 
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
@@ -25,7 +27,7 @@ export class ReactMessageCommand extends SlashCommand {
       'react-message',
       'Use this command to react with a specific category of roles to a message.',
       Category.react,
-      [Permissions.FLAGS.MANAGE_ROLES]
+      [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
@@ -108,7 +110,7 @@ export class ReactMessageCommand extends SlashCommand {
     );
   };
 
-  execute = async (interaction: CommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     const [messageLink] = this.extractStringVariables(
@@ -216,8 +218,8 @@ export class ReactMessageCommand extends SlashCommand {
       );
     }
 
-    const selectMenu = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+      new SelectMenuBuilder()
         .setCustomId(`select-message`)
         .setPlaceholder(`Pick a category to react with.`)
         .addOptions(
@@ -232,6 +234,7 @@ export class ReactMessageCommand extends SlashCommand {
 
     interaction
       .reply({
+        ephemeral: true,
         content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
         components: [selectMenu],
       })
@@ -241,6 +244,8 @@ export class ReactMessageCommand extends SlashCommand {
   };
 }
 
-function isTextChannel(channel: AnyChannel): channel is TextChannel {
-  return channel.type === 'GUILD_TEXT';
+function isTextChannel(
+  channel: NonThreadGuildBasedChannel | Channel
+): channel is TextChannel {
+  return channel.type === ChannelType.GuildText;
 }
