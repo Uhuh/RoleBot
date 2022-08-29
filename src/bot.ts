@@ -35,10 +35,6 @@ export default class RoleBot extends Discord.Client {
 
   constructor() {
     super({
-      // Can't get role position data without caching the roles.
-      makeCache: Discord.Options.cacheWithLimits({
-        ReactionManager: Infinity,
-      }),
       intents: [
         Discord.IntentsBitField.Flags.Guilds,
         Discord.IntentsBitField.Flags.GuildMembers,
