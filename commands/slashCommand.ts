@@ -68,7 +68,13 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   ) {
     const command =
       _commandOverride ??
-      new SlashCommandBuilder().setName(_name).setDescription(_desc);
+      new SlashCommandBuilder()
+        .setName(_name)
+        .setDescription(_desc)
+        .setDefaultMemberPermissions(
+          _permissions.length ? _permissions.reduce((a, b) => a | b) : undefined
+        );
+
     super(command);
     this.client = _client;
     this.name = _name;
