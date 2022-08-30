@@ -26,10 +26,10 @@ export default async (client: RoleBot) => {
   }
 
   // Deleting global commands. (:
-  await deleteSlashCommands();
+  // await deleteSlashCommands();
 
   // Generate global slash commands
-  await generateSlashCommands(commandsJson);
+  // await generateSlashCommands(commandsJson);
 };
 
 async function generateSlashCommands(
