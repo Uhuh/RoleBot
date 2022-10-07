@@ -66,11 +66,13 @@ async function deleteSlashCommands(route: `/${string}`) {
   const log = new LogService('DeleteSlashCommands');
 
   try {
-    rest.get(route).then((data) => {
+    return rest.get(route).then((data) => {
       const promises = [];
       for (const command of data as { id: string }[]) {
         promises.push(rest.delete(`${route}/${command.id}`));
       }
+
+      log.info('Deleting old commands...');
 
       return Promise.all(promises);
     });
