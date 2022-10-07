@@ -12,6 +12,7 @@ import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/queries/reactRole.query';
+import { RolePing } from '../../utilities/utilPings';
 
 export class ReactDeleteCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -67,7 +68,9 @@ export class ReactDeleteCommand extends SlashCommand {
 
       handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `I successfully removed the react role (${emojiMention} - <@&${role.id}>)! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`,
+        content: `I successfully removed the react role (${emojiMention} - ${RolePing(
+          role.id
+        )})! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`,
       });
 
       // Only update react message if there's a category associated with it.

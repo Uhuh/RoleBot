@@ -18,6 +18,7 @@ import {
 } from '../../src/database/queries/joinRole.query';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
+import { RolePing } from '../../utilities/utilPings';
 import {
   handleInteractionReply,
   isValidRolePosition,
@@ -104,7 +105,9 @@ export class AutoJoinCommand extends SlashCommand {
 
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: `:tada: I successfully added <@&${role.id}> to the auto-join list.`,
+          content: `:tada: I successfully added ${RolePing(
+            role.id
+          )} to the auto-join list.`,
         });
       } catch (e) {
         handleInteractionReply(this.log, interaction, {
@@ -202,7 +205,9 @@ export class AutoJoinCommand extends SlashCommand {
         const embed = new EmbedBuilder()
           .setTitle('Reaction Roles Setup')
           .setDescription(
-            `The role <@&${role.id}> is above me in the role list which you can find in \`Server settings > Roles\`.
+            `The role ${RolePing(
+              role.id
+            )} is above me in the role list which you can find in \`Server settings > Roles\`.
             \nPlease make sure that my role \`RoleBot\` is higher than the roles you give me in your servers role hierarchy.`
           );
 

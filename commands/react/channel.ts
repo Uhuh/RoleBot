@@ -12,6 +12,7 @@ import { Category } from '../../utilities/types/commands';
 import { PermissionMappings, SlashCommand } from '../slashCommand';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { ChannelPing } from '../../utilities/utilPings';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -132,7 +133,9 @@ export class ReactChannelCommand extends SlashCommand {
       .join(' ');
 
     const permissionError =
-      `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
+      `Hey! I don't have the right permissions in ${ChannelPing(
+        channel.id
+      )} to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
       'Why do I need these permissions in this channel?\n' +
       codeBlock(`
       - To be able to react I have to be able to see the message so I need the history for the channel.
