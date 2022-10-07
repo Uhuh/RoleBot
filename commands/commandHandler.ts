@@ -34,7 +34,9 @@ export const buildSlashCommands = async (
       ? Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID)
       : Routes.applicationCommands(CLIENT_ID);
 
-    //await deleteSlashCommands(route);
+    log.info(`Using route '${route}'`);
+
+    await deleteSlashCommands(route);
     await generateSlashCommands(route, commandsJson);
   }
 };
