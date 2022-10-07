@@ -1,7 +1,7 @@
 import RoleBot from '../src/bot';
 import { REST } from '@discordjs/rest';
 import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
-import { CLIENT_ID, TOKEN } from '../src/vars';
+import { CLIENT_ID, SERVER_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
 import * as categoryCommands from './category';
 import * as generalCommands from './general';
@@ -9,7 +9,11 @@ import * as reactionCommands from './react';
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
-export default async (client: RoleBot) => {
+export const buildSlashCommands = async (
+  client: RoleBot,
+  buildCommands = false,
+  beta = false
+) => {
   const log = new LogService('SlashCommandHandler');
   log.info(`Loading all slash commands...`);
 
@@ -25,20 +29,24 @@ export default async (client: RoleBot) => {
     commandsJson.push(cmd.data.toJSON());
   }
 
-  // Deleting global commands. (:
-  // await deleteSlashCommands();
+  if (buildCommands) {
+    const route: `/${string}` = beta
+      ? Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID)
+      : Routes.applicationCommands(CLIENT_ID);
 
-  // Generate global slash commands
-  // await generateSlashCommands(commandsJson);
+    //await deleteSlashCommands(route);
+    await generateSlashCommands(route, commandsJson);
+  }
 };
 
 async function generateSlashCommands(
+  route: `/${string}`,
   commandsJson: RESTPostAPIApplicationCommandsJSONBody[]
 ) {
   const log = new LogService('GenerateSlashCommands');
   // Make a request to Discord to create all the slash commands.
   try {
-    const data = (await rest.put(Routes.applicationCommands(CLIENT_ID), {
+    const data = (await rest.put(route, {
       body: commandsJson,
     })) as [];
 
@@ -52,16 +60,14 @@ async function generateSlashCommands(
  * I just need a simple way to delete all the stupid global commands.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function deleteSlashCommands() {
+async function deleteSlashCommands(route: `/${string}`) {
   const log = new LogService('DeleteSlashCommands');
 
   try {
-    rest.get(Routes.applicationCommands(CLIENT_ID)).then((data) => {
+    rest.get(route).then((data) => {
       const promises = [];
       for (const command of data as { id: string }[]) {
-        promises.push(
-          rest.delete(`${Routes.applicationCommands(CLIENT_ID)}/${command.id}`)
-        );
+        promises.push(rest.delete(`${route}/${command.id}`));
       }
 
       return Promise.all(promises);

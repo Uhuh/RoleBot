@@ -1,5 +1,5 @@
 import * as config from './vars';
-import commandHandler from '../commands/commandHandler';
+import { buildSlashCommands } from '../commands/commandHandler';
 import { guildUpdate } from '../events/guildUpdate';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
@@ -149,6 +149,6 @@ export default class RoleBot extends Discord.Client {
     this.log.info('Bot connected.');
 
     // Slash commands can only load once the bot is connected?
-    commandHandler(this);
+    buildSlashCommands(this, false, true);
   };
 }
