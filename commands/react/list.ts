@@ -3,7 +3,6 @@ import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactListCommand extends SlashCommand {
@@ -20,6 +19,23 @@ export class ReactListCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
+    try {
+      // Defer because of Discord rate limits.
+      await interaction
+        .deferReply({
+          ephemeral: true,
+        })
+        .catch((e) =>
+          this.log.error(
+            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
+            interaction.guildId
+          )
+        );
+    } catch (e) {
+      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
+      return;
+    }
+
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(
       interaction.guildId
     ).catch((e) =>
@@ -30,17 +46,19 @@ export class ReactListCommand extends SlashCommand {
     );
 
     if (!reactRoles || !reactRoles.length) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`
-      );
+      return interaction
+        .editReply({
+          content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
+        })
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
     interaction
-      .reply({
+      .editReply({
         content: `Hey! Here's your react roles.`,
         embeds: [embed],
       })

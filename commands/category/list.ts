@@ -8,10 +8,7 @@ import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import RoleBot from '../../src/bot';
-import {
-  handleInteractionReply,
-  spliceIntoChunks,
-} from '../../utilities/utils';
+import { spliceIntoChunks } from '../../utilities/utils';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
 
@@ -31,6 +28,23 @@ export class ListCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    try {
+      // Defer because of Discord rate limits.
+      await interaction
+        .deferReply({
+          ephemeral: true,
+        })
+        .catch((e) =>
+          this.log.error(
+            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
+            interaction.guildId
+          )
+        );
+    } catch (e) {
+      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
+      return;
+    }
+
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
         this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
@@ -39,18 +53,22 @@ export class ListCategoryCommand extends SlashCommand {
     if (!categories || !categories.length) {
       this.log.info(`Guild has no categories.`, interaction.guildId);
 
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
-      );
+      return interaction
+        .editReply(
+          `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
+        )
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
     }
 
-    handleInteractionReply(
-      this.log,
-      interaction,
-      `Hey! Let me build these embeds for you real quick and send them...`
-    );
+    interaction
+      .editReply(
+        `Hey! Let me build these embeds for you real quick and send them...`
+      )
+      .catch((e) =>
+        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+      );
 
     const embeds: EmbedBuilder[] = [];
 
