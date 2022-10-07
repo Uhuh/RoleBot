@@ -8,10 +8,19 @@ import { SlashCommandTypes } from '../utilities/types/commands';
 export abstract class SlashBase {
   constructor(public data: SlashCommandTypes) {}
 
-  addStringOption = (name: string, desc: string, required = false) => {
+  addStringOption = (
+    name: string,
+    desc: string,
+    required = false,
+    choices: { name: string; value: string }[] = []
+  ) => {
     if (this.data instanceof SlashCommandBuilder) {
       this.data.addStringOption((option) =>
-        option.setName(name).setDescription(desc).setRequired(required)
+        option
+          .setName(name)
+          .setDescription(desc)
+          .setRequired(required)
+          .addChoices(...choices)
       );
     }
   };

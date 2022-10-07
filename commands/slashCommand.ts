@@ -45,7 +45,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   public name: string;
   public desc: string;
   public type: Category;
-  private permissions: bigint[];
+  private readonly permissions: bigint[];
   private executions: CommandData[] = [];
 
   public log: LogService;
