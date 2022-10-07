@@ -1,4 +1,4 @@
-import { EmbedBuilder, User } from 'discord.js';
+import { EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
 import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
@@ -8,14 +8,9 @@ import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
+import { RolePing } from '../../utilities/utilPings';
 
 export class EmbedService {
-  private static userTagInfo = (user: User | string): string => {
-    return `${typeof user === 'string' ? user : user?.tag} (<@${
-      typeof user === 'string' ? user : user.id
-    }>)`;
-  };
-
   /**
    * Generate a help embed based on the category type passed in.
    * @param type @Category type to filter out commands.
@@ -58,7 +53,11 @@ export class EmbedService {
     embed
       .setTitle(category.name)
       .setDescription(
-        `Mutually exclusive: **${category.mutuallyExclusive}**\n\nDesc: **${desc}**\n\n${reactRoles}`
+        `Required Role: ${
+          category.requiredRoleId ? RolePing(category.requiredRoleId) : 'None!'
+        } \n\nMutually exclusive: **${
+          category.mutuallyExclusive
+        }**\n\nDesc: **${escapeMarkdown(desc)}**\n\n${reactRoles}`
       )
       .setColor(COLOR.DEFAULT);
 
@@ -67,7 +66,7 @@ export class EmbedService {
 
   public static reactRolesFormattedString = (reactRoles: ReactRole[]) => {
     return reactRoles
-      .map((r) => `${r.emojiTag ?? r.emojiId} - <@&${r.roleId}>`)
+      .map((r) => `${r.emojiTag ?? r.emojiId} - ${RolePing(r.roleId)}`)
       .join('\n');
   };
 
@@ -127,9 +126,15 @@ export class EmbedService {
 
     const embed = new EmbedBuilder();
 
+    const requiredRole = category.requiredRoleId
+      ? `\nRequired: ${RolePing(category.requiredRoleId)}`
+      : '';
+
     embed
       .setTitle(category.name)
-      .setDescription(`${category.description}\n\n${reactRolesString}`)
+      .setDescription(
+        `${category.description}${requiredRole}\n\n${reactRolesString}`
+      )
       .setColor(COLOR.DEFAULT);
 
     return embed;
@@ -157,7 +162,7 @@ export class EmbedService {
       .setDescription(
         `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
           (roleIds.length > 0
-            ? roleIds.map((r) => `<@&${r}>`).join('\n')
+            ? roleIds.map((r) => RolePing(r)).join('\n')
             : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
       )
       .setTimestamp(new Date());

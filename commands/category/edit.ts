@@ -37,6 +37,14 @@ export class EditCategoryCommand extends SlashCommand {
       'mutually-exclusive',
       'Change if roles in this category should be mutually exclusive.'
     );
+    this.addBoolOption(
+      'remove-required-role',
+      'Remove all required roles for the category.'
+    );
+    this.addRoleOption(
+      'new-required-role',
+      'Change what the required roles are for the category.'
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -54,7 +62,20 @@ export class EditCategoryCommand extends SlashCommand {
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
 
-    if (!newName && !newDesc && mutuallyExclusive === null) {
+    const removeRequiredRole = interaction.options.getBoolean(
+      'remove-required-role'
+    );
+
+    const newRequiredRoleId =
+      interaction.options.getRole('new-required-role')?.id ?? undefined;
+
+    if (
+      !newName &&
+      !newDesc &&
+      !newRequiredRoleId &&
+      removeRequiredRole === null &&
+      mutuallyExclusive === null
+    ) {
       this.log.info(
         `User didn't change anything about the category`,
         interaction.guildId
@@ -93,10 +114,13 @@ export class EditCategoryCommand extends SlashCommand {
       );
     }
 
+    const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
+
     const updatedCategory: Partial<ICategory> = {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
+      requiredRoleId: removeRequiredRole ? null : requiredRoleId,
     };
 
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)

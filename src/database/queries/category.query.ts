@@ -13,20 +13,16 @@ export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
   });
 };
 
-export const CREATE_GUILD_CATEGORY = async (
-  guildId: string,
-  name: string,
-  description: string | undefined,
-  mutuallyExclusive: boolean | undefined
-) => {
-  const category = new Category();
+export const CREATE_GUILD_CATEGORY = async (category: ICategory) => {
+  const newCategory = new Category();
 
-  category.guildId = guildId;
-  category.name = name;
-  category.description = description ?? '';
-  category.mutuallyExclusive = mutuallyExclusive ?? false;
+  newCategory.guildId = category.guildId;
+  newCategory.name = category.name;
+  newCategory.description = category.description ?? '';
+  newCategory.mutuallyExclusive = category.mutuallyExclusive ?? false;
+  newCategory.requiredRoleId = category.requiredRoleId;
 
-  return await category.save();
+  return await newCategory.save();
 };
 
 export const EDIT_CATEGORY_BY_ID = (
