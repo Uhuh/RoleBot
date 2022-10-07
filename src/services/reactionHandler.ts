@@ -86,8 +86,8 @@ export class ReactionHandler {
       !member.roles.cache.has(category.requiredRoleId)
     ) {
       // Remove reaction as to not confuse the user that they succeeded.
-      return reaction
-        .remove()
+      return reaction.users
+        .remove(member)
         .catch(() => this.log.debug(`Failed to remove reaction`));
     }
 
