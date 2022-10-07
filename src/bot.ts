@@ -149,6 +149,6 @@ export default class RoleBot extends Discord.Client {
     this.log.info('Bot connected.');
 
     // Slash commands can only load once the bot is connected?
-    buildSlashCommands(this, true, config.CLIENT_ID === '493668628361904139');
+    buildSlashCommands(this, true, config.CLIENT_ID !== '493668628361904139');
   };
 }
