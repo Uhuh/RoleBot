@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import RoleBot from '../../src/bot';
 import { Category as ICategory } from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
@@ -11,9 +10,8 @@ import {
 } from '../../src/database/queries/category.query';
 
 export class EditCategoryCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'category-edit',
       `Edit any category's name, description, or if it's mutually exclusive.`,
       Category.category,
@@ -107,11 +105,10 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`,
+      });
     }
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;

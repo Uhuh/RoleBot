@@ -1,5 +1,5 @@
 import * as config from './vars';
-import { buildSlashCommands } from '../commands/commandHandler';
+import { buildCommands } from '../commands/commandHandler';
 import { guildUpdate } from '../events/guildUpdate';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
@@ -25,7 +25,6 @@ import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query
 
 export default class RoleBot extends Discord.Client {
   config: typeof config;
-  commandsRun: number;
   commands: Discord.Collection<string, SlashCommand>;
 
   // "Services"
@@ -47,13 +46,11 @@ export default class RoleBot extends Discord.Client {
       ],
     });
     this.config = config;
-    this.commandsRun = 0;
+    this.commands = buildCommands();
 
     this.log = new LogService(`RoleBot`);
     this.permissionService = new PermissionService(this);
     this.reactHandler = new ReactionHandler();
-
-    this.commands = new Discord.Collection();
 
     this.on('ready', (): void => {
       this.log.debug(`[Started]: ${new Date()}`);
@@ -66,7 +63,7 @@ export default class RoleBot extends Discord.Client {
     });
 
     this.on('shardError', (e) => {
-      this.log.error(`Encounted shard error.`);
+      this.log.error(`Encountered shard error.`);
       this.log.critical(`${e}`);
     });
 
@@ -147,8 +144,5 @@ export default class RoleBot extends Discord.Client {
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
-
-    // Slash commands can only load once the bot is connected?
-    buildSlashCommands(this, true, config.CLIENT_ID !== '493668628361904139');
   };
 }

@@ -1,0 +1,72 @@
+{
+  "category": [
+    {
+      "name": "category-add",
+      "description": "Add reaction roles to a specific category."
+    },
+    {
+      "name": "category-create",
+      "description": "Create a new category to categorize your reaction roles in."
+    },
+    {
+      "name": "category-edit",
+      "description": "Edit any category's name, description, or if it's mutually exclusive."
+    },
+    {
+      "name": "category-list",
+      "description": "List all your categories and the roles within them."
+    },
+    {
+      "name": "category-remove",
+      "description": "Delete a category. Deleting a category frees all roles it contains."
+    },
+    {
+      "name": "category-update",
+      "description": "Have an existing react role embed you want updated? Use this command!"
+    }
+  ],
+  "general": [
+    {
+      "name": "help",
+      "description": "This command!"
+    },
+    {
+      "name": "info",
+      "description": "RoleBot's invite, ping, etc."
+    },
+    {
+      "name": "auto-join",
+      "description": "Setup auto join roles for the server."
+    },
+    {
+      "name": "tutorial",
+      "description": "Need to learn the basics of RoleBot? Use this command!"
+    }
+  ],
+  "react": [
+    {
+      "name": "react-channel",
+      "description": "Send all categories with react roles to the selected channel."
+    },
+    {
+      "name": "react-create",
+      "description": "Create a new react role. Give the command a role and an emoji. It really is that simple."
+    },
+    {
+      "name": "react-list",
+      "description": "List all reaction roles that are currently active."
+    },
+    {
+      "name": "react-message",
+      "description": "Use this command to react with a specific category of roles to a message."
+    },
+    {
+      "name": "react-nuke",
+      "description": "This will remove ALL react roles for this server."
+    },
+    {
+      "name": "react-remove",
+      "description": "Remove an existing reaction role from a drop down menu."
+    }
+  ]
+}

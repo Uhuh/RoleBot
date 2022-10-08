@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import RoleBot from '../../src/bot';
 
 import {
   handleInteractionReply,
@@ -15,9 +14,8 @@ import {
 import { RolePing } from '../../utilities/utilPings';
 
 export class ReactDeleteCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-remove',
       'Remove an existing reaction role from a drop down menu.',
       Category.react,
@@ -76,7 +74,7 @@ export class ReactDeleteCommand extends SlashCommand {
       // Only update react message if there's a category associated with it.
       if (reactRole.categoryId) {
         updateReactMessages(
-          this.client,
+          interaction,
           reactRole.categoryId,
           this.log,
           ReactMessageUpdate.reactRoleRemove

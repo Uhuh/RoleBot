@@ -6,7 +6,6 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
 
@@ -15,9 +14,8 @@ import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactNukeCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-nuke',
       'This will remove ALL react roles for this server.',
       Category.react,

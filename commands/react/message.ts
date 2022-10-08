@@ -9,7 +9,6 @@ import {
   SelectMenuInteraction,
   TextChannel,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
@@ -21,9 +20,8 @@ import {
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 
 export class ReactMessageCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-message',
       'Use this command to react with a specific category of roles to a message.',
       Category.react,
@@ -40,7 +38,7 @@ export class ReactMessageCommand extends SlashCommand {
   handleSelect = async (interaction: SelectMenuInteraction, args: string[]) => {
     const [guildId, channelId, messageId, categoryId] = args;
 
-    const channel = await this.client.channels.fetch(channelId);
+    const channel = await interaction.guild?.channels.fetch(channelId);
 
     if (!channel || !isTextChannel(channel)) {
       return handleInteractionReply(this.log, interaction, {

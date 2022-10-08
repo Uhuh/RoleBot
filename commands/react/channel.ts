@@ -3,7 +3,6 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 
 import { EmbedService } from '../../src/services/embedService';
 import { reactToMessage } from '../../utilities/utils';
@@ -14,9 +13,8 @@ import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/react
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 
 export class ReactChannelCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-channel',
       'Send all categories with react roles to the selected channel.',
       Category.react,

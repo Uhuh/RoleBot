@@ -7,15 +7,13 @@ import {
 import { SlashCommand } from '../slashCommand';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
-import RoleBot from '../../src/bot';
 import { spliceIntoChunks } from '../../utilities/utils';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
 
 export class ListCategoryCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'category-list',
       'List all your categories and the roles within them.',
       Category.category,
@@ -90,12 +88,20 @@ export class ListCategoryCommand extends SlashCommand {
         ?.send({
           embeds: chunk,
         })
-        .catch(() =>
+        .catch(() => {
           this.log.error(
             `Failed to send category embeds to channel[${interaction.channel?.id}]`,
             interaction.guildId
-          )
-        );
+          );
+
+          interaction
+            .editReply(
+              `Hey! I need the \`SEND_MESSAGE\` permissions to send the category embeds in this channel.`
+            )
+            .catch((e) =>
+              this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+            );
+        });
     }
   };
 }

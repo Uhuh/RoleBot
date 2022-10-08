@@ -7,9 +7,8 @@ import {
   Message,
   Role,
   SelectMenuInteraction,
+  CommandInteraction,
 } from 'discord.js';
-import RoleBot from '../src/bot';
-
 import { ReactRole } from '../src/database/entities';
 import {
   GET_CATEGORY_BY_ID,
@@ -66,7 +65,7 @@ export enum ReactMessageUpdate {
 }
 
 export const updateReactMessages = async (
-  client: RoleBot,
+  interaction: CommandInteraction,
   categoryId: number,
   log: LogService,
   type: ReactMessageUpdate
@@ -80,7 +79,7 @@ export const updateReactMessages = async (
 
     const { guildId, channelId, messageId } = reactMessage;
 
-    const channel = await client.channels
+    const channel = await interaction.guild?.channels
       .fetch(channelId)
       .catch(() => log.info(`Failed to fetch channel[${channelId}]`, guildId));
 

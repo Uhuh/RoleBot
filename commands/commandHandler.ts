@@ -1,16 +1,36 @@
-import RoleBot from '../src/bot';
 import { REST } from '@discordjs/rest';
-import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
+import {
+  Collection,
+  RESTPostAPIApplicationCommandsJSONBody,
+  Routes,
+} from 'discord.js';
 import { CLIENT_ID, SERVER_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
 import * as categoryCommands from './category';
 import * as generalCommands from './general';
 import * as reactionCommands from './react';
+import { SlashCommand } from './slashCommand';
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
+export const buildCommands = () => {
+  const log = new LogService('CommandHandler');
+  log.info(`Building commands...`);
+
+  const commandMap: Collection<string, SlashCommand> = new Collection();
+  // Use the slash commands name generated from their data.
+  for (const cmd of [
+    ...Object.values(generalCommands).map((c) => new c()),
+    ...Object.values(categoryCommands).map((c) => new c()),
+    ...Object.values(reactionCommands).map((c) => new c()),
+  ]) {
+    commandMap.set(cmd.data.name.toLowerCase(), cmd);
+  }
+
+  return commandMap;
+};
+
 export const buildSlashCommands = async (
-  client: RoleBot,
   buildCommands = false,
   beta = false
 ) => {
@@ -21,11 +41,10 @@ export const buildSlashCommands = async (
 
   // Use the slash commands name generated from their data.
   for (const cmd of [
-    ...Object.values(generalCommands).map((c) => new c(client)),
-    ...Object.values(categoryCommands).map((c) => new c(client)),
-    ...Object.values(reactionCommands).map((c) => new c(client)),
+    ...Object.values(generalCommands).map((c) => new c()),
+    ...Object.values(categoryCommands).map((c) => new c()),
+    ...Object.values(reactionCommands).map((c) => new c()),
   ]) {
-    client.commands.set(cmd.data.name.toLowerCase(), cmd);
     commandsJson.push(cmd.data.toJSON());
   }
 

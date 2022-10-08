@@ -1,14 +1,12 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import RoleBot from '../../src/bot';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactListCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-list',
       'List all reaction roles that are currently active.',
       Category.react,
