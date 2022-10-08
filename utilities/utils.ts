@@ -24,7 +24,7 @@ import { EmbedService } from '../src/services/embedService';
 import { LogService } from '../src/services/logService';
 import { CLIENT_ID } from '../src/vars';
 
-export const reactToMessage = (
+export const reactToMessage = async (
   message: Message,
   guildId: string,
   categoryRoles: ReactRole[],
@@ -33,30 +33,31 @@ export const reactToMessage = (
   isCustomMessage: boolean,
   log: LogService
 ) => {
-  return Promise.all(
-    categoryRoles.map((r) => {
-      message
-        .react(r.emojiId)
-        .then(() => {
-          CREATE_REACT_MESSAGE({
-            messageId: message.id,
-            emojiId: r.emojiId,
-            roleId: r.roleId,
-            guildId,
-            categoryId: categoryId,
-            isCustomMessage,
-            channelId,
-          });
-        })
-        .catch((e) => {
-          log.debug(
-            `Failed to react to message[${message.id}] with emoji[${
-              r.emojiTag ?? r.emojiId
-            }] in guild[${guildId}]\n${e}`
-          );
-        });
-    })
-  );
+  for (const role of categoryRoles) {
+    try {
+      await message.react(role.emojiId);
+
+      CREATE_REACT_MESSAGE({
+        messageId: message.id,
+        emojiId: role.emojiId,
+        roleId: role.roleId,
+        guildId,
+        categoryId: categoryId,
+        isCustomMessage,
+        channelId,
+      });
+    } catch (e) {
+      log.debug(
+        `Failed to react to message[${message.id}] with emoji[${
+          role.emojiTag ?? role.emojiId
+        }] in guild[${guildId}]\n${e}`
+      );
+
+      return false;
+    }
+  }
+
+  return true;
 };
 
 export enum ReactMessageUpdate {
@@ -77,28 +78,34 @@ export const updateReactMessages = async (
       return log.debug(`No react messages exist with category[${categoryId}]`);
     }
 
-    const channel = await client.channels.fetch(reactMessage.channelId);
+    const { guildId, channelId, messageId } = reactMessage;
+
+    const channel = await client.channels
+      .fetch(channelId)
+      .catch(() => log.info(`Failed to fetch channel[${channelId}]`, guildId));
 
     if (!(channel?.type === ChannelType.GuildText)) {
       return log.debug(
-        `Guild[${reactMessage.guildId}] apparently does not have channel[${reactMessage.channelId}]`
+        `Guild[${guildId}] apparently does not have channel[${channelId}]`
       );
     }
 
-    const message = await channel.messages.fetch(reactMessage.messageId);
+    const message = await channel.messages
+      .fetch(messageId)
+      .catch(() => log.info(`Failed to fetch message[${messageId}]`, guildId));
 
     if (!message) {
       return log.debug(
-        `Could not find message[${reactMessage.messageId}] in channel[${reactMessage.channelId}] in guild[${reactMessage.guildId}]`
+        `Could not find message[${messageId}] in channel[${channelId}] in guild[${guildId}]`
       );
     }
 
     const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(categoryId);
-    const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
+    const category = await GET_CATEGORY_BY_ID(categoryId);
 
     if (!category) {
       return log.critical(
-        `Category[${reactMessage.categoryId}] does not exist in guild[${reactMessage.guildId}]`
+        `Category[${categoryId}] does not exist in guild[${guildId}]`
       );
     }
 
@@ -115,26 +122,28 @@ export const updateReactMessages = async (
         })
         .catch(() =>
           log.error(
-            `Failed to edit message[${reactMessage.messageId}] with updated react role embed in guild[${reactMessage.guildId}]`
+            `Failed to edit message[${messageId}] with updated react role embed in guild[${guildId}]`
           )
         );
     }
 
     // If we're removing a role this matters. Otherwise we're only updating the embed for the category title/description
     if (type === ReactMessageUpdate.reactRoleRemove) {
-      // Remove all react messages since they are created and depend on RoleBots reactions
-      await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
-
-      // Clear all reactions to remove and old incorrect reactions.
+      /**
+       * Clear all reactions first. If RoleBot is missing permission then we don't want to delete react message by ID.
+       */
       await message.reactions.removeAll();
+
+      // Remove all react messages since they are created and depend on RoleBots reactions
+      await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(messageId);
 
       // Re-react to the message with the updated react role list.
       reactToMessage(
         message,
-        reactMessage.guildId,
+        guildId,
         categoryRoles,
         channel.id,
-        reactMessage.categoryId,
+        categoryId,
         reactMessage.isCustomMessage,
         log
       );
