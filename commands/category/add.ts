@@ -54,7 +54,7 @@ export class AddCategoryCommand extends SlashCommand {
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     // To edit our button message with the updated list of react roles.
-    const categorilessRoles = (
+    const rolesWithoutCategories = (
       (await GET_REACT_ROLES_NOT_IN_CATEGORIES(interaction.guildId)) ?? []
     ).filter((r) => r.roleId !== reactRole?.roleId);
 
@@ -128,7 +128,7 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     const roleButtons = await this.buildReactRoleButtons(
-      categorilessRoles,
+      rolesWithoutCategories,
       Number(categoryId)
     );
 
@@ -158,6 +158,7 @@ export class AddCategoryCommand extends SlashCommand {
         `Failed to update roles[${reactRoleId}] categoryId[${categoryId}]\n${e}`,
         interaction.guildId
       );
+
       interaction
         .update({
           content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
@@ -169,14 +170,6 @@ export class AddCategoryCommand extends SlashCommand {
           )
         );
     }
-
-    /**
-     * Grab role from db
-     * Grab category from db
-     * Check that the role has no category set.
-     * Update role and category to share relationship
-     *
-     */
   };
 
   /**
