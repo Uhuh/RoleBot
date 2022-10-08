@@ -80,6 +80,17 @@ export class ReactionHandler {
       );
     }
 
+    // If the category limits who can react and the user doesn't have said role ignore request.
+    if (
+      category.requiredRoleId &&
+      !member.roles.cache.has(category.requiredRoleId)
+    ) {
+      // Remove reaction as to not confuse the user that they succeeded.
+      return reaction.users
+        .remove(member)
+        .catch(() => this.log.debug(`Failed to remove reaction`));
+    }
+
     if (category.mutuallyExclusive) {
       return this.mutuallyExclusive(reactMessage, member, guild, type);
     }

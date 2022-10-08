@@ -17,6 +17,7 @@ import {
 } from '../../src/database/queries/reactMessage.query';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { requiredPermissions } from '../../utilities/utilErrorMessages';
 
 export class UpdateCategoryCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -76,14 +77,19 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     }
 
-    const message = await channel.messages.fetch(messageId);
+    const permissionsError = requiredPermissions(channel.id);
+
+    const message = await channel.messages
+      .fetch(messageId)
+      .catch((e) =>
+        this.log.info(`Failed to fetch message[${messageId}]\n${e}`)
+      );
 
     if (!message) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find that message, make sure you're copying the message link right.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: permissionsError,
+      });
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MESSAGE_ID(messageId);
@@ -111,13 +117,13 @@ export class UpdateCategoryCommand extends SlashCommand {
       return handleInteractionReply(
         this.log,
         interaction,
-        `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`
+        `Hey! I couldn't find a category associated with that message.`
       );
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
-    if (!categoryRoles || !categoryRoles.length) {
+    if (!categoryRoles.length) {
       this.log.info(
         `Category[${category.id}] has no react roles associated with it.`,
         interaction.guildId
@@ -136,7 +142,9 @@ export class UpdateCategoryCommand extends SlashCommand {
       await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
 
       // Clear all reactions to remove and old incorrect reactions.
-      await message.reactions.removeAll();
+      await message.reactions
+        .removeAll()
+        .catch(() => this.log.info(`Failed to remove all reactions.`));
 
       await message
         .edit({ embeds: [embed] })
@@ -164,7 +172,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         });
 
       // Re-react to the message with the updated react role list.
-      reactToMessage(
+      const isSuccessfulReacting = await reactToMessage(
         message,
         interaction.guildId,
         categoryRoles,
@@ -173,6 +181,13 @@ export class UpdateCategoryCommand extends SlashCommand {
         reactMessage.isCustomMessage,
         this.log
       );
+
+      if (!isSuccessfulReacting) {
+        return handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: permissionsError,
+        });
+      }
     } catch (e) {
       this.log.error(
         `Failed to edit category[${category.id}] embed and re-react to it\n${e}`,

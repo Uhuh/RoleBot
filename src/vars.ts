@@ -12,6 +12,7 @@ export const TOKEN: string = process.env.TOKEN || '';
 export const DB_NAME = process.env.DB_NAME || 'rolebotBeta';
 export const POSTGRES_URL = `${process.env.POSTGRES_URL}${DB_NAME}` || '';
 export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 6;
+export const SERVER_ID = '567819334852804626';
 // Only sync when in dev
 export const SYNC_DB = Boolean(Number(process.env.SYNC_DB)) || false;
 export const WEBHOOK_ID = process.env.WEBHOOK_ID || '';

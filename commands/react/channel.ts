@@ -1,4 +1,3 @@
-import { codeBlock } from '@discordjs/builders';
 import {
   ChannelType,
   ChatInputCommandInteraction,
@@ -9,9 +8,10 @@ import RoleBot from '../../src/bot';
 import { EmbedService } from '../../src/services/embedService';
 import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
-import { PermissionMappings, SlashCommand } from '../slashCommand';
+import { SlashCommand } from '../slashCommand';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { requiredPermissions } from '../../utilities/utilErrorMessages';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -121,27 +121,6 @@ export class ReactChannelCommand extends SlashCommand {
         );
     }
 
-    const permissions = [
-      PermissionsBitField.Flags.ReadMessageHistory,
-      PermissionsBitField.Flags.AddReactions,
-      PermissionsBitField.Flags.SendMessages,
-      PermissionsBitField.Flags.ManageMessages,
-      PermissionsBitField.Flags.ManageRoles,
-    ]
-      .map((p) => `\`${PermissionMappings.get(p)}\``)
-      .join(' ');
-
-    const permissionError =
-      `Hey! I don't have the right permissions in <#${channel.id}> to correctly setup the react role embeds. I need ${permissions} to work as intended.` +
-      'Why do I need these permissions in this channel?\n' +
-      codeBlock(`
-      - To be able to react I have to be able to see the message so I need the history for the channel.
-      - Have to be able to react, it is a react role bot.
-      - Have to be able to send embeds.
-      - To update the embeds react role list.
-      - To update users roles.
-      `);
-
     /* There might be a better solution to this. Potentially reply first, then update the interaction later. Discord interactions feel so incredibly inconsistent though. So for now force users to WAIT the whole 3 seconds so that Discord doesn't cry. */
     await new Promise((res) => {
       setTimeout(
@@ -154,6 +133,8 @@ export class ReactChannelCommand extends SlashCommand {
     const textChannel = await interaction.guild?.channels.fetch(channel.id);
     if (textChannel?.type !== ChannelType.GuildText) return;
 
+    const permissionError = requiredPermissions(channel.id);
+
     for (const category of categories) {
       const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
       if (!categoryRoles.length) continue;
@@ -165,7 +146,7 @@ export class ReactChannelCommand extends SlashCommand {
           embeds: [embed],
         });
 
-        reactToMessage(
+        const isSuccessfulReacting = await reactToMessage(
           reactEmbedMessage,
           interaction.guildId,
           categoryRoles,
@@ -174,21 +155,22 @@ export class ReactChannelCommand extends SlashCommand {
           false,
           this.log
         );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
 
-        /**
-         * Somehow the type DiscordAPIError DOES NOT include the httpStatus code despite the returned error here having it.
-         * They also only set their "status" property as undefined. Lol?
-         */
-        if (e?.httpStatus === 403) {
+        if (!isSuccessfulReacting) {
+          reactEmbedMessage
+            .delete()
+            .catch(() =>
+              this.log.info(
+                `Failed to delete embed message after failing reaction.`
+              )
+            );
+
           return interaction.editReply(permissionError);
         }
+      } catch (e) {
+        this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
 
-        return interaction.editReply(
-          `Hey! I encounted an error. Report this to the support server. \`${e}\``
-        );
+        return interaction.editReply(permissionError);
       }
 
       await new Promise((res) => {
@@ -198,7 +180,7 @@ export class ReactChannelCommand extends SlashCommand {
 
     interaction
       .editReply({
-        content: 'Hey! I sent those embeds and am currently reacting to them.',
+        content: 'Hey! I successfully sent the embeds and reacted to them!',
       })
       .catch((e) =>
         this.log.error(

@@ -25,6 +25,10 @@ export class CreateCategoryCommand extends SlashCommand {
       'mutually-exclusive',
       `Make roles from this category mutually exclusive.`
     );
+    this.addRoleOption(
+      'required-role',
+      'Require users to have a certain role to obtain roles from this category.'
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -32,21 +36,24 @@ export class CreateCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [categoryName, categoryDesc] = this.extractStringVariables(
+    const [name, description] = this.extractStringVariables(
       interaction,
       'category-name',
       'category-desc'
     );
 
     const mutuallyExclusive =
-      interaction.options.get('mutually-exclusive')?.value;
+      interaction.options.getBoolean('mutually-exclusive') ?? false;
 
-    if (!categoryName) {
+    const requiredRoleId =
+      interaction.options.getRole('required-role')?.id ?? null;
+
+    if (!name) {
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
         content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
       });
-    } else if (categoryName.length > 90) {
+    } else if (name.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
@@ -54,7 +61,7 @@ export class CreateCategoryCommand extends SlashCommand {
       });
     }
 
-    if (await GET_CATEGORY_BY_NAME(interaction.guildId, categoryName)) {
+    if (await GET_CATEGORY_BY_NAME(interaction.guildId, name)) {
       return handleInteractionReply(
         this.log,
         interaction,
@@ -62,26 +69,27 @@ export class CreateCategoryCommand extends SlashCommand {
       );
     }
 
-    CREATE_GUILD_CATEGORY(
-      interaction.guildId,
-      categoryName,
-      categoryDesc,
-      !!mutuallyExclusive
-    )
+    CREATE_GUILD_CATEGORY({
+      guildId: interaction.guildId,
+      name,
+      description,
+      mutuallyExclusive,
+      requiredRoleId,
+    })
       .then(() => {
         this.log.info(
-          `Successfully created category[${categoryName}]`,
+          `Successfully created category[${name}]`,
           interaction.guildId
         );
         handleInteractionReply(
           this.log,
           interaction,
-          `Hey! I successfully created the category \`${categoryName}\` for you!`
+          `Hey! I successfully created the category \`${name}\` for you!`
         );
       })
       .catch((e) => {
         this.log.error(
-          `Issue creating category[${categoryName}]\n${e}`,
+          `Issue creating category[${name}]\n${e}`,
           interaction.guildId
         );
         handleInteractionReply(

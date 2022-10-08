@@ -22,6 +22,7 @@ import {
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/queries/reactRole.query';
+import { RolePing } from '../../utilities/utilPings';
 
 export class ReactRoleCommand extends SlashCommand {
   constructor(client: RoleBot) {
@@ -77,7 +78,9 @@ export class ReactRoleCommand extends SlashCommand {
       const embed = new EmbedBuilder()
         .setTitle('Reaction Roles Setup')
         .setDescription(
-          `The role <@&${role.id}> is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
+          `The role ${RolePing(
+            role.id
+          )} is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
         );
 
       const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -153,7 +156,9 @@ export class ReactRoleCommand extends SlashCommand {
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `The react role (${emojiMention} - <@&${reactRole.roleId}>) already has this emoji assigned to it.`,
+        content: `The react role (${emojiMention} - ${RolePing(
+          reactRole.roleId
+        )}) already has this emoji assigned to it.`,
       });
     }
 
@@ -166,7 +171,9 @@ export class ReactRoleCommand extends SlashCommand {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `There's a react role already using the role \`${reactRole.name}\` (${emojiMention} - <@&${reactRole.roleId}>).`,
+        content: `There's a react role already using the role \`${
+          reactRole.name
+        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`,
       });
     }
 
@@ -193,7 +200,9 @@ export class ReactRoleCommand extends SlashCommand {
 
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: `:tada: Successfully created the react role (${emojiMention} - <@&${role.id}>) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`,
+          content: `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
+            role.id
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`,
         });
       })
       .catch((e) => {
