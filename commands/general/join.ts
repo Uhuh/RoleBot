@@ -9,7 +9,6 @@ import {
   PermissionsBitField,
   Role,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 import {
   CREATE_JOIN_ROLE,
   DELETE_JOIN_ROLE,
@@ -26,7 +25,7 @@ import {
 import { SlashCommand } from '../slashCommand';
 
 export class AutoJoinCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     /**
      * Since making subcommand groups is currently awkward here is the workaround.
      * @TODO - Change the parent SlashCommand system to better accomodate for this besides the "override" command.
@@ -72,7 +71,6 @@ export class AutoJoinCommand extends SlashCommand {
       );
 
     super(
-      client,
       commandName,
       commandDescription,
       Category.general,
@@ -140,11 +138,10 @@ export class AutoJoinCommand extends SlashCommand {
     try {
       await DELETE_JOIN_ROLE(role.id);
 
-      handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I successfully removed the role from the auto-join list.`
-      );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I successfully removed the role from the auto-join list.`,
+      });
     } catch (e) {
       this.log.error(
         `Failed to remove auto-join role[${role.id}]`,
@@ -248,6 +245,7 @@ export class AutoJoinCommand extends SlashCommand {
         break;
       default:
         handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
           content: `Hey! I had an issue parsing my own command. Do I have a sub command labelled as ${subCommandName}?`,
         });
     }

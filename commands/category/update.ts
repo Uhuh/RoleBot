@@ -5,7 +5,6 @@ import {
   PermissionsBitField,
   TextChannel,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 
 import { EmbedService } from '../../src/services/embedService';
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
@@ -20,9 +19,8 @@ import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/react
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 
 export class UpdateCategoryCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'category-update',
       'Have an existing react role embed you want updated? Use this command!',
       Category.category,
@@ -31,7 +29,7 @@ export class UpdateCategoryCommand extends SlashCommand {
 
     this.addStringOption(
       'message-link',
-      'The link to the category embed messge. This will be used to find and update the embed.',
+      'The link to the category embed message. This will be used to find and update the embed.',
       true
     );
   }
@@ -54,7 +52,7 @@ export class UpdateCategoryCommand extends SlashCommand {
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! Something happened and I can't see the passed in emssage link. Could you try again?`,
+        content: `Hey! Something happened and I can't see the passed in message link. Could you try again?`,
       });
     }
 
@@ -70,11 +68,10 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
 
     if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I couldn't find that channel, make sure you're copying the message link right.`,
+      });
     }
 
     const permissionsError = requiredPermissions(channel.id);
@@ -114,11 +111,10 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find a category associated with that message.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I couldn't find a category associated with that message.`,
+      });
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);

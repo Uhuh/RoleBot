@@ -3,16 +3,15 @@ import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
-import RoleBot from '../../src/bot';
 
 export class InfoCommand extends SlashCommand {
-  constructor(client: RoleBot) {
-    super(client, 'info', `RoleBot's invite, ping, etc.`, Category.general);
+  constructor() {
+    super('info', `RoleBot's invite, ping, etc.`, Category.general);
   }
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
     const size = (
-      await this.client.shard?.fetchClientValues('guilds.cache.size')
+      await interaction.client.shard?.fetchClientValues('guilds.cache.size')
     )?.reduce<number>((a, b) => a + Number(b), 0);
 
     embed
@@ -28,7 +27,7 @@ This servers shard ID: ${interaction.guild?.shardId}
 Server count: ${size} servers.
 Latency is ${
           Date.now() - interaction.createdTimestamp
-        }ms. API Latency is ${Math.round(this.client.ws.ping)}ms.
+        }ms. API Latency is ${Math.round(interaction.client.ws.ping)}ms.
 
 [Click to Vote!](${VOTE_URL})
 [Join the support server!](${SUPPORT_URL})

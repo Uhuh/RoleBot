@@ -13,7 +13,6 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { LogService } from '../src/services/logService';
 import { SlashBase } from './slashBase';
-import RoleBot from '../src/bot';
 import { handleInteractionReply } from '../utilities/utils';
 
 export const PermissionMappings: Map<bigint, string> = new Map([
@@ -52,14 +51,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
 
   private static totalCommandsRun = 0;
 
-  /**
-   * This is for commands that may need information from the client
-   * Such as needed guild data.
-   */
-  public client: RoleBot;
-
   constructor(
-    _client: RoleBot,
     _name: string,
     _desc: string,
     _type: Category,
@@ -76,7 +68,6 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
         );
 
     super(command);
-    this.client = _client;
     this.name = _name;
     this.desc = _desc;
     this.type = _type;

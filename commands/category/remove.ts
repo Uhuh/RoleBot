@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import RoleBot from '../../src/bot';
 
 import { handleInteractionReply } from '../../utilities/utils';
 import {
@@ -10,9 +9,8 @@ import {
 } from '../../src/database/queries/category.query';
 
 export class RemoveCategoryCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'category-remove',
       'Delete a category. Deleting a category frees all roles it contains.',
       Category.category,
@@ -41,11 +39,10 @@ export class RemoveCategoryCommand extends SlashCommand {
         `Required option was empty for categoryName[${categoryName}]`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I don't think you passed in a name. Could you please try again?`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I don't think you passed in a name. Could you please try again?`,
+      });
     }
 
     const category = await GET_CATEGORY_BY_NAME(
@@ -59,11 +56,10 @@ export class RemoveCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`,
+      });
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
@@ -73,11 +69,10 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`
-        );
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`,
+        });
       })
       .catch((e) => {
         this.log.error(
@@ -85,11 +80,10 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I had an issue deleting the category. Please wait a second and try again.`
-        );
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `Hey! I had an issue deleting the category. Please wait a second and try again.`,
+        });
       });
   };
 }

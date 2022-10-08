@@ -6,7 +6,6 @@ import {
   EmbedBuilder,
   PermissionsBitField,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { Category } from '../../utilities/types/commands';
@@ -25,9 +24,8 @@ import {
 import { RolePing } from '../../utilities/utilPings';
 
 export class ReactRoleCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'react-role',
       'Create a new react role. Give the command a role and an emoji. It really is that simple.',
       Category.react,
@@ -65,11 +63,10 @@ export class ReactRoleCommand extends SlashCommand {
      * Discord button row limitation is 5x5 so only a max of 25 buttons.
      */
     if (reactRolesNotInCategory >= 24) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responded please *remove* some react roles to get below 25 **not ina  category**. This is due to a Discord limitation!`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
+      });
     }
 
     const isValidPosition = await isValidRolePosition(interaction, role);

@@ -18,7 +18,6 @@ import {
   handleInteractionReply,
   spliceIntoChunks,
 } from '../../utilities/utils';
-import RoleBot from '../../src/bot';
 import { ReactRole } from '../../src/database/entities';
 import {
   GET_REACT_ROLES_BY_CATEGORY_ID,
@@ -28,9 +27,8 @@ import {
 } from '../../src/database/queries/reactRole.query';
 
 export class AddCategoryCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'category-add',
       'Add reaction roles to a specific category.',
       Category.category,
@@ -73,11 +71,10 @@ export class AddCategoryCommand extends SlashCommand {
         `Unable to find category roles for category[${categoryId}]`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! Something broke. But I'm working on it, please be patient!`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`,
+      });
     }
 
     const unknownErrorMessage = `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`;
@@ -88,7 +85,10 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, unknownErrorMessage);
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: unknownErrorMessage,
+      });
     }
 
     if (!category) {
@@ -97,7 +97,10 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, unknownErrorMessage);
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: unknownErrorMessage,
+      });
     }
 
     if (categoryRoles.length >= 20) {
@@ -105,11 +108,10 @@ export class AddCategoryCommand extends SlashCommand {
         `Category[${categoryId}] already has 20 react roles in it.`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`,
+      });
     }
 
     if (reactRole.categoryId) {
@@ -120,11 +122,10 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`
-      );
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`,
+      });
     }
 
     const roleButtons = await this.buildReactRoleButtons(
@@ -189,11 +190,10 @@ export class AddCategoryCommand extends SlashCommand {
         `Could not find category[${categoryId}] after it was selected in dropdown.`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! The category you selected... I can't find it. Does it exist anymore? Please wait a second and try running \`/${this.name}\` again.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! The category you selected... I can't find it. Does it exist anymore? Please wait a second and try running \`/${this.name}\` again.`,
+      });
     }
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
@@ -213,12 +213,12 @@ export class AddCategoryCommand extends SlashCommand {
           `Failed to send category[${category.id}] buttons\n${e}`,
           interaction.guildId
         );
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I had an issue making some buttons for you. I suspect that one of the react role emojis isn't actually an emoji. Check out \`/react-list\` to confirm this.` +
-            `\nIf they are all emojis please visit the support server found in the \`/info\` command so we can figure out the issue!`
-        );
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content:
+            `Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.` +
+            `\nIf the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`,
+        });
       });
   };
 
@@ -263,11 +263,10 @@ export class AddCategoryCommand extends SlashCommand {
         `Guild has no categories to add react roles to.`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! There are no categories, go create one with \`/category-create\` and then try again.`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! There are no categories, go create one with \`/category-create\` and then try again.`,
+      });
     }
 
     const hasReactRoles = (
@@ -279,11 +278,10 @@ export class AddCategoryCommand extends SlashCommand {
         `Guild has no react roles to add to category.`,
         interaction.guildId
       );
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! Before trying to add react roles to a category, make sure you created some. Try out \`/react-role\` to create some!`
-      );
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `Hey! Before trying to add react roles to a category, make sure you created some. Try out \`/react-role\` to create some!`,
+      });
     }
 
     // Value format: `commandName_guildID-categoryId`

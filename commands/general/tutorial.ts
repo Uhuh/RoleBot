@@ -5,15 +5,13 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
 } from 'discord.js';
-import RoleBot from '../../src/bot';
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
 export class TutorialCommand extends SlashCommand {
-  constructor(client: RoleBot) {
+  constructor() {
     super(
-      client,
       'tutorial',
       `Need to learn the basics of RoleBot? Use this command!`,
       Category.general

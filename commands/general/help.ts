@@ -9,17 +9,18 @@ import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
-import RoleBot from '../../src/bot';
 
 export class HelpCommand extends SlashCommand {
-  constructor(client: RoleBot) {
-    super(client, 'help', 'This command!', Category.general);
+  constructor() {
+    super('help', 'This command!', Category.general);
   }
 
   handleSelect = (interaction: SelectMenuInteraction, args: string[]) => {
     const [type] = args;
 
-    const embed = EmbedService.helpEmbed(type, this.client);
+    if (!(type in Category)) return;
+
+    const embed = EmbedService.helpEmbed(type as Category);
 
     interaction
       .update({ embeds: [embed] })

@@ -1,4 +1,4 @@
-import { ShardingManager } from 'discord.js-light';
+import { ShardingManager } from 'discord.js';
 import { LogService } from './services/logService';
 
 export class ShardHandler {
