@@ -36,7 +36,7 @@ export const buildSlashCommands = async (
 
     log.info(`Using route '${route}'`);
 
-    await deleteSlashCommands(route);
+    // await deleteSlashCommands(route);
     await generateSlashCommands(route, commandsJson);
   }
 };
