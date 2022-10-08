@@ -71,7 +71,6 @@ export class EmbedService {
   /**
    * Build a single embed to list all roles and their associated emoji.
    * @param reactRoles List of all react roles in a guild.
-   * @param client Client used to grab emojis from.
    * @returns Built embed for caller command to send.
    */
   public static reactRoleListEmbed = (reactRoles: ReactRole[]) => {
