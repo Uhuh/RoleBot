@@ -15,7 +15,6 @@ export class EmbedService {
   /**
    * Generate a help embed based on the category type passed in.
    * @param type @Category type to filter out commands.
-   * @param client RoleBot client to filter commands.
    * @returns Return built embed
    */
   public static helpEmbed = (type: CommandCategory) => {
