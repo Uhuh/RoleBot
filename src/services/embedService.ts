@@ -2,31 +2,30 @@ import { EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
 import { Category } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
-import RoleBot from '../../src/bot';
-import * as tutorialJson from '../../utilities/json/tutorial.json';
 import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
+import { Category as CommandCategory } from '../../utilities/types/commands';
+import tutorialJson from '../../utilities/json/tutorial.json';
+import commands from '../../utilities/json/commands.json';
 
 export class EmbedService {
   /**
    * Generate a help embed based on the category type passed in.
    * @param type @Category type to filter out commands.
-   * @param client Rolebot client to filter commands.
+   * @param client RoleBot client to filter commands.
    * @returns Return built embed
    */
-  public static helpEmbed = (type: string, client: RoleBot) => {
+  public static helpEmbed = (type: CommandCategory) => {
     const embed = new EmbedBuilder();
 
     embed.setTitle(`**${type.toUpperCase()} commands**`).setColor(COLOR.AQUA);
 
-    client.commands
-      .filter((c) => c.type === type)
-      .forEach((func) =>
-        embed.addFields({ name: `/${func.name}`, value: func.desc })
-      );
+    commands[type].forEach((func) =>
+      embed.addFields({ name: `/${func.name}`, value: func.description })
+    );
 
     return embed;
   };
