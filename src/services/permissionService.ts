@@ -1,5 +1,5 @@
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import Rolebot from '../bot';
+import RoleBot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';
 
@@ -10,10 +10,10 @@ export enum HasPerms {
 }
 
 export class PermissionService {
-  client: Rolebot;
+  client: RoleBot;
   log: LogService;
 
-  constructor(_client: Rolebot) {
+  constructor(_client: RoleBot) {
     this.client = _client;
     this.log = new LogService('PermissionService');
   }
