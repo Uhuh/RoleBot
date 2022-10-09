@@ -1,4 +1,5 @@
 import {
+  AutocompleteInteraction,
   ChannelType,
   ChatInputCommandInteraction,
   PermissionsBitField,
@@ -8,15 +9,19 @@ import { EmbedService } from '../../src/services/embedService';
 import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_GUILD_CATEGORIES,
+} from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
+import { isCategoryNull } from '../../utilities/utilIsNull';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
     super(
       'react-channel',
-      'Send all categories with react roles to the selected channel.',
+      'Send all categories or one with react roles to the selected channel.',
       Category.react,
       [PermissionsBitField.Flags.ManageRoles]
     );
@@ -26,7 +31,51 @@ export class ReactChannelCommand extends SlashCommand {
       'The channel that will receive reaction roles.',
       true
     );
+
+    this.addStringOption(
+      'category-name',
+      'Send only a single category to the channel.',
+      false,
+      [],
+      true
+    );
   }
+
+  handleAutoComplete = async (interaction: AutocompleteInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+
+    const focusedValue = interaction.options.getFocused();
+    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
+
+    await interaction
+      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
+      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
+  };
+
+  handleSingleCategory = async (
+    interaction: ChatInputCommandInteraction,
+    categoryId: number
+  ) => {
+    const channel = interaction.options.getChannel('channel');
+
+    if (!channel || channel.type !== ChannelType.GuildText) {
+      this.log.error(`Passed in channel was invalid.`, interaction.guildId);
+
+      return interaction
+        .editReply(`Hey! I only support sending embeds to text channels!`)
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
+    }
+
+    const category = await GET_CATEGORY_BY_ID(categoryId);
+
+    if (isCategoryNull(interaction, category, categoryId)) return;
+  };
 
   public execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
@@ -48,6 +97,15 @@ export class ReactChannelCommand extends SlashCommand {
     } catch (e) {
       this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
       return;
+    }
+
+    /**
+     * If the user passed in a category we don't need to waste time here.
+     */
+    const categoryId = interaction.options.getString('category-name');
+
+    if (categoryId) {
+      return this.handleSingleCategory(interaction, Number(categoryId));
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
