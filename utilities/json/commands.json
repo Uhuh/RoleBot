@@ -49,6 +49,10 @@
       "description": "Send all categories with react roles to the selected channel."
     },
     {
+      "name": "react-clean",
+      "description": "If you delete a role RoleBot might miss it, this will remove '@deleted' roles."
+    },
+    {
       "name": "react-create",
       "description": "Create a new react role. Give the command a role and an emoji. It really is that simple."
     },
