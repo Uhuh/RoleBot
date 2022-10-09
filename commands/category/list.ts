@@ -62,7 +62,7 @@ export class ListCategoryCommand extends SlashCommand {
 
     interaction
       .editReply(
-        `Hey! Let me build these embeds for you real quick and send them...`
+        `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react-clean\` to remove them.`
       )
       .catch((e) =>
         this.log.error(`Interaction failed.\n${e}`, interaction.guildId)

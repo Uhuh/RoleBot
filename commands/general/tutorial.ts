@@ -8,8 +8,11 @@ import {
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import tutorialJson from '../../utilities/json/tutorial.json';
 
 export class TutorialCommand extends SlashCommand {
+  readonly maxPage = tutorialJson['embeds'].length - 1;
+
   constructor() {
     super(
       'tutorial',
@@ -27,7 +30,7 @@ export class TutorialCommand extends SlashCommand {
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId(`${this.name}_${pageId + 1}`)
-        .setDisabled(pageId === 3)
+        .setDisabled(pageId === this.maxPage)
         .setLabel('Next')
         .setStyle(ButtonStyle.Primary)
     );

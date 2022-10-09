@@ -2,31 +2,65 @@
   "embeds": [
     {
       "title": "Where to start. | Page 1",
-      "description": "RoleBot's been reworked quite a bit! With this new :tada:cleanup:tada: RoleBot can help manage your react roles a lot easier now!\n\n**Firstly**, RoleBot used to have a thing called \"folders\". That's been renamed to \"category\". It just felt right, yknow?\n\n**Secondly**, RoleBot now forces you to use categories as a way to manage all of your react roles. It's easier to track things with a category.\n\n**To start off** let's create a category with the `/category-create` command. I'm going to make a **Colors** category and store color react roles in it later.",
-      "images": [
-        ""
-      ]
+      "description": [
+        "Welcome to RoleBot! To understand how RoleBot works we need to understand what a `category` and `react role` is and how they work together when we talk about RoleBot.\n",
+        "When we refer to a `category` we're describing how RoleBot groups together a bunch of react roles, **not** a Discord category. Categories can be configured to change up how users obtain roles. More on this later!\n",
+        "When we refer to a `react role` we're describing the relationship you make between an **emoji** and a **Discord role**. RoleBot uses this information to know what role to give a user when they react to a setup message.\n",
+        "**React roles** MUST be within a **category** in order for users to obtain any roles. RoleBot uses categories as a way to remember react roles and settings for each one."
+      ],
+      "image": "https://s3.us-east-2.amazonaws.com/rolebot.gg/assets/banners/banner.png"
     },
     {
-      "title": "Creating React Roles. | Page 2",
-      "description": "Creating react roles is easy! Simply do `/react-role` and pass in the role and emoji you want paired together.\n\nReact roles aren't very useful by themselves. They need to be placed into a `category`. Again these are also easy to make using the `/category-create` command. You can make react roles inside a category `mutually exclusive`. This means a user can only have one react role from that category at a time when reacting.",
-      "images": [
-        ""
-      ]
+      "title": "How to create a react role. | Page 2",
+      "description": [
+        "When creating a react role with RoleBot there's two things you need to keep in mind.\n",
+        "**You cannot have duplicate roles OR emojis**. This is vital since RoleBot uses the emoji reacted with to figure out which role a user should get.",
+        "Creating a react role is easy! Simply do `/react-role` then pass in the role and emoji you want paired together.\n",
+        "It's recommended that you create a few react roles before adding them to a category to save time.\n",
+        "**Warning:** Sometimes you may want to delete a role in your server, most times RoleBot will catch that and remove react roles that had that. If RoleBot misses that and you see `@deleted` in the react role list use the `/react-clean` command.\n",
+        "_(If you do decide to add a lot of react roles at the start, you'll be limited to 25 react roles until you start adding them to categories. This is a Discord limitation.)_"
+      ],
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1028514952186704002/unknown.png"
     },
     {
-      "title": "Adding React Roles to Categories. | Page 3",
-      "description": "Now we're getting to the most important part, adding react roles to a category. Again it's fairly simple! Just use the `/category-add` command, this will give you a dropdown menu to select a category from.\nWhen you select your category RoleBot will then show you all categoriless react roles as buttons where you can then click on them to add them to the category! *Pretty simple huh?*",
-      "images": [
-        ""
-      ]
+      "title": "How to create a category. | Page 3",
+      "description": [
+        "Categories are how RoleBot group together react roles. Let's go over what each category setting does.\n",
+        "When creating a category we use the command `/category-create`. **By default you're only required to give the category a name and can leave the other options empty.**",
+        "* `category-desc` is the category description. This is text that will show above the react roles in the embed when displayed. Use it to briefly describe the purpose of the category or theme.",
+        "* `mutually-exclusive` is what dictates if a user can obtain all roles from a category or only one. If the value for this is true then a user may only get one role at a time from the category.",
+        "* `required-role` will only allow users with a specific role to react and obtain roles from the category."
+      ],
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1028513235390955620/unknown.png"
     },
     {
-      "title": "Setting up the React Role messages. | Page 4",
-      "description": "So now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n\nThere are **two** different ways we can have RoleBot work for us. RoleBot can use its own messages in the `/react-channel` command, where it will create am embed for each category and list the react roles inside it and then react to it, thus watching all reactions on it, or.\n\nWe can have RoleBot monitor custom messages. Do you have a cutely formatted message you want to use instead of RoleBot's embeds? Use `/react-message` and give the command a message link. This will allow you to select which category RoleBot uses for that message. ",
-      "images": [
-        ""
-      ]
+      "title": "How to add react roles to a category. | Page 4",
+      "description": [
+        "Adding react roles is simple. We start by running the `/category-add` command.",
+        "RoleBot will prompt you to select which category you would like to add react roles to with a dropdown menu.\n",
+        "Once you select the category you want to add to, RoleBot will present to you the react roles you create in button form. Click each react role you want to add to the category.\n",
+        "**Each category can only hold a max of 20 react roles due to Discords message reaction limit.**"
+      ],
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1028540253021159455/unknown.png"
+    },
+    {
+      "title": "How to give out roles. | Page 5",
+      "description": [
+        "Now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n",
+        "**There are _two_ different ways for RoleBot to listen for reactions.**",
+        "One, you can use `/react-channel` to select a channel that RoleBot will send all of its default embeds to and react to.",
+        "Two, you can use `/react-message` to select a specific message, usually one you wrote and select a single category for RoleBot to react with.\n"
+      ],
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1028550952279609394/unknown.png"
+    },
+    {
+      "title": "The end. | Page 6",
+      "description": [
+        "And that's all folks! That's the basics for RoleBot.\n",
+        "There are a few things to pay attention to, most times RoleBot doesn't work as expected is due to RoleBot not having the correct permissions. So make sure to check those!\n",
+        "If you ever need help join the [support server!](https://discord.gg/9BYN266sC4)"
+      ],
+      "image": "https://s3.us-east-2.amazonaws.com/rolebot.gg/assets/banners/banner.png"
     }
   ]
 }

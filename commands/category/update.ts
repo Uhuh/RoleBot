@@ -127,7 +127,9 @@ export class UpdateCategoryCommand extends SlashCommand {
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.`,
+        content:
+          `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
+          `Add some react roles to the category with \`/category-add\` and then try update again. Otherwise just delete it!`,
       });
     }
 
@@ -140,7 +142,9 @@ export class UpdateCategoryCommand extends SlashCommand {
       // Clear all reactions to remove and old incorrect reactions.
       await message.reactions
         .removeAll()
-        .catch(() => this.log.info(`Failed to remove all reactions.`));
+        .catch(() =>
+          this.log.info(`Failed to remove all reactions.`, interaction.guildId)
+        );
 
       await message
         .edit({ embeds: [embed] })

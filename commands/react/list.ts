@@ -57,7 +57,7 @@ export class ReactListCommand extends SlashCommand {
 
     interaction
       .editReply({
-        content: `Hey! Here's your react roles.`,
+        content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
         embeds: [embed],
       })
       .catch((e) =>
