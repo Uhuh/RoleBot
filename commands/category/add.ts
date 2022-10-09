@@ -24,7 +24,6 @@ import {
   GET_REACT_ROLE_BY_ID,
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
-import { isCategoryNull } from '../../utilities/utilIsNull';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor() {
@@ -36,7 +35,7 @@ export class AddCategoryCommand extends SlashCommand {
     );
 
     this.addStringOption(
-      'category-name',
+      'category',
       'The category you want to add react roles to!',
       true,
       [],
@@ -71,8 +70,18 @@ export class AddCategoryCommand extends SlashCommand {
 
     const [reactRoleId, categoryId] = args;
 
-    const reactRole = await GET_REACT_ROLE_BY_ID(Number(reactRoleId));
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+    const reactRole = this.expect(
+      await GET_REACT_ROLE_BY_ID(Number(reactRoleId)),
+      {
+        message: 'Failed to find the react role!',
+        prop: 'react role',
+      }
+    );
+
+    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
+      message: `Failed to find the category!`,
+      prop: 'category',
+    });
 
     // To edit our button message with the updated list of react roles.
     const rolesWithoutCategories = (
@@ -81,11 +90,6 @@ export class AddCategoryCommand extends SlashCommand {
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       Number(categoryId)
-    ).catch((e) =>
-      this.log.critical(
-        `Failed to get react roles with categoryId[${categoryId}]\n${e}`,
-        interaction.guildId ?? ''
-      )
     );
 
     // Should only get here if typeorm throws.
@@ -97,32 +101,6 @@ export class AddCategoryCommand extends SlashCommand {
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
         content: `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`,
-      });
-    }
-
-    const unknownErrorMessage = `Hey! Something weird happened so I couldn't complete that request for you. Please wait a second and try again.`;
-
-    if (!reactRole) {
-      this.log.debug(
-        `React role[${reactRoleId}] was not found with the given ID.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: unknownErrorMessage,
-      });
-    }
-
-    if (!category) {
-      this.log.debug(
-        `Category[${categoryId}] was not found with the given ID.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: unknownErrorMessage,
       });
     }
 
@@ -161,17 +139,10 @@ export class AddCategoryCommand extends SlashCommand {
       const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
       const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
 
-      interaction
-        .update({
-          content: roleButtons.length ? moreRoles : noRolesLeft,
-          components: roleButtons,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to update interaction\n${e}`,
-            interaction.guildId ?? ''
-          )
-        );
+      interaction.update({
+        content: roleButtons.length ? moreRoles : noRolesLeft,
+        components: roleButtons,
+      });
 
       this.log.info(
         `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`,
@@ -183,16 +154,9 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      interaction
-        .update({
-          content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to update interaction\n${e}`,
-            interaction.guildId ?? ''
-          )
-        );
+      interaction.update({
+        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+      });
     }
   };
 
@@ -228,11 +192,14 @@ export class AddCategoryCommand extends SlashCommand {
     }
 
     const { guildId } = interaction;
-    const categoryId = interaction.options.getString('category-name');
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+    const categoryId = interaction.options.getString('category');
+    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
+      message: 'I failed to find that category! Try again.',
+      prop: 'category',
+    });
 
     // I have no clue how this could happen after it just passed the categories ID.
-    if (isCategoryNull(interaction, category, categoryId)) return;
+    //if (isCategoryNull(interaction, category, categoryId)) return;
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
 

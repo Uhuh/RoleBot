@@ -77,7 +77,7 @@ export class ReactNukeCommand extends SlashCommand {
       });
   };
 
-  execute = (interaction: ChatInputCommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(`${this.name}_confirm`)

@@ -15,6 +15,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { LogService } from '../src/services/logService';
 import { SlashBase } from './slashBase';
 import { handleInteractionReply } from '../utilities/utils';
+import { CustomError } from '../src/error/custom.error';
 
 export const PermissionMappings: Map<bigint, string> = new Map([
   [PermissionsBitField.Flags.ReadMessageHistory, 'READ_MESSAGE_HISTORY'],
@@ -81,7 +82,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * if a user has the correct permissions, log that the command has been used and finally execute the implemented `execute` method
    * @param interaction Raw interaction, can be command, button, selection etc.
    */
-  public run = (interaction: Interaction): void => {
+  public run = async (interaction: Interaction) => {
     // Ignore interactions that aren't commands.
     if (!interaction.isChatInputCommand()) {
       return this.log.debug(
@@ -92,25 +93,23 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     // Check all user perms.
     if (!this.canUserRunInteraction(interaction)) return;
 
-    this.executions.push({
-      channelId: interaction.channelId,
-      command: interaction.commandName,
-      guildId: interaction.guildId ?? 'DM',
-      time: new Date(),
-      userId: interaction.user.id,
-    });
-
     try {
-      this.execute(interaction);
+      await this.execute(interaction);
     } catch (e) {
-      this.log.error(
-        `Guild encountered issue when running command[${this.name}]\n${e}`,
-        interaction.guildId
-      );
+      let errorMessage = `Hey! I encountered an error, please wait a second and try again.`;
 
-      interaction.channel?.send(
-        `Hey! Unfortunately I ran into an issue while running that command. Please try again.`
-      );
+      if (!(e instanceof CustomError)) {
+        this.log.critical(`Received non custom error.\n${e}`);
+      } else errorMessage = e.message;
+
+      if (interaction.replied) {
+        interaction.editReply(errorMessage);
+      } else {
+        interaction.reply({
+          ephemeral: true,
+          content: errorMessage,
+        });
+      }
     }
   };
 
@@ -141,8 +140,10 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * This method should be overwritten by the child class and implement the commands functionality.
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
    */
-  public execute = (interaction: ChatInputCommandInteraction) => {
-    handleInteractionReply(
+  public execute = async (
+    interaction: ChatInputCommandInteraction
+  ): Promise<unknown> => {
+    return handleInteractionReply(
       this.log,
       interaction,
       `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
@@ -155,7 +156,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * All options should be keyed with the commands name followed by any IDs it needs separated by a `_`
    * `_` because the slash commands have to use `-`
    * @param interaction SelectMenu option that was clicked.
-   * @param args Essentially all the IDs that are separated with `-`
+   * @param _args Essentially all the IDs that are separated with `-`
    */
   public handleSelect = (
     interaction: SelectMenuInteraction,
@@ -218,7 +219,25 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   extractStringVariables = (
     interaction: ChatInputCommandInteraction,
     ...attrs: string[]
-  ): Array<string | null> => {
-    return attrs.map((a) => interaction.options.getString(a));
+  ): Array<string | undefined> => {
+    return attrs.map((a) => interaction.options.getString(a) ?? undefined);
+  };
+
+  /**
+   * Expect any value passed into here shouldn't be null, otherwise alert the user.
+   * @param value Any entity or value we want to check.
+   * @param props Message to alert user and prop for logging.
+   * @returns value if not null
+   */
+  expect = <T>(
+    value: T | null | undefined,
+    props: { message: string; prop: string }
+  ): T => {
+    if (value === null || value === undefined) {
+      this.log.error(`Expected ${props.prop} to not be null.`);
+      throw new CustomError(props);
+    }
+
+    return value;
   };
 }

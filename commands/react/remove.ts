@@ -15,12 +15,9 @@ import { RolePing } from '../../utilities/utilPings';
 
 export class ReactDeleteCommand extends SlashCommand {
   constructor() {
-    super(
-      'react-remove',
-      'Remove an existing reaction role from a drop down menu.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
+    super('react-remove', 'Remove an existing reaction role.', Category.react, [
+      PermissionsBitField.Flags.ManageRoles,
+    ]);
 
     this.addRoleOption('role', `The reaction role you want to remove.`, true);
   }

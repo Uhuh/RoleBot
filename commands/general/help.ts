@@ -32,7 +32,7 @@ export class HelpCommand extends SlashCommand {
       );
   };
 
-  execute = (interaction: ChatInputCommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
 
     const { user } = interaction.client;

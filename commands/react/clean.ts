@@ -21,16 +21,9 @@ export class ReactCleanCommand extends SlashCommand {
     }
 
     try {
-      await interaction
-        .deferReply({
-          ephemeral: true,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
-            interaction.guildId
-          )
-        );
+      await interaction.deferReply({
+        ephemeral: true,
+      });
     } catch (e) {
       return this.log.error(
         `Failed to defer interaction.\n${e}`,

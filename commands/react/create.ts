@@ -89,15 +89,11 @@ export class ReactRoleCommand extends SlashCommand {
           .setStyle(ButtonStyle.Link)
       );
 
-      return interaction
-        .reply({
-          ephemeral: true,
-          embeds: [embed],
-          components: [button],
-        })
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
+      return interaction.reply({
+        ephemeral: true,
+        embeds: [embed],
+        components: [button],
+      });
     }
 
     // Custom emojis Look like this: <a?:name:id>
