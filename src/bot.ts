@@ -1,5 +1,5 @@
 import * as config from './vars';
-import { buildCommands } from '../commands/commandHandler';
+import { buildCommands, buildSlashCommands } from '../commands/commandHandler';
 import { guildUpdate } from '../events/guildUpdate';
 import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
@@ -144,5 +144,7 @@ export default class RoleBot extends Discord.Client {
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
+
+    buildSlashCommands(true, config.CLIENT_ID !== '493668628361904139');
   };
 }
