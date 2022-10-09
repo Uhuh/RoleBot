@@ -1,4 +1,5 @@
 import {
+  AutocompleteInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
   Interaction,
@@ -31,6 +32,8 @@ export class InteractionHandler {
       InteractionHandler.handleSelect(interaction, client);
     else if (interaction.isButton())
       InteractionHandler.handleButton(interaction, client);
+    else if (interaction.isAutocomplete())
+      InteractionHandler.handleAutocomplete(interaction, client);
   }
 
   /**
@@ -65,6 +68,29 @@ export class InteractionHandler {
         content: 'There was an error while executing this command!',
         ephemeral: true,
       });
+    }
+  }
+
+  /**
+   * Forward interactions autocomplete request to respective command.
+   * @param interaction Interaction to respond to
+   * @param client RoleBot client to find correct command to call its handleAutocomplete method.
+   */
+  private static handleAutocomplete(
+    interaction: AutocompleteInteraction,
+    client: RoleBot
+  ) {
+    const command = client.commands.get(interaction.commandName.toLowerCase());
+
+    if (!command) return;
+
+    try {
+      command.handleAutoComplete(interaction);
+    } catch (e) {
+      this.log.error(
+        `Encountered an error trying to run command[${command.name}]\n${e}`,
+        interaction.guildId
+      );
     }
   }
 
@@ -143,11 +169,13 @@ export class InteractionHandler {
   ): interaction is
     | ChatInputCommandInteraction
     | SelectMenuInteraction
-    | ButtonInteraction {
+    | ButtonInteraction
+    | AutocompleteInteraction {
     return (
       interaction.isCommand() ||
       interaction.isSelectMenu() ||
-      interaction.isButton()
+      interaction.isButton() ||
+      interaction.isAutocomplete()
     );
   }
 

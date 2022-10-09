@@ -4,6 +4,7 @@ import {
   Interaction,
   SelectMenuInteraction,
   PermissionsBitField,
+  AutocompleteInteraction,
 } from 'discord.js';
 import {
   Category,
@@ -118,15 +119,18 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       | ChatInputCommandInteraction
       | ButtonInteraction
       | SelectMenuInteraction
+      | AutocompleteInteraction
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
-          (p) => PermissionMappings.get(p)
-        )}\`.`,
-      });
+      if (!interaction.isAutocomplete()) {
+        handleInteractionReply(this.log, interaction, {
+          ephemeral: true,
+          content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
+            (p) => PermissionMappings.get(p)
+          )}\`.`,
+        });
+      }
       return false;
     }
 
@@ -178,6 +182,16 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   };
 
   /**
+   * This method should respond with data related to the command.
+   * @param interaction Interaction to give data to
+   */
+  public handleAutoComplete = (interaction: AutocompleteInteraction) => {
+    interaction.respond([
+      { name: 'Hey! You forgot to implement autocomplete!', value: 0 },
+    ]);
+  };
+
+  /**
    * Check if a user has the required permissions to run the command.
    * @param interaction User interaction with memberPermissions
    * @returns True if user can run this command, false otherwise.
@@ -187,6 +201,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       | ChatInputCommandInteraction
       | ButtonInteraction
       | SelectMenuInteraction
+      | AutocompleteInteraction
   ) => {
     return this.permissions.length
       ? interaction.memberPermissions?.has(this.permissions, true)
@@ -203,15 +218,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   extractStringVariables = (
     interaction: ChatInputCommandInteraction,
     ...attrs: string[]
-  ): Array<string | undefined> => {
-    return attrs.map((a) => {
-      const val = interaction.options.get(a)?.value;
-      if (typeof val !== 'string' && val !== undefined) {
-        throw Error(
-          `Failed to extract string variable from interaction | [${a} : ${val}]`
-        );
-      }
-      return val;
-    });
+  ): Array<string | null> => {
+    return attrs.map((a) => interaction.options.getString(a));
   };
 }

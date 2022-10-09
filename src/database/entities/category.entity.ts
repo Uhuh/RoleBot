@@ -3,7 +3,7 @@ import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export interface ICategory {
   guildId: string;
   name: string;
-  description?: string;
+  description?: string | null;
   mutuallyExclusive?: boolean;
   requiredRoleId: string | null;
 }
@@ -19,8 +19,8 @@ export class Category extends BaseEntity {
   @Column()
   name!: string;
 
-  @Column()
-  description!: string;
+  @Column({ type: 'text', nullable: true })
+  description!: string | null;
 
   @Column()
   mutuallyExclusive!: boolean;

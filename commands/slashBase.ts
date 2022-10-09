@@ -12,7 +12,8 @@ export abstract class SlashBase {
     name: string,
     desc: string,
     required = false,
-    choices: { name: string; value: string }[] = []
+    choices: { name: string; value: string }[] = [],
+    autocomplete = false
   ) => {
     if (this.data instanceof SlashCommandBuilder) {
       this.data.addStringOption((option) =>
@@ -21,6 +22,7 @@ export abstract class SlashBase {
           .setDescription(desc)
           .setRequired(required)
           .addChoices(...choices)
+          .setAutocomplete(autocomplete)
       );
     }
   };
