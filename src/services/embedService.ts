@@ -32,7 +32,6 @@ export class EmbedService {
   /**
    * Generate an embed that contains all the emojis to roles in a category.
    * @param category Category to parse roles from.
-   * @param client RoleBot to find emojis.
    * @returns built embed.
    */
   public static categoryReactRoleEmbed = async (category: Category) => {
@@ -145,7 +144,8 @@ export class EmbedService {
     embed
       .setColor(COLOR.DEFAULT)
       .setTitle(embedJson.title)
-      .setDescription(embedJson.description);
+      .setDescription(embedJson.description.join('\n'))
+      .setImage(embedJson.image);
 
     return embed;
   };
