@@ -30,15 +30,6 @@ export const PermissionMappings: Map<bigint, string> = new Map([
   [PermissionsBitField.Flags.EmbedLinks, 'EMBED_LINKS'],
 ]);
 
-// Basic command metadata for now. Want to learn how users are utilizing the bot.
-interface CommandData {
-  time: Date;
-  guildId: string;
-  channelId: string;
-  userId: string;
-  command: string;
-}
-
 /**
  * @SlashCommand Helps create the JSON for the slash command and handle its execution.
  */
@@ -47,11 +38,8 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
   public desc: string;
   public type: Category;
   private readonly permissions: bigint[];
-  private executions: CommandData[] = [];
 
   public log: LogService;
-
-  private static totalCommandsRun = 0;
 
   constructor(
     _name: string,
