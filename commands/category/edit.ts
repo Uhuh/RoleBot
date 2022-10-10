@@ -74,7 +74,7 @@ export class EditCategoryCommand extends SlashCommand {
 
     const [categoryId, newName, newDesc] = this.extractStringVariables(
       interaction,
-      'category-name',
+      'category',
       'new-name',
       'new-description'
     );
