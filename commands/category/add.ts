@@ -203,6 +203,13 @@ export class AddCategoryCommand extends SlashCommand {
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
 
+    if (!reactRoles.length) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `You should create a few react roles first! Check out \`/react-role\`!`,
+      });
+    }
+
     const roleButtons = await this.buildReactRoleButtons(
       reactRoles,
       category.id
