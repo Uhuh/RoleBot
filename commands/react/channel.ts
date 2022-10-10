@@ -1,23 +1,30 @@
 import {
+  AutocompleteInteraction,
   ChannelType,
   ChatInputCommandInteraction,
   PermissionsBitField,
+  TextChannel,
 } from 'discord.js';
 
 import { EmbedService } from '../../src/services/embedService';
 import { reactToMessage } from '../../utilities/utils';
-import { Category } from '../../utilities/types/commands';
+import { Category as CommandCategory } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_GUILD_CATEGORIES,
+} from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
+import { setTimeout } from 'node:timers/promises';
+import { Category, ReactRole } from '../../src/database/entities';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
     super(
       'react-channel',
-      'Send all categories with react roles to the selected channel.',
-      Category.react,
+      'Send all categories or one with react roles to the selected channel.',
+      CommandCategory.react,
       [PermissionsBitField.Flags.ManageRoles]
     );
 
@@ -26,28 +33,92 @@ export class ReactChannelCommand extends SlashCommand {
       'The channel that will receive reaction roles.',
       true
     );
+
+    this.addStringOption(
+      'category-name',
+      'Send only a single category to the channel.',
+      false,
+      [],
+      true
+    );
   }
+
+  handleAutoComplete = async (interaction: AutocompleteInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+
+    const focusedValue = interaction.options.getFocused();
+    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
+
+    await interaction
+      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
+      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
+  };
+
+  handleSingleCategory = async (
+    interaction: ChatInputCommandInteraction,
+    categoryId: number
+  ) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const channel = this.expect(interaction.options.getChannel('channel'), {
+      message: `Hey! I can't find the channel! Please wait and try again.`,
+      prop: 'channel',
+    });
+
+    if (channel.type !== ChannelType.GuildText) {
+      this.log.error(`Passed in channel was invalid.`, interaction.guildId);
+
+      return interaction
+        .editReply(`Hey! I only support sending embeds to text channels!`)
+        .catch((e) =>
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        );
+    }
+
+    const textChannel = this.expect(
+      await interaction.guild?.channels.fetch(channel.id),
+      {
+        message: `Failed to find the channel just passed in!`,
+        prop: 'text channel',
+      }
+    );
+
+    if (textChannel.type !== ChannelType.GuildText) return;
+
+    const category = this.expect(await GET_CATEGORY_BY_ID(categoryId), {
+      message: `I failed to find the category! Please wait and try again.`,
+      prop: 'category',
+    });
+
+    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+    if (!roles.length) return;
+
+    this.messageChannelAndReact(interaction, textChannel, category, roles);
+  };
 
   public execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    try {
-      // Defer because of Discord rate limits.
-      await interaction
-        .deferReply({
-          ephemeral: true,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
-            interaction.guildId
-          )
-        );
-    } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
-      return;
+    // Defer because of Discord rate limits.
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
+    /**
+     * If the user passed in a category we don't need to waste time here.
+     */
+    const categoryId = interaction.options.getString('category-name');
+
+    if (categoryId) {
+      return this.handleSingleCategory(interaction, Number(categoryId));
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
@@ -58,13 +129,9 @@ export class ReactChannelCommand extends SlashCommand {
     if (!categories) {
       this.log.debug(`Guild has no categories.`, interaction.guildId);
 
-      return interaction
-        .editReply(
-          `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
-        )
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
+      return interaction.editReply(
+        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
+      );
     }
 
     // Stolen from @react/message execute function
@@ -82,109 +149,81 @@ export class ReactChannelCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return interaction
-        .editReply({
-          content: allCategoriesAreEmpty,
-        })
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
+      return interaction.editReply({
+        content: allCategoriesAreEmpty,
+      });
     }
 
-    const channel = interaction.options.getChannel('channel');
+    const channel = this.expect(interaction.options.getChannel('channel'), {
+      message: `Hey! I failed to find the channel from the command. Please wait a second and try again.`,
+      prop: 'channel',
+    });
 
-    if (!channel) {
-      this.log.info(
-        `Could not find channel on interaction.`,
-        interaction.guildId
-      );
-
-      return interaction
-        .editReply(
-          `Hey! I failed to find the channel from the command. Please wait a second and try again.`
-        )
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
-    } else if (!(channel?.type === ChannelType.GuildText)) {
+    if (channel?.type !== ChannelType.GuildText) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel`,
         interaction.guildId
       );
 
-      return interaction
-        .editReply(`Hey! I only support sending embeds to text channels!`)
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
-    }
-
-    /* There might be a better solution to this. Potentially reply first, then update the interaction later. Discord interactions feel so incredibly inconsistent though. So for now force users to WAIT the whole 3 seconds so that Discord doesn't cry. */
-    await new Promise((res) => {
-      setTimeout(
-        () =>
-          res(`I have to wait at least 3 seconds before Discord goes crazy.`),
-        3000
+      return interaction.editReply(
+        `Hey! I only support sending embeds to text channels!`
       );
-    });
+    }
 
     const textChannel = await interaction.guild?.channels.fetch(channel.id);
     if (textChannel?.type !== ChannelType.GuildText) return;
 
+    for (const category of categories) {
+      const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+      if (!roles.length) continue;
+
+      this.messageChannelAndReact(interaction, textChannel, category, roles);
+
+      await setTimeout(1000);
+    }
+  };
+
+  private messageChannelAndReact = async (
+    interaction: ChatInputCommandInteraction,
+    channel: TextChannel,
+    category: Category,
+    roles: ReactRole[]
+  ) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const embed = EmbedService.reactRoleEmbed(roles, category);
     const permissionError = requiredPermissions(channel.id);
 
-    for (const category of categories) {
-      const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
-      if (!categoryRoles.length) continue;
+    try {
+      const message = await channel.send({
+        embeds: [embed],
+      });
 
-      const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
+      const isSuccessfulReacting = await reactToMessage(
+        message,
+        interaction.guildId,
+        roles,
+        channel.id,
+        category.id,
+        false,
+        this.log
+      );
 
-      try {
-        const reactEmbedMessage = await textChannel.send({
-          embeds: [embed],
-        });
-
-        const isSuccessfulReacting = await reactToMessage(
-          reactEmbedMessage,
-          interaction.guildId,
-          categoryRoles,
-          channel.id,
-          category.id,
-          false,
-          this.log
-        );
-
-        if (!isSuccessfulReacting) {
-          reactEmbedMessage
-            .delete()
-            .catch(() =>
-              this.log.info(
-                `Failed to delete embed message after failing reaction.`
-              )
-            );
-
-          return interaction.editReply(permissionError);
-        }
-      } catch (e) {
-        this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
+      if (!isSuccessfulReacting) {
+        message.delete();
 
         return interaction.editReply(permissionError);
       }
+    } catch (e) {
+      this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
 
-      await new Promise((res) => {
-        setTimeout(() => res(`Send next category message.`), 1000);
-      });
+      return interaction.editReply(permissionError);
     }
 
-    interaction
-      .editReply({
-        content: 'Hey! I successfully sent the embeds and reacted to them!',
-      })
-      .catch((e) =>
-        this.log.error(
-          `Failed to edit interaction reply.\n${e}`,
-          interaction.guildId
-        )
-      );
+    interaction.editReply({
+      content: 'Hey! I successfully sent the embeds and reacted to them!',
+    });
   };
 }

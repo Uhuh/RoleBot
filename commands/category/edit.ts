@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import {
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+} from 'discord.js';
 import { Category as ICategory } from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
@@ -6,21 +10,24 @@ import { SlashCommand } from '../slashCommand';
 import { handleInteractionReply } from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
-  GET_CATEGORY_BY_NAME,
+  GET_CATEGORY_BY_ID,
+  GET_GUILD_CATEGORIES,
 } from '../../src/database/queries/category.query';
 
 export class EditCategoryCommand extends SlashCommand {
   constructor() {
     super(
       'category-edit',
-      `Edit any category's name, description, or if it's mutually exclusive.`,
+      `Edit any category's information.`,
       Category.category,
       [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
-      'name',
-      'The name of the category, this is case sensitive and used to find your category.',
+      'category',
+      'The category you want to edit.',
+      true,
+      [],
       true
     );
     this.addStringOption(
@@ -45,14 +52,29 @@ export class EditCategoryCommand extends SlashCommand {
     );
   }
 
+  handleAutoComplete = async (interaction: AutocompleteInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+
+    const focusedValue = interaction.options.getFocused();
+    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
+
+    await interaction
+      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
+      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
+  };
+
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [name, newName, newDesc] = this.extractStringVariables(
+    const [categoryId, newName, newDesc] = this.extractStringVariables(
       interaction,
-      'name',
+      'category-name',
       'new-name',
       'new-description'
     );
@@ -85,29 +107,17 @@ export class EditCategoryCommand extends SlashCommand {
       });
     }
 
-    if (!name) {
-      this.log.error(
-        `Required option name was undefined.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I had an issue finding the category. Please wait a second and try again.`,
-      });
-    }
-
-    const category = await GET_CATEGORY_BY_NAME(interaction.guildId, name);
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     if (!category) {
       this.log.info(
-        `Category not found with name[${name}]`,
+        `Category not found with id[${categoryId}]`,
         interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! I couldn't find a category with that name. The name is _case sensitive_ so make sure it's typed correctly.`,
+        content: `Hey! I couldn't find the category. Please wait a second and try again.`,
       });
     }
 

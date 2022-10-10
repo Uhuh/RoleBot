@@ -1,12 +1,10 @@
 import {
-  ActionRowBuilder,
+  AutocompleteInteraction,
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
   NonThreadGuildBasedChannel,
   PermissionsBitField,
-  SelectMenuBuilder,
-  SelectMenuInteraction,
   TextChannel,
 } from 'discord.js';
 
@@ -33,79 +31,29 @@ export class ReactMessageCommand extends SlashCommand {
       'Copy a message link and place it here for the message you want me to react to.',
       true
     );
+
+    this.addStringOption(
+      'category',
+      'The category you wish to react with!',
+      true,
+      [],
+      true
+    );
   }
 
-  handleSelect = async (interaction: SelectMenuInteraction, args: string[]) => {
-    const [guildId, channelId, messageId, categoryId] = args;
-
-    const channel = await interaction.guild?.channels.fetch(channelId);
-
-    if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I had an issue handling the option you selected for \`/${this.name}\`. Please wait a moment and try again.`,
-      });
+  handleAutoComplete = async (interaction: AutocompleteInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const message = await channel.messages.fetch(messageId);
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
 
-    if (!message) {
-      this.log.debug(
-        `User gave message[${messageId}] that doesn't exist in channel[${channelId}]`,
-        interaction.guildId
-      );
+    const focusedValue = interaction.options.getFocused();
+    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
 
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I had an issue finding that message. Give me a sec and try again.`
-      );
-    }
-
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
-
-    if (!category) {
-      this.log.info(
-        `Category[${categoryId}] is missing for guild despite having passed previous check.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I had an issue finding that category. Please wait a second and try again.`
-      );
-    }
-
-    const reactRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(Number(categoryId));
-
-    if (!reactRoles.length) {
-      this.log.error(
-        `Category[${categoryId}] in guild somehow has no react roles associated with it.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I had issues getting the react roles for the category. Can you wait a sec and try again?`
-      );
-    }
-
-    handleInteractionReply(this.log, interaction, {
-      ephemeral: true,
-      content: `I'm reacting to the message with all react roles associated with ${category.name}. Please give me a moment to react fully before obtaining roles.`,
-    });
-
-    reactToMessage(
-      message,
-      interaction.guildId || guildId,
-      reactRoles,
-      channel.id,
-      category.id,
-      true,
-      this.log
-    );
+    await interaction
+      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
+      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -134,14 +82,30 @@ export class ReactMessageCommand extends SlashCommand {
       );
     }
 
-    const channel = await interaction.guild?.channels
-      .fetch(channelId)
-      .catch((e) =>
-        this.log.error(
-          `Failed to fetch channel[${channelId}]\n${e}`,
-          interaction.guildId
-        )
-      );
+    const categoryId = interaction.options.getString('category');
+
+    if (isNaN(Number(categoryId))) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! Did you hit enter too fast? I can't find that category. Please wait and try again.`,
+      });
+    }
+
+    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
+      message: 'I failed to find that category! Try again.',
+      prop: 'category',
+    });
+
+    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+
+    if (!roles.length) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react-role\`?`,
+      });
+    }
+
+    const channel = await interaction.guild?.channels.fetch(channelId);
 
     if (!channel || !isTextChannel(channel)) {
       return handleInteractionReply(
@@ -151,14 +115,7 @@ export class ReactMessageCommand extends SlashCommand {
       );
     }
 
-    const message = await channel.messages
-      .fetch(messageId)
-      .catch((e) =>
-        this.log.error(
-          `Failed to fetch message[${messageId}] for channel[${channel.id}]\n${e}`,
-          interaction.guildId
-        )
-      );
+    const message = await channel.messages.fetch(messageId);
 
     if (!message) {
       return handleInteractionReply(
@@ -168,79 +125,20 @@ export class ReactMessageCommand extends SlashCommand {
       );
     }
 
-    // Trying to be as detailed as possible to user if categories don't exist or if they are all empty.
-    const guildHasNoCategories = `It appears there are no categories! Try out \`/category-create\` to create a category reaction pack to store and manage your roles much easier.`;
-    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
+    handleInteractionReply(this.log, interaction, {
+      ephemeral: true,
+      content: `I'm reacting to the message with all react roles associated with ${category.name}.`,
+    });
 
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
-      (e) =>
-        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
+    reactToMessage(
+      message,
+      interaction.guildId,
+      roles,
+      channel.id,
+      category.id,
+      true,
+      this.log
     );
-
-    // This should only happen if typeorm throws an error.
-    if (!categories) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I'm encountering an issue trying to access the servers categories. Please be patient.`
-      );
-    }
-
-    const guildHasCategories = categories.length;
-
-    const categoryRoles = await Promise.all(
-      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c.id))
-    );
-
-    // Presumably, if all the array of roles for each category is length 0 then this being 0 is "false"
-    const allEmptyCategories = categoryRoles.filter((r) => r.length).length;
-
-    if (!guildHasCategories) {
-      this.log.info(`Guild has no categories.`, interaction.guildId);
-
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        guildHasNoCategories
-      );
-    } else if (!allEmptyCategories) {
-      this.log.debug(
-        `Guild has categories but all of them are empty.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        allCategoriesAreEmpty
-      );
-    }
-
-    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-      new SelectMenuBuilder()
-        .setCustomId(`select-message`)
-        .setPlaceholder(`Pick a category to react with.`)
-        .addOptions(
-          categories.map((c, idx) => ({
-            label: c.name ?? `Category-${idx}`,
-            // Discord has a 100 character limit for select menus.
-            description: c.description
-              ? c.description?.slice(0, 99)
-              : `No description!`,
-            value: `${this.name}_${c.guildId}-${channelId}-${messageId}-${c.id}`,
-          }))
-        )
-    );
-
-    interaction
-      .reply({
-        ephemeral: true,
-        content: `Let's make this easier for you. Select a category and I will use the reaction roles in that category to react to the message.`,
-        components: [selectMenu],
-      })
-      .catch((e) =>
-        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-      );
   };
 }
 

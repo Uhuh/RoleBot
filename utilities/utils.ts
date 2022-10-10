@@ -170,7 +170,7 @@ export const spliceIntoChunks = <T>(
 
 /**
  * Handle replying to the interaction and error handling if replies fail.
- * @param logger - Respective slash command
+ * @param logger - Respective slash command log service
  * @param interaction - Interaction that was run
  * @param content - Content to reply to user with
  */

@@ -1,11 +1,16 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import {
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+} from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 
 import { handleInteractionReply } from '../../utilities/utils';
 import {
   DELETE_CATEGORY_BY_ID,
-  GET_CATEGORY_BY_NAME,
+  GET_CATEGORY_BY_ID,
+  GET_GUILD_CATEGORIES,
 } from '../../src/database/queries/category.query';
 
 export class RemoveCategoryCommand extends SlashCommand {
@@ -19,64 +24,63 @@ export class RemoveCategoryCommand extends SlashCommand {
 
     this.addStringOption(
       'category-name',
-      `Name of the category you want to delete.`,
+      `The category you want to delete!`,
+      true,
+      [],
       true
     );
   }
+
+  handleAutoComplete = async (interaction: AutocompleteInteraction) => {
+    if (!interaction.guildId) {
+      return this.log.error(`GuildID did not exist on interaction.`);
+    }
+
+    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
+
+    const focusedValue = interaction.options.getFocused();
+    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
+
+    await interaction
+      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
+      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
+  };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [categoryName] = this.extractStringVariables(
-      interaction,
-      'category-name'
-    );
-
-    if (!categoryName) {
-      this.log.debug(
-        `Required option was empty for categoryName[${categoryName}]`,
-        interaction.guildId
-      );
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I don't think you passed in a name. Could you please try again?`,
-      });
-    }
-
-    const category = await GET_CATEGORY_BY_NAME(
-      interaction.guildId,
-      categoryName
-    );
+    const categoryId = interaction.options.getString('category-name');
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     if (!category) {
-      this.log.info(
-        `Category[${categoryName}] does not exist on guild. Most likely name typo.`,
+      this.log.error(
+        `Category[${categoryId}] does not exist on guild.`,
         interaction.guildId
       );
 
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! I could **not** find a category by the name of \`${categoryName}\`. This command is case sensitive to ensure you delete exactly what you want. Check the name and try again.`,
+        content: `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`,
       });
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
       .then(() => {
         this.log.info(
-          `Successfully deleted category[${categoryName}] for guild`,
+          `Successfully deleted category[${categoryId}]`,
           interaction.guildId
         );
 
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: `Hey! I successfully deleted the category \`${categoryName}\` for you and freed all the roles on it.`,
+          content: `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`,
         });
       })
       .catch((e) => {
         this.log.error(
-          `Issues deleting category[${categoryName}]\n${e}`,
+          `Issues deleting category[${categoryId}]\n${e}`,
           interaction.guildId
         );
 

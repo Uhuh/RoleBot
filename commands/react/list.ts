@@ -19,49 +19,27 @@ export class ReactListCommand extends SlashCommand {
 
     try {
       // Defer because of Discord rate limits.
-      await interaction
-        .deferReply({
-          ephemeral: true,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
-            interaction.guildId
-          )
-        );
+      await interaction.deferReply({
+        ephemeral: true,
+      });
     } catch (e) {
       this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
       return;
     }
 
-    const reactRoles = await GET_REACT_ROLES_BY_GUILD(
-      interaction.guildId
-    ).catch((e) =>
-      this.log.critical(
-        `Failed to fetch react roles\n${e}`,
-        interaction.guildId
-      )
-    );
+    const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
 
     if (!reactRoles || !reactRoles.length) {
-      return interaction
-        .editReply({
-          content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
-        })
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
+      return interaction.editReply({
+        content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
+      });
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
-    interaction
-      .editReply({
-        content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
-        embeds: [embed],
-      })
-      .catch((e) =>
-        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-      );
+    interaction.editReply({
+      content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
+      embeds: [embed],
+    });
   };
 }

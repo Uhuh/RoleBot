@@ -10,6 +10,7 @@ import { Category } from '../../utilities/types/commands';
 import { spliceIntoChunks } from '../../utilities/utils';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
+import { setTimeout } from 'node:timers/promises';
 
 export class ListCategoryCommand extends SlashCommand {
   constructor() {
@@ -28,16 +29,9 @@ export class ListCategoryCommand extends SlashCommand {
 
     try {
       // Defer because of Discord rate limits.
-      await interaction
-        .deferReply({
-          ephemeral: true,
-        })
-        .catch((e) =>
-          this.log.error(
-            `Failed to defer interaction and the try/catch didn't catch it.\n${e}`,
-            interaction.guildId
-          )
-        );
+      await interaction.deferReply({
+        ephemeral: true,
+      });
     } catch (e) {
       this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
       return;
@@ -51,22 +45,14 @@ export class ListCategoryCommand extends SlashCommand {
     if (!categories || !categories.length) {
       this.log.info(`Guild has no categories.`, interaction.guildId);
 
-      return interaction
-        .editReply(
-          `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
-        )
-        .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-        );
+      return interaction.editReply(
+        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
+      );
     }
 
-    interaction
-      .editReply(
-        `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react-clean\` to remove them.`
-      )
-      .catch((e) =>
-        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-      );
+    interaction.editReply(
+      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react-clean\` to remove them.`
+    );
 
     const embeds: EmbedBuilder[] = [];
 
@@ -84,24 +70,12 @@ export class ListCategoryCommand extends SlashCommand {
     }
 
     for (const chunk of spliceIntoChunks(embeds, 10)) {
-      interaction.channel
-        ?.send({
-          embeds: chunk,
-        })
-        .catch(() => {
-          this.log.error(
-            `Failed to send category embeds to channel[${interaction.channel?.id}]`,
-            interaction.guildId
-          );
+      await interaction.followUp({
+        ephemeral: true,
+        embeds: chunk,
+      });
 
-          interaction
-            .editReply(
-              `Hey! I need the \`SEND_MESSAGE\` permissions to send the category embeds in this channel.`
-            )
-            .catch((e) =>
-              this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-            );
-        });
+      await setTimeout(1000);
     }
   };
 }
