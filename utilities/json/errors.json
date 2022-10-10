@@ -1,5 +1,5 @@
 {
   "required_permissions": " - READ_MESSAGE_HISTORY\n - ADD_REACTIONS\n - SEND_MESSAGES\n - MANAGE_MESSAGES\n - MANAGE_ROLES",
   "permission_reasons": " - To be able to react I have to be able to see the message thus I need to see message history for the channel.\n - Have to be able to react, it is a react role bot.\n - Have to be able to send embeds\n - To update the embeds react role list.\n - To update user roles.",
-  "missing_permissions": "Hey! I don't have the right permissions in {{channel}} to correctly setup the react role embeds.\n\nI need these permissions to work as intended.\n{{permissions}}\nWhy do I need these permissions?\n{{permission_reasons}}"
+  "missing_permissions": "**!!! If you used emojis from another server it's possible RoleBot doesn't share that server !!!**\n\nHey! I failed to send messages and react in {{channel}}. Let's make sure I have the right permissions.\n\nI need these permissions to work as intended.\n{{permissions}}\nWhy do I need these permissions?\n{{permission_reasons}}"
 }
