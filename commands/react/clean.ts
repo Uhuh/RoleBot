@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLES_BY_GUILD,
@@ -11,7 +11,8 @@ export class ReactCleanCommand extends SlashCommand {
     super(
       'react-clean',
       `If you delete a role RoleBot might miss it, this will remove '@deleted' roles.`,
-      Category.react
+      Category.react,
+      [PermissionsBitField.Flags.ManageRoles]
     );
   }
 
