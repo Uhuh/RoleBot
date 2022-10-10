@@ -198,9 +198,6 @@ export class AddCategoryCommand extends SlashCommand {
       prop: 'category',
     });
 
-    // I have no clue how this could happen after it just passed the categories ID.
-    //if (isCategoryNull(interaction, category, categoryId)) return;
-
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
 
     if (!reactRoles.length) {
