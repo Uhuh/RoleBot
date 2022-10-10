@@ -39,6 +39,10 @@ export class UpdateCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const [messageLink] = this.extractStringVariables(
       interaction,
       'message-link'
@@ -50,10 +54,9 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! Something happened and I can't see the passed in message link. Could you try again?`,
-      });
+      return interaction.editReply(
+        `Hey! Something happened and I can't see the passed in message link. Could you try again?`
+      );
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
@@ -68,10 +71,9 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
 
     if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I couldn't find that channel, make sure you're copying the message link right.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
+      );
     }
 
     const permissionsError = requiredPermissions(channel.id);
@@ -83,10 +85,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
 
     if (!message) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: permissionsError,
-      });
+      return interaction.editReply(permissionsError);
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MESSAGE_ID(messageId);
@@ -97,10 +96,9 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I looked and didn't see any react roles saved that are associated with that message.`,
-      });
+      return interaction.editReply(
+        `Hey! I looked and didn't see any react roles saved that are associated with that message.`
+      );
     }
 
     const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
@@ -111,10 +109,9 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I couldn't find a category associated with that message.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find a category associated with that message.`
+      );
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
@@ -125,12 +122,10 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content:
-          `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
-          `Add some react roles to the category with \`/category-add\` and then try update again. Otherwise just delete it!`,
-      });
+      return interaction.editReply(
+        `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
+          `Add some react roles to the category with \`/category-add\` and then try update again. Otherwise just delete it!`
+      );
     }
 
     try {
@@ -146,30 +141,19 @@ export class UpdateCategoryCommand extends SlashCommand {
           this.log.info(`Failed to remove all reactions.`, interaction.guildId)
         );
 
-      await message
-        .edit({ embeds: [embed] })
-        .then(() => {
+      // We can only edit our own messages
+      if (message.author === interaction.client.user) {
+        await message.edit({ embeds: [embed] }).then(() => {
           this.log.info(
             `Updated category[${category.id}] embed.`,
             interaction.guildId
           );
 
-          handleInteractionReply(this.log, interaction, {
-            ephemeral: true,
-            content: `Hey! I updated the react role embed message related to this category.`,
-          });
-        })
-        .catch((e) => {
-          this.log.error(
-            `Failed to update message for category[${category.id}]\n${e}`,
-            interaction.guildId
+          interaction.editReply(
+            `Hey! I updated the react role embed message related to this category.`
           );
-
-          handleInteractionReply(this.log, interaction, {
-            ephemeral: true,
-            content: `Hey! I wasn't able to update the message for some reason. Most likely a message history / manage permission issue.`,
-          });
         });
+      }
 
       // Re-react to the message with the updated react role list.
       const isSuccessfulReacting = await reactToMessage(
@@ -194,6 +178,10 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
     }
+
+    interaction.editReply(
+      `Hey! I've successfully re-reacted to the message for you.`
+    );
   };
 }
 
