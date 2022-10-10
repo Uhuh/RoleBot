@@ -18,14 +18,14 @@ export class EditCategoryCommand extends SlashCommand {
   constructor() {
     super(
       'category-edit',
-      `Edit any category's name, description, or if it's mutually exclusive.`,
+      `Edit any category's information.`,
       Category.category,
       [PermissionsBitField.Flags.ManageRoles]
     );
 
     this.addStringOption(
-      'category-name',
-      'The name of the category, this is case sensitive and used to find your category.',
+      'category',
+      'The category you want to edit.',
       true,
       [],
       true
