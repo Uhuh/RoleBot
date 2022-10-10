@@ -82,13 +82,13 @@ export class ReactNukeCommand extends SlashCommand {
       new ButtonBuilder()
         .setCustomId(`${this.name}_confirm`)
         .setLabel('Confirm Nuke')
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Danger)
     );
 
     interaction.reply({
       ephemeral: true,
       components: [buttons],
-      content: `This action is irreversable. By confirming you are deleting all react roles currently setup for this server.`,
+      content: `This action is irreversible. By confirming you are deleting all react roles currently setup for this server.`,
     });
   };
 }
