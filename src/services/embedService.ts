@@ -129,7 +129,7 @@ export class EmbedService {
     embed
       .setTitle(category.name)
       .setDescription(
-        `${category.description}${requiredRole}\n\n${reactRolesString}`
+        `${category.description ?? ''}${requiredRole}\n\n${reactRolesString}`
       )
       .setColor(COLOR.DEFAULT);
 
