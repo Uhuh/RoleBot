@@ -181,10 +181,6 @@ export class ReactChannelCommand extends SlashCommand {
 
       await setTimeout(1000);
     }
-
-    interaction.editReply({
-      content: 'Hey! I successfully sent the embeds and reacted to them!',
-    });
   };
 
   private messageChannelAndReact = async (
