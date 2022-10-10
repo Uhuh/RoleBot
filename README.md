@@ -23,8 +23,8 @@ Now confirm it was installed correctly with
 
 ## Use nvm to install node/npm
 
-Since this version of the bot at time of writing uses `discord.js@13.X` we're required to use `node@16` minimum. So let's install `node@16` with nvm and set the default version to 16.
-> `nvm install 16 && nvm alias default 16`
+Since this version of the bot at time of writing uses `discord.js@14.X` we're required to use `node@18` minimum. So let's install `node@18` with nvm and set the default version to 18.
+> `nvm install 18 && nvm alias default 18`
 
 ## Install yarn with npm
 Now let's install `yarn` globally.
