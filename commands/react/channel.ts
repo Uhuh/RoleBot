@@ -117,8 +117,12 @@ export class ReactChannelCommand extends SlashCommand {
      */
     const categoryId = interaction.options.getString('category-name');
 
-    if (categoryId) {
+    if (categoryId && !isNaN(Number(categoryId))) {
       return this.handleSingleCategory(interaction, Number(categoryId));
+    } else if (categoryId) {
+      return interaction.editReply(
+        `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`
+      );
     }
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(

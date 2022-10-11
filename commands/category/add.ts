@@ -193,6 +193,14 @@ export class AddCategoryCommand extends SlashCommand {
 
     const { guildId } = interaction;
     const categoryId = interaction.options.getString('category');
+
+    if (categoryId && isNaN(Number(categoryId))) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`,
+      });
+    }
+
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
       message: 'I failed to find that category! Try again.',
       prop: 'category',

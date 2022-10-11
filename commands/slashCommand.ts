@@ -90,7 +90,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
         this.log.critical(`Received non custom error.\n${e}`);
       } else errorMessage = e.message;
 
-      if (interaction.replied) {
+      if (interaction.replied || interaction.deferred) {
         interaction.editReply(errorMessage);
       } else {
         interaction.reply({
