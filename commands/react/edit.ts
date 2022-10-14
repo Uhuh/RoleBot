@@ -102,7 +102,7 @@ export class ReactEditCommand extends SlashCommand {
       ephemeral: true,
       content: `:tada: Successfully updated the react role (${emojiTag} - ${RolePing(
         role.id
-      )} :tada:`,
+      )}) :tada:`,
     });
   };
 }
