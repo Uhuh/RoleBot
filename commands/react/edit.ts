@@ -4,6 +4,7 @@ import {
   PermissionsBitField,
 } from 'discord.js';
 import {
+  GET_REACT_ROLE_BY_ROLE_ID,
   UPDATE_REACT_ROLE_EMOJI_ID,
   UPDATE_REACT_ROLE_EMOJI_TAG,
 } from '../../src/database/queries/reactRole.query';
@@ -46,6 +47,14 @@ export class ReactEditCommand extends SlashCommand {
       message: 'Somehow the emoji is missing! Please try again.',
       prop: 'emoji',
     });
+
+    const doesReactRoleExist = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
+    if (!doesReactRoleExist) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! That role doesn't belong to an existing react role.`,
+      });
+    }
 
     const parsedEmoji = parseEmoji(emoji);
 
