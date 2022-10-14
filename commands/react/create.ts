@@ -4,13 +4,13 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
   EmbedBuilder,
+  parseEmoji,
   PermissionsBitField,
 } from 'discord.js';
 
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import emojiReg from 'emoji-regex';
 import {
   handleInteractionReply,
   isValidRolePosition,
@@ -36,24 +36,20 @@ export class ReactRoleCommand extends SlashCommand {
     this.addStringOption('emoji', 'The emoji you want to use.', true);
   }
 
-  emojiRegex = emojiReg();
-
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     const { guild } = interaction;
     if (!guild) return;
 
-    const role = interaction.options.get('role')?.role;
-    const [emoji] = this.extractStringVariables(interaction, 'emoji');
-
-    if (!role || !emoji) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content:
-          'I had some issues finding that role or emoji. Please try again.',
-      });
-    }
+    const role = this.expect(interaction.options.getRole('role'), {
+      message: `Somehow the role is missing! Please try again.`,
+      prop: 'role',
+    });
+    const emoji = this.expect(interaction.options.getString('emoji'), {
+      message: 'Somehow the emoji is missing! Please try again.',
+      prop: 'emoji',
+    });
 
     const reactRolesNotInCategory = (
       await GET_REACT_ROLES_BY_GUILD(guild.id)
@@ -96,53 +92,22 @@ export class ReactRoleCommand extends SlashCommand {
       });
     }
 
-    // Custom emojis Look like this: <a?:name:id>
-    const customEmoji = /(a?):\w+:(\d{17,19})/g.exec(emoji);
+    const parsedEmoji = parseEmoji(emoji);
 
-    // Default set the "emojiId" as the input. It's most likely just unicode.
-    let emojiId = emoji;
-    // I need this information for when the emoji is mentioned.
-    let isEmojiAnimated = false;
-
-    // This is only matched if a custom discord emoji was used.
-    if (customEmoji) {
-      /**
-       * 0 - Matched regex
-       * 1 - 'a' if it is animated. Otherwise it's empty.
-       * 2 - ID
-       */
-      isEmojiAnimated = customEmoji[1] === 'a';
-      emojiId = customEmoji[2];
-    } else {
-      const unicodeEmoji = emoji.match(this.emojiRegex);
-
-      // Please make sure that no NON unicode emojis gets pass.
-      if (!unicodeEmoji) {
-        return handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! You didn't pass in a proper emoji. You need to either pass in a Discord emoji or a servers custom emoji.`,
-        });
-      }
-
-      emojiId = unicodeEmoji[0];
-    }
-
-    if (!emojiId || emojiId === '') {
-      this.log.error(
-        `Failed to extract emoji[${emoji}] with regex from string.`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(this.log, interaction, {
+    if (!parsedEmoji?.id && !parsedEmoji?.name) {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! I had an issue trying to use that emoji. Please wait a moment and try again.`,
+        content: `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
       });
     }
 
     /**
      * For now RoleBot doesn't allow two roles to share the same emoji.
      */
-    let reactRole = await GET_REACT_ROLE_BY_EMOJI(emojiId, guild.id);
+    let reactRole = await GET_REACT_ROLE_BY_EMOJI(
+      parsedEmoji?.id ?? emoji,
+      guild.id
+    );
 
     if (reactRole) {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
@@ -171,21 +136,23 @@ export class ReactRoleCommand extends SlashCommand {
     }
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
-    const emojiTag = customEmoji
-      ? `<${isEmojiAnimated ? 'a' : ''}:nn:${emojiId}>`
-      : undefined;
+    const emojiTag = parsedEmoji?.id
+      ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
+      : null;
 
     CREATE_REACT_ROLE(
       role.name,
       role.id,
-      emojiId,
+      parsedEmoji?.id ?? parsedEmoji?.name ?? emoji,
       emojiTag,
       interaction.guildId,
       ReactRoleType.normal
     )
       .then((reactRole) => {
         this.log.debug(
-          `Successfully created the react role[${role.id}] with emoji[${emojiId}]`,
+          `Successfully created the react role[${role.id}] with emoji[${
+            parsedEmoji?.id ?? parsedEmoji.name
+          }]`,
           interaction.guildId
         );
 
@@ -200,7 +167,7 @@ export class ReactRoleCommand extends SlashCommand {
       })
       .catch((e) => {
         this.log.error(
-          `Failed to create react role[${role.id}] | emoji[id: ${emojiId} : string: ${emoji}]\n${e}`,
+          `Failed to create react role[${role.id}] | emoji[id: ${parsedEmoji?.id} : string: ${emoji}]\n${e}`,
           interaction.guildId
         );
 
