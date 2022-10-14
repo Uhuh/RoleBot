@@ -4,6 +4,7 @@ import {
   PermissionsBitField,
 } from 'discord.js';
 import {
+  GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
   UPDATE_REACT_ROLE_EMOJI_ID,
   UPDATE_REACT_ROLE_EMOJI_TAG,
@@ -34,10 +35,12 @@ export class ReactEditCommand extends SlashCommand {
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
-    this.expect(interaction.guildId, {
-      message: `Where'd the guild go!?!?`,
-      prop: 'guild id',
-    });
+    if (!interaction.guildId) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! I don't see the guild ID anywhere... that's weird.`,
+      });
+    }
 
     const role = this.expect(interaction.options.getRole('role'), {
       message: `Somehow the role is missing! Please try again.`,
@@ -66,6 +69,21 @@ export class ReactEditCommand extends SlashCommand {
     }
 
     const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
+
+    const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
+      emojiContent,
+      interaction.guildId
+    );
+
+    if (doesEmojiBelongToReactRole) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! That emoji belongs to a react role (${RolePing(
+          doesEmojiBelongToReactRole.roleId
+        )})`,
+      });
+    }
+
     const emojiTag = parsedEmoji?.id
       ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
       : null;
