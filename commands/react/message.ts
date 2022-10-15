@@ -11,11 +11,9 @@ import {
 import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_GUILD_CATEGORIES,
-} from '../../src/database/queries/category.query';
+import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 
 export class ReactMessageCommand extends SlashCommand {
   constructor() {
@@ -42,18 +40,15 @@ export class ReactMessageCommand extends SlashCommand {
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
-    if (!interaction.guildId) {
-      return this.log.error(`GuildID did not exist on interaction.`);
+    try {
+      await handleAutocompleteCategory(interaction);
+    } catch (e) {
+      this.log.error(`Failed to get categories for autocomplete.\n${e}`);
+
+      await interaction.respond([
+        { name: `SHOULD NOT SEE THIS! :)`, value: 'oopsies!' },
+      ]);
     }
-
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
-
-    const focusedValue = interaction.options.getFocused();
-    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
-
-    await interaction
-      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
-      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {

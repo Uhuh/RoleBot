@@ -174,7 +174,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * This method should respond with data related to the command.
    * @param interaction Interaction to give data to
    */
-  public handleAutoComplete = (interaction: AutocompleteInteraction) => {
+  public handleAutoComplete = async (interaction: AutocompleteInteraction) => {
     return interaction.respond([
       { name: 'Hey! You forgot to implement autocomplete!', value: 0 },
     ]);

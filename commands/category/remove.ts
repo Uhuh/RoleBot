@@ -10,8 +10,8 @@ import { handleInteractionReply } from '../../utilities/utils';
 import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
-  GET_GUILD_CATEGORIES,
 } from '../../src/database/queries/category.query';
+import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 
 export class RemoveCategoryCommand extends SlashCommand {
   constructor() {
@@ -32,18 +32,15 @@ export class RemoveCategoryCommand extends SlashCommand {
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
-    if (!interaction.guildId) {
-      return this.log.error(`GuildID did not exist on interaction.`);
+    try {
+      await handleAutocompleteCategory(interaction);
+    } catch (e) {
+      this.log.error(`Failed to get categories for autocomplete.\n${e}`);
+
+      await interaction.respond([
+        { name: `SHOULD NOT SEE THIS! :)`, value: 'oopsies!' },
+      ]);
     }
-
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
-
-    const focusedValue = interaction.options.getFocused();
-    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
-
-    await interaction
-      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
-      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {

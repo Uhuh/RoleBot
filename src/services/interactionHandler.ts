@@ -27,13 +27,17 @@ export class InteractionHandler {
     }
 
     if (interaction.isCommand())
-      InteractionHandler.handleCommand(interaction, client);
+      InteractionHandler.handleCommand(interaction, client).catch((e) =>
+        this.log.error(`HandleCommand: ${e}`)
+      );
     else if (interaction.isSelectMenu())
       InteractionHandler.handleSelect(interaction, client);
     else if (interaction.isButton())
       InteractionHandler.handleButton(interaction, client);
     else if (interaction.isAutocomplete())
-      InteractionHandler.handleAutocomplete(interaction, client);
+      InteractionHandler.handleAutocomplete(interaction, client).catch((e) =>
+        this.log.error(`HandleAutocomplete: ${e}`)
+      );
   }
 
   /**
@@ -42,7 +46,7 @@ export class InteractionHandler {
    * @param client RoleBot to find the correct command.
    * @returns void, to exit the function early.
    */
-  private static handleCommand(
+  private static async handleCommand(
     interaction: ChatInputCommandInteraction,
     client: RoleBot
   ) {
@@ -57,7 +61,7 @@ export class InteractionHandler {
     }
 
     try {
-      command.run(interaction);
+      await command.run(interaction);
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,
@@ -76,7 +80,7 @@ export class InteractionHandler {
    * @param interaction Interaction to respond to
    * @param client RoleBot client to find correct command to call its handleAutocomplete method.
    */
-  private static handleAutocomplete(
+  private static async handleAutocomplete(
     interaction: AutocompleteInteraction,
     client: RoleBot
   ) {
@@ -85,7 +89,7 @@ export class InteractionHandler {
     if (!command) return;
 
     try {
-      command.handleAutoComplete(interaction);
+      await command.handleAutoComplete(interaction);
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,

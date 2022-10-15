@@ -18,6 +18,7 @@ import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/react
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { setTimeout } from 'node:timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
+import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
@@ -44,18 +45,15 @@ export class ReactChannelCommand extends SlashCommand {
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
-    if (!interaction.guildId) {
-      return this.log.error(`GuildID did not exist on interaction.`);
+    try {
+      await handleAutocompleteCategory(interaction);
+    } catch (e) {
+      this.log.error(`Failed to get categories for autocomplete.\n${e}`);
+
+      await interaction.respond([
+        { name: `SHOULD NOT SEE THIS! :)`, value: 'oopsies!' },
+      ]);
     }
-
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId);
-
-    const focusedValue = interaction.options.getFocused();
-    const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
-
-    await interaction
-      .respond(filtered.map((c) => ({ name: c.name, value: `${c.id}` })))
-      .catch((e) => this.log.error(`Failed to respond to interaction.\n${e}`));
   };
 
   handleSingleCategory = async (
