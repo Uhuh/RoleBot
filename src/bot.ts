@@ -78,7 +78,7 @@ export default class RoleBot extends Discord.Client {
     });
     this.on('guildDelete', (guild) => {
       guildUpdate(guild, 'Left', this).catch((e) =>
-        this.log.error(`Failed to send webhook for guild leave.`)
+        this.log.error(`Failed to send webhook for guild leave.\n${e}`)
       );
     });
     // React role handling

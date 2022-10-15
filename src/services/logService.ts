@@ -48,16 +48,12 @@ export class LogService {
     const logTypeDate = `${colorMap[level]}[ ${
       labelMap[level]
     } - ${new Date().toLocaleString()} ]${Color.reset}`;
-    const guildTextColor = guildId
-      ? colorMap[((Number(guildId) % 5) + 1) as LogLevel]
-      : Color.reset;
-    const guildString = guildId
-      ? `- ${guildTextColor}[ guild:${guildId} ]${Color.reset}`
-      : '-';
 
-    const logContent = `${logTypeDate} ${guildString} ${this.prefix} ${content}`;
+    const guildString = guildId ? `- [ guild:${guildId} ]` : '-';
 
-    console.log(logContent);
+    const logContent = `${guildString} ${this.prefix} ${content}`;
+
+    console.log(`${logTypeDate} ${logContent}`);
 
     if (level == LogLevel.critical || level == LogLevel.error) {
       RoleBotEventsWebhook.send({
@@ -65,7 +61,7 @@ export class LogService {
       }).catch((e) =>
         console.log(
           logTypeDate,
-          `- [ LogService ] RolebotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`
+          `- [ LogService ] RoleBotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`
         )
       );
     }

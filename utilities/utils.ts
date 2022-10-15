@@ -148,7 +148,10 @@ export const updateReactMessages = async (
       );
     }
   } catch (e) {
-    log.error(`Caught an error updating reaction messages.\n${e}`);
+    log.error(
+      `Caught an error updating reaction messages.\n${e}`,
+      interaction.guildId
+    );
   }
 };
 

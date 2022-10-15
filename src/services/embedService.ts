@@ -174,7 +174,7 @@ export class EmbedService {
       .setColor(Colors.red)
       .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
       .setTitle(`Encountered an error`)
-      .setDescription(codeBlock(content))
+      .setDescription(codeBlock('diff', content))
       .setTimestamp(new Date());
 
     return embed;
