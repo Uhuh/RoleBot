@@ -1,7 +1,7 @@
 import RoleBot from '../src/bot';
 import { EmbedBuilder, Guild } from 'discord.js';
 import { Colors } from '../src/interfaces';
-import { RoleBotEventsWebhook } from '../utilities/types/globals';
+import { RoleBotGuildEventsWebhook } from '../utilities/types/globals';
 
 export const guildUpdate = async (
   guild: Guild,
@@ -29,7 +29,7 @@ export const guildUpdate = async (
         text: `Guilds I'm in: ${size}`,
       });
 
-    return RoleBotEventsWebhook.send({
+    return RoleBotGuildEventsWebhook.send({
       embeds: [embed],
     });
   } catch (e) {
