@@ -41,7 +41,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
 
   public log: LogService;
 
-  constructor(
+  protected constructor(
     _name: string,
     _desc: string,
     _type: Category,
@@ -91,9 +91,9 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       } else errorMessage = e.message;
 
       if (interaction.replied || interaction.deferred) {
-        interaction.editReply(errorMessage);
+        return interaction.editReply(errorMessage);
       } else {
-        interaction.reply({
+        return interaction.reply({
           ephemeral: true,
           content: errorMessage,
         });
@@ -175,7 +175,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * @param interaction Interaction to give data to
    */
   public handleAutoComplete = (interaction: AutocompleteInteraction) => {
-    interaction.respond([
+    return interaction.respond([
       { name: 'Hey! You forgot to implement autocomplete!', value: 0 },
     ]);
   };

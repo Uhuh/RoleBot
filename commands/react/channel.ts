@@ -99,7 +99,12 @@ export class ReactChannelCommand extends SlashCommand {
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
     if (!roles.length) return;
 
-    this.messageChannelAndReact(interaction, textChannel, category, roles);
+    return this.messageChannelAndReact(
+      interaction,
+      textChannel,
+      category,
+      roles
+    );
   };
 
   public execute = async (interaction: ChatInputCommandInteraction) => {
@@ -181,7 +186,12 @@ export class ReactChannelCommand extends SlashCommand {
       const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
       if (!roles.length) continue;
 
-      this.messageChannelAndReact(interaction, textChannel, category, roles);
+      await this.messageChannelAndReact(
+        interaction,
+        textChannel,
+        category,
+        roles
+      );
 
       await setTimeout(1000);
     }
@@ -216,7 +226,7 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
       if (!isSuccessfulReacting) {
-        message.delete();
+        await message.delete();
 
         return interaction.editReply(permissionError);
       }
@@ -226,7 +236,7 @@ export class ReactChannelCommand extends SlashCommand {
       return interaction.editReply(permissionError);
     }
 
-    interaction.editReply({
+    await interaction.editReply({
       content: 'Hey! I successfully sent the embeds and reacted to them!',
     });
   };

@@ -37,7 +37,7 @@ export class ReactListCommand extends SlashCommand {
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
-    interaction.editReply({
+    return interaction.editReply({
       content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
       embeds: [embed],
     });

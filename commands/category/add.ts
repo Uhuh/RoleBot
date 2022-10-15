@@ -139,7 +139,7 @@ export class AddCategoryCommand extends SlashCommand {
       const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
       const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
 
-      interaction.update({
+      await interaction.update({
         content: roleButtons.length ? moreRoles : noRolesLeft,
         components: roleButtons,
       });
@@ -154,7 +154,7 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      interaction.update({
+      return interaction.update({
         content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
       });
     }

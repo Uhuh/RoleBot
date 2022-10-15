@@ -56,6 +56,6 @@ export class ReactCleanCommand extends SlashCommand {
       ? `Removed ${numRemovedRoles} dead react roles.`
       : 'There are no dead react roles.';
 
-    interaction.editReply(reply);
+    return interaction.editReply(reply);
   };
 }

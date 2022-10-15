@@ -10,7 +10,7 @@ export enum COLOR {
 }
 
 // Because of sharding we can't reliably get the guild channel. Also this is actually so much easier!
-export const RolebotEventsWebhook = new WebhookClient({
+export const RoleBotEventsWebhook = new WebhookClient({
   id: WEBHOOK_ID,
   token: WEBHOOK_TOKEN,
 });

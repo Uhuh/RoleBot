@@ -149,7 +149,7 @@ export class UpdateCategoryCommand extends SlashCommand {
             interaction.guildId
           );
 
-          interaction.editReply(
+          return interaction.editReply(
             `Hey! I updated the react role embed message related to this category.`
           );
         });
@@ -179,7 +179,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     }
 
-    interaction.editReply(
+    return interaction.editReply(
       `Hey! I've successfully re-reacted to the message for you.`
     );
   };

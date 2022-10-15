@@ -70,7 +70,7 @@ export class ReactDeleteCommand extends SlashCommand {
 
       // Only update react message if there's a category associated with it.
       if (reactRole.categoryId) {
-        updateReactMessages(
+        return updateReactMessages(
           interaction,
           reactRole.categoryId,
           this.log,

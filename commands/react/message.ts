@@ -130,7 +130,7 @@ export class ReactMessageCommand extends SlashCommand {
       content: `I'm reacting to the message with all react roles associated with ${category.name}.`,
     });
 
-    reactToMessage(
+    return reactToMessage(
       message,
       interaction.guildId,
       roles,

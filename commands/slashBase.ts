@@ -6,7 +6,7 @@ import { SlashCommandTypes } from '../utilities/types/commands';
  * @SlashBase Helps add options to the Discord Slash commands as they are unreasonable large to type out.
  */
 export abstract class SlashBase {
-  constructor(public data: SlashCommandTypes) {}
+  protected constructor(public data: SlashCommandTypes) {}
 
   addStringOption = (
     name: string,

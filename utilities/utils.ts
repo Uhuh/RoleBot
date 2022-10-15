@@ -36,7 +36,7 @@ export const reactToMessage = async (
     try {
       await message.react(role.emojiId);
 
-      CREATE_REACT_MESSAGE({
+      await CREATE_REACT_MESSAGE({
         messageId: message.id,
         emojiId: role.emojiId,
         roleId: role.roleId,
@@ -137,7 +137,7 @@ export const updateReactMessages = async (
       await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(messageId);
 
       // Re-react to the message with the updated react role list.
-      reactToMessage(
+      await reactToMessage(
         message,
         guildId,
         categoryRoles,

@@ -71,20 +71,26 @@ export default class RoleBot extends Discord.Client {
       InteractionHandler.handleInteraction(interaction, this)
     );
 
-    /**
-     * Have to handle raw packets and parse out the reaction ones.
-     * This is required because if the bot restarts it has no memory of old messages, especially
-     * its own messages that are monitored for role management.
-     */
-    // this.on('raw', (r) => handleRawPacket(r, this));
-    this.on('guildCreate', (guild) => guildUpdate(guild, 'Joined', this));
-    this.on('guildDelete', (guild) => guildUpdate(guild, 'Left', this));
+    this.on('guildCreate', (guild) => {
+      guildUpdate(guild, 'Joined', this).catch((e) =>
+        this.log.error(`Failed to send webhook for guild join.\n${e}`)
+      );
+    });
+    this.on('guildDelete', (guild) => {
+      guildUpdate(guild, 'Left', this).catch((e) =>
+        this.log.error(`Failed to send webhook for guild leave.`)
+      );
+    });
     // React role handling
     this.on('messageReactionAdd', (...r) => {
-      this.reactHandler.handleReaction(...r, 'add');
+      this.reactHandler
+        .handleReaction(...r, 'add')
+        .catch((e) => this.log.error(e));
     });
     this.on('messageReactionRemove', (...r) => {
-      this.reactHandler.handleReaction(...r, 'remove');
+      this.reactHandler
+        .handleReaction(...r, 'remove')
+        .catch((e) => this.log.error(e));
     });
     this.on('guildMemberAdd', async (member) => {
       const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
@@ -96,10 +102,17 @@ export default class RoleBot extends Discord.Client {
       });
     });
     // To help try and prevent unknown role errors
-    this.on('roleDelete', (role) => {
-      DELETE_JOIN_ROLE(role.id);
-      DELETE_REACT_MESSAGE_BY_ROLE_ID(role.id);
-      DELETE_REACT_ROLE_BY_ROLE_ID(role.id);
+    this.on('roleDelete', async (role) => {
+      try {
+        await DELETE_JOIN_ROLE(role.id);
+        await DELETE_REACT_MESSAGE_BY_ROLE_ID(role.id);
+        await DELETE_REACT_ROLE_BY_ROLE_ID(role.id);
+      } catch (e) {
+        this.log.error(
+          `Failed to delete react role info on role[${role.id}] delete.\n${e}`,
+          role.guild.id
+        );
+      }
     });
   }
 
@@ -149,6 +162,6 @@ export default class RoleBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
 
-    buildSlashCommands(false, config.CLIENT_ID !== '493668628361904139');
+    await buildSlashCommands(false, config.CLIENT_ID !== '493668628361904139');
   };
 }

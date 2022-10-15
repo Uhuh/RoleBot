@@ -1,4 +1,4 @@
-import { RolebotEventsWebhook } from '../../utilities/types/globals';
+import { RoleBotEventsWebhook } from '../../utilities/types/globals';
 import { EmbedService } from './embedService';
 
 enum LogLevel {
@@ -60,7 +60,7 @@ export class LogService {
     console.log(logContent);
 
     if (level == LogLevel.critical || level == LogLevel.error) {
-      RolebotEventsWebhook.send({
+      RoleBotEventsWebhook.send({
         embeds: [EmbedService.errorEmbed(logContent)],
       }).catch((e) =>
         console.log(

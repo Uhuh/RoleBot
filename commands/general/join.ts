@@ -233,16 +233,13 @@ export class AutoJoinCommand extends SlashCommand {
       case 'add':
         // If we somehow get into this with a null role and the above checks failed.
         if (!role) return;
-        this.add(interaction, role);
-        break;
+        return this.add(interaction, role);
       case 'remove':
         // If we somehow get into this with a null role and the above checks failed.
         if (!role) return;
-        this.remove(interaction, role);
-        break;
+        return this.remove(interaction, role);
       case 'list':
-        this.list(interaction);
-        break;
+        return this.list(interaction);
       default:
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,

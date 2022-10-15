@@ -85,7 +85,7 @@ export class ReactNukeCommand extends SlashCommand {
         .setStyle(ButtonStyle.Danger)
     );
 
-    interaction.reply({
+    return interaction.reply({
       ephemeral: true,
       components: [buttons],
       content: `This action is irreversible. By confirming you are deleting all react roles currently setup for this server.`,
