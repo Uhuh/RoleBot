@@ -100,7 +100,7 @@ export class ReactionHandler {
         member.roles
           .add(reactMessage.roleId)
           .catch((e) =>
-            this.log.error(
+            this.log.debug(
               `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`,
               guild.id
             )
@@ -110,7 +110,7 @@ export class ReactionHandler {
         member.roles
           .remove(reactMessage.roleId)
           .catch((e) =>
-            this.log.error(
+            this.log.debug(
               `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`,
               guild.id
             )
