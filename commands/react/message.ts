@@ -8,7 +8,7 @@ import {
   TextChannel,
 } from 'discord.js';
 
-import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
+import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
@@ -60,21 +60,19 @@ export class ReactMessageCommand extends SlashCommand {
     );
 
     if (!messageLink) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`
-      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`,
+      });
     }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
     if (!channelId || !messageId) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``
-      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``,
+      });
     }
 
     const categoryId = interaction.options.getString('category');
@@ -100,27 +98,33 @@ export class ReactMessageCommand extends SlashCommand {
       });
     }
 
-    const channel = await interaction.guild?.channels.fetch(channelId);
+    const channel = await interaction.guild?.channels
+      .fetch(channelId)
+      .catch((e) =>
+        this.log.debug(`Failed to find channel.\n${e}`, interaction.guildId)
+      );
 
     if (!channel || !isTextChannel(channel)) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
-      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! I couldn't find that channel, make sure you're copying the message link right and that it's from _this_ server.`,
+      });
     }
 
-    const message = await channel.messages.fetch(messageId);
+    const message = await channel.messages
+      .fetch(messageId)
+      .catch((e) =>
+        this.log.debug(`Failed to find message.\n${e}`, interaction.guildId)
+      );
 
     if (!message) {
-      return handleInteractionReply(
-        this.log,
-        interaction,
-        `Hey! I couldn't find that message, make sure you're copying the message link right.`
-      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Hey! I couldn't find that message, make sure you're copying the message link right.`,
+      });
     }
 
-    handleInteractionReply(this.log, interaction, {
+    await interaction.reply({
       ephemeral: true,
       content: `I'm reacting to the message with all react roles associated with ${category.name}.`,
     });
