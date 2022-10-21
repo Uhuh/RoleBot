@@ -98,7 +98,7 @@ export default class RoleBot extends Discord.Client {
       if (!joinRoles.length) return;
 
       member.roles.add(joinRoles.map((r) => r.roleId)).catch((e) => {
-        this.log.error(`Issue giving member join roles\n${e}`);
+        this.log.debug(`Issue giving member join roles\n${e}`);
       });
     });
     // To help try and prevent unknown role errors
