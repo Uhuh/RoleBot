@@ -92,15 +92,14 @@ export class ReactEditCommand extends SlashCommand {
     await UPDATE_REACT_ROLE_EMOJI_TAG(role.id, emojiTag);
 
     this.log.debug(
-      `Updated role[${role.id}] to use emoji[${JSON.stringify(parsedEmoji)} - ${
-        emojiTag ?? parsedEmoji.name
+      `Updated role[${role.id}] to use emoji[${JSON.stringify(parsedEmoji)} - ${emojiTag ?? parsedEmoji.name
       }]`,
       interaction.guildId
     );
 
     return interaction.reply({
       ephemeral: true,
-      content: `:tada: Successfully updated the react role (${emojiTag} - ${RolePing(
+      content: `:tada: Successfully updated the react role (${emojiTag ?? parsedEmoji.name} - ${RolePing(
         role.id
       )}) :tada:`,
     });
