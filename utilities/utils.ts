@@ -10,6 +10,7 @@ import {
   CommandInteraction,
 } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
+import { DisplayType } from '../src/database/entities/category.entity';
 import {
   GET_CATEGORY_BY_ID,
   GET_ROLES_BY_CATEGORY_ID,
@@ -210,4 +211,14 @@ export async function isValidRolePosition(
   if (!clientUser) return false;
 
   return clientUser.roles.highest.position > role.position;
+}
+
+export function parseDisplayString(display: string | null): DisplayType {
+  switch (display) {
+    case 'alpha': return DisplayType.alpha;
+    case 'reversedAlpha': return DisplayType.reversedAlpha;
+    case 'time': return DisplayType.time;
+    case 'reversedTime': return DisplayType.reversedTime;
+    default: return DisplayType.alpha;
+  }
 }

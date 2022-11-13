@@ -6,7 +6,7 @@ import {
 } from '../../src/database/queries/category.query';
 
 import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply } from '../../utilities/utils';
+import { handleInteractionReply, parseDisplayString } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class CreateCategoryCommand extends SlashCommand {
@@ -55,16 +55,7 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    console.log(displayString);
-
-    let displayOrder = DisplayType.alpha;
-
-    switch (displayString) {
-      case 'alpha': displayOrder = DisplayType.alpha; break;
-      case 'reversedAlpha': displayOrder = DisplayType.reversedAlpha; break;
-      case 'time': displayOrder = DisplayType.time; break;
-      case 'reversedTime': displayOrder = DisplayType.reversedTime; break;
-    }
+    const displayOrder = parseDisplayString(displayString);
 
     if (!name) {
       return handleInteractionReply(this.log, interaction, {

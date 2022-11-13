@@ -7,7 +7,7 @@ import { Category as ICategory, DisplayType } from '../../src/database/entities/
 
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { handleInteractionReply } from '../../utilities/utils';
+import { handleInteractionReply, parseDisplayString } from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
@@ -94,14 +94,7 @@ export class EditCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    let displayOrder = DisplayType.alpha;
-
-    switch (displayString) {
-      case 'alpha': displayOrder = DisplayType.alpha; break;
-      case 'reversedAlpha': displayOrder = DisplayType.reversedAlpha; break;
-      case 'time': displayOrder = DisplayType.time; break;
-      case 'reversedTime': displayOrder = DisplayType.reversedTime; break;
-    }
+    const displayOrder = parseDisplayString(displayString);
 
     if (
       !newName &&
