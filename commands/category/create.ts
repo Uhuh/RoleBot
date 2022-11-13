@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import { DisplayType } from '../../src/database/entities/category.entity';
 import {
   CREATE_GUILD_CATEGORY,
   GET_CATEGORY_BY_NAME,
@@ -49,7 +50,7 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    const displayOrder = parseDisplayString(displayString);
+    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
 
     if (!name) {
       return handleInteractionReply(this.log, interaction, {

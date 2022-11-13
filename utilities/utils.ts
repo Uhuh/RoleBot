@@ -215,7 +215,7 @@ export async function isValidRolePosition(
 
 interface ICommandStringOptions {
   name: string;
-  value: string;
+  value: keyof typeof DisplayType;
 }
 
 export function getDisplayCommandValues(): ICommandStringOptions[] {
@@ -227,12 +227,6 @@ export function getDisplayCommandValues(): ICommandStringOptions[] {
   ];
 }
 
-export function parseDisplayString(display: string | null): DisplayType {
-  switch (display) {
-    case 'alpha': return DisplayType.alpha;
-    case 'reversedAlpha': return DisplayType.reversedAlpha;
-    case 'time': return DisplayType.time;
-    case 'reversedTime': return DisplayType.reversedTime;
-    default: return DisplayType.alpha;
-  }
+export function parseDisplayString(display: keyof typeof DisplayType | null): DisplayType {
+  return DisplayType[display ?? 'alpha'];
 }
