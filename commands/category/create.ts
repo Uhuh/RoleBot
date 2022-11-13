@@ -1,12 +1,11 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import { DisplayType } from '../../src/database/entities/category.entity';
 import {
   CREATE_GUILD_CATEGORY,
   GET_CATEGORY_BY_NAME,
 } from '../../src/database/queries/category.query';
 
 import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class CreateCategoryCommand extends SlashCommand {
@@ -28,12 +27,7 @@ export class CreateCategoryCommand extends SlashCommand {
       'required-role',
       'Require users to have a certain role to obtain roles from this category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, [
-      { name: 'Alphabetical', value: 'alpha' },
-      { name: 'Reverse alphabetical', value: 'reversedAlpha' },
-      { name: 'Insertion order', value: 'time' },
-      { name: 'Reverse insertion', value: 'reversedTime' },
-    ]);
+    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {

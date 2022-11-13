@@ -213,6 +213,20 @@ export async function isValidRolePosition(
   return clientUser.roles.highest.position > role.position;
 }
 
+interface ICommandStringOptions {
+  name: string;
+  value: string;
+}
+
+export function getDisplayCommandValues(): ICommandStringOptions[] {
+  return [
+    { name: 'Alphabetical', value: 'alpha' },
+    { name: 'Reverse alphabetical', value: 'reversedAlpha' },
+    { name: 'Insertion order', value: 'time' },
+    { name: 'Reverse insertion', value: 'reversedTime' },
+  ];
+}
+
 export function parseDisplayString(display: string | null): DisplayType {
   switch (display) {
     case 'alpha': return DisplayType.alpha;

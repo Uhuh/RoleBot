@@ -3,11 +3,11 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import { Category as ICategory, DisplayType } from '../../src/database/entities/category.entity';
+import { Category as ICategory } from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
@@ -50,12 +50,7 @@ export class EditCategoryCommand extends SlashCommand {
       'new-required-role',
       'Change what the required roles are for the category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, [
-      { name: 'Alphabetical', value: 'alpha' },
-      { name: 'Reverse alphabetical', value: 'reversedAlpha' },
-      { name: 'Insertion order', value: 'time' },
-      { name: 'Reverse insertion', value: 'reversedTime' },
-    ]);
+    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
