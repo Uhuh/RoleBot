@@ -1,4 +1,5 @@
 import { IsNull } from 'typeorm';
+import { displayOrderQuery } from '../../../utilities/utils';
 import { Category, ReactRole } from '../entities';
 import { DisplayType } from '../entities/category.entity';
 import { ReactRoleType } from '../entities/reactRole.entity';
@@ -64,15 +65,7 @@ export const GET_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
 };
 
 export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType?: DisplayType) => {
-  let orderProperties: { [k: string]: 'ASC' | 'DESC' } = {
-    name: 'ASC'
-  };
-
-  switch (displayType) {
-    case DisplayType.reversedAlpha: orderProperties = { name: 'DESC' }; break;
-    case DisplayType.time: orderProperties = { categoryAddDate: 'ASC' }; break;
-    case DisplayType.reversedTime: orderProperties = { categoryAddDate: 'DESC' }; break;
-  }
+  const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({
     where: {

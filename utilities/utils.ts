@@ -107,7 +107,10 @@ export const updateReactMessages = async (
       );
     }
 
-    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(categoryId, category.displayOrder);
+    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(
+      categoryId,
+      category.displayOrder
+    );
     const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
     /**
@@ -227,6 +230,20 @@ export function getDisplayCommandValues(): ICommandStringOptions[] {
   ];
 }
 
-export function parseDisplayString(display: keyof typeof DisplayType | null): DisplayType {
+export function parseDisplayString(
+  display: keyof typeof DisplayType | null
+): DisplayType {
   return DisplayType[display ?? 'alpha'];
+}
+
+export function displayOrderQuery(display?: DisplayType): {
+  [k: string]: 'ASC' | 'DESC';
+} {
+  switch (display) {
+    case DisplayType.alpha: return { name: 'ASC' };
+    case DisplayType.reversedAlpha: return { name: 'DESC' };
+    case DisplayType.time: return { categoryAddDate: 'ASC' };
+    case DisplayType.reversedTime: return { categoryAddDate: 'DESC' };
+    default: return { name: 'ASC' };
+  }
 }

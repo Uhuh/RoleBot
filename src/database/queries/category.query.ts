@@ -1,3 +1,4 @@
+import { displayOrderQuery } from '../../../utilities/utils';
 import { Category, ReactRole } from '../entities';
 import { DisplayType, ICategory } from '../entities/category.entity';
 
@@ -7,15 +8,7 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
 };
 
 export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType: DisplayType) => {
-  let orderProperties: { [k: string]: 'ASC' | 'DESC' } = {
-    name: 'ASC'
-  };
-
-  switch (displayType) {
-    case DisplayType.reversedAlpha: orderProperties = { name: 'DESC' }; break;
-    case DisplayType.time: orderProperties = { categoryAddDate: 'ASC' }; break;
-    case DisplayType.reversedTime: orderProperties = { categoryAddDate: 'DESC' }; break;
-  }
+  const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({
     where: { category: { id: categoryId } },
