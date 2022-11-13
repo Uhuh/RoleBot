@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import { DisplayType } from '../../src/database/entities/category.entity';
 import {
   CREATE_GUILD_CATEGORY,
   GET_CATEGORY_BY_NAME,
@@ -27,6 +28,12 @@ export class CreateCategoryCommand extends SlashCommand {
       'required-role',
       'Require users to have a certain role to obtain roles from this category.'
     );
+    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, [
+      { name: 'Alphabetical', value: 'alpha' },
+      { name: 'Reverse alphabetical', value: 'reversedAlpha' },
+      { name: 'Insertion order', value: 'time' },
+      { name: 'Reverse insertion', value: 'reversedTime' },
+    ]);
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -45,6 +52,19 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const requiredRoleId =
       interaction.options.getRole('required-role')?.id ?? null;
+
+    const displayString = interaction.options.getString('display-order');
+
+    console.log(displayString);
+
+    let displayOrder = DisplayType.alpha;
+
+    switch (displayString) {
+      case 'alpha': displayOrder = DisplayType.alpha; break;
+      case 'reversedAlpha': displayOrder = DisplayType.reversedAlpha; break;
+      case 'time': displayOrder = DisplayType.time; break;
+      case 'reversedTime': displayOrder = DisplayType.reversedTime; break;
+    }
 
     if (!name) {
       return handleInteractionReply(this.log, interaction, {
@@ -72,6 +92,7 @@ export class CreateCategoryCommand extends SlashCommand {
       description,
       mutuallyExclusive,
       requiredRoleId,
+      displayOrder
     })
       .then(() => {
         this.log.info(

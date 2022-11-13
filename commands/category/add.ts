@@ -19,6 +19,7 @@ import {
   GET_REACT_ROLES_BY_CATEGORY_ID,
   GET_REACT_ROLES_NOT_IN_CATEGORIES,
   GET_REACT_ROLE_BY_ID,
+  UPDATE_REACT_ROLE_BY_ID,
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
@@ -131,6 +132,7 @@ export class AddCategoryCommand extends SlashCommand {
 
     try {
       await UPDATE_REACT_ROLE_CATEGORY(Number(reactRoleId), Number(categoryId));
+      await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), { categoryAddDate: new Date() });
       const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
       const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
 

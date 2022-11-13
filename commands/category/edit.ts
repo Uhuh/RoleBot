@@ -3,7 +3,7 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import { Category as ICategory } from '../../src/database/entities/category.entity';
+import { Category as ICategory, DisplayType } from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
@@ -50,6 +50,12 @@ export class EditCategoryCommand extends SlashCommand {
       'new-required-role',
       'Change what the required roles are for the category.'
     );
+    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, [
+      { name: 'Alphabetical', value: 'alpha' },
+      { name: 'Reverse alphabetical', value: 'reversedAlpha' },
+      { name: 'Insertion order', value: 'time' },
+      { name: 'Reverse insertion', value: 'reversedTime' },
+    ]);
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
@@ -86,9 +92,21 @@ export class EditCategoryCommand extends SlashCommand {
     const newRequiredRoleId =
       interaction.options.getRole('new-required-role')?.id ?? undefined;
 
+    const displayString = interaction.options.getString('display-order');
+
+    let displayOrder = DisplayType.alpha;
+
+    switch (displayString) {
+      case 'alpha': displayOrder = DisplayType.alpha; break;
+      case 'reversedAlpha': displayOrder = DisplayType.reversedAlpha; break;
+      case 'time': displayOrder = DisplayType.time; break;
+      case 'reversedTime': displayOrder = DisplayType.reversedTime; break;
+    }
+
     if (
       !newName &&
       !newDesc &&
+      !displayString &&
       !newRequiredRoleId &&
       removeRequiredRole === null &&
       mutuallyExclusive === null
@@ -125,6 +143,7 @@ export class EditCategoryCommand extends SlashCommand {
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
       requiredRoleId: removeRequiredRole ? null : requiredRoleId,
+      displayOrder
     };
 
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)

@@ -1,6 +1,6 @@
 import { EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
-import { Category } from '../database/entities/category.entity';
+import { Category, DisplayType } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
 import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
@@ -36,7 +36,7 @@ export class EmbedService {
    */
   public static categoryReactRoleEmbed = async (category: Category) => {
     const embed = new EmbedBuilder();
-    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id, category.displayOrder);
 
     const reactRoles = categoryRoles.length
       ? this.reactRolesFormattedString(categoryRoles)
@@ -47,13 +47,20 @@ export class EmbedService {
         ? 'Description not set. Set it in `/category-edit`'
         : category.description;
 
+    let displayOrder = 'Alphabetical';
+
+    switch (category.displayOrder) {
+      case DisplayType.reversedAlpha: displayOrder = 'Reversed alphabetical'; break;
+      case DisplayType.time: displayOrder = 'Insertion order'; break;
+      case DisplayType.reversedTime: displayOrder = 'Reversed insertion'; break;
+    }
+
     embed
       .setTitle(category.name)
       .setDescription(
-        `Required Role: ${
-          category.requiredRoleId ? RolePing(category.requiredRoleId) : 'None!'
-        } \n\nMutually exclusive: **${
-          category.mutuallyExclusive
+        `Required Role: ${category.requiredRoleId ? RolePing(category.requiredRoleId) : 'None!'
+        }\n\nReact role display order: **${displayOrder
+        }**\n\nMutually exclusive: **${category.mutuallyExclusive
         }**\n\nDesc: **${escapeMarkdown(desc)}**\n\n${reactRoles}`
       )
       .setColor(COLOR.DEFAULT);
@@ -80,14 +87,14 @@ export class EmbedService {
 
     const inCategory = rolesInCategory.length
       ? `**In a category:**\n${this.reactRolesFormattedString(
-          rolesInCategory
-        )}\n`
+        rolesInCategory
+      )}\n`
       : '';
 
     const notInCategory = rolesNotInCategory.length
       ? `**Not in a category:**\n${this.reactRolesFormattedString(
-          rolesNotInCategory
-        )}`
+        rolesNotInCategory
+      )}`
       : '';
 
     embed
@@ -158,9 +165,9 @@ export class EmbedService {
       .setColor(Colors.green)
       .setDescription(
         `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
-          (roleIds.length > 0
-            ? roleIds.map((r) => RolePing(r)).join('\n')
-            : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
+        (roleIds.length > 0
+          ? roleIds.map((r) => RolePing(r)).join('\n')
+          : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
       )
       .setTimestamp(new Date());
 

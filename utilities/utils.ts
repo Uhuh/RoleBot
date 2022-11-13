@@ -47,8 +47,7 @@ export const reactToMessage = async (
       });
     } catch (e) {
       log.debug(
-        `Failed to react to message[${message.id}] with emoji[${
-          role.emojiTag ?? role.emojiId
+        `Failed to react to message[${message.id}] with emoji[${role.emojiTag ?? role.emojiId
         }] in guild[${guildId}]\n${e}`
       );
 
@@ -99,7 +98,6 @@ export const updateReactMessages = async (
       );
     }
 
-    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(categoryId);
     const category = await GET_CATEGORY_BY_ID(categoryId);
 
     if (!category) {
@@ -108,6 +106,7 @@ export const updateReactMessages = async (
       );
     }
 
+    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(categoryId, category.displayOrder);
     const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
     /**

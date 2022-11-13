@@ -1,5 +1,6 @@
 import { IsNull } from 'typeorm';
 import { Category, ReactRole } from '../entities';
+import { DisplayType } from '../entities/category.entity';
 import { ReactRoleType } from '../entities/reactRole.entity';
 
 // React role related
@@ -62,16 +63,24 @@ export const GET_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
   });
 };
 
-export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number) => {
+export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType?: DisplayType) => {
+  let orderProperties: { [k: string]: 'ASC' | 'DESC' } = {
+    name: 'ASC'
+  };
+
+  switch (displayType) {
+    case DisplayType.reversedAlpha: orderProperties = { name: 'DESC' }; break;
+    case DisplayType.time: orderProperties = { categoryAddDate: 'ASC' }; break;
+    case DisplayType.reversedTime: orderProperties = { categoryAddDate: 'DESC' }; break;
+  }
+
   return await ReactRole.find({
     where: {
       category: {
         id: categoryId,
       },
     },
-    order: {
-      name: 'ASC',
-    },
+    order: orderProperties,
   });
 };
 
@@ -129,5 +138,14 @@ export const UPDATE_REACT_ROLE_CATEGORY = async (
   if (!category) throw Error(`Category[${categoryId}] does not exist.`);
 
   reactRole.category = category;
+  reactRole.categoryAddDate = new Date();
+
   return reactRole.save();
+};
+
+export const UPDATE_REACT_ROLE_BY_ID = async (
+  id: number,
+  reactRole: Partial<ReactRole>
+) => {
+  return await ReactRole.update({ id }, reactRole);
 };
