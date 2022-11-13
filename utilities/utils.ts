@@ -10,6 +10,7 @@ import {
   CommandInteraction,
 } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
+import { DisplayType } from '../src/database/entities/category.entity';
 import {
   GET_CATEGORY_BY_ID,
   GET_ROLES_BY_CATEGORY_ID,
@@ -47,8 +48,7 @@ export const reactToMessage = async (
       });
     } catch (e) {
       log.debug(
-        `Failed to react to message[${message.id}] with emoji[${
-          role.emojiTag ?? role.emojiId
+        `Failed to react to message[${message.id}] with emoji[${role.emojiTag ?? role.emojiId
         }] in guild[${guildId}]\n${e}`
       );
 
@@ -99,7 +99,6 @@ export const updateReactMessages = async (
       );
     }
 
-    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(categoryId);
     const category = await GET_CATEGORY_BY_ID(categoryId);
 
     if (!category) {
@@ -108,6 +107,10 @@ export const updateReactMessages = async (
       );
     }
 
+    const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(
+      categoryId,
+      category.displayOrder
+    );
     const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
     /**
@@ -211,4 +214,36 @@ export async function isValidRolePosition(
   if (!clientUser) return false;
 
   return clientUser.roles.highest.position > role.position;
+}
+
+interface ICommandStringOptions {
+  name: string;
+  value: keyof typeof DisplayType;
+}
+
+export function getDisplayCommandValues(): ICommandStringOptions[] {
+  return [
+    { name: 'Alphabetical', value: 'alpha' },
+    { name: 'Reverse alphabetical', value: 'reversedAlpha' },
+    { name: 'Insertion order', value: 'time' },
+    { name: 'Reverse insertion', value: 'reversedTime' },
+  ];
+}
+
+export function parseDisplayString(
+  display: keyof typeof DisplayType | null
+): DisplayType {
+  return DisplayType[display ?? 'alpha'];
+}
+
+export function displayOrderQuery(display?: DisplayType): {
+  [k: string]: 'ASC' | 'DESC';
+} {
+  switch (display) {
+    case DisplayType.alpha: return { name: 'ASC' };
+    case DisplayType.reversedAlpha: return { name: 'DESC' };
+    case DisplayType.time: return { categoryAddDate: 'ASC' };
+    case DisplayType.reversedTime: return { categoryAddDate: 'DESC' };
+    default: return { name: 'ASC' };
+  }
 }

@@ -3,11 +3,11 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import { Category as ICategory } from '../../src/database/entities/category.entity';
+import { Category as ICategory, DisplayType } from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { handleInteractionReply } from '../../utilities/utils';
+import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
@@ -50,6 +50,7 @@ export class EditCategoryCommand extends SlashCommand {
       'new-required-role',
       'Change what the required roles are for the category.'
     );
+    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
@@ -86,9 +87,14 @@ export class EditCategoryCommand extends SlashCommand {
     const newRequiredRoleId =
       interaction.options.getRole('new-required-role')?.id ?? undefined;
 
+    const displayString = interaction.options.getString('display-order');
+
+    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
+
     if (
       !newName &&
       !newDesc &&
+      !displayString &&
       !newRequiredRoleId &&
       removeRequiredRole === null &&
       mutuallyExclusive === null
@@ -125,6 +131,7 @@ export class EditCategoryCommand extends SlashCommand {
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
       requiredRoleId: removeRequiredRole ? null : requiredRoleId,
+      displayOrder
     };
 
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)

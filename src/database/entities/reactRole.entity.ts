@@ -45,4 +45,10 @@ export class ReactRole extends BaseEntity {
   @ManyToOne(() => Category, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'categoryId' })
   category?: Category;
+
+  @Column({
+    type: 'timestamp',
+    default: new Date(),
+  })
+  categoryAddDate!: Date;
 }
