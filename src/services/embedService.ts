@@ -10,6 +10,10 @@ import { RolePing } from '../../utilities/utilPings';
 import { Category as CommandCategory } from '../../utilities/types/commands';
 import tutorialJson from '../../utilities/json/tutorial.json';
 import commands from '../../utilities/json/commands.json';
+import {
+  GuildReactType,
+  IGuildConfig,
+} from '../database/entities/guild.entity';
 
 export class EmbedService {
   /**
@@ -200,6 +204,23 @@ export class EmbedService {
       .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
       .setTitle(`Encountered an error`)
       .setDescription(codeBlock('diff', content))
+      .setTimestamp(new Date());
+
+    return embed;
+  };
+
+  public static guildConfig = async (config: IGuildConfig) => {
+    const embed = new EmbedBuilder();
+
+    embed
+      .setColor(Colors.red)
+      .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
+      .setTitle('Server configuration.')
+      .setDescription(
+        `React type: **${
+          GuildReactType[config.reactType]
+        }**\nHide button emojis: **${config.hideEmojis}**`
+      )
       .setTimestamp(new Date());
 
     return embed;

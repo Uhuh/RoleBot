@@ -6,7 +6,11 @@ export const GET_GUILD_CONFIG = (guildId: string) => {
 };
 
 export const CREATE_GUILD_CONFIG = (guildId: string) => {
-  return GuildConfig.create({ guildId });
+  const config = new GuildConfig();
+
+  config.guildId = guildId;
+
+  return config.save();
 };
 
 export const EDIT_GUILD_CONFIG = (

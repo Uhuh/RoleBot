@@ -5,6 +5,7 @@ import {
   EDIT_GUILD_CONFIG,
   GET_GUILD_CONFIG,
 } from '../../src/database/queries/guild.query';
+import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import {
   getGuildReactConfigValues,
@@ -27,6 +28,10 @@ export class ConfigCommand extends SlashCommand {
       false,
       getGuildReactConfigValues()
     );
+    this.addBoolOption(
+      'hide-emojis',
+      'If using button react-type, you can hide the emojis for the buttons.'
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -39,16 +44,31 @@ export class ConfigCommand extends SlashCommand {
     // If the config doesn't exist that means we failed to create it on join.
     let guildConfig = await GET_GUILD_CONFIG(guildId);
     if (!guildConfig) {
-      guildConfig = CREATE_GUILD_CONFIG(guildId);
+      guildConfig = await CREATE_GUILD_CONFIG(guildId);
     }
 
     const reactTypeString = interaction.options.getString('react-type');
     const reactType = parseGuildReactString(
       reactTypeString as keyof typeof GuildReactType
     );
+    const hideEmojis = interaction.options.getBoolean('hide-emojis');
 
     await EDIT_GUILD_CONFIG(guildId, {
-      reactType,
+      reactType: reactType ?? guildConfig.reactType,
+      hideEmojis: hideEmojis ?? guildConfig.hideEmojis,
+    });
+
+    const updatedConfig = this.expect(await GET_GUILD_CONFIG(guildId), {
+      message: 'Failed to find server config!',
+      prop: 'config',
+    });
+
+    const embed = await EmbedService.guildConfig(updatedConfig);
+
+    return interaction.reply({
+      ephemeral: true,
+      content: `Heyo! Here's your new server configuration.`,
+      embeds: [embed],
     });
   };
 }

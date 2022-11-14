@@ -12,7 +12,7 @@ export const guildUpdate = async (
   const color = type === 'Joined' ? Colors.green : Colors.red;
   try {
     if (type === 'Joined') {
-      CREATE_GUILD_CONFIG(guild.id);
+      await CREATE_GUILD_CONFIG(guild.id);
     }
 
     const size = (
