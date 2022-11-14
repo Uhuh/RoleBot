@@ -7,7 +7,10 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
   return await Category.find({ where: { guildId }, order: { name: 'ASC' } });
 };
 
-export const GET_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType: DisplayType) => {
+export const GET_ROLES_BY_CATEGORY_ID = async (
+  categoryId: number,
+  displayType: DisplayType
+) => {
   const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({
