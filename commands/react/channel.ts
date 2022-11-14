@@ -94,7 +94,10 @@ export class ReactChannelCommand extends SlashCommand {
       prop: 'category',
     });
 
-    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      category.id,
+      category.displayOrder
+    );
     if (!roles.length) return;
 
     return this.messageChannelAndReact(
@@ -181,7 +184,10 @@ export class ReactChannelCommand extends SlashCommand {
     if (textChannel?.type !== ChannelType.GuildText) return;
 
     for (const category of categories) {
-      const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id, category.displayOrder);
+      const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+        category.id,
+        category.displayOrder
+      );
       if (!roles.length) continue;
 
       await this.messageChannelAndReact(
