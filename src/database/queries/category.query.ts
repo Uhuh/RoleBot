@@ -24,6 +24,7 @@ export const CREATE_GUILD_CATEGORY = async (category: ICategory) => {
   newCategory.description = category.description ?? '';
   newCategory.mutuallyExclusive = category.mutuallyExclusive ?? false;
   newCategory.requiredRoleId = category.requiredRoleId;
+  newCategory.excludedRoleId = category.excludedRoleId;
   newCategory.displayOrder = category.displayOrder;
 
   return await newCategory.save();
