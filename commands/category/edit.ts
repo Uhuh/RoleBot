@@ -42,12 +42,21 @@ export class EditCategoryCommand extends SlashCommand {
       'mutually-exclusive',
       'Change if roles in this category should be mutually exclusive.'
     );
-    this.addBoolOption(
-      'remove-required-role',
-      'Remove all required roles for the category.'
+    this.addStringOption(
+      'remove-role-type',
+      'Select to remove either required-role or excluded-role.',
+      false,
+      [
+        { name: 'Required role', value: 'required-role' },
+        { name: 'Excluded role', value: 'excluded-role' },
+      ]
     );
     this.addRoleOption(
       'new-required-role',
+      'Change what the required roles are for the category.'
+    );
+    this.addRoleOption(
+      'new-excluded-role',
       'Change what the required roles are for the category.'
     );
     this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
@@ -70,22 +79,21 @@ export class EditCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [categoryId, newName, newDesc] = this.extractStringVariables(
-      interaction,
-      'category',
-      'new-name',
-      'new-description'
-    );
+    const categoryId = this.expect(interaction.options.getString('category'), { message: 'Category appears to be invalid!', prop: `category` });
+    const newName = interaction.options.getString('new-name');
+    const newDesc = interaction.options.getString('new-description');
 
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
 
-    const removeRequiredRole = interaction.options.getBoolean(
-      'remove-required-role'
+    const removeRoleType = interaction.options.getString(
+      'remove-role-type'
     );
 
     const newRequiredRoleId =
       interaction.options.getRole('new-required-role')?.id ?? undefined;
+    const newExcludedRoleId =
+      interaction.options.getRole('new-excluded-role')?.id ?? undefined;
 
     const displayString = interaction.options.getString('display-order');
 
@@ -96,7 +104,8 @@ export class EditCategoryCommand extends SlashCommand {
       !newDesc &&
       !displayString &&
       !newRequiredRoleId &&
-      removeRequiredRole === null &&
+      !newExcludedRoleId &&
+      removeRoleType === null &&
       mutuallyExclusive === null
     ) {
       this.log.info(
@@ -125,12 +134,14 @@ export class EditCategoryCommand extends SlashCommand {
     }
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
+    const excludedRoleId = newExcludedRoleId ?? category.excludedRoleId;
 
     const updatedCategory: Partial<ICategory> = {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
-      requiredRoleId: removeRequiredRole ? null : requiredRoleId,
+      requiredRoleId: (removeRoleType && removeRoleType === 'required-role') ? null : requiredRoleId,
+      excludedRoleId: (removeRoleType && removeRoleType === 'excluded-role') ? null : excludedRoleId,
       displayOrder
     };
 
