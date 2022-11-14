@@ -59,6 +59,7 @@ export class EmbedService {
       .setTitle(category.name)
       .setDescription(
         `Required Role: ${category.requiredRoleId ? RolePing(category.requiredRoleId) : 'None!'
+        }\nExcluded Role: ${category.excludedRoleId ? RolePing(category.excludedRoleId) : 'None!'
         }\n\nReact role display order: **${displayOrder
         }**\n\nMutually exclusive: **${category.mutuallyExclusive
         }**\n\nDesc: **${escapeMarkdown(desc)}**\n\n${reactRoles}`
@@ -133,10 +134,14 @@ export class EmbedService {
       ? `\nRequired: ${RolePing(category.requiredRoleId)}`
       : '';
 
+    const excludedRole = category.excludedRoleId
+      ? `\nExcluded: ${RolePing(category.excludedRoleId)}`
+      : '';
+
     embed
       .setTitle(category.name)
       .setDescription(
-        `${category.description ?? ''}${requiredRole}\n\n${reactRolesString}`
+        `${category.description ?? ''}${requiredRole}${excludedRole}\n\n${reactRolesString}`
       )
       .setColor(COLOR.DEFAULT);
 

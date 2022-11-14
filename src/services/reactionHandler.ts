@@ -91,6 +91,16 @@ export class ReactionHandler {
         .catch(() => this.log.debug(`Failed to remove reaction`));
     }
 
+    // If the category has an excluded role, and the user has said excluded role, ignore request.
+    if (
+      category.excludedRoleId &&
+      member.roles.cache.has(category.excludedRoleId)
+    ) {
+      return reaction.users
+        .remove(member)
+        .catch(() => this.log.debug(`Failed to remove reaction`));
+    }
+
     if (category.mutuallyExclusive) {
       return this.mutuallyExclusive(reactMessage, member, guild, type);
     }

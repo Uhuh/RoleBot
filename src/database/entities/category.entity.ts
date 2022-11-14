@@ -13,6 +13,7 @@ export interface ICategory {
   description?: string | null;
   mutuallyExclusive?: boolean;
   requiredRoleId: string | null;
+  excludedRoleId: string | null;
   displayOrder: DisplayType;
 }
 
@@ -35,6 +36,9 @@ export class Category extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   requiredRoleId!: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  excludedRoleId!: string | null;
 
   @Column({
     type: 'enum',

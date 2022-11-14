@@ -28,6 +28,10 @@ export class CreateCategoryCommand extends SlashCommand {
       'required-role',
       'Require users to have a certain role to obtain roles from this category.'
     );
+    this.addRoleOption(
+      'excluded-role',
+      'Users with this role cannot obtain roles from this category.'
+    );
     this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
   }
 
@@ -47,6 +51,9 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const requiredRoleId =
       interaction.options.getRole('required-role')?.id ?? null;
+
+    const excludedRoleId =
+      interaction.options.getRole('excluded-role')?.id ?? null;
 
     const displayString = interaction.options.getString('display-order');
 
@@ -78,6 +85,7 @@ export class CreateCategoryCommand extends SlashCommand {
       description,
       mutuallyExclusive,
       requiredRoleId,
+      excludedRoleId,
       displayOrder
     })
       .then(() => {
