@@ -3,11 +3,18 @@ import {
   ChatInputCommandInteraction,
   PermissionsBitField,
 } from 'discord.js';
-import { Category as ICategory, DisplayType } from '../../src/database/entities/category.entity';
+import {
+  Category as ICategory,
+  DisplayType,
+} from '../../src/database/entities/category.entity';
 
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import {
+  getDisplayCommandValues,
+  handleInteractionReply,
+  parseDisplayString,
+} from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
@@ -59,7 +66,12 @@ export class EditCategoryCommand extends SlashCommand {
       'new-excluded-role',
       'Change what the required roles are for the category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
+    this.addStringOption(
+      'display-order',
+      'Change how the category displays the react roles.',
+      false,
+      getDisplayCommandValues()
+    );
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
@@ -79,16 +91,17 @@ export class EditCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const categoryId = this.expect(interaction.options.getString('category'), { message: 'Category appears to be invalid!', prop: `category` });
+    const categoryId = this.expect(interaction.options.getString('category'), {
+      message: 'Category appears to be invalid!',
+      prop: `category`,
+    });
     const newName = interaction.options.getString('new-name');
     const newDesc = interaction.options.getString('new-description');
 
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
 
-    const removeRoleType = interaction.options.getString(
-      'remove-role-type'
-    );
+    const removeRoleType = interaction.options.getString('remove-role-type');
 
     const newRequiredRoleId =
       interaction.options.getRole('new-required-role')?.id ?? undefined;
@@ -97,7 +110,9 @@ export class EditCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
+    const displayOrder = parseDisplayString(
+      displayString as keyof typeof DisplayType
+    );
 
     if (
       !newName &&
@@ -140,9 +155,15 @@ export class EditCategoryCommand extends SlashCommand {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
-      requiredRoleId: (removeRoleType && removeRoleType === 'required-role') ? null : requiredRoleId,
-      excludedRoleId: (removeRoleType && removeRoleType === 'excluded-role') ? null : excludedRoleId,
-      displayOrder
+      requiredRoleId:
+        removeRoleType && removeRoleType === 'required-role'
+          ? null
+          : requiredRoleId,
+      excludedRoleId:
+        removeRoleType && removeRoleType === 'excluded-role'
+          ? null
+          : excludedRoleId,
+      displayOrder,
     };
 
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)
