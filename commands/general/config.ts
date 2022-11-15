@@ -54,7 +54,7 @@ export class ConfigCommand extends SlashCommand {
     const hideEmojis = interaction.options.getBoolean('hide-emojis');
 
     await EDIT_GUILD_CONFIG(guildId, {
-      reactType: reactType ?? guildConfig.reactType,
+      reactType: reactTypeString ? reactType : guildConfig.reactType,
       hideEmojis: hideEmojis ?? guildConfig.hideEmojis,
     });
 
