@@ -9,6 +9,7 @@ import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
 import RoleBot from '../bot';
 import { handleInteractionReply } from '../../utilities/utils';
+import { ButtonHandler } from './buttonHandler';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
@@ -33,7 +34,7 @@ export class InteractionHandler {
     else if (interaction.isSelectMenu())
       InteractionHandler.handleSelect(interaction, client);
     else if (interaction.isButton())
-      InteractionHandler.handleButton(interaction, client);
+      void InteractionHandler.handleButton(interaction, client);
     else if (interaction.isAutocomplete())
       InteractionHandler.handleAutocomplete(interaction, client).catch((e) =>
         this.log.error(`HandleAutocomplete: ${e}`)
@@ -137,9 +138,34 @@ export class InteractionHandler {
    * @param interaction Button interaction to handle.
    * @param client RoleBot client to find correct command to call its handleButton method.
    */
-  private static handleButton(interaction: ButtonInteraction, client: RoleBot) {
+  private static async handleButton(
+    interaction: ButtonInteraction,
+    client: RoleBot
+  ) {
     try {
       const [commandName, args] = this.extractCommandInfo(interaction);
+
+      /**
+       * If a user is pushing a button that's known as a react button
+       * then the guild must be using button interactions instead of reactions.
+       */
+      if (commandName === 'react-button') {
+        await interaction
+          .deferReply({
+            ephemeral: true,
+          })
+          .catch((e) => {
+            this.log.error(
+              `Failed to defer interaction for button react-role type.\n${e}`
+            );
+            return interaction.reply({
+              ephemeral: true,
+              content: `Failed to defer interaction! Oops?!?`,
+            });
+          });
+        return ButtonHandler.handleButton(interaction, args);
+      }
+
       const command = client.commands.get(commandName);
 
       if (!command?.canUserRunInteraction(interaction)) {
