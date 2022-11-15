@@ -84,9 +84,14 @@ export class EmbedService {
     return embed;
   };
 
-  public static reactRolesFormattedString = (reactRoles: ReactRole[]) => {
+  public static reactRolesFormattedString = (
+    reactRoles: ReactRole[],
+    hideEmojis = false
+  ) => {
+    const emoji = (r: ReactRole) => r.emojiTag ?? r.emojiId;
+
     return reactRoles
-      .map((r) => `${r.emojiTag ?? r.emojiId} - ${RolePing(r.roleId)}`)
+      .map((r) => `${hideEmojis ? '' : emoji(r) + ' - '}${RolePing(r.roleId)}`)
       .join('\n');
   };
 
@@ -139,9 +144,13 @@ export class EmbedService {
 
   public static reactRoleEmbed = (
     reactRoles: ReactRole[],
-    category: Category
+    category: Category,
+    hideEmojis = false
   ) => {
-    const reactRolesString = this.reactRolesFormattedString(reactRoles);
+    const reactRolesString = this.reactRolesFormattedString(
+      reactRoles,
+      hideEmojis
+    );
 
     const embed = new EmbedBuilder();
 
@@ -211,15 +220,17 @@ export class EmbedService {
 
   public static guildConfig = async (config: IGuildConfig) => {
     const embed = new EmbedBuilder();
+    const description = `**Hey! If you changed your react type your old messages/buttons will be invalid.\nIf you swap back and haven't deleted those messages then they're still valid. Just make sure the types match for what you want.**`;
 
     embed
       .setColor(Colors.red)
       .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
       .setTitle('Server configuration.')
       .setDescription(
-        `React type: **${
-          GuildReactType[config.reactType]
-        }**\nHide button emojis: **${config.hideEmojis}**`
+        description +
+          `\n\nReact type: **${
+            GuildReactType[config.reactType]
+          }**\nHide button emojis: **${config.hideEmojis}**`
       )
       .setTimestamp(new Date());
 
