@@ -1,4 +1,4 @@
-import { IsNull } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 import { displayOrderQuery } from '../../../utilities/utils';
 import { Category, ReactRole } from '../entities';
 import { DisplayType } from '../entities/category.entity';
@@ -64,7 +64,19 @@ export const GET_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
   });
 };
 
-export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType?: DisplayType) => {
+export const GET_GUILD_CATEGORY_ROLE_COUNT = async (guildId: string) => {
+  return await ReactRole.count({
+    where: {
+      guildId,
+      categoryId: Not(IsNull()),
+    },
+  });
+};
+
+export const GET_REACT_ROLES_BY_CATEGORY_ID = async (
+  categoryId: number,
+  displayType?: DisplayType
+) => {
   const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({

@@ -14,7 +14,10 @@ import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
 } from '../../src/database/queries/category.query';
-import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import {
+  GET_GUILD_CATEGORY_ROLE_COUNT,
+  GET_REACT_ROLES_BY_CATEGORY_ID,
+} from '../../src/database/queries/reactRole.query';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { setTimeout } from 'node:timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
@@ -113,6 +116,8 @@ export class ReactChannelCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    const { guildId } = interaction;
+
     // Defer because of Discord rate limits.
     await interaction.deferReply({
       ephemeral: true,
@@ -131,13 +136,12 @@ export class ReactChannelCommand extends SlashCommand {
       );
     }
 
-    const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
-      (e) =>
-        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
+    const categories = await GET_GUILD_CATEGORIES(guildId).catch((e) =>
+      this.log.error(`Failed to get categories\n${e}`, guildId)
     );
 
     if (!categories) {
-      this.log.debug(`Guild has no categories.`, interaction.guildId);
+      this.log.debug(`Guild has no categories.`, guildId);
 
       return interaction.editReply(
         `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
@@ -146,17 +150,12 @@ export class ReactChannelCommand extends SlashCommand {
 
     // Stolen from @react/message execute function
     const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
-    const categoryRoles = await Promise.all(
-      categories.map((c) => GET_REACT_ROLES_BY_CATEGORY_ID(c.id))
-    );
+    const categoryRolesCount = await GET_GUILD_CATEGORY_ROLE_COUNT(guildId);
 
-    // Presumably, if all the array of roles for each category is length 0 then this being 0 is "false"
-    const allEmptyCategories = categoryRoles.filter((r) => r.length).length;
-
-    if (!allEmptyCategories) {
+    if (!categoryRolesCount) {
       this.log.debug(
         `Guild has categories but all of them are empty.`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply({
@@ -172,7 +171,7 @@ export class ReactChannelCommand extends SlashCommand {
     if (channel?.type !== ChannelType.GuildText) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply(
