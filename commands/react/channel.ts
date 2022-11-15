@@ -1,5 +1,7 @@
 import {
   AutocompleteInteraction,
+  ButtonStyle,
+  ButtonBuilder,
   ChannelType,
   ChatInputCommandInteraction,
   PermissionsBitField,
@@ -7,7 +9,7 @@ import {
 } from 'discord.js';
 
 import { EmbedService } from '../../src/services/embedService';
-import { reactToMessage } from '../../utilities/utils';
+import { reactToMessage, spliceIntoChunks } from '../../utilities/utils';
 import { Category as CommandCategory } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
@@ -22,6 +24,9 @@ import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { setTimeout } from 'node:timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import { GuildReactType } from '../../src/database/entities/guild.entity';
+import { ActionRowBuilder } from '@discordjs/builders';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
@@ -111,7 +116,7 @@ export class ReactChannelCommand extends SlashCommand {
     );
   };
 
-  public execute = async (interaction: ChatInputCommandInteraction) => {
+  execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
@@ -200,6 +205,28 @@ export class ReactChannelCommand extends SlashCommand {
     }
   };
 
+  private reactRoleButtons = (reactRoles: ReactRole[], hideEmojis: boolean) => {
+    const customId = (r: ReactRole) => `react-button_${r.id}-${r.categoryId}`;
+    const buildButton = (r: ReactRole) => {
+      const button = new ButtonBuilder()
+        .setCustomId(customId(r))
+        .setLabel(r.name)
+        .setStyle(ButtonStyle.Secondary);
+
+      if (hideEmojis) {
+        return button;
+      } else {
+        return button.setEmoji(r.emojiId);
+      }
+    };
+
+    return spliceIntoChunks(reactRoles, 5).map((roles) =>
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        roles.map(buildButton)
+      )
+    );
+  };
+
   private messageChannelAndReact = async (
     interaction: ChatInputCommandInteraction,
     channel: TextChannel,
@@ -209,29 +236,49 @@ export class ReactChannelCommand extends SlashCommand {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
+    const config = await GET_GUILD_CONFIG(interaction.guildId);
 
-    const embed = EmbedService.reactRoleEmbed(roles, category);
+    let embed = undefined;
+    const buttons = [];
+
+    switch (config?.reactType) {
+      case GuildReactType.button:
+        embed = EmbedService.reactRoleEmbed(roles, category, config.hideEmojis);
+        buttons.push(...this.reactRoleButtons(roles, config.hideEmojis));
+        break;
+      case GuildReactType.select:
+        // @TODO - Handle select dropdown in future.
+        embed = EmbedService.reactRoleEmbed(roles, category);
+        break;
+      case GuildReactType.reaction:
+      default:
+        embed = EmbedService.reactRoleEmbed(roles, category);
+    }
+
     const permissionError = requiredPermissions(channel.id);
 
     try {
       const message = await channel.send({
         embeds: [embed],
+        components: buttons,
       });
 
-      const isSuccessfulReacting = await reactToMessage(
-        message,
-        interaction.guildId,
-        roles,
-        channel.id,
-        category.id,
-        false,
-        this.log
-      );
+      if (config?.reactType !== GuildReactType.button) {
+        const isSuccessfulReacting = await reactToMessage(
+          message,
+          interaction.guildId,
+          roles,
+          channel.id,
+          category.id,
+          false,
+          this.log
+        );
 
-      if (!isSuccessfulReacting) {
-        await message.delete();
+        if (!isSuccessfulReacting) {
+          await message.delete();
 
-        return interaction.editReply(permissionError);
+          return interaction.editReply(permissionError);
+        }
       }
     } catch (e) {
       this.log.error(`Failed to send embeds.\n${e}`, interaction.guildId);
@@ -240,7 +287,7 @@ export class ReactChannelCommand extends SlashCommand {
     }
 
     await interaction.editReply({
-      content: 'Hey! I successfully sent the embeds and reacted to them!',
+      content: 'Hey! Check the channel to make sure I worked properly.',
     });
   };
 }
