@@ -19,7 +19,10 @@ import {
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
-import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import {
+  CREATE_GUILD_CONFIG,
+  GET_GUILD_CONFIG,
+} from '../../src/database/queries/guild.query';
 import {
   GuildReactType,
   IGuildConfig,
@@ -134,10 +137,10 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     }
 
-    const config = this.expect(await GET_GUILD_CONFIG(guildId), {
-      message: `Hey! Your server config is missing. Mind running the /config command?`,
-      prop: 'config',
-    });
+    let config = await GET_GUILD_CONFIG(guildId);
+    if (!config) {
+      config = await CREATE_GUILD_CONFIG(guildId);
+    }
 
     try {
       const embed = EmbedService.reactRoleEmbed(

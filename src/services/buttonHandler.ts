@@ -7,7 +7,10 @@ import {
   GET_CATEGORY_BY_ID,
   GET_ROLES_BY_CATEGORY_ID,
 } from '../database/queries/category.query';
-import { GET_GUILD_CONFIG } from '../database/queries/guild.query';
+import {
+  CREATE_GUILD_CONFIG,
+  GET_GUILD_CONFIG,
+} from '../database/queries/guild.query';
 import { GET_REACT_ROLE_BY_ID } from '../database/queries/reactRole.query';
 import { LogService } from './logService';
 
@@ -19,8 +22,12 @@ export class ButtonHandler {
     args: string[]
   ) => {
     if (!interaction.guildId) return;
+    const { guildId } = interaction;
 
-    const config = await GET_GUILD_CONFIG(interaction.guildId);
+    let config = await GET_GUILD_CONFIG(guildId);
+    if (!config) {
+      config = await CREATE_GUILD_CONFIG(guildId);
+    }
 
     /**
      * Ignore request if the server react type isn't button related.
