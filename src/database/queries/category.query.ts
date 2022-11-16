@@ -19,7 +19,9 @@ export const GET_ROLES_BY_CATEGORY_ID = async (
   });
 };
 
-export const CREATE_GUILD_CATEGORY = async (category: ICategory) => {
+export const CREATE_GUILD_CATEGORY = async (
+  category: Omit<ICategory, 'id'>
+) => {
   const newCategory = new Category();
 
   newCategory.guildId = category.guildId;
