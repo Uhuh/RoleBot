@@ -14,7 +14,10 @@ import { SlashCommand } from '../slashCommand';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
-import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import {
+  CREATE_GUILD_CONFIG,
+  GET_GUILD_CONFIG,
+} from '../../src/database/queries/guild.query';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
 
 export class ReactMessageCommand extends SlashCommand {
@@ -58,7 +61,10 @@ export class ReactMessageCommand extends SlashCommand {
 
     const { guildId } = interaction;
 
-    const config = await GET_GUILD_CONFIG(guildId);
+    let config = await GET_GUILD_CONFIG(guildId);
+    if (!config) {
+      config = await CREATE_GUILD_CONFIG(guildId);
+    }
 
     if (config?.reactType !== GuildReactType.reaction) {
       return interaction.reply({

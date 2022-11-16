@@ -22,7 +22,10 @@ import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { setTimeout } from 'node:timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
-import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import {
+  CREATE_GUILD_CONFIG,
+  GET_GUILD_CONFIG,
+} from '../../src/database/queries/guild.query';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
 import { reactRoleButtons } from '../../utilities/utilButtons';
@@ -213,7 +216,13 @@ export class ReactChannelCommand extends SlashCommand {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
-    const config = await GET_GUILD_CONFIG(interaction.guildId);
+
+    const { guildId } = interaction;
+
+    let config = await GET_GUILD_CONFIG(guildId);
+    if (!config) {
+      config = await CREATE_GUILD_CONFIG(guildId);
+    }
 
     let embed = undefined;
     const buttons = [];
@@ -250,7 +259,7 @@ export class ReactChannelCommand extends SlashCommand {
             messageId: message.id,
             emojiId: roles[0].emojiId,
             roleId: roles[0].roleId,
-            guildId: interaction.guildId,
+            guildId: guildId,
             categoryId: category.id,
             isCustomMessage: false,
             channelId: channel.id,
@@ -261,7 +270,7 @@ export class ReactChannelCommand extends SlashCommand {
         default: {
           const isSuccessfulReacting = await reactToMessage(
             message,
-            interaction.guildId,
+            guildId,
             roles,
             channel.id,
             category.id,

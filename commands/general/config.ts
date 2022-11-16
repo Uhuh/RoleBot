@@ -42,9 +42,9 @@ export class ConfigCommand extends SlashCommand {
     const { guildId } = interaction;
 
     // If the config doesn't exist that means we failed to create it on join.
-    let guildConfig = await GET_GUILD_CONFIG(guildId);
-    if (!guildConfig) {
-      guildConfig = await CREATE_GUILD_CONFIG(guildId);
+    let config = await GET_GUILD_CONFIG(guildId);
+    if (!config) {
+      config = await CREATE_GUILD_CONFIG(guildId);
     }
 
     const reactTypeString = interaction.options.getString('react-type');
@@ -54,8 +54,8 @@ export class ConfigCommand extends SlashCommand {
     const hideEmojis = interaction.options.getBoolean('hide-emojis');
 
     await EDIT_GUILD_CONFIG(guildId, {
-      reactType: reactTypeString ? reactType : guildConfig.reactType,
-      hideEmojis: hideEmojis ?? guildConfig.hideEmojis,
+      reactType: reactTypeString ? reactType : config.reactType,
+      hideEmojis: hideEmojis ?? config.hideEmojis,
     });
 
     const updatedConfig = this.expect(await GET_GUILD_CONFIG(guildId), {
