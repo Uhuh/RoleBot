@@ -30,8 +30,8 @@ export class ReactRole extends BaseEntity {
   emojiId!: string;
 
   /* If the emoji is custom this will be the emoji mention. <(a?):name:id> Because emojis can be animated and Discord sucks. */
-  @Column({ nullable: true })
-  emojiTag?: string;
+  @Column({ type: 'character varying', nullable: true })
+  emojiTag!: string | null;
 
   @Column()
   guildId!: string;

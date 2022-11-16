@@ -2,6 +2,7 @@ import RoleBot from '../src/bot';
 import { EmbedBuilder, Guild } from 'discord.js';
 import { Colors } from '../src/interfaces';
 import { RoleBotGuildEventsWebhook } from '../utilities/types/globals';
+import { CREATE_GUILD_CONFIG } from '../src/database/queries/guild.query';
 
 export const guildUpdate = async (
   guild: Guild,
@@ -10,6 +11,10 @@ export const guildUpdate = async (
 ) => {
   const color = type === 'Joined' ? Colors.green : Colors.red;
   try {
+    if (type === 'Joined') {
+      await CREATE_GUILD_CONFIG(guild.id);
+    }
+
     const size = (
       await client.shard?.fetchClientValues('guilds.cache.size')
     )?.reduce<number>((a, b) => a + Number(b), 0);

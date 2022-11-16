@@ -14,6 +14,8 @@ import { SlashCommand } from '../slashCommand';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import { GuildReactType } from '../../src/database/entities/guild.entity';
 
 export class ReactMessageCommand extends SlashCommand {
   constructor() {
@@ -54,17 +56,25 @@ export class ReactMessageCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
-    const [messageLink] = this.extractStringVariables(
-      interaction,
-      'message-link'
-    );
+    const { guildId } = interaction;
 
-    if (!messageLink) {
+    const config = await GET_GUILD_CONFIG(guildId);
+
+    if (config?.reactType !== GuildReactType.reaction) {
       return interaction.reply({
         ephemeral: true,
-        content: `Hmm, I'm not sure what happened but I can't see the message link. Please try again.`,
+        content: `Hey! You can use the message command only if the config react-type is reaction.`,
       });
     }
+
+    const messageLink = this.expect(
+      interaction.options.getString('message-link'),
+      {
+        message:
+          'Make sure to pass the message link by right click copying it on desktop!',
+        prop: 'message-link',
+      }
+    );
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
@@ -100,9 +110,7 @@ export class ReactMessageCommand extends SlashCommand {
 
     const channel = await interaction.guild?.channels
       .fetch(channelId)
-      .catch((e) =>
-        this.log.debug(`Failed to find channel.\n${e}`, interaction.guildId)
-      );
+      .catch((e) => this.log.debug(`Failed to find channel.\n${e}`, guildId));
 
     if (!channel || !isTextChannel(channel)) {
       return interaction.reply({
@@ -113,9 +121,7 @@ export class ReactMessageCommand extends SlashCommand {
 
     const message = await channel.messages
       .fetch(messageId)
-      .catch((e) =>
-        this.log.debug(`Failed to find message.\n${e}`, interaction.guildId)
-      );
+      .catch((e) => this.log.debug(`Failed to find message.\n${e}`, guildId));
 
     if (!message) {
       return interaction.reply({
@@ -131,7 +137,7 @@ export class ReactMessageCommand extends SlashCommand {
 
     return reactToMessage(
       message,
-      interaction.guildId,
+      guildId,
       roles,
       channel.id,
       category.id,

@@ -1,4 +1,4 @@
-import { IsNull } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 import { displayOrderQuery } from '../../../utilities/utils';
 import { Category, ReactRole } from '../entities';
 import { DisplayType } from '../entities/category.entity';
@@ -16,7 +16,7 @@ export const CREATE_REACT_ROLE = async (
   const reactRole = new ReactRole();
 
   reactRole.emojiId = emojiId;
-  reactRole.emojiTag = emojiTag ?? undefined;
+  reactRole.emojiTag = emojiTag;
   reactRole.roleId = roleId;
   reactRole.guildId = guildId;
   reactRole.name = name;
@@ -64,7 +64,19 @@ export const GET_REACT_ROLE_BY_ROLE_ID = async (roleId: string) => {
   });
 };
 
-export const GET_REACT_ROLES_BY_CATEGORY_ID = async (categoryId: number, displayType?: DisplayType) => {
+export const GET_GUILD_CATEGORY_ROLE_COUNT = async (guildId: string) => {
+  return await ReactRole.count({
+    where: {
+      guildId,
+      categoryId: Not(IsNull()),
+    },
+  });
+};
+
+export const GET_REACT_ROLES_BY_CATEGORY_ID = async (
+  categoryId: number,
+  displayType?: DisplayType
+) => {
   const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({
@@ -81,16 +93,7 @@ export const UPDATE_REACT_ROLE_EMOJI_TAG = async (
   roleId: string,
   emojiTag: string | null
 ) => {
-  const reactRole = await ReactRole.findOne({
-    where: { roleId },
-  });
-
-  if (!reactRole)
-    throw Error(`Role[${roleId}] doesn't exist despite having just found it.`);
-
-  reactRole.emojiTag = emojiTag ?? undefined;
-
-  return await reactRole.save();
+  return await ReactRole.update({ roleId }, { emojiTag });
 };
 
 export const UPDATE_REACT_ROLE_EMOJI_ID = async (
