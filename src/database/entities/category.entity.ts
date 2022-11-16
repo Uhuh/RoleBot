@@ -4,10 +4,11 @@ export enum DisplayType {
   alpha = 0,
   reversedAlpha,
   time,
-  reversedTime
+  reversedTime,
 }
 
 export interface ICategory {
+  id: number;
   guildId: string;
   name: string;
   description?: string | null;
@@ -43,7 +44,7 @@ export class Category extends BaseEntity {
   @Column({
     type: 'enum',
     enum: DisplayType,
-    default: DisplayType.alpha
+    default: DisplayType.alpha,
   })
   displayOrder!: DisplayType;
 }
