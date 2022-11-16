@@ -1,7 +1,5 @@
 import {
   AutocompleteInteraction,
-  ButtonStyle,
-  ButtonBuilder,
   ChannelType,
   ChatInputCommandInteraction,
   PermissionsBitField,
@@ -9,7 +7,7 @@ import {
 } from 'discord.js';
 
 import { EmbedService } from '../../src/services/embedService';
-import { reactToMessage, spliceIntoChunks } from '../../utilities/utils';
+import { reactToMessage } from '../../utilities/utils';
 import { Category as CommandCategory } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
@@ -26,7 +24,8 @@ import { Category, ReactRole } from '../../src/database/entities';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
-import { ActionRowBuilder } from '@discordjs/builders';
+import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
+import { reactRoleButtons } from '../../utilities/utilButtons';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
@@ -205,28 +204,6 @@ export class ReactChannelCommand extends SlashCommand {
     }
   };
 
-  private reactRoleButtons = (reactRoles: ReactRole[], hideEmojis: boolean) => {
-    const customId = (r: ReactRole) => `react-button_${r.id}-${r.categoryId}`;
-    const buildButton = (r: ReactRole) => {
-      const button = new ButtonBuilder()
-        .setCustomId(customId(r))
-        .setLabel(r.name)
-        .setStyle(ButtonStyle.Secondary);
-
-      if (hideEmojis) {
-        return button;
-      } else {
-        return button.setEmoji(r.emojiId);
-      }
-    };
-
-    return spliceIntoChunks(reactRoles, 5).map((roles) =>
-      new ActionRowBuilder<ButtonBuilder>().addComponents(
-        roles.map(buildButton)
-      )
-    );
-  };
-
   private messageChannelAndReact = async (
     interaction: ChatInputCommandInteraction,
     channel: TextChannel,
@@ -244,7 +221,7 @@ export class ReactChannelCommand extends SlashCommand {
     switch (config?.reactType) {
       case GuildReactType.button:
         embed = EmbedService.reactRoleEmbed(roles, category, config.hideEmojis);
-        buttons.push(...this.reactRoleButtons(roles, config.hideEmojis));
+        buttons.push(...reactRoleButtons(roles, config.hideEmojis));
         break;
       case GuildReactType.select:
         // @TODO - Handle select dropdown in future.
@@ -263,21 +240,40 @@ export class ReactChannelCommand extends SlashCommand {
         components: buttons,
       });
 
-      if (config?.reactType !== GuildReactType.button) {
-        const isSuccessfulReacting = await reactToMessage(
-          message,
-          interaction.guildId,
-          roles,
-          channel.id,
-          category.id,
-          false,
-          this.log
-        );
+      switch (config?.reactType) {
+        case GuildReactType.button: {
+          /**
+           * When the server uses buttons we don't react, so just save whatever the first react-role emoji and role id are.
+           * This is so we can get the message later whenever a user wants to update this embed.
+           */
+          await CREATE_REACT_MESSAGE({
+            messageId: message.id,
+            emojiId: roles[0].emojiId,
+            roleId: roles[0].roleId,
+            guildId: interaction.guildId,
+            categoryId: category.id,
+            isCustomMessage: false,
+            channelId: channel.id,
+          });
+          break;
+        }
+        case GuildReactType.reaction:
+        default: {
+          const isSuccessfulReacting = await reactToMessage(
+            message,
+            interaction.guildId,
+            roles,
+            channel.id,
+            category.id,
+            false,
+            this.log
+          );
 
-        if (!isSuccessfulReacting) {
-          await message.delete();
+          if (!isSuccessfulReacting) {
+            await message.delete();
 
-          return interaction.editReply(permissionError);
+            return interaction.editReply(permissionError);
+          }
         }
       }
     } catch (e) {
