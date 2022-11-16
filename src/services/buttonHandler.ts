@@ -1,7 +1,12 @@
-import { ButtonInteraction } from 'discord.js';
+import { ButtonInteraction, GuildMember } from 'discord.js';
 import { RolePing } from '../../utilities/utilPings';
+import { ReactRole } from '../database/entities';
+import { ICategory } from '../database/entities/category.entity';
 import { GuildReactType } from '../database/entities/guild.entity';
-import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';
+import {
+  GET_CATEGORY_BY_ID,
+  GET_ROLES_BY_CATEGORY_ID,
+} from '../database/queries/category.query';
 import { GET_GUILD_CONFIG } from '../database/queries/guild.query';
 import { GET_REACT_ROLE_BY_ID } from '../database/queries/reactRole.query';
 import { LogService } from './logService';
@@ -88,38 +93,46 @@ export class ButtonHandler {
       );
     }
 
-    // @TODO - Handle mutually exclusive.
+    const handleError = (
+      interaction: ButtonInteraction,
+      error: unknown,
+      type: 'add' | 'remove'
+    ) => {
+      this.log.debug(
+        `Failed to ${type} role[${reactRole.roleId}] user[${member.id}]\n${error}`
+      );
 
+      return interaction.editReply(
+        `Hey! I couldn't ${type} the role ${RolePing(
+          reactRole.roleId
+        )}. Do I have manage role permissions?`
+      );
+    };
+
+    // Remove the role if the user has it. Should catch mutually exclusive removes too.
     if (member.roles.cache.has(reactRole.roleId)) {
-      member.roles.remove(reactRole.roleId).catch((e) => {
-        this.log.debug(
-          `Failed to remove role[${reactRole.roleId}] from user[${member.id}]\n${e}`
-        );
-
-        return interaction.editReply(
-          `Hey! I had issues removing the role ${RolePing(
-            reactRole.roleId
-          )}. Do I have manage role permissions?`
-        );
-      });
+      member.roles
+        .remove(reactRole.roleId)
+        .catch((e) => handleError(interaction, e, 'remove'));
 
       return interaction.editReply(
         `Hey! I remove the role ${RolePing(
           reactRole.roleId
         )} from you successfully.`
       );
-    } else {
-      member.roles.add(reactRole.roleId).catch((e) => {
-        this.log.debug(
-          `Failed to add role[${reactRole.roleId}] to user[${member.id}]\n${e}`
-        );
+    }
 
-        return interaction.editReply(
-          `Hey! I had issues adding the role ${RolePing(
-            reactRole.roleId
-          )}. Do I have manage role permissions?`
-        );
-      });
+    if (category.mutuallyExclusive) {
+      await ButtonHandler.mutuallyExclusive(
+        interaction,
+        member,
+        category,
+        reactRole
+      );
+    } else {
+      member.roles
+        .add(reactRole.roleId)
+        .catch((e) => handleError(interaction, e, 'add'));
 
       return interaction.editReply(
         `Hey! I added the role ${RolePing(
@@ -127,7 +140,48 @@ export class ButtonHandler {
         )} to you successfully.`
       );
     }
+  };
 
-    return;
+  public static mutuallyExclusive = async (
+    interaction: ButtonInteraction,
+    member: GuildMember,
+    category: ICategory,
+    role: ReactRole
+  ) => {
+    const roles = (
+      await GET_ROLES_BY_CATEGORY_ID(category.id, category.displayOrder)
+    ).map((r) => r.roleId);
+
+    const rolesToRemove = member.roles.cache.filter((r) =>
+      roles.includes(r.id)
+    );
+
+    await member.roles.remove(rolesToRemove).catch((e) => {
+      this.log.error(
+        `Failed to remove roles[${rolesToRemove}] from user[${member.id}]\n${e}`
+      );
+
+      return interaction.editReply(
+        `Hey! I couldn't remove some mutually exclusive roles from you. Do I have the manage role permission?`
+      );
+    });
+
+    await member.roles.add(role.roleId).catch((e) => {
+      this.log.error(
+        `Failed to add role[${role.roleId}] from user[${member.id}]\n${e}`
+      );
+
+      return interaction.editReply(
+        `Hey! I couldn't add the role ${RolePing(
+          role.roleId
+        )}. Do I the manage roles permission?`
+      );
+    });
+
+    return interaction.editReply(
+      `Hey! I gave you the ${RolePing(
+        role.roleId
+      )} role and removed ${rolesToRemove.map((r) => RolePing(r.id)).join(' ')}`
+    );
   };
 }
