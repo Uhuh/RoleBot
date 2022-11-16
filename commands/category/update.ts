@@ -2,6 +2,7 @@ import {
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
+  Message,
   PermissionsBitField,
   TextChannel,
 } from 'discord.js';
@@ -11,12 +12,22 @@ import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
+  CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
   GET_REACT_MESSAGE_BY_MESSAGE_ID,
 } from '../../src/database/queries/reactMessage.query';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
+import { GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
+import {
+  GuildReactType,
+  IGuildConfig,
+} from '../../src/database/entities/guild.entity';
+import { ICategory } from '../../src/database/entities/category.entity';
+import { ReactRole } from '../../src/database/entities';
+import { reactRoleButtons } from '../../utilities/utilButtons';
+import { EmbedBuilder } from '@discordjs/builders';
 
 export class UpdateCategoryCommand extends SlashCommand {
   constructor() {
@@ -39,35 +50,27 @@ export class UpdateCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    const { guildId } = interaction;
+
     await interaction.deferReply({
       ephemeral: true,
     });
 
-    const [messageLink] = this.extractStringVariables(
-      interaction,
-      'message-link'
+    const messageLink = this.expect(
+      interaction.options.getString('message-link'),
+      {
+        message:
+          'Make sure to pass the message link by right click copying it on desktop!',
+        prop: 'message-link',
+      }
     );
-
-    if (!messageLink) {
-      this.log.critical(
-        `Undefined message-link despite being required in guild.`,
-        interaction.guildId
-      );
-
-      return interaction.editReply(
-        `Hey! Something happened and I can't see the passed in message link. Could you try again?`
-      );
-    }
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
     const channel = await interaction.guild?.channels
       .fetch(channelId)
       .catch((e) =>
-        this.log.debug(
-          `Failed to find channel[${channelId}]\n${e}`,
-          interaction.guildId
-        )
+        this.log.debug(`Failed to find channel[${channelId}]\n${e}`, guildId)
       );
 
     if (!channel || !isTextChannel(channel)) {
@@ -93,7 +96,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     if (!reactMessage) {
       this.log.info(
         `No react messages exist with messageId[${messageId}]`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply(
@@ -106,7 +109,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     if (!category) {
       this.log.info(
         `Category not found with categoryId[${reactMessage.categoryId}]]`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply(
@@ -114,12 +117,15 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     }
 
-    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+    const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      category.id,
+      category.displayOrder
+    );
 
     if (!categoryRoles.length) {
       this.log.info(
         `Category[${category.id}] has no react roles associated with it.`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply(
@@ -128,49 +134,54 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
     }
 
+    const config = this.expect(await GET_GUILD_CONFIG(guildId), {
+      message: `Hey! Your server config is missing. Mind running the /config command?`,
+      prop: 'config',
+    });
+
     try {
-      const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
+      const embed = EmbedService.reactRoleEmbed(
+        categoryRoles,
+        category,
+        config?.hideEmojis
+      );
 
       // Remove all react messages since they are created and depend on RoleBots reactions
       await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
 
-      // Clear all reactions to remove and old incorrect reactions.
+      // Clear all reactions to remove any old incorrect reactions.
       await message.reactions
         .removeAll()
         .catch(() =>
-          this.log.info(`Failed to remove all reactions.`, interaction.guildId)
+          this.log.info(`Failed to remove all reactions.`, message.guildId)
         );
 
-      // We can only edit our own messages
-      if (message.author === interaction.client.user) {
-        await message.edit({ embeds: [embed] }).then(() => {
-          this.log.info(
-            `Updated category[${category.id}] embed.`,
-            interaction.guildId
+      switch (config.reactType) {
+        case GuildReactType.button:
+          await this.handleButtonType(
+            interaction,
+            categoryRoles,
+            embed,
+            category,
+            config,
+            message,
+            channel
+          );
+          break;
+
+        case GuildReactType.reaction:
+          await this.handleReactionType(
+            interaction,
+            message,
+            embed,
+            categoryRoles,
+            category,
+            channel
           );
 
           return interaction.editReply(
-            `Hey! I updated the react role embed message related to this category.`
+            `Hey! I've successfully re-reacted to the message for you.`
           );
-        });
-      }
-
-      // Re-react to the message with the updated react role list.
-      const isSuccessfulReacting = await reactToMessage(
-        message,
-        interaction.guildId,
-        categoryRoles,
-        channel.id,
-        reactMessage.categoryId,
-        reactMessage.isCustomMessage,
-        this.log
-      );
-
-      if (!isSuccessfulReacting) {
-        return handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: permissionsError,
-        });
       }
     } catch (e) {
       this.log.error(
@@ -178,10 +189,98 @@ export class UpdateCategoryCommand extends SlashCommand {
         interaction.guildId
       );
     }
+  };
 
-    return interaction.editReply(
-      `Hey! I've successfully re-reacted to the message for you.`
+  handleButtonType = async (
+    interaction: ChatInputCommandInteraction,
+    roles: ReactRole[],
+    embed: EmbedBuilder,
+    category: ICategory,
+    config: IGuildConfig,
+    message: Message,
+    channel: Channel
+  ) => {
+    if (!interaction.guildId) throw 'Interaction guild ID missing';
+    if (message.author !== interaction.client.user) {
+      return interaction.editReply(
+        `Hey! I can only edit embeds and buttons that are MY message! Make sure the message you're copying is correct.`
+      );
+    }
+
+    const buttons = reactRoleButtons(roles, config.hideEmojis);
+
+    await CREATE_REACT_MESSAGE({
+      messageId: message.id,
+      emojiId: roles[0].emojiId,
+      roleId: roles[0].roleId,
+      guildId: interaction.guildId,
+      categoryId: category.id,
+      isCustomMessage: false,
+      channelId: channel.id,
+    });
+
+    await message
+      .edit({ embeds: [embed], components: buttons })
+      .then(() => {
+        return interaction.editReply(`Hey! I updated that embed for you.`);
+      })
+      .catch((e) => {
+        this.log.error(
+          `Failed to update message embed.\n${e}`,
+          interaction.guildId
+        );
+
+        return interaction.editReply(
+          `Hey! I couldn't edit the embed, am I missing READ HISTORY / MANAGE MESSAGE permissions?`
+        );
+      });
+  };
+
+  handleReactionType = async (
+    interaction: ChatInputCommandInteraction,
+    message: Message,
+    embed: EmbedBuilder,
+    roles: ReactRole[],
+    category: ICategory,
+    channel: Channel
+  ) => {
+    if (!message.guildId) throw 'Message has no guild ID';
+
+    const permissionsError = requiredPermissions(channel.id);
+    let isCustomMessage = true;
+
+    // We can only edit our own messages
+    if (message.author === interaction.client.user) {
+      isCustomMessage = false;
+      await message.edit({ embeds: [embed], components: [] }).then(() => {
+        this.log.info(
+          `Updated category[${category.id}] embed.`,
+          message.guildId
+        );
+
+        return interaction.editReply(
+          `Hey! I updated the react role embed message related to this category.`
+        );
+      });
+    }
+
+    // Re-react to the message with the updated react role list.
+    const isSuccessfulReacting = await reactToMessage(
+      message,
+      message.guildId,
+      roles,
+      channel.id,
+      category.id,
+      isCustomMessage,
+      this.log
     );
+
+    if (!isSuccessfulReacting) {
+      return handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: permissionsError,
+      });
+    }
   };
 }
 
