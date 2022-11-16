@@ -16,7 +16,7 @@ export const CREATE_REACT_ROLE = async (
   const reactRole = new ReactRole();
 
   reactRole.emojiId = emojiId;
-  reactRole.emojiTag = emojiTag ?? undefined;
+  reactRole.emojiTag = emojiTag;
   reactRole.roleId = roleId;
   reactRole.guildId = guildId;
   reactRole.name = name;
@@ -93,16 +93,7 @@ export const UPDATE_REACT_ROLE_EMOJI_TAG = async (
   roleId: string,
   emojiTag: string | null
 ) => {
-  const reactRole = await ReactRole.findOne({
-    where: { roleId },
-  });
-
-  if (!reactRole)
-    throw Error(`Role[${roleId}] doesn't exist despite having just found it.`);
-
-  reactRole.emojiTag = emojiTag ?? undefined;
-
-  return await reactRole.save();
+  return await ReactRole.update({ roleId }, { emojiTag });
 };
 
 export const UPDATE_REACT_ROLE_EMOJI_ID = async (
