@@ -27,8 +27,12 @@ export const guildUpdate = async (
       .setThumbnail(guild.iconURL() || '')
       .setDescription(guild.name)
       .addFields(
-        { name: 'Member size:', value: `${guild.memberCount}`, inline: true },
-        { name: 'Guild ID:', value: `${guild.id}`, inline: true }
+        {
+          name: 'Member size:',
+          value: `[${guild.memberCount}]`,
+          inline: true,
+        },
+        { name: 'Guild ID:', value: `[${guild.id}]`, inline: true }
       )
       .setFooter({
         text: `Guilds I'm in: ${size}`,
