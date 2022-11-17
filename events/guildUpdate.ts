@@ -42,7 +42,13 @@ export const guildUpdate = async (
       embeds: [embed],
     });
   } catch (e) {
-    console.error(`Failed to send guild update webhook`);
+    console.error(
+      `Failed to send guild update webhook\nGuild: ${JSON.stringify({
+        id: guild.id,
+        type,
+        members: guild.memberCount,
+      })}`
+    );
     console.error(`${e}`);
   }
 };
