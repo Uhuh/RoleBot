@@ -107,7 +107,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`,
+        content: ``,
       });
     }
 
@@ -121,7 +121,7 @@ export class AddCategoryCommand extends SlashCommand {
 
       handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`,
+        content: ``,
       });
     }
 
@@ -135,8 +135,8 @@ export class AddCategoryCommand extends SlashCommand {
       await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
         categoryAddDate: new Date(),
       });
-      const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
-      const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
+      const moreRoles = ``;
+      const noRolesLeft = ``;
 
       await interaction.update({
         content: roleButtons.length ? moreRoles : noRolesLeft,
@@ -154,7 +154,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
 
       return interaction.update({
-        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+        content: ``,
       });
     }
   };
@@ -196,12 +196,12 @@ export class AddCategoryCommand extends SlashCommand {
     if (categoryId && isNaN(Number(categoryId))) {
       return interaction.reply({
         ephemeral: true,
-        content: `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`,
+        content: ``,
       });
     }
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: 'I failed to find that category! Try again.',
+      message: '',
       prop: 'category',
     });
 
@@ -210,7 +210,7 @@ export class AddCategoryCommand extends SlashCommand {
     if (!reactRoles.length) {
       return interaction.reply({
         ephemeral: true,
-        content: `You should create a few react roles first! Check out \`/react-role\`!`,
+        content: ``,
       });
     }
 
@@ -223,7 +223,7 @@ export class AddCategoryCommand extends SlashCommand {
       .reply({
         ephemeral: true,
         components: roleButtons,
-        content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
+        content: ``,
       })
       .catch((e) => {
         this.log.error(
@@ -232,9 +232,7 @@ export class AddCategoryCommand extends SlashCommand {
         );
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content:
-            `Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.` +
-            `\nIf the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`,
+          content: '',
         });
       });
   };
