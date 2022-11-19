@@ -4,7 +4,7 @@
   "CATEGORY:ADD:CATEGORY:ROLES:EMPTY": "Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.",
   "CATEGORY:ADD:CATEGORY:ROLES:MAX": "Hey! Category {{categoryName}}` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!",
   "CATEGORY:ADD:REACT_ROLE:EXISTING": "Hey! This role is already in the category `{{categoryName}}`.",
-  "CATEGORY:ADD:REACT_ROLE:ADD_MORE": "I've added `{{reactRoleName}}` to `${categoryName}`, you can add more roles if you wish.",
+  "CATEGORY:ADD:REACT_ROLE:ADD_MORE": "I've added `{{reactRoleName}}` to `{{categoryName}}`, you can add more roles if you wish.",
   "CATEGORY:ADD:REACT_ROLE:NO_MORE": "I've added `{{reactRoleName}}` to `{{categoryName}}`. If you want to add more you need to create more react roles first.",
   "CATEGORY:ADD:REACT_ROLE:UPDATE:FAILED": "Hey! I had an issue adding `{{reactRoleName}}` to the category `{{categoryName}}`. Please wait a second and try again.",
   "CATEGORY:ADD:CATEGORY_ID:INTERACTION:FAILED": "Hey! You need to wait for options to show before hitting enter. You entered \"{{categoryId}}\" which isn't a category here.",
