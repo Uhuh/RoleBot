@@ -70,13 +70,13 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRole = this.expect(
       await GET_REACT_ROLE_BY_ID(Number(reactRoleId)),
       {
-        message: i18n.__('CATEGORY:ADD:REACT_ROLE:FIND:FAILED'),
+        message: i18n.__('CATEGORY.ADD.REACT_ROLE.FIND_FAILED'),
         prop: 'react role',
       }
     );
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: i18n.__('CATEGORY:ADD:CATEGORY:FIND:FAILED'),
+      message: i18n.__('CATEGORY.ADD.CATEGORY.FIND_FAILED'),
       prop: 'category',
     });
 
@@ -97,7 +97,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: i18n.__('CATEGORY:ADD:CATEGORY:ROLES:EMPTY'),
+        content: i18n.__('CATEGORY.ADD.CATEGORY.ROLES_EMPTY'),
       });
     }
 
@@ -108,7 +108,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: i18n.__('CATEGORY:ADD:CATEGORY:ROLES:MAX'),
+        content: i18n.__('CATEGORY.ADD.CATEGORY.ROLES_MAX'),
       });
     }
 
@@ -122,8 +122,8 @@ export class AddCategoryCommand extends SlashCommand {
 
       handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: i18n.__('CATEGORY:ADD:REACT_ROLE:EXISTING', {
-          categoryName: reactRoleCategory?.name ?? '',
+        content: i18n.__('CATEGORY.ADD.REACT_ROLE.EXISTING', {
+          categoryName: reactRoleCategory?.name ?? 'CATEGORY_NAME',
         }),
       });
     }
@@ -133,21 +133,22 @@ export class AddCategoryCommand extends SlashCommand {
       Number(categoryId)
     );
 
+    const namesObject = {
+      reactRoleName: reactRole.name,
+      categoryName: category.name,
+    };
+
     try {
       await UPDATE_REACT_ROLE_CATEGORY(Number(reactRoleId), Number(categoryId));
       await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
         categoryAddDate: new Date(),
       });
-      const namesObject = {
-        reactRoleName: reactRole.name,
-        categoryName: category.name,
-      };
       const moreRoles = i18n.__(
-        'CATEGORY:ADD:REACT_ROLE:ADD_MORE',
+        'CATEGORY.ADD.REACT_ROLE.ADD_MORE',
         namesObject
       );
       const noRolesLeft = i18n.__(
-        'CATEGORY:ADD:REACT_ROLE:NO_MORE',
+        'CATEGORY.ADD.REACT_ROLE.NO_MORE',
         namesObject
       );
 
@@ -167,7 +168,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
 
       return interaction.update({
-        content: i18n.__('CATEGORY:ADD:REACT_ROLE:UPDATE:FAILED'),
+        content: i18n.__('CATEGORY.ADD.REACT_ROLE.UPDATE_FAILED', namesObject),
       });
     }
   };
@@ -209,14 +210,14 @@ export class AddCategoryCommand extends SlashCommand {
     if (categoryId && isNaN(Number(categoryId))) {
       return interaction.reply({
         ephemeral: true,
-        content: i18n.__('CATEGORY:ADD:CATEGORY_ID:INTERACTION:FAILED', {
+        content: i18n.__('CATEGORY.ADD.FAILED', {
           categoryId,
         }),
       });
     }
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: i18n.__('CATEGORY:ADD:INVALID:CATEGORY_ID'),
+      message: i18n.__('CATEGORY.ADD.INVALID'),
       prop: 'category',
     });
 
@@ -225,7 +226,7 @@ export class AddCategoryCommand extends SlashCommand {
     if (!reactRoles.length) {
       return interaction.reply({
         ephemeral: true,
-        content: i18n.__('CATEGORY:ADD:REACT_ROLES:EMPTY'),
+        content: i18n.__('CATEGORY.ADD.REACT_ROLE.EMPTY'),
       });
     }
 
@@ -238,7 +239,9 @@ export class AddCategoryCommand extends SlashCommand {
       .reply({
         ephemeral: true,
         components: roleButtons,
-        content: i18n.__('CATEGORY:ADD:BUTTON:ADD'),
+        content: i18n.__('CATEGORY.ADD.BUTTON.ADD', {
+          categoryName: category.name,
+        }),
       })
       .catch((e) => {
         this.log.error(
@@ -247,7 +250,7 @@ export class AddCategoryCommand extends SlashCommand {
         );
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: i18n.__('CATEGORY:ADD:BUTTON:FAIL'),
+          content: i18n.__('CATEGORY.ADD.BUTTON.FAIL'),
         });
       });
   };

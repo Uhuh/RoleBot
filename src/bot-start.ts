@@ -6,6 +6,7 @@ i18n.configure({
   locales: ['en'],
   directory: path.join(__dirname, 'locales'),
   defaultLocale: 'en',
+  objectNotation: true,
 });
 
 const RoleBot = new RB();
