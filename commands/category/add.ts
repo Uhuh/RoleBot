@@ -23,6 +23,7 @@ import {
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import * as i18n from 'i18n';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor() {
@@ -69,13 +70,13 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRole = this.expect(
       await GET_REACT_ROLE_BY_ID(Number(reactRoleId)),
       {
-        message: '',
+        message: i18n.__('CATEGORY:ADD:REACT_ROLE:FIND:FAILED'),
         prop: 'react role',
       }
     );
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: ``,
+      message: i18n.__('CATEGORY:ADD:CATEGORY:FIND:FAILED'),
       prop: 'category',
     });
 
@@ -96,7 +97,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:CATEGORY:ROLES:EMPTY'),
       });
     }
 
@@ -107,7 +108,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:CATEGORY:ROLES:MAX'),
       });
     }
 
@@ -121,7 +122,9 @@ export class AddCategoryCommand extends SlashCommand {
 
       handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:REACT_ROLE:EXISTING', {
+          categoryName: reactRoleCategory?.name ?? '',
+        }),
       });
     }
 
@@ -135,8 +138,18 @@ export class AddCategoryCommand extends SlashCommand {
       await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
         categoryAddDate: new Date(),
       });
-      const moreRoles = ``;
-      const noRolesLeft = ``;
+      const namesObject = {
+        reactRoleName: reactRole.name,
+        categoryName: category.name,
+      };
+      const moreRoles = i18n.__(
+        'CATEGORY:ADD:REACT_ROLE:ADD_MORE',
+        namesObject
+      );
+      const noRolesLeft = i18n.__(
+        'CATEGORY:ADD:REACT_ROLE:NO_MORE',
+        namesObject
+      );
 
       await interaction.update({
         content: roleButtons.length ? moreRoles : noRolesLeft,
@@ -154,7 +167,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
 
       return interaction.update({
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:REACT_ROLE:UPDATE:FAILED'),
       });
     }
   };
@@ -196,12 +209,14 @@ export class AddCategoryCommand extends SlashCommand {
     if (categoryId && isNaN(Number(categoryId))) {
       return interaction.reply({
         ephemeral: true,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:CATEGORY_ID:INTERACTION:FAILED', {
+          categoryId,
+        }),
       });
     }
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: '',
+      message: i18n.__('CATEGORY:ADD:INVALID:CATEGORY_ID'),
       prop: 'category',
     });
 
@@ -210,7 +225,7 @@ export class AddCategoryCommand extends SlashCommand {
     if (!reactRoles.length) {
       return interaction.reply({
         ephemeral: true,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:REACT_ROLES:EMPTY'),
       });
     }
 
@@ -223,7 +238,7 @@ export class AddCategoryCommand extends SlashCommand {
       .reply({
         ephemeral: true,
         components: roleButtons,
-        content: ``,
+        content: i18n.__('CATEGORY:ADD:BUTTON:ADD'),
       })
       .catch((e) => {
         this.log.error(
@@ -232,7 +247,7 @@ export class AddCategoryCommand extends SlashCommand {
         );
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: '',
+          content: i18n.__('CATEGORY:ADD:BUTTON:FAIL'),
         });
       });
   };
