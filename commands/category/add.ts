@@ -69,13 +69,13 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRole = this.expect(
       await GET_REACT_ROLE_BY_ID(Number(reactRoleId)),
       {
-        message: 'Failed to find the react role!',
+        message: '',
         prop: 'react role',
       }
     );
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: `Failed to find the category!`,
+      message: ``,
       prop: 'category',
     });
 
@@ -96,7 +96,7 @@ export class AddCategoryCommand extends SlashCommand {
       );
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`,
+        content: ``,
       });
     }
 
@@ -132,7 +132,9 @@ export class AddCategoryCommand extends SlashCommand {
 
     try {
       await UPDATE_REACT_ROLE_CATEGORY(Number(reactRoleId), Number(categoryId));
-      await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), { categoryAddDate: new Date() });
+      await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
+        categoryAddDate: new Date(),
+      });
       const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
       const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
 
