@@ -38,6 +38,37 @@
         "INVALID_ID": "I couldn't find the category from the command. Please try again.",
         "INVALID": "Hey! I couldn't find the category. Please wait a second and try again."
       }
+    },
+    "LIST": {
+      "EMPTY": "Hey! It appears that there aren't any categories for this server, go make some with `/category-create`!",
+      "PROLONG": "Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run `/react-clean` to remove them."
+    },
+    "REMOVE": {
+      "SUCCESS": "Hey! I successfully deleted the category `{{name}}` for you and freed all the roles on it.",
+      "FAILED": "Hey! I had an issue deleting the category. Please wait a second and try again.",
+      "CATEGORY": {
+        "INVALID": "Hey! This is unusual, I couldn't find that category! Please try again after waiting a second."
+      }
+    },
+    "UPDATE": {
+      "SUCCESS": "Hey! I've successfully re-reacted to the message for you.",
+      "EMPTY": "Hey! I see that message uses category `{{name}}` but it has no react roles in it.\nAdd some react roles to the category with `/category-add` and then try update again. Otherwise just delete it!",
+      "INVALID": {
+        "LINK": "Make sure to pass the message link by right click copying it on desktop!",
+        "CHANNEL": "Hey! I couldn't find that channel, make sure you're copying the message link right.",
+        "MESSAGE": "Hey! I looked and didn't see any react roles saved that are associated with that message.",
+        "CATEGORY": "Hey! I couldn't find a category associated with that message."
+      },
+      "BUTTON": {
+        "SUCCESS": "Hey! I updated that embed for you.",
+        "FAILED": "Hey! I couldn't edit the embed, am I missing READ HISTORY / MANAGE MESSAGE permissions?",
+        "INVALID": {
+          "MESSAGE": "Hey! I can only edit embeds and buttons that are MY message! Make sure the message you're copying is correct."
+        }
+      },
+      "REACT": {
+        "SUCCESS": "Hey! I updated the react role embed message related to this category."
+      }
     }
   },
   "": ""

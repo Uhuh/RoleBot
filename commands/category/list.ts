@@ -11,6 +11,7 @@ import { spliceIntoChunks } from '../../utilities/utils';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
 import { setTimeout } from 'node:timers/promises';
+import * as i18n from 'i18n';
 
 export class ListCategoryCommand extends SlashCommand {
   constructor() {
@@ -45,14 +46,10 @@ export class ListCategoryCommand extends SlashCommand {
     if (!categories || !categories.length) {
       this.log.info(`Guild has no categories.`, interaction.guildId);
 
-      return interaction.editReply(
-        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
-      );
+      return interaction.editReply(i18n.__('CATEGORY.LIST.EMPTY'));
     }
 
-    await interaction.editReply(
-      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react-clean\` to remove them.`
-    );
+    await interaction.editReply(i18n.__('CATEGORY.LIST.PROLONG'));
 
     const embeds: EmbedBuilder[] = [];
 
