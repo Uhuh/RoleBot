@@ -20,6 +20,24 @@
         "ADD": "Below are reaction roles and their respective emojis. Click the buttons you want to add to the category `{{categoryName}}`.",
         "FAIL": "Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.\nIf the problem persist please visit the support server found in the `/info` command so we can figure out the issue!"
       }
+    },
+    "CREATE": {
+      "SUCCESS": "Hey! I successfully created the category `{{name}}` for you!",
+      "FAILED": "Hey! I had some trouble creating that category for you. Please wait a minute and try again.",
+      "CATEGORY": {
+        "INVALID_NAME": "Hey! It says you submitted no category name! You need to submit that. Please try again.",
+        "MAX_NAME_LENGTH": "Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!",
+        "EXIST": "Hey! It turns out you already have a category with that name made. Try checking it out."
+      }
+    },
+    "EDIT": {
+      "SUCCESS": "Hey! I successfully updated the category `{{name}}` for you.",
+      "FAILED": "Hey! I couldn't update the category `{{name}}` for you.",
+      "INVALID": "Hey! You need to pass at _least_ one updated field about the category.",
+      "CATEGORY": {
+        "INVALID_ID": "I couldn't find the category from the command. Please try again.",
+        "INVALID": "Hey! I couldn't find the category. Please wait a second and try again."
+      }
     }
   },
   "": ""

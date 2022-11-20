@@ -12,7 +12,6 @@ import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
   getDisplayCommandValues,
-  handleInteractionReply,
   parseDisplayString,
 } from '../../utilities/utils';
 import {
@@ -20,6 +19,7 @@ import {
   GET_CATEGORY_BY_ID,
 } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import * as i18n from 'i18n';
 
 export class EditCategoryCommand extends SlashCommand {
   constructor() {
@@ -92,7 +92,7 @@ export class EditCategoryCommand extends SlashCommand {
     }
 
     const categoryId = this.expect(interaction.options.getString('category'), {
-      message: 'Category appears to be invalid!',
+      message: i18n.__('CATEGORY.EDIT.CATEGORY.INVALID_ID'),
       prop: `category`,
     });
     const newName = interaction.options.getString('new-name');
@@ -128,25 +128,16 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! You need to pass at _least_ one updated field about the category.`,
+        content: i18n.__('CATEGORY.EDIT.INVALID'),
       });
     }
 
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
-
-    if (!category) {
-      this.log.info(
-        `Category not found with id[${categoryId}]`,
-        interaction.guildId
-      );
-
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I couldn't find the category. Please wait a second and try again.`,
-      });
-    }
+    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
+      message: i18n.__('CATEGORY.EDIT.CATEGORY.INVALID'),
+      prop: 'category',
+    });
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
     const excludedRoleId = newExcludedRoleId ?? category.excludedRoleId;
@@ -173,16 +164,21 @@ export class EditCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
+          content: i18n.__('CATEGORY.EDIT.SUCCESS', { name: category.name }),
         });
       })
-      .catch((e) =>
+      .catch((e) => {
         this.log.critical(
           `Failed to edit category[${category.id}]\n${e}`,
           interaction.guildId
-        )
-      );
+        );
+
+        return interaction.reply({
+          ephemeral: true,
+          content: i18n.__('CATEGORY.EDIT.FAILED', { name: category.name }),
+        });
+      });
   };
 }
