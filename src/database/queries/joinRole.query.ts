@@ -22,6 +22,10 @@ export const GET_GUILD_JOIN_ROLES = async (guildId: string) => {
   return await JoinRole.find({ where: { guildId } });
 };
 
+export const GET_GUILD_JOIN_ROLES_COUNT = async (guildId: string) => {
+  return await JoinRole.count({ where: { guildId } });
+};
+
 export const GET_JOIN_ROLE_BY_ID = async (roleId: string) => {
   return await JoinRole.find({ where: { roleId } });
 };

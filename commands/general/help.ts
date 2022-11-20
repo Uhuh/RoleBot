@@ -41,29 +41,28 @@ export class HelpCommand extends SlashCommand {
     const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
       new SelectMenuBuilder()
         .setCustomId(`select-${this.name}`)
-        .setPlaceholder('Pick a category')
+        .setPlaceholder(i18n.__('GENERAL.HELP.OPTIONS.PLACEHOLDER'))
         .addOptions([
           {
-            label: 'Category commands',
-            description:
-              'Want to categorize your reaction roles? Sort them with categories!',
+            label: i18n.__('GENERAL.HELP.OPTIONS.CATEGORY.LABEL'),
+            description: i18n.__('GENERAL.HELP.OPTIONS.CATEGORY.DESCRIPTION'),
             value: `${this.name}_${Category.category}`,
           },
           {
-            label: 'Reaction role commands',
-            description: `Manage your servers reaction roles with these commands.`,
+            label: i18n.__('GENERAL.HELP.OPTIONS.REACT.LABEL'),
+            description: i18n.__('GENERAL.HELP.OPTIONS.REACT.DESCRIPTION'),
             value: `${this.name}_${Category.react}`,
           },
           {
-            label: 'General commands',
-            description: 'Basic commands everyone can use!',
+            label: i18n.__('GENERAL.HELP.OPTIONS.GENERAL.LABEL'),
+            description: i18n.__('GENERAL.HELP.OPTIONS.GENERAL.DESCRIPTION'),
             value: `${this.name}_${Category.general}`,
           },
         ])
     );
 
     embed
-      .setTitle('Command Help')
+      .setTitle(i18n.__('GENERAL.HELP.TITLE'))
       .setColor(COLOR.DEFAULT)
       .setAuthor({
         name: user.username,
@@ -76,25 +75,12 @@ export class HelpCommand extends SlashCommand {
       })
       .setTimestamp(new Date());
 
-    embed.setDescription(
-      `Hey! **If you've never used me before make sure to check out \`/tutorial\`! It'll explain how RoleBot works.**\n
-      **Want to host the bot yourself? Check out the [GitHub](https://github.com/Uhuh/RoleBot)**
-      \nThanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!${''}\nI've broken them up by category for your convenience.`
-    );
+    embed.setDescription(i18n.__('GENERAL.HELP.DESCRIPTION'));
 
-    interaction
-      .reply({
-        ephemeral: true,
-        embeds: [embed],
-        components: [selectMenu],
-      })
-      .catch((e) =>
-        this.log.error(
-          `Failed to defer interaction. Interaction timestamp: ${new Date(
-            interaction.createdTimestamp
-          )}\n${e}`,
-          interaction.guildId
-        )
-      );
+    await interaction.reply({
+      ephemeral: true,
+      embeds: [embed],
+      components: [selectMenu],
+    });
   };
 }

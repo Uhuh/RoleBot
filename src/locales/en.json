@@ -71,5 +71,51 @@
       }
     }
   },
+  "GENERAL": {
+    "CONFIG": {
+      "SUCCESS": "Hey! Here's your new server configuration.",
+      "FAILED": "Failed to find server config!"
+    },
+    "HELP": {
+      "TITLE": "Command Help",
+      "DESCRIPTION": "Hey! **If you've never used me before make sure to check out `/tutorial`! It'll explain how RoleBot works.**\n**Want to host the bot yourself? Check out the [GitHub](https: //github.com/Uhuh/RoleBot)**\nThanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!$\nI've broken them up by category for your convenience.",
+      "OPTIONS": {
+        "PLACEHOLDER": "Pick a category",
+        "CATEGORY": {
+          "LABEL": "Category commands'",
+          "DESCRIPTION": "Want to categorize your reaction roles? Sort them with categories!"
+        },
+        "REACT": {
+          "LABEL": "Reaction role commands",
+          "DESCRIPTION": "Manage your servers reaction roles with these commands."
+        },
+        "GENERAL": {
+          "LABEL": "General commands",
+          "DESCRIPTION": "Basic commands everyone can use!"
+        }
+      }
+    },
+    "INFO": {
+      "TITLE": "Info about me.",
+      "CONTENT": "Here's some info about me.",
+      "DESCRIPTION": "Thanks for using RoleBot!\n\nCheck out my site! https://rolebot.gg\n\nThis servers shard ID: {{shardId}}\nServer count: {{size}} servers.\nLatency is {{latency}}ms. API Latency is {{apiLatency}}ms."
+    },
+    "JOIN": {
+      "INVALID_TITLE": "Reaction Roles Setup",
+      "INVALID_DESCRIPTION": "The role {{role}} is above me in the role list which you can find in `Server settings > Roles`.\nPlease make sure that my role `RoleBot` is higher than the roles you give me in your servers role hierarchy.",
+      "ADD": {
+        "SUCCESS": ":tada: I successfully added {{role}} to the auto-join list.",
+        "FAILED": "Hey! I had an issue adding that role to the servers auto-join list.",
+        "EXIST": "Hey! That role is already in your auto-join list. Use `/auto-join list` to see what roles are in that list.",
+        "TOO_MANY": "Hey! Currently RoleBot doesn't support having more than 5 auto-join roles."
+      },
+      "REMOVE": {
+        "SUCCESS": "Hey! I successfully removed the role from the auto-join list.",
+        "FAILED": "Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.",
+        "DOES_NOT_EXIST": "That role wasn't found in the auto-join list so nothing was removed."
+      }
+    },
+    "TUTORIAL": {}
+  },
   "": ""
 }

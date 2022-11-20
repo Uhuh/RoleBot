@@ -13,6 +13,7 @@ import {
   CREATE_JOIN_ROLE,
   DELETE_JOIN_ROLE,
   GET_GUILD_JOIN_ROLES,
+  GET_GUILD_JOIN_ROLES_COUNT,
   GET_JOIN_ROLE_BY_ID,
 } from '../../src/database/queries/joinRole.query';
 import { EmbedService } from '../../src/services/embedService';
@@ -23,6 +24,7 @@ import {
   isValidRolePosition,
 } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class AutoJoinCommand extends SlashCommand {
   constructor() {
@@ -85,38 +87,39 @@ export class AutoJoinCommand extends SlashCommand {
   ) => {
     if (!interaction.guildId) return;
 
-    const numJoinRoles = (await GET_GUILD_JOIN_ROLES(interaction.guildId))
-      .length;
+    const { guildId } = interaction;
+
+    const numJoinRoles = await GET_GUILD_JOIN_ROLES_COUNT(guildId);
 
     const doesRoleExist = await GET_JOIN_ROLE_BY_ID(role.id);
 
     if (doesRoleExist.length) {
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`,
+        content: i18n.__('GENERAL.JOIN.ADD.EXIST'),
       });
     }
 
     if (numJoinRoles < 5) {
       try {
-        await CREATE_JOIN_ROLE(role.name, role.id, interaction.guildId);
+        await CREATE_JOIN_ROLE(role.name, role.id, guildId);
 
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `:tada: I successfully added ${RolePing(
-            role.id
-          )} to the auto-join list.`,
+          content: i18n.__('GENERAL.JOIN.ADD.SUCCESS', {
+            role: RolePing(role.id),
+          }),
         });
       } catch (e) {
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `Hey! I had an issue adding that role to the servers auto-join list.`,
+          content: i18n.__('GENERAL.JOIN.ADD.FAILED'),
         });
       }
     } else {
-      handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`,
+        content: i18n.__('GENERAL.JOIN.ADD.TOO_MANY'),
       });
     }
   };
@@ -129,27 +132,28 @@ export class AutoJoinCommand extends SlashCommand {
 
     // If the role isn't in the database then no point in trying to remove.
     if (!doesRoleExist) {
-      return handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `That role wasn't found in the auto-join list so nothing was removed.`,
+        content: i18n.__('GENERAL.JOIN.REMOVE.DOES_NOT_EXIST'),
       });
     }
 
     try {
       await DELETE_JOIN_ROLE(role.id);
 
-      handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! I successfully removed the role from the auto-join list.`,
+        content: i18n.__('GENERAL.JOIN.REMOVE.SUCCESS'),
       });
     } catch (e) {
       this.log.error(
         `Failed to remove auto-join role[${role.id}]`,
         interaction.guildId
       );
-      handleInteractionReply(this.log, interaction, {
+
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`,
+        content: i18n.__('GENERAL.JOIN.REMOVE.FAILED'),
       });
     }
   };
@@ -161,51 +165,30 @@ export class AutoJoinCommand extends SlashCommand {
 
     const embed = EmbedService.joinRoleEmbed(joinRoles.map((r) => r.roleId));
 
-    interaction
-      .reply({
-        ephemeral: true,
-        embeds: [embed],
-      })
-      .catch(() => {
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue sending the embed.`,
-        });
-      });
+    return interaction.reply({
+      ephemeral: true,
+      embeds: [embed],
+    });
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
 
-    const subCommandName = interaction.options.getSubcommand();
-    const subCommandOptions = interaction.options.data;
-    let role: Role | APIRole | undefined | null;
+    const addRole = interaction.options.getRole('add-role');
+    const removeRole = interaction.options.getRole('remove-role');
 
-    // Check if the subcommand has options, if it does then it might be add/remove and we can get the role the user passed
-    if (
-      subCommandOptions[0].options &&
-      subCommandOptions[0].options[0].options?.length
-    ) {
-      const optionName = subCommandOptions[0].options[0].options[0].name;
-      role = interaction.options.get(optionName)?.role;
-
-      if (role === undefined || role === null) {
-        return handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I couldn't find the role for some reason. If this continues please join the support server.`,
-        });
-      }
-
-      const isValidPosition = await isValidRolePosition(interaction, role);
+    if (!addRole && !removeRole) {
+      return this.list(interaction);
+    } else if (addRole) {
+      const isValidPosition = await isValidRolePosition(interaction, addRole);
 
       if (!isValidPosition) {
         const embed = new EmbedBuilder()
-          .setTitle('Reaction Roles Setup')
+          .setTitle(i18n.__('GENERAL.JOIN.INVALID_TITLE'))
           .setDescription(
-            `The role ${RolePing(
-              role.id
-            )} is above me in the role list which you can find in \`Server settings > Roles\`.
-            \nPlease make sure that my role \`RoleBot\` is higher than the roles you give me in your servers role hierarchy.`
+            i18n.__('GENERAL.JOIN.INVALID_DESCRIPTION', {
+              role: RolePing(addRole.id),
+            })
           );
 
         const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -217,34 +200,16 @@ export class AutoJoinCommand extends SlashCommand {
             .setStyle(ButtonStyle.Link)
         );
 
-        return interaction
-          .reply({
-            ephemeral: true,
-            embeds: [embed],
-            components: [button],
-          })
-          .catch((e) =>
-            this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
-          );
-      }
-    }
-
-    switch (subCommandName) {
-      case 'add':
-        // If we somehow get into this with a null role and the above checks failed.
-        if (!role) return;
-        return this.add(interaction, role);
-      case 'remove':
-        // If we somehow get into this with a null role and the above checks failed.
-        if (!role) return;
-        return this.remove(interaction, role);
-      case 'list':
-        return this.list(interaction);
-      default:
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `Hey! I had an issue parsing my own command. Do I have a sub command labelled as ${subCommandName}?`,
+          embeds: [embed],
+          components: [button],
         });
+      }
+
+      return this.add(interaction, addRole);
+    } else if (removeRole) {
+      return this.remove(interaction, removeRole);
     }
   };
 }

@@ -12,6 +12,7 @@ import {
   parseGuildReactString,
 } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class ConfigCommand extends SlashCommand {
   constructor() {
@@ -59,7 +60,7 @@ export class ConfigCommand extends SlashCommand {
     });
 
     const updatedConfig = this.expect(await GET_GUILD_CONFIG(guildId), {
-      message: 'Failed to find server config!',
+      message: i18n.__('GENERAL.CONFIG.FAILED'),
       prop: 'config',
     });
 
@@ -67,7 +68,7 @@ export class ConfigCommand extends SlashCommand {
 
     return interaction.reply({
       ephemeral: true,
-      content: `Heyo! Here's your new server configuration.`,
+      content: i18n.__('GENERAL.CONFIG.SUCCESS'),
       embeds: [embed],
     });
   };
