@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 
 import { EmbedService } from '../../src/services/embedService';
-import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
+import { reactToMessage } from '../../utilities/utils';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
@@ -31,6 +31,7 @@ import { ICategory } from '../../src/database/entities/category.entity';
 import { ReactRole } from '../../src/database/entities';
 import { reactRoleButtons } from '../../utilities/utilButtons';
 import { EmbedBuilder } from '@discordjs/builders';
+import * as i18n from 'i18n';
 
 export class UpdateCategoryCommand extends SlashCommand {
   constructor() {
@@ -62,8 +63,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     const messageLink = this.expect(
       interaction.options.getString('message-link'),
       {
-        message:
-          'Make sure to pass the message link by right click copying it on desktop!',
+        message: i18n.__('CATEGORY.UPDATE.INVALID.LINK'),
         prop: 'message-link',
       }
     );
@@ -77,9 +77,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
 
     if (!channel || !isTextChannel(channel)) {
-      return interaction.editReply(
-        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
-      );
+      return interaction.editReply(i18n.__('CATEGORY.UPDATE.INVALID.LINK'));
     }
 
     const permissionsError = requiredPermissions(channel.id);
@@ -102,9 +100,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         guildId
       );
 
-      return interaction.editReply(
-        `Hey! I looked and didn't see any react roles saved that are associated with that message.`
-      );
+      return interaction.editReply(i18n.__('CATEGORY.UPDATE.INVALID.MESSAGE'));
     }
 
     const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
@@ -115,9 +111,7 @@ export class UpdateCategoryCommand extends SlashCommand {
         guildId
       );
 
-      return interaction.editReply(
-        `Hey! I couldn't find a category associated with that message.`
-      );
+      return interaction.editReply(i18n.__('CATEGORY.UPDATE.INVALID.CATEGORY'));
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
@@ -132,8 +126,7 @@ export class UpdateCategoryCommand extends SlashCommand {
       );
 
       return interaction.editReply(
-        `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
-          `Add some react roles to the category with \`/category-add\` and then try update again. Otherwise just delete it!`
+        i18n.__('CATEGORY.UPDATE.INVALID.CATEGORY', { name: category.name })
       );
     }
 
@@ -182,9 +175,7 @@ export class UpdateCategoryCommand extends SlashCommand {
             channel
           );
 
-          return interaction.editReply(
-            `Hey! I've successfully re-reacted to the message for you.`
-          );
+          return interaction.editReply(i18n.__('CATEGORY.UPDATE.SUCCESS'));
       }
     } catch (e) {
       this.log.error(
@@ -206,7 +197,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     if (!interaction.guildId) throw 'Interaction guild ID missing';
     if (message.author !== interaction.client.user) {
       return interaction.editReply(
-        `Hey! I can only edit embeds and buttons that are MY message! Make sure the message you're copying is correct.`
+        i18n.__('CATEGORY.UPDATE.BUTTON.INVALID.MESSAGE')
       );
     }
 
@@ -225,7 +216,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     await message
       .edit({ embeds: [embed], components: buttons })
       .then(() => {
-        return interaction.editReply(`Hey! I updated that embed for you.`);
+        return interaction.editReply(i18n.__('CATEGORY.UPDATE.BUTTON.SUCCESS'));
       })
       .catch((e) => {
         this.log.error(
@@ -233,9 +224,7 @@ export class UpdateCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        return interaction.editReply(
-          `Hey! I couldn't edit the embed, am I missing READ HISTORY / MANAGE MESSAGE permissions?`
-        );
+        return interaction.editReply(i18n.__('CATEGORY.UPDATE.BUTTON.FAILED'));
       });
   };
 
@@ -261,9 +250,7 @@ export class UpdateCategoryCommand extends SlashCommand {
           message.guildId
         );
 
-        return interaction.editReply(
-          `Hey! I updated the react role embed message related to this category.`
-        );
+        return interaction.editReply(i18n.__('CATEGORY.UPDATE.REACT.SUCCESS'));
       });
     }
 
@@ -279,10 +266,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     );
 
     if (!isSuccessfulReacting) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: permissionsError,
-      });
+      return interaction.editReply(permissionsError);
     }
   };
 }

@@ -6,8 +6,13 @@ import {
 } from '../../src/database/queries/category.query';
 
 import { Category } from '../../utilities/types/commands';
-import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import {
+  getDisplayCommandValues,
+  handleInteractionReply,
+  parseDisplayString,
+} from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class CreateCategoryCommand extends SlashCommand {
   constructor() {
@@ -32,7 +37,12 @@ export class CreateCategoryCommand extends SlashCommand {
       'excluded-role',
       'Users with this role cannot obtain roles from this category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
+    this.addStringOption(
+      'display-order',
+      'Change how the category displays the react roles.',
+      false,
+      getDisplayCommandValues()
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -40,11 +50,12 @@ export class CreateCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [name, description] = this.extractStringVariables(
-      interaction,
-      'category-name',
-      'category-desc'
-    );
+    const name = this.expect(interaction.options.getString('category-name'), {
+      message: i18n.__('CATEGORY.CREATE.CATEGORY.INVALID_NAME'),
+      prop: 'category-name',
+    });
+
+    const description = interaction.options.getString('category-desc');
 
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive') ?? false;
@@ -57,25 +68,22 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
+    const displayOrder = parseDisplayString(
+      displayString as keyof typeof DisplayType
+    );
 
-    if (!name) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
-      });
-    } else if (name.length > 90) {
+    if (name.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
+        content: i18n.__('CATEGORY.CREATE.CATEGORY.MAX_NAME_LENGTH'),
       });
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, name)) {
       return handleInteractionReply(this.log, interaction, {
         ephemeral: true,
-        content: `Hey! It turns out you already have a category with that name made. Try checking it out.`,
+        content: i18n.__('CATEGORY.CREATE.CATEGORY.EXIST'),
       });
     }
 
@@ -86,7 +94,7 @@ export class CreateCategoryCommand extends SlashCommand {
       mutuallyExclusive,
       requiredRoleId,
       excludedRoleId,
-      displayOrder
+      displayOrder,
     })
       .then(() => {
         this.log.info(
@@ -95,7 +103,7 @@ export class CreateCategoryCommand extends SlashCommand {
         );
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: `Hey! I successfully created the category \`${name}\` for you!`,
+          content: i18n.__('CATEGORY.CREATE.SUCCESS', { name }),
         });
       })
       .catch((e) => {
@@ -105,7 +113,7 @@ export class CreateCategoryCommand extends SlashCommand {
         );
         handleInteractionReply(this.log, interaction, {
           ephemeral: true,
-          content: `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`,
+          content: i18n.__('CATEGORY.CREATE.FAILED'),
         });
       });
   };

@@ -45,36 +45,25 @@ export class TutorialCommand extends SlashCommand {
     const embed = EmbedService.tutorialEmbed(pageId);
     const buttons = this.makeButtons(pageId);
 
-    interaction
-      .update({
-        embeds: [embed],
-        components: [buttons],
-      })
-      .catch((e) =>
-        this.log.error(
-          `Failed to update tutorial interaction.\n${e}`,
-          interaction.guildId
-        )
-      );
+    return interaction.update({
+      embeds: [embed],
+      components: [buttons],
+    });
   };
 
+  /**
+   * @TODO - Need to do i18n support for the tutorial.
+   */
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = EmbedService.tutorialEmbed(0);
 
     const buttons = this.makeButtons(0);
 
-    interaction
-      .reply({
-        ephemeral: true,
-        content: `Hey! Let's get to learning.`,
-        embeds: [embed],
-        components: [buttons],
-      })
-      .catch((e) =>
-        this.log.error(
-          `Failed to send tutorial embed.\n${e}`,
-          interaction.guildId
-        )
-      );
+    return interaction.reply({
+      ephemeral: true,
+      content: `Hey! Let's get to learning.`,
+      embeds: [embed],
+      components: [buttons],
+    });
   };
 }

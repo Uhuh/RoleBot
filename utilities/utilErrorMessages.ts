@@ -2,6 +2,9 @@ import errors from './json/errors.json';
 import { codeBlock } from 'discord.js';
 import { ChannelPing } from './utilPings';
 
+/**
+ * @TODO - Figure out i18n translations for this.
+ */
 export const requiredPermissions = (channelId: string) => {
   const resultString = errors['missing_permissions']
     .replace(/{{channel}}/g, ChannelPing(channelId))

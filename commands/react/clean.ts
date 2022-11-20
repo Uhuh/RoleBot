@@ -5,6 +5,7 @@ import {
 } from '../../src/database/queries/reactRole.query';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class ReactCleanCommand extends SlashCommand {
   constructor() {
@@ -53,8 +54,8 @@ export class ReactCleanCommand extends SlashCommand {
     }
 
     const reply = numRemovedRoles
-      ? `Removed ${numRemovedRoles} dead react roles.`
-      : 'There are no dead react roles.';
+      ? i18n.__('REACT.CLEAN.REMOVED', { num: `${numRemovedRoles}` })
+      : i18n.__('REACT.CLEAN.USELESS');
 
     return interaction.editReply(reply);
   };

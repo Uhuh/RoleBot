@@ -5,13 +5,12 @@ import {
 } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-
-import { handleInteractionReply } from '../../utilities/utils';
 import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
 } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import * as i18n from 'i18n';
 
 export class RemoveCategoryCommand extends SlashCommand {
   constructor() {
@@ -57,9 +56,9 @@ export class RemoveCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`,
+        content: i18n.__('CATEGORY.REMOVE.CATEGORY.INVALID'),
       });
     }
 
@@ -70,9 +69,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`,
+          content: i18n.__('CATEGORY.REMOVE.SUCCESS', { name: category.name }),
         });
       })
       .catch((e) => {
@@ -81,9 +80,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
+        return interaction.reply({
           ephemeral: true,
-          content: `Hey! I had an issue deleting the category. Please wait a second and try again.`,
+          content: i18n.__('CATEGORY.REMOVE.FAILED'),
         });
       });
   };
