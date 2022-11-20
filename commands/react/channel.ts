@@ -29,6 +29,7 @@ import {
 import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
 import { reactRoleButtons } from '../../utilities/utilButtons';
+import * as i18n from 'i18n';
 
 export class ReactChannelCommand extends SlashCommand {
   constructor() {
@@ -75,7 +76,7 @@ export class ReactChannelCommand extends SlashCommand {
     }
 
     const channel = this.expect(interaction.options.getChannel('channel'), {
-      message: `Hey! I can't find the channel! Please wait and try again.`,
+      message: i18n.__('REACT.CHANNEL.SINGLE.INVALID.CHANNEL'),
       prop: 'channel',
     });
 
@@ -83,7 +84,7 @@ export class ReactChannelCommand extends SlashCommand {
       this.log.error(`Passed in channel was invalid.`, interaction.guildId);
 
       return interaction
-        .editReply(`Hey! I only support sending embeds to text channels!`)
+        .editReply(i18n.__('REACT.CHANNEL.CHANNEL_TYPE'))
         .catch((e) =>
           this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
         );
@@ -92,7 +93,7 @@ export class ReactChannelCommand extends SlashCommand {
     const textChannel = this.expect(
       await interaction.guild?.channels.fetch(channel.id),
       {
-        message: `Failed to find the channel just passed in!`,
+        message: i18n.__('REACT.CHANNEL.SINGLE.FAILED.CHANNEL'),
         prop: 'text channel',
       }
     );
@@ -100,7 +101,7 @@ export class ReactChannelCommand extends SlashCommand {
     if (textChannel.type !== ChannelType.GuildText) return;
 
     const category = this.expect(await GET_CATEGORY_BY_ID(categoryId), {
-      message: `I failed to find the category! Please wait and try again.`,
+      message: i18n.__('REACT.CHANNEL.SINGLE.FAILED.CATEGORY'),
       prop: 'category',
     });
 
@@ -139,7 +140,7 @@ export class ReactChannelCommand extends SlashCommand {
       return this.handleSingleCategory(interaction, Number(categoryId));
     } else if (categoryId) {
       return interaction.editReply(
-        `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`
+        i18n.__('REACT.CHANNEL.CATEGORY_OPTION', { categoryId })
       );
     }
 
@@ -150,13 +151,10 @@ export class ReactChannelCommand extends SlashCommand {
     if (!categories) {
       this.log.debug(`Guild has no categories.`, guildId);
 
-      return interaction.editReply(
-        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
-      );
+      return interaction.editReply(i18n.__('REACT.SINGLE.NO_CATEGORIES'));
     }
 
     // Stolen from @react/message execute function
-    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
     const categoryRolesCount = await GET_GUILD_CATEGORY_ROLE_COUNT(guildId);
 
     if (!categoryRolesCount) {
@@ -166,12 +164,12 @@ export class ReactChannelCommand extends SlashCommand {
       );
 
       return interaction.editReply({
-        content: allCategoriesAreEmpty,
+        content: i18n.__('REACT.CHANNEL.EMPTY_CATEGORIES'),
       });
     }
 
     const channel = this.expect(interaction.options.getChannel('channel'), {
-      message: `Hey! I failed to find the channel from the command. Please wait a second and try again.`,
+      message: i18n.__('REACT.CHANNEL.CHANNEL_OPTION'),
       prop: 'channel',
     });
 
@@ -181,9 +179,7 @@ export class ReactChannelCommand extends SlashCommand {
         guildId
       );
 
-      return interaction.editReply(
-        `Hey! I only support sending embeds to text channels!`
-      );
+      return interaction.editReply(i18n.__('REACT.CHANNEL.CHANNEL_TYPE'));
     }
 
     const textChannel = await interaction.guild?.channels.fetch(channel.id);
@@ -291,8 +287,6 @@ export class ReactChannelCommand extends SlashCommand {
       return interaction.editReply(permissionError);
     }
 
-    await interaction.editReply({
-      content: 'Hey! Check the channel to make sure I worked properly.',
-    });
+    await interaction.editReply(i18n.__('REACT.SUCCESS'));
   };
 }

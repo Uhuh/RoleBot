@@ -3,6 +3,7 @@ import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.q
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class ReactListCommand extends SlashCommand {
   constructor() {
@@ -31,14 +32,14 @@ export class ReactListCommand extends SlashCommand {
 
     if (!reactRoles || !reactRoles.length) {
       return interaction.editReply({
-        content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
+        content: i18n.__('REACT.LIST.FAILED'),
       });
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
     return interaction.editReply({
-      content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
+      content: i18n.__('REACT.LIST.SUCCESS'),
       embeds: [embed],
     });
   };

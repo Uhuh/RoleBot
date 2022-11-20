@@ -1,28 +1,28 @@
 {
   "CATEGORY": {
     "ADD": {
-      "FAILED": "Hey! You need to wait for options to show before hitting enter. You entered \"{{categoryId}}\" which isn't a category here.",
+      "FAILED": "Hey! You need to wait for options to show before hitting enter. You entered \"{{{categoryId}}}\" which isn't a category here.",
       "INVALID": "I failed to find that category! Try again.",
       "CATEGORY": {
         "FIND_FAILED": "Failed to find the category!",
         "ROLES_EMPTY": "Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.",
-        "ROLES_MAX": "Hey! Category {{categoryName}}` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!"
+        "ROLES_MAX": "Hey! Category {{{categoryName}}}` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!"
       },
       "REACT_ROLE": {
         "FIND_FAILED": "Failed to find the react role!",
-        "EXISTING": "Hey! This role is already in the category `{{categoryName}}`.",
-        "ADD_MORE": "I've added `{{reactRoleName}}` to `{{categoryName}}`, you can add more roles if you wish.",
-        "NO_MORE": "I've added `{{reactRoleName}}` to `{{categoryName}}`. If you want to add more you need to create more react roles first.",
-        "UPDATE_FAILED": "Hey! I had an issue adding `{{reactRoleName}}` to the category `{{categoryName}}`. Please wait a second and try again.",
+        "EXISTING": "Hey! This role is already in the category `{{{categoryName}}}`.",
+        "ADD_MORE": "I've added `{{reactRoleName}}` to `{{{categoryName}}}`, you can add more roles if you wish.",
+        "NO_MORE": "I've added `{{reactRoleName}}` to `{{{categoryName}}}`. If you want to add more you need to create more react roles first.",
+        "UPDATE_FAILED": "Hey! I had an issue adding `{{reactRoleName}}` to the category `{{{categoryName}}}`. Please wait a second and try again.",
         "EMPTY": "You should create a few react roles first! Check out `/react-role`!"
       },
       "BUTTON": {
-        "ADD": "Below are reaction roles and their respective emojis. Click the buttons you want to add to the category `{{categoryName}}`.",
+        "ADD": "Below are reaction roles and their respective emojis. Click the buttons you want to add to the category `{{{categoryName}}}`.",
         "FAIL": "Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.\nIf the problem persist please visit the support server found in the `/info` command so we can figure out the issue!"
       }
     },
     "CREATE": {
-      "SUCCESS": "Hey! I successfully created the category `{{name}}` for you!",
+      "SUCCESS": "Hey! I successfully created the category `{{{name}}}` for you!",
       "FAILED": "Hey! I had some trouble creating that category for you. Please wait a minute and try again.",
       "CATEGORY": {
         "INVALID_NAME": "Hey! It says you submitted no category name! You need to submit that. Please try again.",
@@ -31,8 +31,8 @@
       }
     },
     "EDIT": {
-      "SUCCESS": "Hey! I successfully updated the category `{{name}}` for you.",
-      "FAILED": "Hey! I couldn't update the category `{{name}}` for you.",
+      "SUCCESS": "Hey! I successfully updated the category `{{{name}}}` for you.",
+      "FAILED": "Hey! I couldn't update the category `{{{name}}}` for you.",
       "INVALID": "Hey! You need to pass at _least_ one updated field about the category.",
       "CATEGORY": {
         "INVALID_ID": "I couldn't find the category from the command. Please try again.",
@@ -44,7 +44,7 @@
       "PROLONG": "Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run `/react-clean` to remove them."
     },
     "REMOVE": {
-      "SUCCESS": "Hey! I successfully deleted the category `{{name}}` for you and freed all the roles on it.",
+      "SUCCESS": "Hey! I successfully deleted the category `{{{name}}}` for you and freed all the roles on it.",
       "FAILED": "Hey! I had an issue deleting the category. Please wait a second and try again.",
       "CATEGORY": {
         "INVALID": "Hey! This is unusual, I couldn't find that category! Please try again after waiting a second."
@@ -52,7 +52,7 @@
     },
     "UPDATE": {
       "SUCCESS": "Hey! I've successfully re-reacted to the message for you.",
-      "EMPTY": "Hey! I see that message uses category `{{name}}` but it has no react roles in it.\nAdd some react roles to the category with `/category-add` and then try update again. Otherwise just delete it!",
+      "EMPTY": "Hey! I see that message uses category `{{{name}}}` but it has no react roles in it.\nAdd some react roles to the category with `/category-add` and then try update again. Otherwise just delete it!",
       "INVALID": {
         "LINK": "Make sure to pass the message link by right click copying it on desktop!",
         "CHANNEL": "Hey! I couldn't find that channel, make sure you're copying the message link right.",
@@ -102,9 +102,9 @@
     },
     "JOIN": {
       "INVALID_TITLE": "Reaction Roles Setup",
-      "INVALID_DESCRIPTION": "The role {{role}} is above me in the role list which you can find in `Server settings > Roles`.\nPlease make sure that my role `RoleBot` is higher than the roles you give me in your servers role hierarchy.",
+      "INVALID_DESCRIPTION": "The role {{{role}}} is above me in the role list which you can find in `Server settings > Roles`.\nPlease make sure that my role `RoleBot` is higher than the roles you give me in your servers role hierarchy.",
       "ADD": {
-        "SUCCESS": ":tada: I successfully added {{role}} to the auto-join list.",
+        "SUCCESS": ":tada: I successfully added {{{role}}} to the auto-join list.",
         "FAILED": "Hey! I had an issue adding that role to the servers auto-join list.",
         "EXIST": "Hey! That role is already in your auto-join list. Use `/auto-join list` to see what roles are in that list.",
         "TOO_MANY": "Hey! Currently RoleBot doesn't support having more than 5 auto-join roles."
@@ -117,5 +117,54 @@
     },
     "TUTORIAL": {}
   },
-  "": ""
+  "REACT": {
+    "CHANNEL": {
+      "CHANNEL_OPTION": "Hey! I failed to find the channel from the command. Please wait a second and try again.",
+      "CATEGORY_OPTION": "Hey! You need to wait for options to show before hitting enter. You entered \"{{categoryId}}\" which isn't a category here.",
+      "NO_CATEGORIES": "Hey! You need to make some categories and fill them with react roles before running this command. Check out `/category-add`.",
+      "EMPTY_CATEGORIES": "Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out `/category-add` to start adding roles to a category.",
+      "CHANNEL_TYPE": "Hey! I only support sending embeds to text channels!",
+      "SUCCESS": "Hey! Check the channel to make sure I worked properly.",
+      "SINGLE": {
+        "INVALID": {
+          "CHANNEL": "Hey! I can't find the channel! Please wait and try again."
+        },
+        "FAILED": {
+          "CHANNEL": "Failed to find the channel just passed in!",
+          "CATEGORY": "I failed to find the category! Please wait and try again."
+        }
+      }
+    },
+    "CLEAN": {
+      "REMOVED": "Removed {{{num}}} dead react roles.",
+      "USELESS": "There are no dead react roles."
+    },
+    "CREATE": {
+      "SUCCESS": ":tada: Successfully created the react role ({{{emoji}}} - {{{role}}}) :tada: \n**Make sure to add your newly created react role to a category with `/category-add`!**",
+      "FAILED": "React role failed to create. Please try again.",
+      "MAX_ALLOWED_NO_CATEGORY": "Hey! It turns out you have {{num}} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however `/category-add` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!",
+      "MISSING": {
+        "ROLE": "Somehow the role is missing! Please try again.",
+        "EMOJI": "Somehow the emoji is missing! Please try again."
+      },
+      "INVALID": {
+        "EMOJI": "Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again."
+      },
+      "EMOJI_USED": "The react role ({{{emoji}}} - {{{role}}}) already has this emoji assigned to it.",
+      "ROLE_USED": "There's a react role already using the role `{{{name}}}` ({{{emoji}}} - {{{role}}})."
+    },
+    "EDIT": {
+      "SUCCESS": ":tada: Successfully updated the react role ({{{emoji}}} - {{{role}}}) :tada:",
+      "MISSING": "Somehow the {{{prop}}} is missing! Please try again.",
+      "INVALID": {
+        "ROLE": "Hey! That role doesn't belong to an existing react role.",
+        "EMOJI": "Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again."
+      },
+      "EMOJI_USED": "Hey! That emoji belongs to a react role ({{{role}}})"
+    },
+    "LIST": {
+      "SUCCESS": "Hey! Here's your react roles. If you notice any `@deleted` roles run `/react-clean` to remove them.",
+      "FAILED": "Hey! Turns out this server doesn't have any react roles setup. Start creating some with `/react-role`!"
+    }
+  }
 }

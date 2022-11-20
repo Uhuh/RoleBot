@@ -175,7 +175,7 @@ export class AutoJoinCommand extends SlashCommand {
     if (!interaction.guildId) return;
 
     const addRole = interaction.options.getRole('add-role');
-    const removeRole = interaction.options.getRole('remove-role');
+    const removeRole = interaction.options.getRole('remove-join');
 
     if (!addRole && !removeRole) {
       return this.list(interaction);

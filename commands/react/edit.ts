@@ -12,6 +12,7 @@ import {
 import { Category } from '../../utilities/types/commands';
 import { RolePing } from '../../utilities/utilPings';
 import { SlashCommand } from '../slashCommand';
+import * as i18n from 'i18n';
 
 export class ReactEditCommand extends SlashCommand {
   constructor() {
@@ -43,11 +44,15 @@ export class ReactEditCommand extends SlashCommand {
     }
 
     const role = this.expect(interaction.options.getRole('role'), {
-      message: `Somehow the role is missing! Please try again.`,
+      message: i18n.__('REACT.EDIT.MISSING', {
+        prop: 'role',
+      }),
       prop: 'role',
     });
     const emoji = this.expect(interaction.options.getString('new-emoji'), {
-      message: 'Somehow the emoji is missing! Please try again.',
+      message: i18n.__('REACT.EDIT.MISSING', {
+        prop: 'emoji',
+      }),
       prop: 'emoji',
     });
 
@@ -55,7 +60,7 @@ export class ReactEditCommand extends SlashCommand {
     if (!doesReactRoleExist) {
       return interaction.reply({
         ephemeral: true,
-        content: `Hey! That role doesn't belong to an existing react role.`,
+        content: i18n.__('REACT.EDIT.INVALID.ROLE'),
       });
     }
 
@@ -64,23 +69,23 @@ export class ReactEditCommand extends SlashCommand {
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
       return interaction.reply({
         ephemeral: true,
-        content: `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
+        content: i18n.__('REACT.EDIT.INVALID.EMOJI'),
       });
     }
 
     const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
 
-    const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
+    const emojiReactRole = await GET_REACT_ROLE_BY_EMOJI(
       emojiContent,
       interaction.guildId
     );
 
-    if (doesEmojiBelongToReactRole) {
+    if (emojiReactRole) {
       return interaction.reply({
         ephemeral: true,
-        content: `Hey! That emoji belongs to a react role (${RolePing(
-          doesEmojiBelongToReactRole.roleId
-        )})`,
+        content: i18n.__('REACT.EDIT.EMOJI_USED', {
+          role: RolePing(emojiReactRole.roleId),
+        }),
       });
     }
 
@@ -100,9 +105,10 @@ export class ReactEditCommand extends SlashCommand {
 
     return interaction.reply({
       ephemeral: true,
-      content: `:tada: Successfully updated the react role (${
-        emojiTag ?? parsedEmoji.name
-      } - ${RolePing(role.id)}) :tada:`,
+      content: i18n.__('REACT.EDIT.SUCCESS', {
+        emoji: emojiTag ?? parsedEmoji.name,
+        role: RolePing(role.id),
+      }),
     });
   };
 }
