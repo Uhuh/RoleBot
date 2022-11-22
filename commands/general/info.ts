@@ -62,7 +62,6 @@ export class InfoCommand extends SlashCommand {
         {
           name: '<:rolebot_people:1044464965618253895> Shard ID',
           value: `This servers shard is ${interaction.guild?.shardId}`,
-          inline: true,
         },
         {
           name: '<:rolebot_people:1044464965618253895> Server count',
@@ -70,7 +69,6 @@ export class InfoCommand extends SlashCommand {
             (acc, guildCount) => acc + Number(guildCount),
             0
           )} servers.`,
-          inline: true,
         },
         {
           name: '<:rolebot_people:1044464965618253895> Total Member count',
@@ -78,12 +76,10 @@ export class InfoCommand extends SlashCommand {
             (acc, memberCount) => acc + Number(memberCount),
             0
           )} current users.`,
-          inline: true,
         },
         {
           name: `${emoji} Ping`,
           value: `RoleBot's ping is ${ping}ms.`,
-          inline: true,
         }
       )
 
