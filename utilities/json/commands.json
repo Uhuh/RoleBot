@@ -1,4 +1,10 @@
 {
+  "owner": [
+    {
+      "name": "eval",
+      "description": "Devs only :)"
+    }
+  ],
   "category": [
     {
       "name": "category-add",

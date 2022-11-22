@@ -9,6 +9,7 @@ export enum Category {
   general = 'general',
   category = 'category',
   react = 'react',
+  owner = 'owner',
 }
 
 export type SlashCommandTypes =

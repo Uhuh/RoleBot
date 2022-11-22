@@ -1,45 +1,92 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
+import {
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  Colors,
+  EmbedBuilder,
+} from 'discord.js';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
-import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
 
 export class InfoCommand extends SlashCommand {
   constructor() {
     super('info', `RoleBot's invite, ping, etc.`, Category.general);
   }
+
+  buttons = () => {
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Invite')
+        .setURL(INVITE_URL)
+        .setStyle(ButtonStyle.Link),
+      new ButtonBuilder()
+        .setLabel('Vote')
+        .setURL(VOTE_URL)
+        .setStyle(ButtonStyle.Link),
+      new ButtonBuilder()
+        .setLabel('Support Server')
+        .setURL(SUPPORT_URL)
+        .setStyle(ButtonStyle.Link)
+    );
+  };
+
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
-    const size = (
-      await interaction.client.shard?.fetchClientValues('guilds.cache.size')
-    )?.reduce<number>((a, b) => a + Number(b), 0);
+    const [size, memberCount] = await Promise.all([
+      interaction.client.shard?.fetchClientValues('guilds.cache.size'),
+      interaction.client.shard?.broadcastEval((c) =>
+        c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
+      ),
+    ]);
+
+    const buttons = this.buttons();
+    let emoji;
+
+    const ping = Math.floor(interaction.client.ws.ping);
+
+    if (ping > 0) {
+      emoji = ' <:rolebot__goodping:1044464966973001819>';
+    }
+    if (ping > 125) {
+      emoji = '<:rolebot__idleping:1044466765117272094>';
+    }
+    if (ping > 250) {
+      emoji = '<:rolebot__badping:1044466766270701619>';
+    }
 
     embed
       .setTitle('General Info')
-      .setColor(COLOR.AQUA)
-      .setDescription(
-        `
-Thanks for using RoleBot!
-
-Check out my site! https://rolebot.gg
-
-This servers shard ID: ${interaction.guild?.shardId}
-Server count: ${size} servers.
-Latency is ${
-          Date.now() - interaction.createdTimestamp
-        }ms. API Latency is ${Math.round(interaction.client.ws.ping)}ms.
-
-[Click to Vote!](${VOTE_URL})
-[Join the support server!](${SUPPORT_URL})
-[Click to invite!](${INVITE_URL})
-`
+      .setColor(Colors.Blurple)
+      .addFields(
+        {
+          name: '<:rolebot_people:1044464965618253895> Shard ID',
+          value: `This servers shard is ${interaction.guild?.shardId}`,
+          inline: true,
+        },
+        {
+          name: '<:rolebot_people:1044464965618253895> Server count',
+          value: `RoleBot is in ${size} servers.`,
+          inline: true,
+        },
+        {
+          name: '<:rolebot_people:1044464965618253895> Total Member count',
+          value: `RoleBot has ${memberCount} current users.`,
+          inline: true,
+        },
+        {
+          name: `${emoji} Ping`,
+          value: `RoleBot's ping is ${ping}ms.`,
+          inline: true,
+        }
       )
+
       .setThumbnail(AVATAR_URL);
 
     interaction
       .reply({
-        content: `Here's some info about me.`,
         embeds: [embed],
+        components: [buttons],
       })
       .catch((e) =>
         this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
