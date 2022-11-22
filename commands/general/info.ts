@@ -66,12 +66,18 @@ export class InfoCommand extends SlashCommand {
         },
         {
           name: '<:rolebot_people:1044464965618253895> Server count',
-          value: `RoleBot is in ${size} servers.`,
+          value: `RoleBot is in ${size?.reduce<number>(
+            (acc, guildCount) => acc + Number(guildCount),
+            0
+          )} servers.`,
           inline: true,
         },
         {
           name: '<:rolebot_people:1044464965618253895> Total Member count',
-          value: `RoleBot has ${memberCount} current users.`,
+          value: `RoleBot has ${memberCount?.reduce<number>(
+            (acc, memberCount) => acc + Number(memberCount),
+            0
+          )} current users.`,
           inline: true,
         },
         {
