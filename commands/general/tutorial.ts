@@ -9,6 +9,7 @@ import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import tutorialJson from '../../utilities/json/tutorial.json';
+import { TUTORIAL_PLAYLIST } from '../../src/vars';
 
 export class TutorialCommand extends SlashCommand {
   readonly maxPage = tutorialJson['embeds'].length - 1;
@@ -66,7 +67,7 @@ export class TutorialCommand extends SlashCommand {
     interaction
       .reply({
         ephemeral: true,
-        content: `Hey! Let's get to learning.`,
+        content: `Hey! Let's get to learning.\n**Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n`,
         embeds: [embed],
         components: [buttons],
       })

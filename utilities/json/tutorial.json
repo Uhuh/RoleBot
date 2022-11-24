@@ -31,9 +31,11 @@
         "When creating a category we use the command `/category-create`. **By default you're only required to give the category a name and can leave the other options empty.**",
         "* `category-desc` is the category description. This is text that will show above the react roles in the embed when displayed. Use it to briefly describe the purpose of the category or theme.",
         "* `mutually-exclusive` is what dictates if a user can obtain all roles from a category or only one. If the value for this is true then a user may only get one role at a time from the category.",
-        "* `required-role` will only allow users with a specific role to react and obtain roles from the category."
+        "* `required-role` will only allow users with a specific role to react and obtain roles from the category.",
+        "* `excluded-role` will ignore users with this role for the set category.",
+        "* `display-order` determines how to list react roles and reactions for messages."
       ],
-      "image": "https://media.discordapp.net/attachments/935424318471548978/1028513235390955620/unknown.png"
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1045157006845161472/image.png"
     },
     {
       "title": "How to add react roles to a category. | Page 4",

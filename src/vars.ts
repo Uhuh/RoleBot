@@ -22,3 +22,6 @@ export const WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN || '';
 
 export const GUILD_WEBHOOK_ID = process.env.GUILD_WEBHOOK_ID || '';
 export const GUILD_WEBHOOK_TOKEN = process.env.GUILD_WEBHOOK_TOKEN || '';
+
+export const TUTORIAL_PLAYLIST =
+  'https://www.youtube.com/watch?v=ikqTW4bbM7s&list=PLW0pJjCQgtaV2ukCIV_0h56Ld2wtKyvcR';

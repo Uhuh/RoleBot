@@ -6,6 +6,7 @@ import {
   SelectMenuInteraction,
 } from 'discord.js';
 import { EmbedService } from '../../src/services/embedService';
+import { TUTORIAL_PLAYLIST } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/globals';
 import { SlashCommand } from '../slashCommand';
@@ -78,8 +79,9 @@ export class HelpCommand extends SlashCommand {
 
     embed.setDescription(
       `Hey! **If you've never used me before make sure to check out \`/tutorial\`! It'll explain how RoleBot works.**\n
-      **Want to host the bot yourself? Check out the [GitHub](https://github.com/Uhuh/RoleBot)**
-      \nThanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!${''}\nI've broken them up by category for your convenience.`
+      **Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n
+      **Want to host the bot yourself? Check out the [GitHub](https://github.com/Uhuh/RoleBot)**\n
+      Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`
     );
 
     interaction
