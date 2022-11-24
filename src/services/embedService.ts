@@ -4,7 +4,7 @@ import { Category, DisplayType } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
 import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
-import { AVATAR_URL } from '../vars';
+import { AVATAR_URL, SUPPORT_URL } from '../vars';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
 import { Category as CommandCategory } from '../../utilities/types/commands';
@@ -231,6 +231,28 @@ export class EmbedService {
           `\n\nReact type: **${
             GuildReactType[config.reactType]
           }**\nHide button emojis: **${config.hideEmojis}**`
+      )
+      .setTimestamp(new Date());
+
+    return embed;
+  };
+
+  public static announcementEmbed = () => {
+    const embed = new EmbedBuilder();
+    const announcementLink =
+      'https://canary.discord.com/channels/567819334852804626/567821914999881728/1044604697203445902';
+
+    embed
+      .setColor(Colors.red)
+      .setAuthor({ name: 'RoleBot' })
+      .setTitle('Important announcement.')
+      .setDescription(
+        `Hey RoleBot users,\nSadly this current version of RoleBot will be shutting down in the foreseeable future.\n**But**, this is not the end of RoleBot. You can invite the new application through RoleBot's site at https://rolebot.gg/invite\n
+        Please make sure to join the [support server](${SUPPORT_URL}) and read the announcement that [answers some questions you may have.](${announcementLink})\n
+        **Both the new and old bot read from the same database so NO data is lost.**\nIf you're having **issues inviting the new bot** please carry on using the new one and check frequently as we need to verify the new one with Discord.
+        \nI look forward to continuing working on RoleBot and bring even greater features to you guys!\n
+        That's all,\nSincerely, Panku
+        `
       )
       .setTimestamp(new Date());
 

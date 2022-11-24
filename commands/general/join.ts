@@ -18,10 +18,7 @@ import {
 import { EmbedService } from '../../src/services/embedService';
 import { Category } from '../../utilities/types/commands';
 import { RolePing } from '../../utilities/utilPings';
-import {
-  handleInteractionReply,
-  isValidRolePosition,
-} from '../../utilities/utils';
+import { isValidRolePosition } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class AutoJoinCommand extends SlashCommand {
@@ -91,33 +88,29 @@ export class AutoJoinCommand extends SlashCommand {
     const doesRoleExist = await GET_JOIN_ROLE_BY_ID(role.id);
 
     if (doesRoleExist.length) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`,
-      });
+      return interaction.editReply(
+        `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`
+      );
     }
 
     if (numJoinRoles < 5) {
       try {
         await CREATE_JOIN_ROLE(role.name, role.id, interaction.guildId);
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `:tada: I successfully added ${RolePing(
+        await interaction.editReply(
+          `:tada: I successfully added ${RolePing(
             role.id
-          )} to the auto-join list.`,
-        });
+          )} to the auto-join list.`
+        );
       } catch (e) {
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue adding that role to the servers auto-join list.`,
-        });
+        await interaction.editReply(
+          `Hey! I had an issue adding that role to the servers auto-join list.`
+        );
       }
     } else {
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`,
-      });
+      await interaction.editReply(
+        `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`
+      );
     }
   };
 
@@ -129,28 +122,25 @@ export class AutoJoinCommand extends SlashCommand {
 
     // If the role isn't in the database then no point in trying to remove.
     if (!doesRoleExist) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `That role wasn't found in the auto-join list so nothing was removed.`,
-      });
+      return interaction.editReply(
+        `That role wasn't found in the auto-join list so nothing was removed.`
+      );
     }
 
     try {
       await DELETE_JOIN_ROLE(role.id);
 
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I successfully removed the role from the auto-join list.`,
-      });
+      await interaction.editReply(
+        `Hey! I successfully removed the role from the auto-join list.`
+      );
     } catch (e) {
       this.log.error(
         `Failed to remove auto-join role[${role.id}]`,
         interaction.guildId
       );
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`,
-      });
+      await interaction.editReply(
+        `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`
+      );
     }
   };
 
@@ -166,16 +156,17 @@ export class AutoJoinCommand extends SlashCommand {
         ephemeral: true,
         embeds: [embed],
       })
-      .catch(() => {
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue sending the embed.`,
-        });
-      });
+      .catch(() =>
+        interaction.editReply(`Hey! I had an issue sending the embed.`)
+      );
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const subCommandName = interaction.options.getSubcommand();
     const subCommandOptions = interaction.options.data;
@@ -190,10 +181,9 @@ export class AutoJoinCommand extends SlashCommand {
       role = interaction.options.get(optionName)?.role;
 
       if (role === undefined || role === null) {
-        return handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I couldn't find the role for some reason. If this continues please join the support server.`,
-        });
+        return interaction.editReply(
+          `Hey! I couldn't find the role for some reason. If this continues please join the support server.`
+        );
       }
 
       const isValidPosition = await isValidRolePosition(interaction, role);
@@ -241,10 +231,9 @@ export class AutoJoinCommand extends SlashCommand {
       case 'list':
         return this.list(interaction);
       default:
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue parsing my own command. Do I have a sub command labelled as ${subCommandName}?`,
-        });
+        return interaction.editReply(
+          `Hey! I had an issue parsing my own command. Do I have a sub command labelled as ${subCommandName}?`
+        );
     }
   };
 }

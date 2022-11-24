@@ -10,6 +10,7 @@ import { LogService } from './logService';
 import RoleBot from '../bot';
 import { handleInteractionReply } from '../../utilities/utils';
 import { ButtonHandler } from './buttonHandler';
+import { EmbedService } from './embedService';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
@@ -63,6 +64,19 @@ export class InteractionHandler {
 
     try {
       await command.run(interaction);
+
+      /**
+       * This announcement is only for the old version of RoleBot.
+       * Hoping users that run any command will see this and invite the new bot.
+       */
+      if (interaction.deferred) {
+        const embed = EmbedService.announcementEmbed();
+        await interaction.followUp({
+          ephemeral: true,
+          content: `Hey! **Important news regarding RoleBot**`,
+          embeds: [embed],
+        });
+      }
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,

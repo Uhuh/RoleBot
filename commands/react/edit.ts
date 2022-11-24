@@ -36,11 +36,12 @@ export class ReactEditCommand extends SlashCommand {
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I don't see the guild ID anywhere... that's weird.`,
-      });
+      return this.log.error(`Interaction missing guild ID`);
     }
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const role = this.expect(interaction.options.getRole('role'), {
       message: `Somehow the role is missing! Please try again.`,
@@ -53,19 +54,17 @@ export class ReactEditCommand extends SlashCommand {
 
     const doesReactRoleExist = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
     if (!doesReactRoleExist) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! That role doesn't belong to an existing react role.`,
-      });
+      return interaction.editReply(
+        `Hey! That role doesn't belong to an existing react role.`
+      );
     }
 
     const parsedEmoji = parseEmoji(emoji);
 
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+      );
     }
 
     const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
@@ -76,12 +75,11 @@ export class ReactEditCommand extends SlashCommand {
     );
 
     if (doesEmojiBelongToReactRole) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! That emoji belongs to a react role (${RolePing(
+      return interaction.editReply(
+        `Hey! That emoji belongs to a react role (${RolePing(
           doesEmojiBelongToReactRole.roleId
-        )})`,
-      });
+        )})`
+      );
     }
 
     const emojiTag = parsedEmoji?.id
@@ -98,11 +96,10 @@ export class ReactEditCommand extends SlashCommand {
       interaction.guildId
     );
 
-    return interaction.reply({
-      ephemeral: true,
-      content: `:tada: Successfully updated the react role (${
+    return interaction.editReply(
+      `:tada: Successfully updated the react role (${
         emojiTag ?? parsedEmoji.name
-      } - ${RolePing(role.id)}) :tada:`,
-    });
+      } - ${RolePing(role.id)}) :tada:`
+    );
   };
 }

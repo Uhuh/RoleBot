@@ -21,16 +21,9 @@ export class ReactCleanCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    try {
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      return this.log.error(
-        `Failed to defer interaction.\n${e}`,
-        interaction.guildId
-      );
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     let numRemovedRoles = 0;
 

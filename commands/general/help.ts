@@ -36,6 +36,10 @@ export class HelpCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { user } = interaction.client;
     if (!user) return;
 
@@ -85,8 +89,7 @@ export class HelpCommand extends SlashCommand {
     );
 
     interaction
-      .reply({
-        ephemeral: true,
+      .editReply({
         embeds: [embed],
         components: [selectMenu],
       })

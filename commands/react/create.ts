@@ -11,10 +11,7 @@ import {
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-import {
-  handleInteractionReply,
-  isValidRolePosition,
-} from '../../utilities/utils';
+import { isValidRolePosition } from '../../utilities/utils';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLES_BY_GUILD,
@@ -39,6 +36,10 @@ export class ReactRoleCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { guild } = interaction;
     if (!guild) return;
 
@@ -59,10 +60,9 @@ export class ReactRoleCommand extends SlashCommand {
      * Discord button row limitation is 5x5 so only a max of 25 buttons.
      */
     if (reactRolesNotInCategory >= 24) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
-      });
+      return interaction.editReply(
+        `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`
+      );
     }
 
     const isValidPosition = await isValidRolePosition(interaction, role);
@@ -112,12 +112,11 @@ export class ReactRoleCommand extends SlashCommand {
     if (reactRole) {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `The react role (${emojiMention} - ${RolePing(
+      return interaction.editReply(
+        `The react role (${emojiMention} - ${RolePing(
           reactRole.roleId
-        )}) already has this emoji assigned to it.`,
-      });
+        )}) already has this emoji assigned to it.`
+      );
     }
 
     /**
@@ -127,12 +126,11 @@ export class ReactRoleCommand extends SlashCommand {
 
     if (reactRole) {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `There's a react role already using the role \`${
+      return interaction.editReply(
+        `There's a react role already using the role \`${
           reactRole.name
-        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`,
-      });
+        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
+      );
     }
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
@@ -158,12 +156,11 @@ export class ReactRoleCommand extends SlashCommand {
 
         const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
+        return interaction.editReply(
+          `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
             role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`,
-        });
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`
+        );
       })
       .catch((e) => {
         this.log.error(
@@ -171,10 +168,9 @@ export class ReactRoleCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: 'React role failed to create. Please try again.',
-        });
+        return interaction.editReply(
+          'React role failed to create. Please try again.'
+        );
       });
   };
 }

@@ -10,7 +10,6 @@ import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/re
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
 
 import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply } from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class ReactNukeCommand extends SlashCommand {
@@ -29,14 +28,6 @@ export class ReactNukeCommand extends SlashCommand {
         `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
       );
     }
-
-    handleInteractionReply(
-      this.log,
-      interaction,
-      `User ${
-        interaction.member?.user || '[REDACTED]'
-      } has confirmed and deleted all react roles for the server.`
-    );
 
     // Need to delete all react messages or users will be able to react still and get roles.
     DELETE_REACT_MESSAGES_BY_GUILD_ID(interaction.guildId)
@@ -57,9 +48,7 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
+        return interaction.reply(
           `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`
         );
       })
@@ -69,15 +58,17 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
+        return interaction.reply(
           `Hey! I had an issue deleting all the react roles.`
         );
       });
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(`${this.name}_confirm`)
@@ -85,8 +76,7 @@ export class ReactNukeCommand extends SlashCommand {
         .setStyle(ButtonStyle.Danger)
     );
 
-    return interaction.reply({
-      ephemeral: true,
+    return interaction.editReply({
       components: [buttons],
       content: `This action is irreversible. By confirming you are deleting all react roles currently setup for this server.`,
     });

@@ -6,7 +6,10 @@ import {
 } from '../../src/database/queries/category.query';
 
 import { Category } from '../../utilities/types/commands';
-import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import {
+  getDisplayCommandValues,
+  parseDisplayString,
+} from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class CreateCategoryCommand extends SlashCommand {
@@ -32,13 +35,22 @@ export class CreateCategoryCommand extends SlashCommand {
       'excluded-role',
       'Users with this role cannot obtain roles from this category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
+    this.addStringOption(
+      'display-order',
+      'Change how the category displays the react roles.',
+      false,
+      getDisplayCommandValues()
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const [name, description] = this.extractStringVariables(
       interaction,
@@ -57,26 +69,25 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
+    const displayOrder = parseDisplayString(
+      displayString as keyof typeof DisplayType
+    );
 
     if (!name) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! It says you submitted no category name! You need to submit that. Please try again.`,
-      });
+      return interaction.editReply(
+        `Hey! It says you submitted no category name! You need to submit that. Please try again.`
+      );
     } else if (name.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
-      });
+      return interaction.editReply(
+        `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`
+      );
     }
 
     if (await GET_CATEGORY_BY_NAME(interaction.guildId, name)) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! It turns out you already have a category with that name made. Try checking it out.`,
-      });
+      return interaction.editReply(
+        `Hey! It turns out you already have a category with that name made. Try checking it out.`
+      );
     }
 
     CREATE_GUILD_CATEGORY({
@@ -86,27 +97,27 @@ export class CreateCategoryCommand extends SlashCommand {
       mutuallyExclusive,
       requiredRoleId,
       excludedRoleId,
-      displayOrder
+      displayOrder,
     })
       .then(() => {
         this.log.info(
           `Successfully created category[${name}]`,
           interaction.guildId
         );
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I successfully created the category \`${name}\` for you!`,
-        });
+
+        return interaction.editReply(
+          `Hey! I successfully created the category \`${name}\` for you!`
+        );
       })
       .catch((e) => {
         this.log.error(
           `Issue creating category[${name}]\n${e}`,
           interaction.guildId
         );
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`,
-        });
+
+        return interaction.editReply(
+          `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
+        );
       });
   };
 }

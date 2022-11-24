@@ -39,6 +39,10 @@ export class ConfigCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { guildId } = interaction;
 
     // If the config doesn't exist that means we failed to create it on join.
@@ -65,8 +69,7 @@ export class ConfigCommand extends SlashCommand {
 
     const embed = await EmbedService.guildConfig(updatedConfig);
 
-    return interaction.reply({
-      ephemeral: true,
+    return interaction.editReply({
       content: `Heyo! Here's your new server configuration.`,
       embeds: [embed],
     });

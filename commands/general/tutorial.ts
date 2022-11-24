@@ -62,11 +62,14 @@ export class TutorialCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = EmbedService.tutorialEmbed(0);
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const buttons = this.makeButtons(0);
 
     interaction
-      .reply({
-        ephemeral: true,
+      .editReply({
         content: `Hey! Let's get to learning.\n**Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n`,
         embeds: [embed],
         components: [buttons],
