@@ -10,10 +10,7 @@ import {
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { SlashCommand } from '../slashCommand';
 import { Category } from '../../utilities/types/commands';
-import {
-  handleInteractionReply,
-  spliceIntoChunks,
-} from '../../utilities/utils';
+import { spliceIntoChunks } from '../../utilities/utils';
 import { ReactRole } from '../../src/database/entities';
 import {
   GET_REACT_ROLES_BY_CATEGORY_ID,
@@ -23,6 +20,7 @@ import {
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { RolePing } from '../../utilities/utilPings';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor() {
@@ -94,7 +92,7 @@ export class AddCategoryCommand extends SlashCommand {
         `Unable to find category roles for category[${categoryId}]`,
         interaction.guildId
       );
-      return handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
         content: `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`,
       });
@@ -105,7 +103,7 @@ export class AddCategoryCommand extends SlashCommand {
         `Category[${categoryId}] already has 20 react roles in it.`,
         interaction.guildId
       );
-      return handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
         content: `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`,
       });
@@ -119,9 +117,11 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      handleInteractionReply(this.log, interaction, {
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`,
+        content: `Hey! The role ${RolePing(
+          reactRole.roleId
+        )} is already in the category \`${reactRoleCategory?.name}\`.`,
       });
     }
 
@@ -132,9 +132,15 @@ export class AddCategoryCommand extends SlashCommand {
 
     try {
       await UPDATE_REACT_ROLE_CATEGORY(Number(reactRoleId), Number(categoryId));
-      await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), { categoryAddDate: new Date() });
-      const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
-      const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
+      await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
+        categoryAddDate: new Date(),
+      });
+      const moreRoles = `I've added ${RolePing(reactRole.roleId)} to \`${
+        category.name
+      }\`, you can add more roles if you wish.`;
+      const noRolesLeft = `I've added ${RolePing(reactRole.roleId)} to \`${
+        category.name
+      }\`. If you want to add more you need to create more react roles first.`;
 
       await interaction.update({
         content: roleButtons.length ? moreRoles : noRolesLeft,
@@ -152,7 +158,11 @@ export class AddCategoryCommand extends SlashCommand {
       );
 
       return interaction.update({
-        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+        content: `Hey! I had an issue adding ${RolePing(
+          reactRole.roleId
+        )} to the category \`${
+          category.name
+        }\`. Please wait a second and try again.`,
       });
     }
   };
@@ -188,14 +198,17 @@ export class AddCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { guildId } = interaction;
     const categoryId = interaction.options.getString('category');
 
     if (categoryId && isNaN(Number(categoryId))) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`,
-      });
+      return interaction.editReply(
+        `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`
+      );
     }
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
@@ -206,10 +219,9 @@ export class AddCategoryCommand extends SlashCommand {
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
 
     if (!reactRoles.length) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `You should create a few react roles first! Check out \`/react-role\`!`,
-      });
+      return interaction.editReply(
+        `You should create a few react roles first! Check out \`/react-role\`!`
+      );
     }
 
     const roleButtons = await this.buildReactRoleButtons(
@@ -218,8 +230,7 @@ export class AddCategoryCommand extends SlashCommand {
     );
 
     interaction
-      .reply({
-        ephemeral: true,
+      .editReply({
         components: roleButtons,
         content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
       })
@@ -228,12 +239,10 @@ export class AddCategoryCommand extends SlashCommand {
           `Failed to send category[${category.id}] buttons\n${e}`,
           interaction.guildId
         );
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content:
-            `Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.` +
-            `\nIf the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`,
-        });
+        return interaction.editReply(
+          `Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.` +
+            `\nIf the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
+        );
       });
   };
 }

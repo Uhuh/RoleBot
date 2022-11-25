@@ -5,8 +5,6 @@ import {
 } from 'discord.js';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
-
-import { handleInteractionReply } from '../../utilities/utils';
 import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
@@ -48,6 +46,10 @@ export class RemoveCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const categoryId = interaction.options.getString('category-name');
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
@@ -57,10 +59,9 @@ export class RemoveCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`,
-      });
+      return interaction.editReply(
+        `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`
+      );
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
@@ -70,10 +71,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`,
-        });
+        return interaction.editReply(
+          `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`
+        );
       })
       .catch((e) => {
         this.log.error(
@@ -81,10 +81,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue deleting the category. Please wait a second and try again.`,
-        });
+        return interaction.editReply(
+          `Hey! I had an issue deleting the category. Please wait a second and try again.`
+        );
       });
   };
 }

@@ -14,13 +14,15 @@ export class EvalCommand extends SlashCommand {
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { member } = interaction;
 
     if (!this.developerIds.includes(member?.user.id ?? '')) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Nuhuhuh! You're not a dev!`,
-      });
+      return interaction.editReply(`Nuhuhuh! You're not a dev!`);
     }
 
     let content = interaction.options.getString('command');
@@ -33,7 +35,7 @@ export class EvalCommand extends SlashCommand {
 
       const embed = this.buildEmbed(output);
 
-      return interaction.reply({
+      return interaction.editReply({
         embeds: [embed],
       });
     } catch (e) {
@@ -44,7 +46,7 @@ export class EvalCommand extends SlashCommand {
       if (typeof content !== 'string')
         content = util.inspect(content, { depth: 0 });
 
-      return interaction.reply({
+      return interaction.editReply({
         content: 'Oops!!!',
         embeds: [embed],
       });

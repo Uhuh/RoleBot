@@ -40,6 +40,8 @@ export class InfoCommand extends SlashCommand {
       ),
     ]);
 
+    await interaction.deferReply();
+
     const buttons = this.buttons();
     let emoji;
 
@@ -86,7 +88,7 @@ export class InfoCommand extends SlashCommand {
       .setThumbnail(AVATAR_URL);
 
     interaction
-      .reply({
+      .editReply({
         embeds: [embed],
         components: [buttons],
       })

@@ -36,6 +36,10 @@ export class HelpCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { user } = interaction.client;
     if (!user) return;
 
@@ -84,9 +88,8 @@ export class HelpCommand extends SlashCommand {
       Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`
     );
 
-    interaction
-      .reply({
-        ephemeral: true,
+    await interaction
+      .editReply({
         embeds: [embed],
         components: [selectMenu],
       })

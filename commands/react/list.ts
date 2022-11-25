@@ -17,15 +17,9 @@ export class ReactListCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
-    try {
-      // Defer because of Discord rate limits.
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
-      return;
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
 

@@ -12,7 +12,6 @@ import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../slashCommand';
 import {
   getDisplayCommandValues,
-  handleInteractionReply,
   parseDisplayString,
 } from '../../utilities/utils';
 import {
@@ -91,6 +90,10 @@ export class EditCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const categoryId = this.expect(interaction.options.getString('category'), {
       message: 'Category appears to be invalid!',
       prop: `category`,
@@ -128,10 +131,9 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! You need to pass at _least_ one updated field about the category.`,
-      });
+      return interaction.editReply(
+        `Hey! You need to pass at _least_ one updated field about the category.`
+      );
     }
 
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
@@ -142,10 +144,9 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I couldn't find the category. Please wait a second and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find the category. Please wait a second and try again.`
+      );
     }
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
@@ -173,10 +174,9 @@ export class EditCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
-        });
+        return interaction.editReply(
+          `Hey! I successfully updated the category \`${category.name}\` for you.`
+        );
       })
       .catch((e) =>
         this.log.critical(

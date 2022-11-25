@@ -27,15 +27,9 @@ export class ListCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    try {
-      // Defer because of Discord rate limits.
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
-      return;
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>

@@ -4,15 +4,18 @@ import {
   ChatInputCommandInteraction,
   Interaction,
   SelectMenuInteraction,
+  Snowflake,
 } from 'discord.js';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
 import RoleBot from '../bot';
 import { handleInteractionReply } from '../../utilities/utils';
 import { ButtonHandler } from './buttonHandler';
+import { EmbedService } from './embedService';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
+  private static userAlert = new Map<Snowflake, Date>();
   /**
    * Parse raw interactions and ensure they are handled correctly based on their type.
    * @param interaction Raw interaction. Determine what type it is and handle it.
@@ -63,6 +66,27 @@ export class InteractionHandler {
 
     try {
       await command.run(interaction);
+
+      /**
+       * This announcement is only for the old version of RoleBot.
+       * Hoping users that run any command will see this and invite the new bot.
+       */
+      const alert = InteractionHandler.userAlert.get(interaction.user.id);
+      const now = new Date();
+
+      if (interaction.deferred && (!alert || alert < now)) {
+        InteractionHandler.userAlert.set(
+          interaction.user.id,
+          new Date(now.setDate(now.getDate() + 1))
+        );
+
+        const embed = EmbedService.announcementEmbed();
+        await interaction.followUp({
+          ephemeral: true,
+          content: `Hey! **Important news regarding RoleBot**`,
+          embeds: [embed],
+        });
+      }
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,
