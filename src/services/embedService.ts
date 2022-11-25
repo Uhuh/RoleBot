@@ -249,7 +249,7 @@ export class EmbedService {
       .setDescription(
         `Hey RoleBot users,\nSadly this current version of RoleBot will be shutting down in the foreseeable future.\n**But**, this is not the end of RoleBot. You can invite the new application through RoleBot's site at https://rolebot.gg/invite\n
         Please make sure to join the [support server](${SUPPORT_URL}) and read the announcement that [answers some questions you may have.](${announcementLink})\n
-        **Both the new and old bot read from the same database so NO data is lost.**\nIf you're having **issues inviting the new bot** please carry on using the new one and check frequently as we need to verify the new one with Discord.
+        **Both the new and old bot read from the same database so NO data is lost.**\nIf you're having **issues inviting the new bot** please carry on using the **old one** and check frequently as we need to verify the new one with Discord.
         \nI look forward to continuing working on RoleBot and bring even greater features to you guys!\n
         That's all,\nSincerely, Panku
         `
