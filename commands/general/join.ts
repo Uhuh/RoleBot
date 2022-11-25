@@ -152,8 +152,7 @@ export class AutoJoinCommand extends SlashCommand {
     const embed = EmbedService.joinRoleEmbed(joinRoles.map((r) => r.roleId));
 
     interaction
-      .reply({
-        ephemeral: true,
+      .editReply({
         embeds: [embed],
       })
       .catch(() =>
@@ -208,8 +207,7 @@ export class AutoJoinCommand extends SlashCommand {
         );
 
         return interaction
-          .reply({
-            ephemeral: true,
+          .editReply({
             embeds: [embed],
             components: [button],
           })

@@ -88,7 +88,7 @@ export class HelpCommand extends SlashCommand {
       Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`
     );
 
-    interaction
+    await interaction
       .editReply({
         embeds: [embed],
         components: [selectMenu],

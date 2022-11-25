@@ -20,6 +20,7 @@ import {
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { RolePing } from '../../utilities/utilPings';
 
 export class AddCategoryCommand extends SlashCommand {
   constructor() {
@@ -116,9 +117,11 @@ export class AddCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      await interaction.reply({
+      return interaction.reply({
         ephemeral: true,
-        content: `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`,
+        content: `Hey! The role ${RolePing(
+          reactRole.roleId
+        )} is already in the category \`${reactRoleCategory?.name}\`.`,
       });
     }
 
@@ -132,8 +135,12 @@ export class AddCategoryCommand extends SlashCommand {
       await UPDATE_REACT_ROLE_BY_ID(Number(reactRoleId), {
         categoryAddDate: new Date(),
       });
-      const moreRoles = `I've added \`${reactRole.name}\` to \`${category.name}\`, you can add more roles if you wish.`;
-      const noRolesLeft = `I've added \`${reactRole.name}\` to \`${category.name}\`. If you want to add more you need to create more react roles first.`;
+      const moreRoles = `I've added ${RolePing(reactRole.roleId)} to \`${
+        category.name
+      }\`, you can add more roles if you wish.`;
+      const noRolesLeft = `I've added ${RolePing(reactRole.roleId)} to \`${
+        category.name
+      }\`. If you want to add more you need to create more react roles first.`;
 
       await interaction.update({
         content: roleButtons.length ? moreRoles : noRolesLeft,
@@ -151,7 +158,11 @@ export class AddCategoryCommand extends SlashCommand {
       );
 
       return interaction.update({
-        content: `Hey! I had an issue adding \`${reactRole.name}\` to the category \`${category.name}\`. Please wait a second and try again.`,
+        content: `Hey! I had an issue adding ${RolePing(
+          reactRole.roleId
+        )} to the category \`${
+          category.name
+        }\`. Please wait a second and try again.`,
       });
     }
   };

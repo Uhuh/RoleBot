@@ -85,8 +85,7 @@ export class ReactRoleCommand extends SlashCommand {
           .setStyle(ButtonStyle.Link)
       );
 
-      return interaction.reply({
-        ephemeral: true,
+      return interaction.editReply({
         embeds: [embed],
         components: [button],
       });
@@ -95,10 +94,9 @@ export class ReactRoleCommand extends SlashCommand {
     const parsedEmoji = parseEmoji(emoji);
 
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+      );
     }
 
     /**
@@ -138,39 +136,39 @@ export class ReactRoleCommand extends SlashCommand {
       ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
       : null;
 
-    CREATE_REACT_ROLE(
-      role.name,
-      role.id,
-      parsedEmoji?.id ?? parsedEmoji?.name ?? emoji,
-      emojiTag,
-      interaction.guildId,
-      ReactRoleType.normal
-    )
-      .then((reactRole) => {
-        this.log.debug(
-          `Successfully created the react role[${role.id}] with emoji[${
-            parsedEmoji?.id ?? parsedEmoji.name
-          }]`,
-          interaction.guildId
-        );
+    try {
+      const reactRole = await CREATE_REACT_ROLE(
+        role.name,
+        role.id,
+        parsedEmoji?.id ?? parsedEmoji?.name ?? emoji,
+        emojiTag,
+        interaction.guildId,
+        ReactRoleType.normal
+      );
 
-        const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
+      this.log.debug(
+        `Successfully created the react role[${role.id}] with emoji[${
+          parsedEmoji?.id ?? parsedEmoji.name
+        }]`,
+        interaction.guildId
+      );
 
-        return interaction.editReply(
-          `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
-            role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`
-        );
-      })
-      .catch((e) => {
-        this.log.error(
-          `Failed to create react role[${role.id}] | emoji[id: ${parsedEmoji?.id} : string: ${emoji}]\n${e}`,
-          interaction.guildId
-        );
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-        return interaction.editReply(
-          'React role failed to create. Please try again.'
-        );
-      });
+      await interaction.editReply(
+        `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
+          role.id
+        )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`
+      );
+    } catch (e) {
+      this.log.error(
+        `Failed to create react role[${role.id}] | emoji[id: ${parsedEmoji?.id} : string: ${emoji}]\n${e}`,
+        interaction.guildId
+      );
+
+      await interaction.editReply(
+        'React role failed to create. Please try again.'
+      );
+    }
   };
 }
