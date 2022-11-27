@@ -10,6 +10,8 @@ import * as categoryCommands from './category';
 import * as generalCommands from './general';
 import * as reactionCommands from './react';
 import { SlashCommand } from './slashCommand';
+import { SlashCommand as Command } from './commands/command';
+import { CategoryBaseCommand } from './commands/category';
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -28,6 +30,39 @@ export const buildCommands = () => {
   }
 
   return commandMap;
+};
+
+export const commands = () => {
+  const log = new LogService('CommandHandler');
+  log.info(`Building commands...`);
+
+  const commandMap: Collection<string, Command> = new Collection();
+  const category = new CategoryBaseCommand();
+
+  commandMap.set(category.name, category);
+
+  return commandMap;
+};
+
+export const buildNewCommands = async (buildCommands = false, beta = false) => {
+  const log = new LogService('SlashCommandHandler');
+  log.info(`Loading all slash commands...`);
+
+  const commandsJson: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
+  const category = new CategoryBaseCommand();
+
+  commandsJson.push(category.toJSON());
+
+  if (buildCommands) {
+    const route: `/${string}` = beta
+      ? Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID)
+      : Routes.applicationCommands(CLIENT_ID);
+
+    log.info(`Using route '${route}'`);
+
+    // await deleteSlashCommands(route);
+    await generateSlashCommands(route, commandsJson);
+  }
 };
 
 export const buildSlashCommands = async (

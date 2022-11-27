@@ -1,8 +1,7 @@
-import { EmbedBuilder, escapeMarkdown } from 'discord.js';
+import { Colors, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
 import { Category, DisplayType } from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
-import { Colors } from '../interfaces';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
@@ -193,7 +192,7 @@ export class EmbedService {
 
     embed
       .setTitle(`Server auto join roles.`)
-      .setColor(Colors.green)
+      .setColor(Colors.Green)
       .setDescription(
         `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
           (roleIds.length > 0
@@ -209,7 +208,7 @@ export class EmbedService {
     const embed = new EmbedBuilder();
 
     embed
-      .setColor(Colors.red)
+      .setColor(Colors.Red)
       .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
       .setTitle(`Encountered an error`)
       .setDescription(codeBlock('diff', content))
@@ -223,7 +222,7 @@ export class EmbedService {
     const description = `**Hey! If you changed your react type your old messages/buttons will be invalid.\nIf you swap back and haven't deleted those messages then they're still valid. Just make sure the types match for what you want.**`;
 
     embed
-      .setColor(Colors.red)
+      .setColor(Colors.Red)
       .setAuthor({ name: 'RoleBot', iconURL: AVATAR_URL })
       .setTitle('Server configuration.')
       .setDescription(

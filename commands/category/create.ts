@@ -6,7 +6,11 @@ import {
 } from '../../src/database/queries/category.query';
 
 import { Category } from '../../utilities/types/commands';
-import { getDisplayCommandValues, handleInteractionReply, parseDisplayString } from '../../utilities/utils';
+import {
+  getDisplayCommandValues,
+  handleInteractionReply,
+  parseDisplayString,
+} from '../../utilities/utils';
 import { SlashCommand } from '../slashCommand';
 
 export class CreateCategoryCommand extends SlashCommand {
@@ -32,7 +36,12 @@ export class CreateCategoryCommand extends SlashCommand {
       'excluded-role',
       'Users with this role cannot obtain roles from this category.'
     );
-    this.addStringOption('display-order', 'Change how the category displays the react roles.', false, getDisplayCommandValues());
+    this.addStringOption(
+      'display-order',
+      'Change how the category displays the react roles.',
+      false,
+      getDisplayCommandValues()
+    );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -40,11 +49,8 @@ export class CreateCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const [name, description] = this.extractStringVariables(
-      interaction,
-      'category-name',
-      'category-desc'
-    );
+    const name = interaction.options.getString('category-name');
+    const description = interaction.options.getString('category-desc');
 
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive') ?? false;
@@ -57,7 +63,9 @@ export class CreateCategoryCommand extends SlashCommand {
 
     const displayString = interaction.options.getString('display-order');
 
-    const displayOrder = parseDisplayString(displayString as keyof typeof DisplayType);
+    const displayOrder = parseDisplayString(
+      displayString as keyof typeof DisplayType
+    );
 
     if (!name) {
       return handleInteractionReply(this.log, interaction, {
@@ -86,7 +94,7 @@ export class CreateCategoryCommand extends SlashCommand {
       mutuallyExclusive,
       requiredRoleId,
       excludedRoleId,
-      displayOrder
+      displayOrder,
     })
       .then(() => {
         this.log.info(

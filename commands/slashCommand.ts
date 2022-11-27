@@ -1,7 +1,6 @@
 import {
   ButtonInteraction,
   ChatInputCommandInteraction,
-  Interaction,
   SelectMenuInteraction,
   PermissionsBitField,
   AutocompleteInteraction,
@@ -70,14 +69,7 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
    * if a user has the correct permissions, log that the command has been used and finally execute the implemented `execute` method
    * @param interaction Raw interaction, can be command, button, selection etc.
    */
-  public run = async (interaction: Interaction) => {
-    // Ignore interactions that aren't commands.
-    if (!interaction.isChatInputCommand()) {
-      return this.log.debug(
-        `Interaction was not a command. Command that got ran[${this.name}]`
-      );
-    }
-
+  public run = async (interaction: ChatInputCommandInteraction) => {
     // Check all user perms.
     if (!this.canUserRunInteraction(interaction)) return;
 
@@ -106,18 +98,15 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
       | ChatInputCommandInteraction
       | ButtonInteraction
       | SelectMenuInteraction
-      | AutocompleteInteraction
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
-      if (!interaction.isAutocomplete()) {
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
-            (p) => PermissionMappings.get(p)
-          )}\`.`,
-        });
-      }
+      handleInteractionReply(this.log, interaction, {
+        ephemeral: true,
+        content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
+          (p) => PermissionMappings.get(p)
+        )}\`.`,
+      });
       return false;
     }
 
@@ -195,20 +184,6 @@ export abstract class SlashCommand extends SlashBase implements DataCommand {
     return this.permissions.length
       ? interaction.memberPermissions?.has(this.permissions, true)
       : true;
-  };
-
-  /**
-   * TypeScript doesn't know what type a value is but I know the types for some commands options as they are setup in the constructor.
-   * Instead of adding these checks for every command use this function to parse out all the properties.
-   * @param interaction Command ran.
-   * @param attrs Array of properties. This is because we set options and give them custom IDs.
-   * @returns All properties passed in.
-   */
-  extractStringVariables = (
-    interaction: ChatInputCommandInteraction,
-    ...attrs: string[]
-  ): Array<string | undefined> => {
-    return attrs.map((a) => interaction.options.getString(a) ?? undefined);
   };
 
   /**
