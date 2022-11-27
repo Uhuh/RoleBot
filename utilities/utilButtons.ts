@@ -7,7 +7,7 @@ export const reactRoleButtons = (
   reactRoles: ReactRole[],
   hideEmojis: boolean
 ) => {
-  const customId = (r: ReactRole) => `react-button_${r.id}-${r.categoryId}`;
+  const customId = (r: ReactRole) => `react-button_sub_${r.id}-${r.categoryId}`;
   const buildButton = (r: ReactRole) => {
     const button = new ButtonBuilder()
       .setCustomId(customId(r))

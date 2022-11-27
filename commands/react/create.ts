@@ -25,12 +25,9 @@ import { RolePing } from '../../utilities/utilPings';
 
 export class ReactRoleCommand extends SlashCommand {
   constructor() {
-    super(
-      'react-role',
-      'Create a new react role. Give the command a role and an emoji. It really is that simple.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
+    super('react-role', '', Category.react, [
+      PermissionsBitField.Flags.ManageRoles,
+    ]);
 
     this.addRoleOption('role', 'The role you want to use.', true);
     this.addStringOption('emoji', 'The emoji you want to use.', true);

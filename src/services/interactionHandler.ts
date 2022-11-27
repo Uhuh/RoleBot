@@ -109,7 +109,8 @@ export class InteractionHandler {
     client: RoleBot
   ) {
     try {
-      const [commandName, args] = this.extractCommandInfo(interaction);
+      const [commandName, subCommand, args] =
+        this.extractCommandInfo(interaction);
       const command = client.commands.get(commandName);
 
       if (!command?.canUserRunInteraction(interaction)) {
@@ -119,7 +120,7 @@ export class InteractionHandler {
         );
       }
 
-      command?.handleSelect(interaction, args);
+      command?.handleSelect(interaction, subCommand, args);
     } catch (e) {
       this.log.error(
         `An error occured with select[${interaction.customId}]\n${e}`,
@@ -143,7 +144,8 @@ export class InteractionHandler {
     client: RoleBot
   ) {
     try {
-      const [commandName, args] = this.extractCommandInfo(interaction);
+      const [commandName, subCommand, args] =
+        this.extractCommandInfo(interaction);
 
       /**
        * If a user is pushing a button that's known as a react button
@@ -175,7 +177,7 @@ export class InteractionHandler {
         );
       }
 
-      command.handleButton(interaction, args);
+      await command.handleButton(interaction, subCommand, args);
     } catch (e) {
       this.log.error(
         `An error occured with button[${interaction.customId}]\n${e}`,
@@ -211,17 +213,17 @@ export class InteractionHandler {
 
   /**
    * Extract out the command name and the args (IDs) from the interaction.
-   * They should follow a pattern: `commandName_customIds1-customIds2-etc`
+   * They should follow a pattern: `commandName_subCommand_customIds1-customIds2-etc`
    * @param interaction SelectMenu or Button to extract commandName and args out of.
-   * @returns Tuple [commandName, commandArgs]
+   * @returns Tuple [commandName, subCommand, commandArgs]
    */
   private static extractCommandInfo(
     interaction: SelectMenuInteraction | ButtonInteraction
-  ): [string, string[]] {
-    const [commandName, commandArgs] = interaction.isSelectMenu()
+  ): [string, string, string[]] {
+    const [commandName, subCommand, commandArgs] = interaction.isSelectMenu()
       ? interaction.values.join('').split('_')
       : interaction.customId.split('_');
 
-    return [commandName, commandArgs.split('-')];
+    return [commandName, subCommand, commandArgs.split('-')];
   }
 }

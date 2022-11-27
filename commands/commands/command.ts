@@ -3,15 +3,12 @@ import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   ButtonInteraction,
+  ChannelType,
   ChatInputCommandInteraction,
-  SelectMenuInteraction,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
 } from 'discord.js';
-import { CustomError } from '../../src/error/custom.error';
-import { LogService } from '../../src/services/logService';
-import { handleInteractionReply } from '../../utilities/utils';
-import { PermissionMappings } from '../slashCommand';
+import { CommandBasics, CommandHandlers } from './command-basics';
 
 export type SlashCommandOptions = 'string' | 'bool' | 'channel' | 'role';
 
@@ -24,149 +21,35 @@ export interface ICommandOption {
   autocomplete?: boolean;
 }
 
-export class CommandHandlers {
-  public log = new LogService(this.name);
-
-  constructor(public name: string) {}
-  /**
-   * This method should be overwritten by the child class and implement the commands functionality.
-   * @param interaction Command that was ran and handed to this command from the handleInteraction function.
-   */
-  public execute = async (
-    interaction: ChatInputCommandInteraction
-  ): Promise<unknown> => {
-    return handleInteractionReply(
-      this.log,
-      interaction,
-      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
-    );
-  };
-
-  /**
-   * This method should be overwritten by the child class and implement the handling for any option passed.
-   *
-   * All options should be keyed with the commands name followed by any IDs it needs separated by a `_`
-   * `_` because the slash commands have to use `-`
-   * @param interaction SelectMenu option that was clicked.
-   * @param _args Essentially all the IDs that are separated with `-`
-   */
-  public handleSelect = (
-    interaction: SelectMenuInteraction,
-    _args: string[]
-  ) => {
-    handleInteractionReply(
-      this.log,
-      interaction,
-      `Hey! Turns out you didn't implement this commands[${this.name}] dropdown handler yet. How about you do that?`
-    );
-  };
-
-  /**
-   * This method should be overwritten by the child class and implement the handling for any option passed.
-   * @param interaction Button that was clicked
-   * @param args IDs that are inside the buttons customId
-   */
-  public handleButton = (interaction: ButtonInteraction, _args: string[]) => {
-    handleInteractionReply(
-      this.log,
-      interaction,
-      `Hey! Turns out you didn't implement this commands[${this.name}] button handler yet. How about you do that?`
-    );
-  };
-
-  /**
-   * This method should respond with data related to the command.
-   * @param interaction Interaction to give data to
-   */
-  public handleAutoComplete = async (interaction: AutocompleteInteraction) => {
-    console.log(interaction);
-    return interaction.respond([
-      { name: 'Hey! You forgot to implement autocomplete!', value: 'oops' },
-    ]);
-  };
-}
-
-export class CommandBasics extends CommandHandlers {
-  constructor(name: string, protected permissions: bigint[]) {
-    super(name);
-  }
-  /**
-   * This `run` method will never be overwritten and will always check if the `interaction` is a command,
-   * if a user has the correct permissions, log that the command has been used and finally execute the implemented `execute` method
-   * @param interaction Raw interaction, can be command, button, selection etc.
-   */
-  public run = async (interaction: ChatInputCommandInteraction) => {
-    // Check all user perms.
-    if (!this.canUserRunInteraction(interaction)) return;
-
-    try {
-      await this.execute(interaction);
-    } catch (e) {
-      let errorMessage = `Hey! I encountered an error, please wait a second and try again.`;
-
-      if (!(e instanceof CustomError)) {
-        this.log.critical(`Received non custom error.\n${e}`);
-      } else errorMessage = e.message;
-
-      if (interaction.replied || interaction.deferred) {
-        return interaction.editReply(errorMessage);
-      } else {
-        return interaction.reply({
-          ephemeral: true,
-          content: errorMessage,
-        });
-      }
-    }
-  };
-
-  public canUserRunInteraction = (
-    interaction:
-      | ChatInputCommandInteraction
-      | ButtonInteraction
-      | SelectMenuInteraction
-  ): boolean => {
-    // Check all user perms.
-    if (!this.canUserRunCommand(interaction)) {
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
-          (p) => PermissionMappings.get(p)
-        )}\`.`,
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  /**
-   * Check if a user has the required permissions to run the command.
-   * @param interaction User interaction with memberPermissions
-   * @returns True if user can run this command, false otherwise.
-   */
-  private canUserRunCommand = (
-    interaction:
-      | ChatInputCommandInteraction
-      | ButtonInteraction
-      | SelectMenuInteraction
-      | AutocompleteInteraction
-  ) => {
-    return this.permissions.length
-      ? interaction.memberPermissions?.has(this.permissions, true)
-      : true;
-  };
-}
-
 const buildOption = (
   builder: SlashCommandSubcommandBuilder,
   option: ICommandOption
 ) => {
   switch (option.type) {
     case ApplicationCommandOptionType.Boolean:
+      builder.addBooleanOption((o) =>
+        o
+          .setName(option.name)
+          .setDescription(option.description)
+          .setRequired(option.required ?? false)
+      );
       break;
     case ApplicationCommandOptionType.Channel:
+      builder.addChannelOption((o) =>
+        o
+          .setName(option.name)
+          .addChannelTypes(ChannelType.GuildText)
+          .setDescription(option.description)
+          .setRequired(option.required ?? false)
+      );
       break;
     case ApplicationCommandOptionType.Role:
+      builder.addRoleOption((o) =>
+        o
+          .setName(option.name)
+          .setDescription(option.description)
+          .setRequired(option.required ?? false)
+      );
       break;
     case ApplicationCommandOptionType.String:
       builder.addStringOption((o) =>
@@ -183,9 +66,10 @@ const buildOption = (
 
 export class SlashSubCommand extends CommandHandlers {
   constructor(
+    public baseName: string,
     public name: string,
     public description: string,
-    public options: ICommandOption[]
+    public options: ICommandOption[] = []
   ) {
     super(name);
   }
@@ -233,17 +117,24 @@ export class SlashCommand extends CommandBasics {
     return this.command.toJSON();
   }
 
+  getSubCommand(
+    interaction: ChatInputCommandInteraction | AutocompleteInteraction
+  ) {
+    const subCommandName = interaction.options.getSubcommand();
+    const subCommand = this.subCommands.get(subCommandName);
+
+    if (!subCommand) throw `Missing sub command ${subCommandName}`;
+
+    return subCommand;
+  }
+
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
     try {
-      const subCommandName = interaction.options.getSubcommand();
-      const subCommand = this.subCommands.get(subCommandName);
-
-      if (!subCommand) throw `Missing sub command ${subCommandName}`;
-
+      const subCommand = this.getSubCommand(interaction);
       await subCommand.execute(interaction);
     } catch (e) {
       this.log.error(`Failed while handling subCommand execute\n${e}`);
@@ -252,14 +143,26 @@ export class SlashCommand extends CommandBasics {
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
     try {
-      const subCommandName = interaction.options.getSubcommand();
+      const subCommand = this.getSubCommand(interaction);
+      await subCommand.handleAutoComplete(interaction);
+    } catch (e) {
+      this.log.error(`Failed while handling subCommand autocomplete\n${e}`);
+    }
+  };
+
+  handleButton = async (
+    interaction: ButtonInteraction,
+    subCommandName: string,
+    _args: string[]
+  ) => {
+    try {
       const subCommand = this.subCommands.get(subCommandName);
 
       if (!subCommand) throw `Missing sub command ${subCommandName}`;
 
-      await subCommand.handleAutoComplete(interaction);
+      await subCommand.handleButton(interaction, subCommandName, _args);
     } catch (e) {
-      this.log.error(`Failed while handling subCommand autocomplete\n${e}`);
+      this.log.error(`Failed while handling subCommand handleButton\n${e}`);
     }
   };
 }
