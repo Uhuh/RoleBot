@@ -1,10 +1,5 @@
 import * as config from './vars';
-import {
-  buildCommands,
-  buildNewCommands,
-  buildSlashCommands,
-  commands,
-} from '../commands/commandHandler';
+import { buildNewCommands, commands } from '../commands/commandHandler';
 import { guildUpdate } from '../events/guildUpdate';
 import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
