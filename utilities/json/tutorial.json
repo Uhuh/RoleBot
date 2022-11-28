@@ -22,7 +22,7 @@
         "**Warning:** Sometimes you may want to delete a role in your server, most times RoleBot will catch that and remove react roles that had that. If RoleBot misses that and you see `@deleted` in the react role list use the `/react clean` command.\n",
         "_(If you do decide to add a lot of react roles at the start, you'll be limited to 25 react roles until you start adding them to categories. This is a Discord limitation.)_"
       ],
-      "image": "https://media.discordapp.net/attachments/935424318471548978/1028514952186704002/unknown.png"
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1046833696117891153/image.png"
     },
     {
       "title": "How to create a category. | Page 3",
@@ -35,7 +35,7 @@
         "* `excluded-role` will ignore users with this role for the set category.",
         "* `display-order` determines how to list react roles and reactions for messages."
       ],
-      "image": "https://media.discordapp.net/attachments/935424318471548978/1045157006845161472/image.png"
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1046833895682875502/image.png"
     },
     {
       "title": "How to add react roles to a category. | Page 4",
