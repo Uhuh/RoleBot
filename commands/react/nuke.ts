@@ -25,12 +25,6 @@ export class NukeSubCommand extends SlashSubCommand {
       );
     }
 
-    await interaction.editReply(
-      `User ${
-        interaction.member?.user || '[REDACTED]'
-      } has confirmed and deleted all react roles for the server.`
-    );
-
     // Need to delete all react messages or users will be able to react still and get roles.
     DELETE_REACT_MESSAGES_BY_GUILD_ID(interaction.guildId)
       .then(() => {
@@ -50,9 +44,10 @@ export class NukeSubCommand extends SlashSubCommand {
           interaction.guildId
         );
 
-        return interaction.editReply(
-          `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`
-        );
+        return interaction.reply({
+          ephemeral: true,
+          content: `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`,
+        });
       })
       .catch((e) => {
         this.log.error(
@@ -60,16 +55,17 @@ export class NukeSubCommand extends SlashSubCommand {
           interaction.guildId
         );
 
-        return interaction.editReply(
-          `Hey! I had an issue deleting all the react roles.`
-        );
+        return interaction.reply({
+          ephemeral: true,
+          content: `Hey! I had an issue deleting all the react roles.`,
+        });
       });
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(`${this.name}_confirm`)
+        .setCustomId(`${this.baseName}_${this.name}_confirm`)
         .setLabel('Confirm Nuke')
         .setStyle(ButtonStyle.Danger)
     );

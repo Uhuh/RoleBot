@@ -25,6 +25,10 @@ export class RemoveSubCommand extends SlashSubCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     const role = interaction.options.getRole('role');
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     if (!role) {
       this.log.error(
         `Interaction was missing role property despite it being required.`,
