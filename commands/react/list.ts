@@ -23,14 +23,14 @@ export class ListSubCommand extends SlashSubCommand {
 
     if (!reactRoles || !reactRoles.length) {
       return interaction.editReply({
-        content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react-role\`!`,
+        content: `Hey! Turns out this server doesn't have any react roles setup. Start creating some with \`/react create\`!`,
       });
     }
 
     const embed = EmbedService.reactRoleListEmbed(reactRoles);
 
     return interaction.editReply({
-      content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react-clean\` to remove them.`,
+      content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react clean\` to remove them.`,
       embeds: [embed],
     });
   };

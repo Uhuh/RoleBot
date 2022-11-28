@@ -158,7 +158,7 @@ export class InteractionHandler {
           })
           .catch((e) => {
             this.log.error(
-              `Failed to defer interaction for button react-role type.\n${e}`
+              `Failed to defer interaction for button react role type.\n${e}`
             );
             return interaction.reply({
               ephemeral: true,

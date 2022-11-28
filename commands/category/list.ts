@@ -39,7 +39,7 @@ export class ListSubCommand extends SlashSubCommand {
     }
 
     await interaction.editReply(
-      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react-clean\` to remove them.`
+      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react clean\` to remove them.`
     );
 
     const embeds: EmbedBuilder[] = [];

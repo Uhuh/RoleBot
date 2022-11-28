@@ -64,7 +64,7 @@ export class CreateSubcommand extends SlashSubCommand {
      */
     if (reactRolesNotInCategory >= 24) {
       return interaction.editReply({
-        content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
+        content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
       });
     }
 
@@ -160,7 +160,7 @@ export class CreateSubcommand extends SlashSubCommand {
         return interaction.editReply(
           `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
             role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category add\`!**`
         );
       })
       .catch((e) => {

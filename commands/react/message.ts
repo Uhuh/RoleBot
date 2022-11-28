@@ -109,7 +109,7 @@ export class MessageSubCommand extends SlashSubCommand {
 
     if (!roles.length) {
       return interaction.editReply(
-        `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react-role\`?`
+        `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react create\`?`
       );
     }
 

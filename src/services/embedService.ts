@@ -46,11 +46,11 @@ export class EmbedService {
 
     const reactRoles = categoryRoles.length
       ? this.reactRolesFormattedString(categoryRoles)
-      : `This category has no react roles! Add some react roles to this category by using \`/category-add\`!`;
+      : `This category has no react roles! Add some react roles to this category by using \`/category add\`!`;
 
     const desc =
       category.description === '' || !category.description
-        ? 'Description not set. Set it in `/category-edit`'
+        ? 'Description not set. Set it in `/category edit`'
         : category.description;
 
     let displayOrder = 'Alphabetical';
@@ -120,7 +120,7 @@ export class EmbedService {
     embed
       .setTitle(`All your reaction roles!`)
       .setDescription(
-        `This doesn't show what categories these roles are in.\nCheck out \`/category-list\` for more in-depth listing.\n\n${inCategory}${notInCategory}`
+        `This doesn't show what categories these roles are in.\nCheck out \`/category list\` for more in-depth listing.\n\n${inCategory}${notInCategory}`
       )
       .setColor(COLOR.DEFAULT);
 
@@ -133,7 +133,7 @@ export class EmbedService {
     embed.setTitle(`React roles not in a category`).setColor(COLOR.YELLOW);
 
     embed.setDescription(
-      `These roles are up for grabs!\nCheck out \`/category-add\` if you want to add these to a category.\n\n${this.reactRolesFormattedString(
+      `These roles are up for grabs!\nCheck out \`/category add\` if you want to add these to a category.\n\n${this.reactRolesFormattedString(
         reactRoles
       )}`
     );

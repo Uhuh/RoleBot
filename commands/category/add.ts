@@ -213,7 +213,7 @@ export class AddSubCommand extends SlashSubCommand {
 
     if (!reactRoles.length) {
       return interaction.editReply({
-        content: `You should create a few react roles first! Check out \`/react-role\`!`,
+        content: `You should create a few react roles first! Check out \`/react create\`!`,
       });
     }
 

@@ -147,12 +147,12 @@ export class ChannelSubCommand extends SlashSubCommand {
       this.log.debug(`Guild has no categories.`, guildId);
 
       return interaction.editReply(
-        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
+        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category add\`.`
       );
     }
 
     // Stolen from @react/message execute function
-    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
+    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category add\` to start adding roles to a category.`;
     const categoryRolesCount = await GET_GUILD_CATEGORY_ROLE_COUNT(guildId);
 
     if (!categoryRolesCount) {
@@ -248,7 +248,7 @@ export class ChannelSubCommand extends SlashSubCommand {
       switch (config?.reactType) {
         case GuildReactType.button: {
           /**
-           * When the server uses buttons we don't react, so just save whatever the first react-role emoji and role id are.
+           * When the server uses buttons we don't react, so just save whatever the first react role emoji and role id are.
            * This is so we can get the message later whenever a user wants to update this embed.
            */
           await CREATE_REACT_MESSAGE({
