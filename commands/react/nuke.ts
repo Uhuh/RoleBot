@@ -4,35 +4,28 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ChatInputCommandInteraction,
-  PermissionsBitField,
 } from 'discord.js';
 import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
+import { SlashSubCommand } from '../command';
 
-import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply } from '../../utilities/utils';
-import { SlashCommand } from '../slashCommand';
-
-export class ReactNukeCommand extends SlashCommand {
-  constructor() {
+export class NukeSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-nuke',
-      'This will remove ALL react roles for this server.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
+      baseCommand,
+      'nuke',
+      'This will remove ALL react roles for this server.'
     );
   }
 
-  handleButton = (interaction: ButtonInteraction) => {
+  handleButton = async (interaction: ButtonInteraction) => {
     if (!interaction.guildId) {
       return interaction.reply(
         `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
       );
     }
 
-    handleInteractionReply(
-      this.log,
-      interaction,
+    await interaction.editReply(
       `User ${
         interaction.member?.user || '[REDACTED]'
       } has confirmed and deleted all react roles for the server.`
@@ -57,9 +50,7 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
+        return interaction.editReply(
           `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`
         );
       })
@@ -69,9 +60,7 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
+        return interaction.editReply(
           `Hey! I had an issue deleting all the react roles.`
         );
       });

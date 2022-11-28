@@ -1,29 +1,29 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-
 import {
-  handleInteractionReply,
-  ReactMessageUpdate,
-  updateReactMessages,
-} from '../../utilities/utils';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+} from 'discord.js';
 import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
+import { ReactMessageUpdate, updateReactMessages } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class ReactDeleteCommand extends SlashCommand {
-  constructor() {
-    super('react-remove', 'Remove an existing reaction role.', Category.react, [
-      PermissionsBitField.Flags.ManageRoles,
+export class RemoveSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
+    super(baseCommand, 'remove', 'Remove an existing reaction role.', [
+      {
+        name: 'role',
+        description: 'The react role to remove.',
+        required: true,
+        type: ApplicationCommandOptionType.Role,
+      },
     ]);
-
-    this.addRoleOption('role', `The reaction role you want to remove.`, true);
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
-    const role = interaction.options.get('role')?.role;
+    const role = interaction.options.getRole('role');
 
     if (!role) {
       this.log.error(
@@ -31,10 +31,9 @@ export class ReactDeleteCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! For some reason I was unable to get the role that you told me to delete. Is it already deleted? Please try again. :)`,
-      });
+      return interaction.editReply(
+        `Hey! For some reason I was unable to get the role that you told me to delete. Is it already deleted? Please try again. :)`
+      );
     }
 
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
@@ -45,10 +44,9 @@ export class ReactDeleteCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! That role isn't in my system, perhaps you meant to pass in a different role?`,
-      });
+      return interaction.editReply(
+        `Hey! That role isn't in my system, perhaps you meant to pass in a different role?`
+      );
     }
 
     try {
@@ -61,12 +59,11 @@ export class ReactDeleteCommand extends SlashCommand {
 
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `I successfully removed the react role (${emojiMention} - ${RolePing(
+      await interaction.editReply(
+        `I successfully removed the react role (${emojiMention} - ${RolePing(
           role.id
-        )})! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`,
-      });
+        )})! You can add it back at any time if you wish.\n\nI'm gonna do some cleanup now and update any react role embed...`
+      );
 
       // Only update react message if there's a category associated with it.
       if (reactRole.categoryId) {
@@ -83,10 +80,9 @@ export class ReactDeleteCommand extends SlashCommand {
         interaction.guildId
       );
 
-      handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I had an issue deleting that react role. Please wait a moment and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I had an issue deleting that react role. Please wait a moment and try again.`
+      );
     }
   };
 }

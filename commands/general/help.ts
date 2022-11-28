@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ChatInputCommandInteraction,
+  Colors,
   EmbedBuilder,
   SelectMenuBuilder,
   SelectMenuInteraction,
@@ -8,17 +9,18 @@ import {
 import { EmbedService } from '../../src/services/embedService';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
-import { COLOR } from '../../utilities/types/globals';
-import { SlashCommand } from '../slashCommand';
+import { SlashCommand } from '../command';
 
-export class HelpCommand extends SlashCommand {
+export class HelpBaseCommand extends SlashCommand {
   constructor() {
-    super('help', 'This command!', Category.general);
+    super('help', 'This command!', []);
   }
 
-  handleSelect = (interaction: SelectMenuInteraction, args: string[]) => {
-    const [type] = args;
-
+  handleSelect = (
+    interaction: SelectMenuInteraction,
+    type: string,
+    _args: string[]
+  ) => {
     if (!(type in Category)) return;
 
     const embed = EmbedService.helpEmbed(type as Category);
@@ -65,7 +67,7 @@ export class HelpCommand extends SlashCommand {
 
     embed
       .setTitle('Command Help')
-      .setColor(COLOR.DEFAULT)
+      .setColor(Colors.Blurple)
       .setAuthor({
         name: user.username,
         iconURL: user.avatarURL() || '',

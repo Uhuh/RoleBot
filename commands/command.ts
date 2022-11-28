@@ -5,13 +5,24 @@ import {
   ButtonInteraction,
   ChannelType,
   ChatInputCommandInteraction,
+  PermissionsBitField,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { CommandBasics, CommandHandlers } from './command-basics';
 
-export type SlashCommandOptions = 'string' | 'bool' | 'channel' | 'role';
-
+export const PermissionMappings: Map<bigint, string> = new Map([
+  [PermissionsBitField.Flags.ReadMessageHistory, 'READ_MESSAGE_HISTORY'],
+  [PermissionsBitField.Flags.BanMembers, 'BAN_MEMBERS'],
+  [PermissionsBitField.Flags.KickMembers, 'KICK_MEMBERS'],
+  [PermissionsBitField.Flags.ManageGuild, 'MANAGE_GUILD'],
+  [PermissionsBitField.Flags.ManageRoles, 'MANAGE_ROLES'],
+  [PermissionsBitField.Flags.ManageMessages, 'MANAGE_MESSAGES'],
+  [PermissionsBitField.Flags.AddReactions, 'ADD_REACTIONS'],
+  [PermissionsBitField.Flags.SendMessages, 'SEND_MESSAGES'],
+  [PermissionsBitField.Flags.AttachFiles, 'ATTACH_FILES'],
+  [PermissionsBitField.Flags.EmbedLinks, 'EMBED_LINKS'],
+]);
 export interface ICommandOption {
   name: string;
   description: string;
@@ -22,7 +33,7 @@ export interface ICommandOption {
 }
 
 const buildOption = (
-  builder: SlashCommandSubcommandBuilder,
+  builder: SlashCommandSubcommandBuilder | SlashCommandBuilder,
   option: ICommandOption
 ) => {
   switch (option.type) {
@@ -110,6 +121,12 @@ export class SlashCommand extends CommandBasics {
     for (const subCommand of subCommands) {
       subCommand.createSubCommand(this.command);
       this.subCommands.set(subCommand.name, subCommand);
+    }
+  }
+
+  addOption(options: ICommandOption[]) {
+    for (const option of options) {
+      buildOption(this.command, option);
     }
   }
 

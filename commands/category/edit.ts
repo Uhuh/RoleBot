@@ -1,77 +1,75 @@
 import {
+  ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  PermissionsBitField,
 } from 'discord.js';
 import {
-  Category as ICategory,
   DisplayType,
+  ICategory,
 } from '../../src/database/entities/category.entity';
-
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
-import {
-  getDisplayCommandValues,
-  handleInteractionReply,
-  parseDisplayString,
-} from '../../utilities/utils';
 import {
   EDIT_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
 } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import {
+  getDisplayCommandValues,
+  parseDisplayString,
+} from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class EditCategoryCommand extends SlashCommand {
-  constructor() {
-    super(
-      'category-edit',
-      `Edit any category's information.`,
-      Category.category,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
-
-    this.addStringOption(
-      'category',
-      'The category you want to edit.',
-      true,
-      [],
-      true
-    );
-    this.addStringOption(
-      'new-name',
-      'Change the name of the category. This is the title of the embed.'
-    );
-    this.addStringOption(
-      'new-description',
-      'Change the description. This is shown above your react roles in the embed.'
-    );
-    this.addBoolOption(
-      'mutually-exclusive',
-      'Change if roles in this category should be mutually exclusive.'
-    );
-    this.addStringOption(
-      'remove-role-type',
-      'Select to remove either required-role or excluded-role.',
-      false,
-      [
-        { name: 'Required role', value: 'required-role' },
-        { name: 'Excluded role', value: 'excluded-role' },
-      ]
-    );
-    this.addRoleOption(
-      'new-required-role',
-      'Change what the required roles are for the category.'
-    );
-    this.addRoleOption(
-      'new-excluded-role',
-      'Change what the required roles are for the category.'
-    );
-    this.addStringOption(
-      'display-order',
-      'Change how the category displays the react roles.',
-      false,
-      getDisplayCommandValues()
-    );
+export class EditSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
+    super(baseCommand, 'edit', 'Edit a category.', [
+      {
+        name: 'category',
+        description: 'The category to edit',
+        type: ApplicationCommandOptionType.String,
+        required: true,
+        autocomplete: true,
+      },
+      {
+        name: 'new-name',
+        description: 'Change the name of the category.',
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: 'new-description',
+        description: 'Change the description of the category.',
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: 'mutually-exclusive',
+        description:
+          'Change if roles in this category should be mutually exclusive.',
+        type: ApplicationCommandOptionType.Boolean,
+      },
+      {
+        name: 'remove-role-type',
+        description: 'Select to remove either required-role or excluded-role',
+        type: ApplicationCommandOptionType.String,
+        choices: [
+          { name: 'Required role', value: 'required-role' },
+          { name: 'Excluded role', value: 'excluded-role' },
+        ],
+      },
+      {
+        name: 'new-required-role',
+        description: 'Change the required-role.',
+        type: ApplicationCommandOptionType.Role,
+      },
+      {
+        name: 'new-excluded-role',
+        description: 'Change the excluded-role.',
+        type: ApplicationCommandOptionType.Role,
+      },
+      {
+        name: 'display-order',
+        description: 'Change display order',
+        type: ApplicationCommandOptionType.String,
+        choices: getDisplayCommandValues(),
+      },
+    ]);
   }
 
   handleAutoComplete = async (interaction: AutocompleteInteraction) => {
@@ -91,18 +89,20 @@ export class EditCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const categoryId = this.expect(interaction.options.getString('category'), {
       message: 'Category appears to be invalid!',
       prop: `category`,
     });
+
     const newName = interaction.options.getString('new-name');
     const newDesc = interaction.options.getString('new-description');
-
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
-
     const removeRoleType = interaction.options.getString('remove-role-type');
-
     const newRequiredRoleId =
       interaction.options.getRole('new-required-role')?.id ?? undefined;
     const newExcludedRoleId =
@@ -128,10 +128,9 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! You need to pass at _least_ one updated field about the category.`,
-      });
+      return interaction.editReply(
+        `Hey! You need to pass at _least_ one updated field about the category.`
+      );
     }
 
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
@@ -142,10 +141,9 @@ export class EditCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! I couldn't find the category. Please wait a second and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find the category. Please wait a second and try again.`
+      );
     }
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
@@ -173,10 +171,9 @@ export class EditCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I successfully updated the category \`${category.name}\` for you.`,
-        });
+        return interaction.editReply(
+          `Hey! I successfully updated the category \`${category.name}\` for you.`
+        );
       })
       .catch((e) =>
         this.log.critical(

@@ -1,24 +1,18 @@
-import {
-  ChatInputCommandInteraction,
-  PermissionsBitField,
-  EmbedBuilder,
-} from 'discord.js';
-
-import { SlashCommand } from '../slashCommand';
-import { EmbedService } from '../../src/services/embedService';
-import { Category } from '../../utilities/types/commands';
-import { spliceIntoChunks } from '../../utilities/utils';
+import { EmbedBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
+import { EmbedService } from '../../src/services/embedService';
+import { spliceIntoChunks } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 import { setTimeout } from 'node:timers/promises';
 
-export class ListCategoryCommand extends SlashCommand {
-  constructor() {
+export class ListSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'category-list',
-      'List all your categories and the roles within them.',
-      Category.category,
-      [PermissionsBitField.Flags.ManageRoles]
+      baseCommand,
+      'list',
+      'List all your categories and the roles within them.'
     );
   }
 
@@ -27,15 +21,9 @@ export class ListCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    try {
-      // Defer because of Discord rate limits.
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
-      return;
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>

@@ -1,46 +1,45 @@
 import {
+  ApplicationCommandOptionType,
   AutocompleteInteraction,
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
   NonThreadGuildBasedChannel,
-  PermissionsBitField,
   TextChannel,
 } from 'discord.js';
-
-import { reactToMessage } from '../../utilities/utils';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
-import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import {
   CREATE_GUILD_CONFIG,
   GET_GUILD_CONFIG,
 } from '../../src/database/queries/guild.query';
-import { GuildReactType } from '../../src/database/entities/guild.entity';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { reactToMessage } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class ReactMessageCommand extends SlashCommand {
-  constructor() {
+export class MessageSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-message',
+      baseCommand,
+      'message',
       'Use this command to react with a specific category of roles to a message.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
-
-    this.addStringOption(
-      'message-link',
-      'Copy a message link and place it here for the message you want me to react to.',
-      true
-    );
-
-    this.addStringOption(
-      'category',
-      'The category you wish to react with!',
-      true,
-      [],
-      true
+      [
+        {
+          name: 'message-link',
+          description:
+            'Copy a message link and place it here for the message you want me to react to.',
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: 'category',
+          description: 'The category to react with.',
+          required: true,
+          autocomplete: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ]
     );
   }
 
@@ -59,6 +58,10 @@ export class ReactMessageCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
     const { guildId } = interaction;
 
     let config = await GET_GUILD_CONFIG(guildId);
@@ -67,10 +70,9 @@ export class ReactMessageCommand extends SlashCommand {
     }
 
     if (config?.reactType !== GuildReactType.reaction) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! You can use the message command only if the config react-type is reaction.`,
-      });
+      return interaction.editReply(
+        `Hey! You can use the message command only if the config react-type is reaction.`
+      );
     }
 
     const messageLink = this.expect(
@@ -85,19 +87,17 @@ export class ReactMessageCommand extends SlashCommand {
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
     if (!channelId || !messageId) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``,
-      });
+      return interaction.editReply(
+        `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``
+      );
     }
 
     const categoryId = interaction.options.getString('category');
 
     if (isNaN(Number(categoryId))) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! Did you hit enter too fast? I can't find that category. Please wait and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! Did you hit enter too fast? I can't find that category. Please wait and try again.`
+      );
     }
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
@@ -108,10 +108,9 @@ export class ReactMessageCommand extends SlashCommand {
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
 
     if (!roles.length) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react-role\`?`,
-      });
+      return interaction.editReply(
+        `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react-role\`?`
+      );
     }
 
     const channel = await interaction.guild?.channels
@@ -119,10 +118,9 @@ export class ReactMessageCommand extends SlashCommand {
       .catch((e) => this.log.debug(`Failed to find channel.\n${e}`, guildId));
 
     if (!channel || !isTextChannel(channel)) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I couldn't find that channel, make sure you're copying the message link right and that it's from _this_ server.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find that channel, make sure you're copying the message link right and that it's from _this_ server.`
+      );
     }
 
     const message = await channel.messages
@@ -130,16 +128,14 @@ export class ReactMessageCommand extends SlashCommand {
       .catch((e) => this.log.debug(`Failed to find message.\n${e}`, guildId));
 
     if (!message) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I couldn't find that message, make sure you're copying the message link right.`,
-      });
+      return interaction.editReply(
+        `Hey! I couldn't find that message, make sure you're copying the message link right.`
+      );
     }
 
-    await interaction.reply({
-      ephemeral: true,
-      content: `I'm reacting to the message with all react roles associated with ${category.name}.`,
-    });
+    await interaction.editReply(
+      `I'm reacting to the message with all react roles associated with ${category.name}.`
+    );
 
     return reactToMessage(
       message,

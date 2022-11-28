@@ -6,10 +6,10 @@ import {
 } from 'discord.js';
 import { CLIENT_ID, SERVER_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
-import { SlashCommand as Command } from './commands/command';
-import * as GeneralBaseCommands from './commands/general';
-import { CategoryBaseCommand } from './commands/category';
-import { ReactBaseCommand } from './commands/react';
+import { SlashCommand } from './command';
+import * as GeneralBaseCommands from './general';
+import { CategoryBaseCommand } from './category';
+import { ReactBaseCommand } from './react';
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -17,7 +17,7 @@ export const commands = () => {
   const log = new LogService('CommandHandler');
   log.info(`Building commands...`);
 
-  const commandMap: Collection<string, Command> = new Collection();
+  const commandMap: Collection<string, SlashCommand> = new Collection();
   const category = new CategoryBaseCommand();
   const react = new ReactBaseCommand();
 
@@ -27,29 +27,29 @@ export const commands = () => {
   for (const cmd of [
     ...Object.values(GeneralBaseCommands).map((c) => new c()),
   ]) {
-    commandMap.set(cmd.name, cmd);
+    if (cmd) commandMap.set(cmd.name, cmd);
   }
 
   return commandMap;
 };
 
 export const buildNewCommands = async (buildCommands = false, beta = false) => {
-  const log = new LogService('SlashCommandHandler');
-  log.info(`Loading all slash commands...`);
-
-  const commandsJson: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
-  const category = new CategoryBaseCommand();
-  const react = new ReactBaseCommand();
-
-  commandsJson.push(...[category.toJSON(), react.toJSON()]);
-
-  for (const cmd of [
-    ...Object.values(GeneralBaseCommands).map((c) => new c()),
-  ]) {
-    commandsJson.push(cmd.toJSON());
-  }
-
   if (buildCommands) {
+    const log = new LogService('SlashCommandHandler');
+    log.info(`Loading all slash commands...`);
+
+    const commandsJson: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
+    const category = new CategoryBaseCommand();
+    const react = new ReactBaseCommand();
+
+    commandsJson.push(...[category.toJSON(), react.toJSON()]);
+
+    for (const cmd of [
+      ...Object.values(GeneralBaseCommands).map((c) => new c()),
+    ]) {
+      if (cmd) commandsJson.push(cmd.toJSON());
+    }
+
     const route: `/${string}` = beta
       ? Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID)
       : Routes.applicationCommands(CLIENT_ID);

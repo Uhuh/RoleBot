@@ -21,7 +21,7 @@ import {
 } from './database/queries/joinRole.query';
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
-import { SlashCommand } from '../commands/commands/command';
+import { SlashCommand } from '../commands/command';
 
 export default class RoleBot extends Discord.Client {
   config: typeof config;

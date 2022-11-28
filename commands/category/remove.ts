@@ -1,33 +1,30 @@
 import {
+  ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  PermissionsBitField,
 } from 'discord.js';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
-
-import { handleInteractionReply } from '../../utilities/utils';
 import {
   DELETE_CATEGORY_BY_ID,
   GET_CATEGORY_BY_ID,
 } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
+import { SlashSubCommand } from '../command';
 
-export class RemoveCategoryCommand extends SlashCommand {
-  constructor() {
+export class RemoveSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'category-remove',
+      baseCommand,
+      'remove',
       'Delete a category. Deleting a category frees all roles it contains.',
-      Category.category,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
-
-    this.addStringOption(
-      'category-name',
-      `The category you want to delete!`,
-      true,
-      [],
-      true
+      [
+        {
+          name: 'category',
+          description: 'The category to delete.',
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+          required: true,
+        },
+      ]
     );
   }
 
@@ -48,7 +45,11 @@ export class RemoveCategoryCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const categoryId = interaction.options.getString('category-name');
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
+    const categoryId = interaction.options.getString('category');
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     if (!category) {
@@ -57,10 +58,9 @@ export class RemoveCategoryCommand extends SlashCommand {
         interaction.guildId
       );
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`,
-      });
+      return interaction.editReply(
+        `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`
+      );
     }
 
     DELETE_CATEGORY_BY_ID(category.id)
@@ -70,10 +70,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`,
-        });
+        return interaction.editReply(
+          `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`
+        );
       })
       .catch((e) => {
         this.log.error(
@@ -81,10 +80,9 @@ export class RemoveCategoryCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `Hey! I had an issue deleting the category. Please wait a second and try again.`,
-        });
+        return interaction.editReply(
+          `Hey! I had an issue deleting the category. Please wait a second and try again.`
+        );
       });
   };
 }

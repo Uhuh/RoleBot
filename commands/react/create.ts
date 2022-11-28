@@ -1,20 +1,13 @@
 import {
   ActionRowBuilder,
+  ApplicationCommandOptionType,
   ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
   EmbedBuilder,
   parseEmoji,
-  PermissionsBitField,
 } from 'discord.js';
-
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
-import {
-  handleInteractionReply,
-  isValidRolePosition,
-} from '../../utilities/utils';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLES_BY_GUILD,
@@ -22,19 +15,33 @@ import {
   GET_REACT_ROLE_BY_ROLE_ID,
 } from '../../src/database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
+import { isValidRolePosition } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class ReactRoleCommand extends SlashCommand {
-  constructor() {
-    super('react-role', '', Category.react, [
-      PermissionsBitField.Flags.ManageRoles,
+export class CreateSubcommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
+    super(baseCommand, 'create', 'Create a new react role.', [
+      {
+        name: 'role',
+        description: 'The role the user will get.',
+        required: true,
+        type: ApplicationCommandOptionType.Role,
+      },
+      {
+        name: 'emoji',
+        description: 'The emoji users will use',
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
     ]);
-
-    this.addRoleOption('role', 'The role you want to use.', true);
-    this.addStringOption('emoji', 'The emoji you want to use.', true);
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const { guild } = interaction;
     if (!guild) return;
@@ -56,8 +63,7 @@ export class ReactRoleCommand extends SlashCommand {
      * Discord button row limitation is 5x5 so only a max of 25 buttons.
      */
     if (reactRolesNotInCategory >= 24) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
+      return interaction.editReply({
         content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category-add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
       });
     }
@@ -82,8 +88,7 @@ export class ReactRoleCommand extends SlashCommand {
           .setStyle(ButtonStyle.Link)
       );
 
-      return interaction.reply({
-        ephemeral: true,
+      return interaction.editReply({
         embeds: [embed],
         components: [button],
       });
@@ -92,10 +97,9 @@ export class ReactRoleCommand extends SlashCommand {
     const parsedEmoji = parseEmoji(emoji);
 
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
-      });
+      return interaction.editReply(
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+      );
     }
 
     /**
@@ -109,12 +113,11 @@ export class ReactRoleCommand extends SlashCommand {
     if (reactRole) {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `The react role (${emojiMention} - ${RolePing(
+      return interaction.editReply(
+        `The react role (${emojiMention} - ${RolePing(
           reactRole.roleId
-        )}) already has this emoji assigned to it.`,
-      });
+        )}) already has this emoji assigned to it.`
+      );
     }
 
     /**
@@ -124,12 +127,11 @@ export class ReactRoleCommand extends SlashCommand {
 
     if (reactRole) {
       const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: `There's a react role already using the role \`${
+      return interaction.editReply(
+        `There's a react role already using the role \`${
           reactRole.name
-        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`,
-      });
+        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
+      );
     }
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
@@ -155,12 +157,11 @@ export class ReactRoleCommand extends SlashCommand {
 
         const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
+        return interaction.editReply(
+          `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
             role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`,
-        });
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category-add\`!**`
+        );
       })
       .catch((e) => {
         this.log.error(
@@ -168,10 +169,9 @@ export class ReactRoleCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(this.log, interaction, {
-          ephemeral: true,
-          content: 'React role failed to create. Please try again.',
-        });
+        return interaction.editReply(
+          'React role failed to create. Please try again.'
+        );
       });
   };
 }

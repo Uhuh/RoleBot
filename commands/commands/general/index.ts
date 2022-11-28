@@ -1,1 +1,0 @@
-export { InfoBaseCommand } from './info';

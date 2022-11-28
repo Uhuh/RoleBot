@@ -1,31 +1,23 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { EmbedService } from '../../src/services/embedService';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { SlashSubCommand } from '../command';
 
-export class ReactListCommand extends SlashCommand {
-  constructor() {
+export class ListSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-list',
-      'List all reaction roles that are currently active.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
+      baseCommand,
+      'list',
+      'List all reaction roles that are currently active.'
     );
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
-    try {
-      // Defer because of Discord rate limits.
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      this.log.error(`Failed to defer interaction.\n${e}`, interaction.guildId);
-      return;
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
 

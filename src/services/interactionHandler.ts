@@ -224,6 +224,6 @@ export class InteractionHandler {
       ? interaction.values.join('').split('_')
       : interaction.customId.split('_');
 
-    return [commandName, subCommand, commandArgs.split('-')];
+    return [commandName, subCommand, commandArgs?.split('-')];
   }
 }

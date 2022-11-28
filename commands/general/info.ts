@@ -1,17 +1,17 @@
-import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
   Colors,
   EmbedBuilder,
 } from 'discord.js';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { SlashCommand } from '../command';
 
-export class InfoCommand extends SlashCommand {
+export class InfoBaseCommand extends SlashCommand {
   constructor() {
-    super('info', `RoleBot's invite, ping, etc.`, Category.general);
+    super('info', `RoleBot's invite, ping, etc.`, []);
   }
 
   buttons = () => {
@@ -45,15 +45,9 @@ export class InfoCommand extends SlashCommand {
 
     const ping = Math.floor(interaction.client.ws.ping);
 
-    if (ping > 0) {
-      emoji = ' <:rolebot__goodping:1044464966973001819>';
-    }
-    if (ping > 125) {
-      emoji = '<:rolebot__idleping:1044466765117272094>';
-    }
-    if (ping > 250) {
-      emoji = '<:rolebot__badping:1044466766270701619>';
-    }
+    if (ping > 0) emoji = ' <:rolebot__goodping:1044464966973001819>';
+    if (ping > 125) emoji = '<:rolebot__idleping:1044466765117272094>';
+    if (ping > 250) emoji = '<:rolebot__badping:1044466766270701619>';
 
     embed
       .setTitle('General Info')
@@ -82,7 +76,6 @@ export class InfoCommand extends SlashCommand {
           value: `RoleBot's ping is ${ping}ms.`,
         }
       )
-
       .setThumbnail(AVATAR_URL);
 
     interaction

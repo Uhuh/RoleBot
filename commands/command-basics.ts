@@ -4,15 +4,17 @@ import {
   ChatInputCommandInteraction,
   SelectMenuInteraction,
 } from 'discord.js';
-import { CustomError } from '../../src/error/custom.error';
-import { LogService } from '../../src/services/logService';
-import { handleInteractionReply } from '../../utilities/utils';
-import { PermissionMappings } from '../slashCommand';
+import { CustomError } from '../src/error/custom.error';
+import { LogService } from '../src/services/logService';
+import { handleInteractionReply } from '../utilities/utils';
+import { PermissionMappings } from './command';
 
 export class CommandHandlers {
-  public log = new LogService(this.name);
+  public log: LogService;
 
-  constructor(public name: string) {}
+  constructor(public name: string) {
+    this.log = new LogService(name);
+  }
   /**
    * This method should be overwritten by the child class and implement the commands functionality.
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
