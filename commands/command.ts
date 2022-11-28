@@ -82,7 +82,7 @@ export class SlashSubCommand extends CommandHandlers {
     public description: string,
     public options: ICommandOption[] = []
   ) {
-    super(name);
+    super(name, baseName);
   }
 
   createSubCommand(command: SlashCommandBuilder) {

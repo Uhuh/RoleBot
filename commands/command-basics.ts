@@ -12,8 +12,8 @@ import { PermissionMappings } from './command';
 export class CommandHandlers {
   public log: LogService;
 
-  constructor(public name: string) {
-    this.log = new LogService(name);
+  constructor(public name: string, public baseName = '') {
+    this.log = new LogService(`${baseName ? baseName + ' ' : ''}${name}`);
   }
   /**
    * This method should be overwritten by the child class and implement the commands functionality.
