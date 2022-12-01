@@ -162,6 +162,7 @@ export default class RoleBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
 
-    await buildNewCommands(true, config.CLIENT_ID !== '493668628361904139');
+    // 741682757486510081 - New RoleBot application.
+    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
   };
 }
