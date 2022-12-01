@@ -1,26 +1,40 @@
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, Colors } from 'discord.js';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import {
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+  Colors,
+  PermissionsBitField,
+} from 'discord.js';
+import { SlashCommand } from '../command';
 import * as util from 'util';
 
-export class EvalCommand extends SlashCommand {
-  constructor() {
-    super('eval', 'Devs only :)', Category.owner);
-    this.addStringOption('command', 'Command to run', true);
-  }
-
+export class EvalBaseCommand extends SlashCommand {
   developerIds = ['658441101861978151', '289151449412141076'];
+
+  constructor() {
+    super('eval', 'Devs only :)', [PermissionsBitField.Flags.ManageGuild]);
+
+    this.addOption([
+      {
+        name: 'command',
+        description: 'Command to run',
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ]);
+  }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) return;
     const { member } = interaction;
 
     if (!this.developerIds.includes(member?.user.id ?? '')) {
-      return interaction.reply({
+      await interaction.reply({
         ephemeral: true,
         content: `Nuhuhuh! You're not a dev!`,
       });
+
+      return;
     }
 
     let content = interaction.options.getString('command');
@@ -33,7 +47,7 @@ export class EvalCommand extends SlashCommand {
 
       const embed = this.buildEmbed(output);
 
-      return interaction.reply({
+      await interaction.reply({
         embeds: [embed],
       });
     } catch (e) {
@@ -44,7 +58,7 @@ export class EvalCommand extends SlashCommand {
       if (typeof content !== 'string')
         content = util.inspect(content, { depth: 0 });
 
-      return interaction.reply({
+      await interaction.reply({
         content: 'Oops!!!',
         embeds: [embed],
       });

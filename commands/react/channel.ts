@@ -1,56 +1,53 @@
 import {
+  ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChannelType,
   ChatInputCommandInteraction,
-  PermissionsBitField,
   TextChannel,
 } from 'discord.js';
-
-import { EmbedService } from '../../src/services/embedService';
-import { reactToMessage } from '../../utilities/utils';
-import { Category as CommandCategory } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { setTimeout } from 'timers/promises';
+import { Category, ReactRole } from '../../src/database/entities';
+import { GuildReactType } from '../../src/database/entities/guild.entity';
 import {
   GET_CATEGORY_BY_ID,
   GET_GUILD_CATEGORIES,
 } from '../../src/database/queries/category.query';
 import {
-  GET_GUILD_CATEGORY_ROLE_COUNT,
-  GET_REACT_ROLES_BY_CATEGORY_ID,
-} from '../../src/database/queries/reactRole.query';
-import { requiredPermissions } from '../../utilities/utilErrorMessages';
-import { setTimeout } from 'node:timers/promises';
-import { Category, ReactRole } from '../../src/database/entities';
-import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
-import {
   CREATE_GUILD_CONFIG,
   GET_GUILD_CONFIG,
 } from '../../src/database/queries/guild.query';
-import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
+import {
+  GET_GUILD_CATEGORY_ROLE_COUNT,
+  GET_REACT_ROLES_BY_CATEGORY_ID,
+} from '../../src/database/queries/reactRole.query';
+import { EmbedService } from '../../src/services/embedService';
+import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { reactRoleButtons } from '../../utilities/utilButtons';
+import { requiredPermissions } from '../../utilities/utilErrorMessages';
+import { reactToMessage } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class ReactChannelCommand extends SlashCommand {
-  constructor() {
+export class ChannelSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-channel',
-      'Send all categories or one with react roles to the selected channel.',
-      CommandCategory.react,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
-
-    this.addChannelOption(
+      baseCommand,
       'channel',
-      'The channel that will receive reaction roles.',
-      true
-    );
-
-    this.addStringOption(
-      'category-name',
-      'Send only a single category to the channel.',
-      false,
-      [],
-      true
+      'Send all or one categories to a selected channel.',
+      [
+        {
+          name: 'channel',
+          description: 'The channel to send to.',
+          type: ApplicationCommandOptionType.Channel,
+          required: true,
+        },
+        {
+          name: 'category',
+          description: 'Send a single category to the channel.',
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+        },
+      ]
     );
   }
 
@@ -125,7 +122,6 @@ export class ReactChannelCommand extends SlashCommand {
 
     const { guildId } = interaction;
 
-    // Defer because of Discord rate limits.
     await interaction.deferReply({
       ephemeral: true,
     });
@@ -151,12 +147,12 @@ export class ReactChannelCommand extends SlashCommand {
       this.log.debug(`Guild has no categories.`, guildId);
 
       return interaction.editReply(
-        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category-add\`.`
+        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category add\`.`
       );
     }
 
     // Stolen from @react/message execute function
-    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category-add\` to start adding roles to a category.`;
+    const allCategoriesAreEmpty = `Hey! It appears all your categories are empty. I can't react to the message you want if you have at least one react role in at least one category. Check out \`/category add\` to start adding roles to a category.`;
     const categoryRolesCount = await GET_GUILD_CATEGORY_ROLE_COUNT(guildId);
 
     if (!categoryRolesCount) {
@@ -252,7 +248,7 @@ export class ReactChannelCommand extends SlashCommand {
       switch (config?.reactType) {
         case GuildReactType.button: {
           /**
-           * When the server uses buttons we don't react, so just save whatever the first react-role emoji and role id are.
+           * When the server uses buttons we don't react, so just save whatever the first react role emoji and role id are.
            * This is so we can get the message later whenever a user wants to update this embed.
            */
           await CREATE_REACT_MESSAGE({

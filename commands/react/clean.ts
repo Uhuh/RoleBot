@@ -1,18 +1,16 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import {
   DELETE_REACT_ROLE_BY_ROLE_ID,
   GET_REACT_ROLES_BY_GUILD,
 } from '../../src/database/queries/reactRole.query';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { SlashSubCommand } from '../command';
 
-export class ReactCleanCommand extends SlashCommand {
-  constructor() {
+export class CleanSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-clean',
-      `If you delete a role RoleBot might miss it, this will remove '@deleted' roles.`,
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
+      baseCommand,
+      'clean',
+      `If you delete a role RoleBot might miss it, this will remove '@deleted' roles.`
     );
   }
 
@@ -21,16 +19,9 @@ export class ReactCleanCommand extends SlashCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    try {
-      await interaction.deferReply({
-        ephemeral: true,
-      });
-    } catch (e) {
-      return this.log.error(
-        `Failed to defer interaction.\n${e}`,
-        interaction.guildId
-      );
-    }
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     let numRemovedRoles = 0;
 

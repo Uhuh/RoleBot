@@ -4,11 +4,11 @@
       "title": "Quick summary. | Page 1",
       "description": [
         "Welcome to RoleBot! Here's the **short** version of how to use RoleBot.\n",
-        "__**Step 1:**__ Use `/react-role` to create several **React Roles**, which are a combination of a **role** and an **emoji**.",
-        "__**Step 2:**__ Use `/category-create` to create a **Category**, which will hold a group of react roles.",
-        "__**Step 3:**__ Use `/category-add` to put react roles into a category.",
-        "__**Step 4a:**__ Use `/react-channel` to select a channel that RoleBot will send all of its react categories to.",
-        "__**Step 4b:**__ Alternatively, use `/react-message` to select one of your own messages to add a role category to.\n",
+        "__**Step 1:**__ Use `/react create` to create several **React Roles**, which are a combination of a **role** and an **emoji**.",
+        "__**Step 2:**__ Use `/category create` to create a **Category**, which will hold a group of react roles.",
+        "__**Step 3:**__ Use `/category add` to put react roles into a category.",
+        "__**Step 4a:**__ Use `/react channel` to select a channel that RoleBot will send all of its react categories to.",
+        "__**Step 4b:**__ Alternatively, use `/react message` to select one of your own messages to add a role category to.\n",
         "**If this wasn't detailed enough for you, hit next and get a VERY detailed step by step guide.**"
       ],
       "image": "https://s3.us-east-2.amazonaws.com/rolebot.gg/assets/banners/banner.png"
@@ -18,29 +18,29 @@
       "description": [
         "When creating a react role with RoleBot there's one things you need to keep in mind.\n",
         "**You cannot have duplicate roles OR emojis.**\n",
-        "Creating a react role is easy! Simply do `/react-role` then pass in the role and emoji you want paired together.\n",
-        "**Warning:** Sometimes you may want to delete a role in your server, most times RoleBot will catch that and remove react roles that had that. If RoleBot misses that and you see `@deleted` in the react role list use the `/react-clean` command.\n",
+        "Creating a react role is easy! Simply do `/react create` then pass in the role and emoji you want paired together.\n",
+        "**Warning:** Sometimes you may want to delete a role in your server, most times RoleBot will catch that and remove react roles that had that. If RoleBot misses that and you see `@deleted` in the react role list use the `/react clean` command.\n",
         "_(If you do decide to add a lot of react roles at the start, you'll be limited to 25 react roles until you start adding them to categories. This is a Discord limitation.)_"
       ],
-      "image": "https://media.discordapp.net/attachments/935424318471548978/1028514952186704002/unknown.png"
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1046833696117891153/image.png"
     },
     {
       "title": "How to create a category. | Page 3",
       "description": [
         "Categories are how RoleBot group together react roles. Let's go over what each category setting does.\n",
-        "When creating a category we use the command `/category-create`. **By default you're only required to give the category a name and can leave the other options empty.**",
+        "When creating a category we use the command `/category create`. **By default you're only required to give the category a name and can leave the other options empty.**",
         "* `category-desc` is the category description. This is text that will show above the react roles in the embed when displayed. Use it to briefly describe the purpose of the category or theme.",
         "* `mutually-exclusive` is what dictates if a user can obtain all roles from a category or only one. If the value for this is true then a user may only get one role at a time from the category.",
         "* `required-role` will only allow users with a specific role to react and obtain roles from the category.",
         "* `excluded-role` will ignore users with this role for the set category.",
         "* `display-order` determines how to list react roles and reactions for messages."
       ],
-      "image": "https://media.discordapp.net/attachments/935424318471548978/1045157006845161472/image.png"
+      "image": "https://media.discordapp.net/attachments/935424318471548978/1046833895682875502/image.png"
     },
     {
       "title": "How to add react roles to a category. | Page 4",
       "description": [
-        "Adding react roles is simple. We start by running the `/category-add` command.",
+        "Adding react roles is simple. We start by running the `/category add` command.",
         "RoleBot will prompt you to select which category you would like to add react roles to with a dropdown menu.\n",
         "Once you select the category you want to add to, RoleBot will present to you the react roles you create in button form. Click each react role you want to add to the category.\n",
         "**Each category can only hold a max of 20 react roles due to Discords message reaction limit.**"
@@ -52,8 +52,8 @@
       "description": [
         "Now that we created our React Roles, our Category, and added the React Roles into the Category. Let's actually have RoleBot monitor messages for reactions.\n",
         "**There are _two_ different ways for RoleBot to listen for reactions.**",
-        "One, you can use `/react-channel` to select a channel that RoleBot will send all of its default embeds to and react to.",
-        "Two, you can use `/react-message` to select a specific message, usually one you wrote and select a single category for RoleBot to react with.\n"
+        "One, you can use `/react channel` to select a channel that RoleBot will send all of its default embeds to and react to.",
+        "Two, you can use `/react message` to select a specific message, usually one you wrote and select a single category for RoleBot to react with.\n"
       ],
       "image": "https://media.discordapp.net/attachments/935424318471548978/1028550952279609394/unknown.png"
     },

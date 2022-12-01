@@ -116,7 +116,7 @@ export const updateReactMessages = async (
     const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
 
     /**
-     * The /react-message command allows users to use their own message instead of RoleBots
+     * The /react message command allows users to use their own message instead of RoleBots
      * Make sure this is not their message. We cannot edit user messages.
      */
     if (!reactMessage.isCustomMessage) {

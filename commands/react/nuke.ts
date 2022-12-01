@@ -4,39 +4,26 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ChatInputCommandInteraction,
-  PermissionsBitField,
 } from 'discord.js';
 import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
+import { SlashSubCommand } from '../command';
 
-import { Category } from '../../utilities/types/commands';
-import { handleInteractionReply } from '../../utilities/utils';
-import { SlashCommand } from '../slashCommand';
-
-export class ReactNukeCommand extends SlashCommand {
-  constructor() {
+export class NukeSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'react-nuke',
-      'This will remove ALL react roles for this server.',
-      Category.react,
-      [PermissionsBitField.Flags.ManageRoles]
+      baseCommand,
+      'nuke',
+      'This will remove ALL react roles for this server.'
     );
   }
 
-  handleButton = (interaction: ButtonInteraction) => {
+  handleButton = async (interaction: ButtonInteraction) => {
     if (!interaction.guildId) {
       return interaction.reply(
         `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
       );
     }
-
-    handleInteractionReply(
-      this.log,
-      interaction,
-      `User ${
-        interaction.member?.user || '[REDACTED]'
-      } has confirmed and deleted all react roles for the server.`
-    );
 
     // Need to delete all react messages or users will be able to react still and get roles.
     DELETE_REACT_MESSAGES_BY_GUILD_ID(interaction.guildId)
@@ -57,11 +44,10 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`
-        );
+        return interaction.reply({
+          ephemeral: true,
+          content: `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`,
+        });
       })
       .catch((e) => {
         this.log.error(
@@ -69,18 +55,17 @@ export class ReactNukeCommand extends SlashCommand {
           interaction.guildId
         );
 
-        handleInteractionReply(
-          this.log,
-          interaction,
-          `Hey! I had an issue deleting all the react roles.`
-        );
+        return interaction.reply({
+          ephemeral: true,
+          content: `Hey! I had an issue deleting all the react roles.`,
+        });
       });
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(`${this.name}_confirm`)
+        .setCustomId(`${this.baseName}_${this.name}_confirm`)
         .setLabel('Confirm Nuke')
         .setStyle(ButtonStyle.Danger)
     );

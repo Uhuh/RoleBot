@@ -6,19 +6,18 @@ import {
   ChatInputCommandInteraction,
 } from 'discord.js';
 import { EmbedService } from '../../src/services/embedService';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
-import tutorialJson from '../../utilities/json/tutorial.json';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
+import tutorialJson from '../../utilities/json/tutorial.json';
+import { SlashCommand } from '../command';
 
-export class TutorialCommand extends SlashCommand {
+export class TutorialBaseCommand extends SlashCommand {
   readonly maxPage = tutorialJson['embeds'].length - 1;
 
   constructor() {
     super(
       'tutorial',
       `Need to learn the basics of RoleBot? Use this command!`,
-      Category.general
+      []
     );
   }
 
@@ -39,9 +38,13 @@ export class TutorialCommand extends SlashCommand {
     return buttons;
   };
 
-  handleButton = async (interaction: ButtonInteraction, args: string[]) => {
+  handleButton = async (
+    interaction: ButtonInteraction,
+    page: string,
+    _args: string[]
+  ) => {
     /* Should only be getting page ID's from the button event */
-    const [pageId] = args.map((p) => Number(p));
+    const pageId = Number(page);
 
     const embed = EmbedService.tutorialEmbed(pageId);
     const buttons = this.makeButtons(pageId);

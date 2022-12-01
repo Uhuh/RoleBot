@@ -1,6 +1,6 @@
-export { HelpCommand } from './help';
-export { InfoCommand } from './info';
-export { AutoJoinCommand } from './join';
-export { TutorialCommand } from './tutorial';
-export { ConfigCommand } from './config';
-export { EvalCommand } from './eval';
+export { InfoBaseCommand } from './info';
+export { AutoJoinBaseCommand } from './join/index';
+export { ConfigBaseCommand } from './config/index';
+export { EvalBaseCommand } from './eval';
+export { TutorialBaseCommand } from './tutorial';
+export { HelpBaseCommand } from './help';

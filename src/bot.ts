@@ -1,7 +1,6 @@
 import * as config from './vars';
-import { buildCommands, buildSlashCommands } from '../commands/commandHandler';
+import { buildNewCommands, commands } from '../commands/commandHandler';
 import { guildUpdate } from '../events/guildUpdate';
-import { SlashCommand } from '../commands/slashCommand';
 import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
@@ -22,6 +21,7 @@ import {
 } from './database/queries/joinRole.query';
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
+import { SlashCommand } from '../commands/command';
 
 export default class RoleBot extends Discord.Client {
   config: typeof config;
@@ -46,7 +46,7 @@ export default class RoleBot extends Discord.Client {
       ],
     });
     this.config = config;
-    this.commands = buildCommands();
+    this.commands = commands();
 
     this.log = new LogService('RoleBot');
     this.permissionService = new PermissionService(this);
@@ -162,6 +162,7 @@ export default class RoleBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
 
-    await buildSlashCommands(false, config.CLIENT_ID !== '493668628361904139');
+    // 741682757486510081 - New RoleBot application.
+    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
   };
 }

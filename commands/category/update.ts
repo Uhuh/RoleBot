@@ -1,51 +1,45 @@
 import {
+  ApplicationCommandOptionType,
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
+  EmbedBuilder,
   Message,
-  PermissionsBitField,
   TextChannel,
 } from 'discord.js';
-
-import { EmbedService } from '../../src/services/embedService';
-import { handleInteractionReply, reactToMessage } from '../../utilities/utils';
-import { Category } from '../../utilities/types/commands';
-import { SlashCommand } from '../slashCommand';
+import { ReactRole } from '../../src/database/entities';
+import { ICategory } from '../../src/database/entities/category.entity';
 import {
-  CREATE_REACT_MESSAGE,
-  DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
-  GET_REACT_MESSAGE_BY_MESSAGE_ID,
-} from '../../src/database/queries/reactMessage.query';
+  GuildReactType,
+  IGuildConfig,
+} from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
-import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import {
   CREATE_GUILD_CONFIG,
   GET_GUILD_CONFIG,
 } from '../../src/database/queries/guild.query';
 import {
-  GuildReactType,
-  IGuildConfig,
-} from '../../src/database/entities/guild.entity';
-import { ICategory } from '../../src/database/entities/category.entity';
-import { ReactRole } from '../../src/database/entities';
+  CREATE_REACT_MESSAGE,
+  DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
+  GET_REACT_MESSAGE_BY_MESSAGE_ID,
+} from '../../src/database/queries/reactMessage.query';
+import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
+import { EmbedService } from '../../src/services/embedService';
 import { reactRoleButtons } from '../../utilities/utilButtons';
-import { EmbedBuilder } from '@discordjs/builders';
+import { requiredPermissions } from '../../utilities/utilErrorMessages';
+import { reactToMessage } from '../../utilities/utils';
+import { SlashSubCommand } from '../command';
 
-export class UpdateCategoryCommand extends SlashCommand {
-  constructor() {
-    super(
-      'category-update',
-      'Have an existing react role embed you want updated? Use this command!',
-      Category.category,
-      [PermissionsBitField.Flags.ManageRoles]
-    );
-
-    this.addStringOption(
-      'message-link',
-      'The link to the category embed message. This will be used to find and update the embed.',
-      true
-    );
+export class UpdateSubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
+    super(baseCommand, 'update', 'Update an existing RoleBot message embed.', [
+      {
+        name: 'message-link',
+        description: 'The link to the category embed message.',
+        type: ApplicationCommandOptionType.String,
+        required: true,
+      },
+    ]);
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
@@ -133,7 +127,7 @@ export class UpdateCategoryCommand extends SlashCommand {
 
       return interaction.editReply(
         `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
-          `Add some react roles to the category with \`/category-add\` and then try update again. Otherwise just delete it!`
+          `Add some react roles to the category with \`/category add\` and then try update again. Otherwise just delete it!`
       );
     }
 
@@ -279,10 +273,7 @@ export class UpdateCategoryCommand extends SlashCommand {
     );
 
     if (!isSuccessfulReacting) {
-      return handleInteractionReply(this.log, interaction, {
-        ephemeral: true,
-        content: permissionsError,
-      });
+      return interaction.editReply(permissionsError);
     }
   };
 }

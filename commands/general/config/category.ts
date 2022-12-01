@@ -1,36 +1,40 @@
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import { GuildReactType } from '../../src/database/entities/guild.entity';
+import {
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+} from 'discord.js';
+import { GuildReactType } from '../../../src/database/entities/guild.entity';
 import {
   CREATE_GUILD_CONFIG,
   EDIT_GUILD_CONFIG,
   GET_GUILD_CONFIG,
-} from '../../src/database/queries/guild.query';
-import { EmbedService } from '../../src/services/embedService';
-import { Category } from '../../utilities/types/commands';
+} from '../../../src/database/queries/guild.query';
+import { EmbedService } from '../../../src/services/embedService';
 import {
   getGuildReactConfigValues,
   parseGuildReactString,
-} from '../../utilities/utils';
-import { SlashCommand } from '../slashCommand';
+} from '../../../utilities/utils';
+import { SlashSubCommand } from '../../command';
 
-export class ConfigCommand extends SlashCommand {
-  constructor() {
+export class CategorySubCommand extends SlashSubCommand {
+  constructor(baseCommand: string) {
     super(
-      'config',
-      'Edit the servers reaction configurations.',
-      Category.general,
-      [PermissionsBitField.Flags.ManageGuild]
-    );
-
-    this.addStringOption(
-      'react-type',
-      'Change how the bot serves react roles.',
-      false,
-      getGuildReactConfigValues()
-    );
-    this.addBoolOption(
-      'hide-emojis',
-      'If using button react-type, you can hide the emojis for the buttons.'
+      baseCommand,
+      'category',
+      'Change how categories and their react roles display.',
+      [
+        {
+          name: 'react-type',
+          description: 'Change how RoleBot serves react roles.',
+          type: ApplicationCommandOptionType.String,
+          choices: getGuildReactConfigValues(),
+        },
+        {
+          name: 'hide-emojis',
+          description:
+            'If using button react-type, you can hide the emojis for the buttons.',
+          type: ApplicationCommandOptionType.Boolean,
+        },
+      ]
     );
   }
 
@@ -38,6 +42,10 @@ export class ConfigCommand extends SlashCommand {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     const { guildId } = interaction;
 
@@ -65,9 +73,8 @@ export class ConfigCommand extends SlashCommand {
 
     const embed = await EmbedService.guildConfig(updatedConfig);
 
-    return interaction.reply({
-      ephemeral: true,
-      content: `Heyo! Here's your new server configuration.`,
+    return interaction.editReply({
+      content: `Hey! Here's your new server configuration.`,
       embeds: [embed],
     });
   };
