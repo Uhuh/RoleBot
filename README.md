@@ -99,6 +99,12 @@ POSTGRES_URL=postgres://username:password@ip:5432/
 # ↓ Set to 1 if you're working in a dev environment. 
 
 SYNC_DB=0
+
+WEBHOOK_ID=webhook_id
+WEBHOOK_TOKEN=webhook_token
+CLIENT_ID=the_bots_id
+SHARD_COUNT=1
+
 ```
 ### Don't want to use dotenv? Update the variables in `src/vars.ts` instead.
 
