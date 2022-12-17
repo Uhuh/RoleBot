@@ -105,7 +105,10 @@ export class ChannelSubCommand extends SlashSubCommand {
       category.id,
       category.displayOrder
     );
-    if (!roles.length) return;
+    if (!roles.length)
+      return interaction.editReply(
+        `Hey! That category has no react roles associated with it. How about adding some.`
+      );
 
     return this.messageChannelAndReact(
       interaction,
@@ -129,7 +132,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     /**
      * If the user passed in a category we don't need to waste time here.
      */
-    const categoryId = interaction.options.getString('category-name');
+    const categoryId = interaction.options.getString('category');
 
     if (categoryId && !isNaN(Number(categoryId))) {
       return this.handleSingleCategory(interaction, Number(categoryId));
