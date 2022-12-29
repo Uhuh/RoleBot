@@ -1,0 +1,17 @@
+name: Build and Lint
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: yarn
+
+    - name: Build and Lint
+      run: yarn build
