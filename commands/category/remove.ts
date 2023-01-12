@@ -45,17 +45,19 @@ export class RemoveSubCommand extends SlashSubCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    const { guildId } = interaction;
+
     await interaction.deferReply({
       ephemeral: true,
     });
 
     const categoryId = interaction.options.getString('category');
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+    const category = await GET_CATEGORY_BY_ID(guildId, Number(categoryId));
 
     if (!category) {
       this.log.error(
         `Category[${categoryId}] does not exist on guild.`,
-        interaction.guildId
+        guildId
       );
 
       return interaction.editReply(
@@ -63,12 +65,9 @@ export class RemoveSubCommand extends SlashSubCommand {
       );
     }
 
-    DELETE_CATEGORY_BY_ID(category.id)
+    DELETE_CATEGORY_BY_ID(guildId, category.id)
       .then(() => {
-        this.log.info(
-          `Successfully deleted category[${categoryId}]`,
-          interaction.guildId
-        );
+        this.log.info(`Successfully deleted category[${categoryId}]`, guildId);
 
         return interaction.editReply(
           `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`
@@ -77,7 +76,7 @@ export class RemoveSubCommand extends SlashSubCommand {
       .catch((e) => {
         this.log.error(
           `Issues deleting category[${categoryId}]\n${e}`,
-          interaction.guildId
+          guildId
         );
 
         return interaction.editReply(

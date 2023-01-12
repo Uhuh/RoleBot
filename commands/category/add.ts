@@ -70,10 +70,13 @@ export class AddSubCommand extends SlashSubCommand {
       }
     );
 
-    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: `Failed to find the category!`,
-      prop: 'category',
-    });
+    const category = this.expect(
+      await GET_CATEGORY_BY_ID(interaction.guildId, Number(categoryId)),
+      {
+        message: `Failed to find the category!`,
+        prop: 'category',
+      }
+    );
 
     // To edit our button message with the updated list of react roles.
     const rolesWithoutCategories = (
@@ -107,7 +110,10 @@ export class AddSubCommand extends SlashSubCommand {
     }
 
     if (reactRole.categoryId) {
-      const reactRoleCategory = await GET_CATEGORY_BY_ID(reactRole.categoryId);
+      const reactRoleCategory = await GET_CATEGORY_BY_ID(
+        reactRole.guildId,
+        reactRole.categoryId
+      );
 
       this.log.info(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`,
@@ -205,10 +211,13 @@ export class AddSubCommand extends SlashSubCommand {
       });
     }
 
-    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: 'I failed to find that category! Try again.',
-      prop: 'category',
-    });
+    const category = this.expect(
+      await GET_CATEGORY_BY_ID(guildId, Number(categoryId)),
+      {
+        message: 'I failed to find that category! Try again.',
+        prop: 'category',
+      }
+    );
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
 

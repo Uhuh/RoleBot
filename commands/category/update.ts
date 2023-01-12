@@ -101,7 +101,10 @@ export class UpdateSubCommand extends SlashSubCommand {
       );
     }
 
-    const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
+    const category = await GET_CATEGORY_BY_ID(
+      reactMessage.guildId,
+      reactMessage.categoryId
+    );
 
     if (!category) {
       this.log.info(

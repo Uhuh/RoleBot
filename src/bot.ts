@@ -148,7 +148,6 @@ export default class RoleBot extends Discord.Client {
     await createConnection({
       type: 'postgres',
       url: config.POSTGRES_URL,
-      synchronize: config.SYNC_DB,
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
     })
       .then(() => this.log.debug(`Successfully connected to postgres DB.`))

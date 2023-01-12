@@ -89,6 +89,8 @@ export class EditSubCommand extends SlashSubCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
+    const { guildId } = interaction;
+
     await interaction.deferReply({
       ephemeral: true,
     });
@@ -123,23 +125,17 @@ export class EditSubCommand extends SlashSubCommand {
       removeRoleType === null &&
       mutuallyExclusive === null
     ) {
-      this.log.info(
-        `User didn't change anything about the category`,
-        interaction.guildId
-      );
+      this.log.info(`User didn't change anything about the category`, guildId);
 
       return interaction.editReply(
         `Hey! You need to pass at _least_ one updated field about the category.`
       );
     }
 
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+    const category = await GET_CATEGORY_BY_ID(guildId, Number(categoryId));
 
     if (!category) {
-      this.log.info(
-        `Category not found with id[${categoryId}]`,
-        interaction.guildId
-      );
+      this.log.info(`Category not found with id[${categoryId}]`, guildId);
 
       return interaction.editReply(
         `Hey! I couldn't find the category. Please wait a second and try again.`
@@ -164,11 +160,11 @@ export class EditSubCommand extends SlashSubCommand {
       displayOrder,
     };
 
-    EDIT_CATEGORY_BY_ID(category.id, updatedCategory)
+    EDIT_CATEGORY_BY_ID(guildId, category.id, updatedCategory)
       .then(() => {
         this.log.info(
           `Updated category[${category.id}] successfully.`,
-          interaction.guildId
+          guildId
         );
 
         return interaction.editReply(
@@ -178,7 +174,7 @@ export class EditSubCommand extends SlashSubCommand {
       .catch((e) =>
         this.log.critical(
           `Failed to edit category[${category.id}]\n${e}`,
-          interaction.guildId
+          guildId
         )
       );
   };

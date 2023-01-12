@@ -100,10 +100,13 @@ export class MessageSubCommand extends SlashSubCommand {
       );
     }
 
-    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: 'I failed to find that category! Try again.',
-      prop: 'category',
-    });
+    const category = this.expect(
+      await GET_CATEGORY_BY_ID(guildId, Number(categoryId)),
+      {
+        message: 'I failed to find that category! Try again.',
+        prop: 'category',
+      }
+    );
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       category.guildId,

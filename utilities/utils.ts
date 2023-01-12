@@ -101,7 +101,7 @@ export const updateReactMessages = async (
       );
     }
 
-    const category = await GET_CATEGORY_BY_ID(categoryId);
+    const category = await GET_CATEGORY_BY_ID(guildId, categoryId);
 
     if (!category) {
       return log.critical(
@@ -110,6 +110,7 @@ export const updateReactMessages = async (
     }
 
     const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(
+      guildId,
       categoryId,
       category.displayOrder
     );

@@ -82,6 +82,7 @@ export const GET_REACT_ROLES_BY_CATEGORY_ID = async (
 
   return await ReactRole.find({
     where: {
+      guildId,
       category: {
         id: categoryId,
       },

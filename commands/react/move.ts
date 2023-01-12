@@ -62,10 +62,13 @@ export class MoveSubCommand extends SlashSubCommand {
       prop: 'categoryId',
     });
 
-    const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
-      message: `Hey! I had an issue finding the category in my database. Please wait and try again.`,
-      prop: 'category',
-    });
+    const category = this.expect(
+      await GET_CATEGORY_BY_ID(interaction.guildId, Number(categoryId)),
+      {
+        message: `Hey! I had an issue finding the category in my database. Please wait and try again.`,
+        prop: 'category',
+      }
+    );
 
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
 

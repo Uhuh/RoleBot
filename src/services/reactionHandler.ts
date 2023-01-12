@@ -71,7 +71,10 @@ export class ReactionHandler {
       );
     }
 
-    const category = await GET_CATEGORY_BY_ID(reactMessage.categoryId);
+    const category = await GET_CATEGORY_BY_ID(
+      reactMessage.guildId,
+      reactMessage.categoryId
+    );
 
     if (!category) {
       return this.log.error(

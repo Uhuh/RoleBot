@@ -8,13 +8,14 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
 };
 
 export const GET_ROLES_BY_CATEGORY_ID = async (
+  guildId: string,
   categoryId: number,
   displayType: DisplayType
 ) => {
   const orderProperties = displayOrderQuery(displayType);
 
   return await ReactRole.find({
-    where: { category: { id: categoryId } },
+    where: { category: { guildId, id: categoryId } },
     order: orderProperties,
   });
 };
@@ -36,20 +37,21 @@ export const CREATE_GUILD_CATEGORY = async (
 };
 
 export const EDIT_CATEGORY_BY_ID = (
+  guildId: string,
   id: number,
   category: Partial<ICategory>
 ) => {
-  return Category.update({ id }, category);
+  return Category.update({ guildId, id }, category);
 };
 
 export const GET_CATEGORY_BY_NAME = async (guildId: string, name: string) => {
   return await Category.findOne({ where: { guildId, name } });
 };
 
-export const GET_CATEGORY_BY_ID = (id: number) => {
-  return Category.findOne({ where: { id } });
+export const GET_CATEGORY_BY_ID = (guildId: string, id: number) => {
+  return Category.findOne({ where: { guildId, id } });
 };
 
-export const DELETE_CATEGORY_BY_ID = (id: number) => {
-  return Category.delete({ id });
+export const DELETE_CATEGORY_BY_ID = (guildId: string, id: number) => {
+  return Category.delete({ guildId, id });
 };

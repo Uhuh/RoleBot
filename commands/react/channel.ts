@@ -96,10 +96,13 @@ export class ChannelSubCommand extends SlashSubCommand {
 
     if (textChannel.type !== ChannelType.GuildText) return;
 
-    const category = this.expect(await GET_CATEGORY_BY_ID(categoryId), {
-      message: `I failed to find the category! Please wait and try again.`,
-      prop: 'category',
-    });
+    const category = this.expect(
+      await GET_CATEGORY_BY_ID(interaction.guildId, categoryId),
+      {
+        message: `I failed to find the category! Please wait and try again.`,
+        prop: 'category',
+      }
+    );
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       category.guildId,

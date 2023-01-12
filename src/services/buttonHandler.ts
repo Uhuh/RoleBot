@@ -48,7 +48,7 @@ export class ButtonHandler {
     }
 
     const reactRole = await GET_REACT_ROLE_BY_ID(Number(reactRoleId));
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+    const category = await GET_CATEGORY_BY_ID(guildId, Number(categoryId));
 
     if (!reactRole || !category) {
       return interaction.editReply(
@@ -156,7 +156,11 @@ export class ButtonHandler {
     role: ReactRole
   ) => {
     const roles = (
-      await GET_ROLES_BY_CATEGORY_ID(category.id, category.displayOrder)
+      await GET_ROLES_BY_CATEGORY_ID(
+        category.guildId,
+        category.id,
+        category.displayOrder
+      )
     ).map((r) => r.roleId);
 
     const rolesToRemove = member.roles.cache.filter((r) =>
