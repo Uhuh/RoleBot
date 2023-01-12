@@ -102,6 +102,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     });
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      category.guildId,
       category.id,
       category.displayOrder
     );
@@ -190,6 +191,7 @@ export class ChannelSubCommand extends SlashSubCommand {
 
     for (const category of categories) {
       const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+        category.guildId,
         category.id,
         category.displayOrder
       );

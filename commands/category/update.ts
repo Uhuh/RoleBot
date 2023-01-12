@@ -115,6 +115,7 @@ export class UpdateSubCommand extends SlashSubCommand {
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      guildId,
       category.id,
       category.displayOrder
     );

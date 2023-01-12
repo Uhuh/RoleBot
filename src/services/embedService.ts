@@ -40,6 +40,7 @@ export class EmbedService {
   public static categoryReactRoleEmbed = async (category: Category) => {
     const embed = new EmbedBuilder();
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      category.guildId,
       category.id,
       category.displayOrder
     );

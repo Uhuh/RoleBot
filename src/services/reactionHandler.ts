@@ -160,7 +160,10 @@ export class ReactionHandler {
     }
 
     const categoryRoles = (
-      await GET_REACT_ROLES_BY_CATEGORY_ID(reactMessage.categoryId)
+      await GET_REACT_ROLES_BY_CATEGORY_ID(
+        reactMessage.guildId,
+        reactMessage.categoryId
+      )
     ).map((r) => r.roleId);
 
     /**

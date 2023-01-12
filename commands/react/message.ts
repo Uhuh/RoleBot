@@ -105,7 +105,10 @@ export class MessageSubCommand extends SlashSubCommand {
       prop: 'category',
     });
 
-    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(category.id);
+    const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      category.guildId,
+      category.id
+    );
 
     if (!roles.length) {
       return interaction.editReply(

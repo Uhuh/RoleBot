@@ -74,6 +74,7 @@ export const GET_GUILD_CATEGORY_ROLE_COUNT = async (guildId: string) => {
 };
 
 export const GET_REACT_ROLES_BY_CATEGORY_ID = async (
+  guildId: string,
   categoryId: number,
   displayType?: DisplayType
 ) => {

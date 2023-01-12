@@ -81,6 +81,7 @@ export class AddSubCommand extends SlashSubCommand {
     ).filter((r) => r.roleId !== reactRole?.roleId);
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
+      interaction.guildId,
       Number(categoryId)
     );
 
