@@ -96,10 +96,27 @@ export class CreateSubcommand extends SlashSubCommand {
 
     const parsedEmoji = parseEmoji(emoji);
 
-    if (!parsedEmoji?.id && !parsedEmoji?.name) {
+    if ((!parsedEmoji?.id && !parsedEmoji?.name) || !parsedEmoji) {
       return interaction.editReply(
         `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
       );
+    }
+
+    /**
+     * Only custom Discord emojis have IDs
+     * So check if the bot can even see the emoji.
+     */
+    if (parsedEmoji && parsedEmoji.id) {
+      const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
+        interaction,
+        parsedEmoji
+      );
+
+      if (!doesBotHaveAccess) {
+        return interaction.editReply(
+          `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
+        );
+      }
     }
 
     /**
@@ -160,7 +177,7 @@ export class CreateSubcommand extends SlashSubCommand {
         return interaction.editReply(
           `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
             role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category add\`!**`
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category add\`!**\n\n**Note: React roles can only have one emoji related to a role, if you use multiple emojis for a role it will break!**`
         );
       })
       .catch((e) => {
@@ -174,4 +191,32 @@ export class CreateSubcommand extends SlashSubCommand {
         );
       });
   };
+
+  /**
+   * Find if bot has access to an emoji on any guild on a shard.
+   * @param interaction to grab client shard and get all guild emoji caches
+   * @param emoji the emoji to find and see if it exist
+   * @returns true if emoji exist on some guild
+   */
+  private async doesBotHaveEmojiAccess(
+    interaction: ChatInputCommandInteraction,
+    emoji: {
+      animated: boolean;
+      name: string;
+      id: string | null;
+    }
+  ) {
+    const emojis = (
+      await interaction.client.shard?.broadcastEval((c) =>
+        c.guilds.cache.map((g) => g.emojis.cache)
+      )
+    )?.flat(3);
+
+    if (!emojis || !emojis.length) {
+      this.log.error(`Failed to get guild emojis.`);
+      return false;
+    }
+
+    return emojis.find((e) => e.id === emoji.id && emoji.id !== null);
+  }
 }
