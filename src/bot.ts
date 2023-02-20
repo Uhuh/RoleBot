@@ -44,6 +44,7 @@ export default class RoleBot extends Discord.Client {
         Discord.Partials.Channel,
         Discord.Partials.Reaction,
       ],
+      allowedMentions: { parse: [] },
     });
     this.config = config;
     this.commands = commands();

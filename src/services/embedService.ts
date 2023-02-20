@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, escapeMarkdown } from 'discord.js';
+import { Colors, EmbedBuilder } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
 import {
   Category,
