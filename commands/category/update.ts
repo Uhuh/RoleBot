@@ -3,7 +3,6 @@ import {
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   Message,
   TextChannel,
 } from 'discord.js';
@@ -137,12 +136,6 @@ export class UpdateSubCommand extends SlashSubCommand {
     }
 
     try {
-      const embed = EmbedService.reactRoleEmbed(
-        categoryRoles,
-        category,
-        config?.hideEmojis
-      );
-
       // Remove all react messages since they are created and depend on RoleBots reactions
       await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
 
@@ -158,7 +151,6 @@ export class UpdateSubCommand extends SlashSubCommand {
           await this.handleButtonType(
             interaction,
             categoryRoles,
-            embed,
             category,
             config,
             message,
@@ -170,10 +162,10 @@ export class UpdateSubCommand extends SlashSubCommand {
           await this.handleReactionType(
             interaction,
             message,
-            embed,
             categoryRoles,
             category,
-            channel
+            channel,
+            config.hideEmbed
           );
 
           return interaction.editReply(
@@ -191,7 +183,6 @@ export class UpdateSubCommand extends SlashSubCommand {
   handleButtonType = async (
     interaction: ChatInputCommandInteraction,
     roles: ReactRole[],
-    embed: EmbedBuilder,
     category: ICategory,
     config: IGuildConfig,
     message: Message,
@@ -216,8 +207,18 @@ export class UpdateSubCommand extends SlashSubCommand {
       channelId: channel.id,
     });
 
+    const editedMessage = {
+      embeds: config.hideEmbed
+        ? []
+        : [EmbedService.reactRoleEmbed(roles, category, config?.hideEmojis)],
+      content: config.hideEmbed
+        ? EmbedService.reactRoleEmbedless(roles, category, config?.hideEmojis)
+        : '',
+      components: buttons,
+    };
+
     await message
-      .edit({ embeds: [embed], components: buttons })
+      .edit(editedMessage)
       .then(() => {
         return interaction.editReply(`Hey! I updated that embed for you.`);
       })
@@ -236,10 +237,10 @@ export class UpdateSubCommand extends SlashSubCommand {
   handleReactionType = async (
     interaction: ChatInputCommandInteraction,
     message: Message,
-    embed: EmbedBuilder,
     roles: ReactRole[],
     category: ICategory,
-    channel: Channel
+    channel: Channel,
+    hideEmbed: boolean
   ) => {
     if (!message.guildId) throw 'Message has no guild ID';
 
@@ -248,8 +249,16 @@ export class UpdateSubCommand extends SlashSubCommand {
 
     // We can only edit our own messages
     if (message.author === interaction.client.user) {
+      const editedMessage = {
+        embeds: hideEmbed ? [] : [EmbedService.reactRoleEmbed(roles, category)],
+        content: hideEmbed
+          ? EmbedService.reactRoleEmbedless(roles, category)
+          : '',
+        components: [],
+      };
+
       isCustomMessage = false;
-      await message.edit({ embeds: [embed], components: [] }).then(() => {
+      await message.edit(editedMessage).then(() => {
         this.log.info(
           `Updated category[${category.id}] embed.`,
           message.guildId

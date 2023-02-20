@@ -223,30 +223,26 @@ export class ChannelSubCommand extends SlashSubCommand {
       config = await CREATE_GUILD_CONFIG(guildId);
     }
 
-    let embed = undefined;
-    const buttons = [];
+    const hideEmojis =
+      config.reactType === GuildReactType.button ? config?.hideEmojis : false;
 
-    switch (config?.reactType) {
-      case GuildReactType.button:
-        embed = EmbedService.reactRoleEmbed(roles, category, config.hideEmojis);
-        buttons.push(...reactRoleButtons(roles, config.hideEmojis));
-        break;
-      case GuildReactType.select:
-        // @TODO - Handle select dropdown in future.
-        embed = EmbedService.reactRoleEmbed(roles, category);
-        break;
-      case GuildReactType.reaction:
-      default:
-        embed = EmbedService.reactRoleEmbed(roles, category);
-    }
+    const messageOptions = {
+      embeds: !config.hideEmbed
+        ? [EmbedService.reactRoleEmbed(roles, category, hideEmojis)]
+        : [],
+      content: config.hideEmbed
+        ? EmbedService.reactRoleEmbedless(roles, category, hideEmojis)
+        : '',
+      components:
+        config.reactType === GuildReactType.button
+          ? reactRoleButtons(roles, config.hideEmojis)
+          : [],
+    };
 
     const permissionError = requiredPermissions(channel.id);
 
     try {
-      const message = await channel.send({
-        embeds: [embed],
-        components: buttons,
-      });
+      const message = await channel.send(messageOptions);
 
       switch (config?.reactType) {
         case GuildReactType.button: {

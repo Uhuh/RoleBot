@@ -22,6 +22,9 @@ export class ReactRole extends BaseEntity {
   @Column()
   name!: string;
 
+  @Column({ nullable: true })
+  description?: string;
+
   @Column()
   roleId!: string;
 

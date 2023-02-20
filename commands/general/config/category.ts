@@ -34,6 +34,12 @@ export class CategorySubCommand extends SlashSubCommand {
             'If using button react-type, you can hide the emojis for the buttons.',
           type: ApplicationCommandOptionType.Boolean,
         },
+        {
+          name: 'hide-embed',
+          description:
+            'Change if RoleBot uses an embed or just a normal message.',
+          type: ApplicationCommandOptionType.Boolean,
+        },
       ]
     );
   }
@@ -60,9 +66,11 @@ export class CategorySubCommand extends SlashSubCommand {
       reactTypeString as keyof typeof GuildReactType
     );
     const hideEmojis = interaction.options.getBoolean('hide-emojis');
+    const hideEmbed = interaction.options.getBoolean('hide-embed');
 
     await EDIT_GUILD_CONFIG(guildId, {
       reactType: reactTypeString ? reactType : config.reactType,
+      hideEmbed: hideEmbed ?? config.hideEmbed,
       hideEmojis: hideEmojis ?? config.hideEmojis,
     });
 
