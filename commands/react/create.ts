@@ -33,6 +33,11 @@ export class CreateSubcommand extends SlashSubCommand {
         required: true,
         type: ApplicationCommandOptionType.String,
       },
+      {
+        name: 'description',
+        description: 'Describe the purpose of the role for your users!',
+        type: ApplicationCommandOptionType.String,
+      },
     ]);
   }
 
@@ -54,6 +59,7 @@ export class CreateSubcommand extends SlashSubCommand {
       message: 'Somehow the emoji is missing! Please try again.',
       prop: 'emoji',
     });
+    const description = interaction.options.getString('description');
 
     const reactRolesNotInCategory = (
       await GET_REACT_ROLES_BY_GUILD(guild.id)
@@ -158,6 +164,7 @@ export class CreateSubcommand extends SlashSubCommand {
 
     CREATE_REACT_ROLE(
       role.name,
+      description,
       role.id,
       parsedEmoji?.id ?? parsedEmoji?.name ?? emoji,
       emojiTag,

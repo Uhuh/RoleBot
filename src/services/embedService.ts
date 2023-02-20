@@ -1,6 +1,10 @@
 import { Colors, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { COLOR } from '../../utilities/types/globals';
-import { Category, DisplayType } from '../database/entities/category.entity';
+import {
+  Category,
+  DisplayType,
+  ICategory,
+} from '../database/entities/category.entity';
 import { ReactRole } from '../database/entities/reactRole.entity';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
@@ -76,7 +80,7 @@ export class EmbedService {
           category.excludedRoleId ? RolePing(category.excludedRoleId) : 'None!'
         }\n\nReact role display order: **${displayOrder}**\n\nMutually exclusive: **${
           category.mutuallyExclusive
-        }**\n\nDesc: **${escapeMarkdown(desc)}**\n\n${reactRoles}`
+        }**\n\nDesc: **${desc.split('\\n').join('\n')}**\n\n${reactRoles}`
       )
       .setColor(COLOR.DEFAULT);
 
@@ -90,7 +94,12 @@ export class EmbedService {
     const emoji = (r: ReactRole) => r.emojiTag ?? r.emojiId;
 
     return reactRoles
-      .map((r) => `${hideEmojis ? '' : emoji(r) + ' - '}${RolePing(r.roleId)}`)
+      .map(
+        (r) =>
+          `${hideEmojis ? '' : emoji(r) + ' - '}${RolePing(r.roleId)} ${
+            r.description ?? ''
+          }`
+      )
       .join('\n');
   };
 
@@ -143,15 +152,34 @@ export class EmbedService {
 
   public static reactRoleEmbed = (
     reactRoles: ReactRole[],
-    category: Category,
+    category: ICategory,
+    hideEmojis = false
+  ) => {
+    const embed = new EmbedBuilder();
+
+    const description = EmbedService.reactRoleEmbedless(
+      reactRoles,
+      category,
+      hideEmojis
+    );
+
+    embed
+      .setTitle(category.name)
+      .setDescription(description)
+      .setColor(COLOR.DEFAULT);
+
+    return embed;
+  };
+
+  public static reactRoleEmbedless = (
+    reactRoles: ReactRole[],
+    category: ICategory,
     hideEmojis = false
   ) => {
     const reactRolesString = this.reactRolesFormattedString(
       reactRoles,
       hideEmojis
     );
-
-    const embed = new EmbedBuilder();
 
     const requiredRole = category.requiredRoleId
       ? `\nRequired: ${RolePing(category.requiredRoleId)}`
@@ -161,16 +189,9 @@ export class EmbedService {
       ? `\nExcluded: ${RolePing(category.excludedRoleId)}`
       : '';
 
-    embed
-      .setTitle(category.name)
-      .setDescription(
-        `${
-          category.description ?? ''
-        }${requiredRole}${excludedRole}\n\n${reactRolesString}`
-      )
-      .setColor(COLOR.DEFAULT);
-
-    return embed;
+    return `${
+      category.description?.split('\\n').join('\n') ?? ''
+    }${requiredRole}${excludedRole}\n\n${reactRolesString}`;
   };
 
   public static tutorialEmbed = (pageId: number) => {
@@ -229,7 +250,9 @@ export class EmbedService {
         description +
           `\n\nReact type: **${
             GuildReactType[config.reactType]
-          }**\nHide button emojis: **${config.hideEmojis}**`
+          }**\nHide button emojis: **${config.hideEmojis}**\nHide embeds: **${
+            config.hideEmbed
+          }**`
       )
       .setTimestamp(new Date());
 

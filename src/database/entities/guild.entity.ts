@@ -10,6 +10,7 @@ export interface IGuildConfig {
   id: number;
   guildId: string;
   reactType: GuildReactType;
+  hideEmbed: boolean;
   hideEmojis: boolean;
 }
 
@@ -27,6 +28,11 @@ export class GuildConfig extends BaseEntity {
     default: GuildReactType.reaction,
   })
   reactType!: GuildReactType;
+
+  @Column({
+    default: false,
+  })
+  hideEmbed!: boolean;
 
   // If reactType is type button, then we can allow the ability to hide emojis in buttons.
   @Column({
