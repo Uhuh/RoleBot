@@ -114,7 +114,13 @@ export class CreateSubcommand extends SlashSubCommand {
      */
     if (parsedEmoji && parsedEmoji.id) {
       // Force the emoji cache to update encase the user just added the emoji to their server.
-      const emoji = await interaction.guild?.emojis.fetch(parsedEmoji.id);
+      const emoji = await interaction.guild?.emojis
+        .fetch(parsedEmoji.id)
+        .catch((e) =>
+          this.log.debug(
+            `Couldn't fetch emoji, most likely in different server.\n{e}`
+          )
+        );
 
       if (!emoji) {
         const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
