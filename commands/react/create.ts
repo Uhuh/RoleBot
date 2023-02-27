@@ -113,15 +113,20 @@ export class CreateSubcommand extends SlashSubCommand {
      * So check if the bot can even see the emoji.
      */
     if (parsedEmoji && parsedEmoji.id) {
-      const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
-        interaction,
-        parsedEmoji
-      );
+      // Force the emoji cache to update encase the user just added the emoji to their server.
+      const emoji = await interaction.guild?.emojis.fetch(parsedEmoji.id);
 
-      if (!doesBotHaveAccess) {
-        return interaction.editReply(
-          `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
+      if (!emoji) {
+        const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
+          interaction,
+          parsedEmoji
         );
+
+        if (!doesBotHaveAccess) {
+          return interaction.editReply(
+            `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
+          );
+        }
       }
     }
 
