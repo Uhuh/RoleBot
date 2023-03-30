@@ -6,7 +6,7 @@ import {
   Interaction,
   Message,
   Role,
-  SelectMenuInteraction,
+  StringSelectMenuInteraction,
   CommandInteraction,
 } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
@@ -187,7 +187,7 @@ export const handleInteractionReply = (
   interaction:
     | ChatInputCommandInteraction
     | ButtonInteraction
-    | SelectMenuInteraction,
+    | StringSelectMenuInteraction,
   content: { content: string; ephemeral?: boolean } | string
 ) => {
   interaction.reply(content).catch((interactionError) => {
