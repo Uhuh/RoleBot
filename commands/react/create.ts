@@ -118,7 +118,7 @@ export class CreateSubcommand extends SlashSubCommand {
         .fetch(parsedEmoji.id)
         .catch((e) =>
           this.log.debug(
-            `Couldn't fetch emoji, most likely in different server.\n{e}`
+            `Couldn't fetch emoji, most likely in different server.\n${e}`
           )
         );
 
