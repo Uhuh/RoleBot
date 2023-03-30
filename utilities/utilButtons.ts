@@ -1,5 +1,4 @@
-import { ActionRowBuilder } from '@discordjs/builders';
-import { ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
 import { spliceIntoChunks } from './utils';
 

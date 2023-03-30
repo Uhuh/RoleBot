@@ -153,11 +153,7 @@ export default class RoleBot extends Discord.Client {
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
     })
       .then(() => this.log.debug(`Successfully connected to postgres DB.`))
-      .catch((e) =>
-        this.log.critical(
-          `Failed to connect to postgres\n${config.POSTGRES_URL}\n${e}`
-        )
-      );
+      .catch((e) => this.log.critical(`Failed to connect to postgres\n${e}`));
 
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
