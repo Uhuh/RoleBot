@@ -1,4 +1,4 @@
-import { RoleBotErrorEventsWebhook } from '../../utilities/types/globals';
+import { WebhookClient } from 'discord.js';
 import { EmbedService } from './embedService';
 
 enum LogLevel {
@@ -54,6 +54,12 @@ export class LogService {
     const logContent = `${guildString} ${this.prefix} ${content}`;
 
     console.log(`${logTypeDate} ${logContent}`);
+
+    if (!process.env.ERROR_WEBHOOK) return;
+
+    const RoleBotErrorEventsWebhook = new WebhookClient({
+      url: process.env.ERROR_WEBHOOK,
+    });
 
     if (level == LogLevel.critical || level == LogLevel.error) {
       RoleBotErrorEventsWebhook.send({
