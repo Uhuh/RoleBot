@@ -73,11 +73,21 @@ export default class RoleBot extends Discord.Client {
     );
 
     this.on('guildCreate', (guild) => {
+      // If the client isn't ready then spawns are still sharding.
+      if (!this.isReady()) {
+        return;
+      }
+
       guildUpdate(guild, 'Joined', this).catch((e) =>
         this.log.error(`Failed to send webhook for guild join.\n${e}`)
       );
     });
     this.on('guildDelete', (guild) => {
+      // If the client isn't ready then spawns are still sharding.
+      if (!this.isReady()) {
+        return;
+      }
+
       guildUpdate(guild, 'Left', this).catch((e) =>
         this.log.error(`Failed to send webhook for guild leave.\n${e}`)
       );
