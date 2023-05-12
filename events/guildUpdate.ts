@@ -1,6 +1,5 @@
 import RoleBot from '../src/bot';
-import { Colors, EmbedBuilder, Guild } from 'discord.js';
-import { RoleBotGuildEventsWebhook } from '../utilities/types/globals';
+import { Colors, EmbedBuilder, Guild, WebhookClient } from 'discord.js';
 import { CREATE_GUILD_CONFIG } from '../src/database/queries/guild.query';
 
 export const guildUpdate = async (
@@ -13,6 +12,14 @@ export const guildUpdate = async (
     if (type === 'Joined') {
       await CREATE_GUILD_CONFIG(guild.id);
     }
+
+    if (!process.env.GUILD_WEBHOOK) {
+      return;
+    }
+
+    const RoleBotGuildEventsWebhook = new WebhookClient({
+      url: process.env.GUILD_WEBHOOK,
+    });
 
     const size = (
       await client.shard?.fetchClientValues('guilds.cache.size')
