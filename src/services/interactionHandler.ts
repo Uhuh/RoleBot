@@ -31,7 +31,7 @@ export class InteractionHandler {
       InteractionHandler.handleCommand(interaction, client).catch((e) =>
         this.log.error(`HandleCommand: ${e}`)
       );
-    else if (interaction.isSelectMenu())
+    else if (interaction.isStringSelectMenu())
       InteractionHandler.handleSelect(interaction, client);
     else if (interaction.isButton())
       void InteractionHandler.handleButton(interaction, client);
