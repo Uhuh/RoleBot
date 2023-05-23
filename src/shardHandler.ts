@@ -24,6 +24,9 @@ export class ShardHandler {
       shard.on('reconnecting', () =>
         this.log.debug(`Shard[${shard.id}] attempting to reconnect.`)
       );
+      shard.on('error', (e) =>
+        this.log.error(`Shard[${shard.id}] errored.\n${e}`)
+      );
     });
   }
 
