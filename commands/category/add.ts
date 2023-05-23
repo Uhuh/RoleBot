@@ -20,6 +20,7 @@ import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { RolePing } from '../../utilities/utilPings';
 import { spliceIntoChunks } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
+import { z } from 'zod';
 
 export class AddSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
@@ -222,21 +223,68 @@ export class AddSubCommand extends SlashSubCommand {
       category.id
     );
 
-    interaction
-      .editReply({
+    try {
+      await interaction.editReply({
         components: roleButtons,
         content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
-      })
-      .catch((e) => {
-        this.log.error(
-          `Failed to send category[${category.id}] buttons\n${e}`,
-          interaction.guildId
-        );
+      });
+    } catch (e: unknown) {
+      this.log.error(
+        `Failed to send category[${category.id}] buttons\n${e}`,
+        interaction.guildId
+      );
+
+      const buttonErrorSchema = z.object({
+        rawError: z.object({
+          errors: z.object({
+            components: z.record(
+              z.string(),
+              z.object({
+                components: z.record(z.string(), z.unknown()),
+              })
+            ),
+          }),
+        }),
+      });
+
+      const buttonError = buttonErrorSchema.safeParse(e);
+
+      if (!buttonError.success) {
+        this.log.error(`Failed to parse button error schema.`);
 
         return interaction.editReply(
-          `Hey! I had an issue making some buttons for you. Sometimes emojis aren't supported, like iPhone emojis, please make sure to use Discords emoji picker.` +
-            `\nIf the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
+          `Hey! Something pretty bad happened. Please join the support server found in \`/info\` so we can work on this.`
         );
-      });
+      }
+
+      const { data } = buttonError;
+
+      let brokenEmojis = '';
+
+      /**
+       * Discord sends some ugly error object when we submit invalid buttons.
+       * But we can find the exact button row and emoji that has the errors by reading the keys.
+       */
+      for (const row of Object.keys(data.rawError.errors.components)) {
+        for (const emoji of Object.keys(
+          data.rawError.errors.components[row].components
+        )) {
+          if (isNaN(Number(row)) || isNaN(Number(emoji))) continue;
+
+          const button =
+            roleButtons[Number(row)].components[Number(emoji)].data;
+
+          brokenEmojis += `The react role \`${button.label}\` has an invalid emoji "${button.emoji?.name}".\n`;
+        }
+      }
+
+      return interaction.editReply(
+        brokenEmojis +
+          `# **Check these things!**` +
+          `\nRemember you can only have a single emoji, and it has to be a valid emoji. Make sure it's not plain text.\n` +
+          `Run \`/category list\`, you should see ":pensive: - @your-role" not "pensive - @your-role"\n` +
+          `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
+      );
+    }
   };
 }
