@@ -9,7 +9,7 @@ import { SlashCommand } from '../command';
 import * as util from 'util';
 
 export class EvalBaseCommand extends SlashCommand {
-  developerIds = ['658441101861978151', '289151449412141076'];
+  developerIds = ['289151449412141076'];
 
   constructor() {
     super('eval', 'Devs only :)', [PermissionsBitField.Flags.ManageGuild]);
