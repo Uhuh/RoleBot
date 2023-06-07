@@ -224,17 +224,26 @@ export class CreateSubcommand extends SlashSubCommand {
       id: string | null;
     }
   ) {
-    const emojis = (
-      await interaction.client.shard?.broadcastEval((c) =>
-        c.guilds.cache.map((g) => g.emojis.cache)
-      )
-    )?.flat(3);
+    try {
+      const emojis = (
+        await interaction.client.shard?.broadcastEval((c) =>
+          c.guilds.cache.map((g) => g.emojis.cache)
+        )
+      )?.flat(3);
 
-    if (!emojis || !emojis.length) {
-      this.log.error(`Failed to get guild emojis.`);
-      return false;
+      if (!emojis || !emojis.length) {
+        this.log.error(`Failed to get guild emojis.`);
+        return false;
+      }
+
+      return emojis.find((e) => e.id === emoji.id && emoji.id !== null);
+    } catch (e) {
+      this.log.critical(
+        `Failed to broadcastEval emojis.\n${e}`,
+        interaction.guildId
+      );
+
+      return null;
     }
-
-    return emojis.find((e) => e.id === emoji.id && emoji.id !== null);
   }
 }
