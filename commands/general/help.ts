@@ -1,10 +1,10 @@
 import {
   ActionRowBuilder,
+  AnySelectMenuInteraction,
   ChatInputCommandInteraction,
   Colors,
   EmbedBuilder,
-  SelectMenuBuilder,
-  SelectMenuInteraction,
+  StringSelectMenuBuilder,
 } from 'discord.js';
 import { EmbedService } from '../../src/services/embedService';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
@@ -17,7 +17,7 @@ export class HelpBaseCommand extends SlashCommand {
   }
 
   handleSelect = (
-    interaction: SelectMenuInteraction,
+    interaction: AnySelectMenuInteraction,
     type: string,
     _args: string[]
   ) => {
@@ -41,29 +41,30 @@ export class HelpBaseCommand extends SlashCommand {
     const { user } = interaction.client;
     if (!user) return;
 
-    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-      new SelectMenuBuilder()
-        .setCustomId(`select-${this.name}`)
-        .setPlaceholder('Pick a category')
-        .addOptions([
-          {
-            label: 'Category commands',
-            description:
-              'Want to categorize your reaction roles? Sort them with categories!',
-            value: `${this.name}_${Category.category}`,
-          },
-          {
-            label: 'Reaction role commands',
-            description: `Manage your servers reaction roles with these commands.`,
-            value: `${this.name}_${Category.react}`,
-          },
-          {
-            label: 'General commands',
-            description: 'Basic commands everyone can use!',
-            value: `${this.name}_${Category.general}`,
-          },
-        ])
-    );
+    const selectMenu =
+      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId(`select-${this.name}`)
+          .setPlaceholder('Pick a category')
+          .addOptions([
+            {
+              label: 'Category commands',
+              description:
+                'Want to categorize your reaction roles? Sort them with categories!',
+              value: `${this.name}_${Category.category}`,
+            },
+            {
+              label: 'Reaction role commands',
+              description: `Manage your servers reaction roles with these commands.`,
+              value: `${this.name}_${Category.react}`,
+            },
+            {
+              label: 'General commands',
+              description: 'Basic commands everyone can use!',
+              value: `${this.name}_${Category.general}`,
+            },
+          ])
+      );
 
     embed
       .setTitle('Command Help')

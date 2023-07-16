@@ -2,7 +2,7 @@ import {
   AutocompleteInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
-  SelectMenuInteraction,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import { CustomError } from '../src/error/custom.error';
 import { LogService } from '../src/services/logService';
@@ -38,7 +38,7 @@ export class CommandHandlers {
    * @param _args Essentially all the IDs that are separated with `-`
    */
   public handleSelect = (
-    interaction: SelectMenuInteraction,
+    interaction: StringSelectMenuInteraction,
     subCommand: string,
     _args: string[]
   ) => {
@@ -132,7 +132,7 @@ export class CommandBasics extends CommandHandlers {
     interaction:
       | ChatInputCommandInteraction
       | ButtonInteraction
-      | SelectMenuInteraction
+      | StringSelectMenuInteraction
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
@@ -157,7 +157,7 @@ export class CommandBasics extends CommandHandlers {
     interaction:
       | ChatInputCommandInteraction
       | ButtonInteraction
-      | SelectMenuInteraction
+      | StringSelectMenuInteraction
       | AutocompleteInteraction
   ) => {
     return this.permissions.length

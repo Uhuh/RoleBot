@@ -3,7 +3,7 @@ import {
   ButtonInteraction,
   ChatInputCommandInteraction,
   Interaction,
-  SelectMenuInteraction,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
@@ -105,7 +105,7 @@ export class InteractionHandler {
    * @param client RoleBot client to find correct command to call its handleSelect method.
    */
   private static handleSelect(
-    interaction: SelectMenuInteraction,
+    interaction: StringSelectMenuInteraction,
     client: RoleBot
   ) {
     try {
@@ -200,12 +200,12 @@ export class InteractionHandler {
     interaction: Interaction
   ): interaction is
     | ChatInputCommandInteraction
-    | SelectMenuInteraction
+    | StringSelectMenuInteraction
     | ButtonInteraction
     | AutocompleteInteraction {
     return (
       interaction.isCommand() ||
-      interaction.isSelectMenu() ||
+      interaction.isStringSelectMenu() ||
       interaction.isButton() ||
       interaction.isAutocomplete()
     );
@@ -218,11 +218,12 @@ export class InteractionHandler {
    * @returns Tuple [commandName, subCommand, commandArgs]
    */
   private static extractCommandInfo(
-    interaction: SelectMenuInteraction | ButtonInteraction
+    interaction: StringSelectMenuInteraction | ButtonInteraction
   ): [string, string, string[]] {
-    const [commandName, subCommand, commandArgs] = interaction.isSelectMenu()
-      ? interaction.values.join('').split('_')
-      : interaction.customId.split('_');
+    const [commandName, subCommand, commandArgs] =
+      interaction.isStringSelectMenu()
+        ? interaction.values.join('').split('_')
+        : interaction.customId.split('_');
 
     return [commandName, subCommand, commandArgs?.split('-')];
   }
