@@ -35,7 +35,7 @@ export class EditSubCommand extends SlashSubCommand {
       },
       {
         name: 'new-description',
-        description: 'Change the description of the category.',
+        description: 'Description of the category, use [remove] to remove it.',
         type: ApplicationCommandOptionType.String,
       },
       {
@@ -98,8 +98,11 @@ export class EditSubCommand extends SlashSubCommand {
       prop: `category`,
     });
 
+    /**
+     * All the options from the slash command.
+     */
+    let newDesc = interaction.options.getString('new-description');
     const newName = interaction.options.getString('new-name');
-    const newDesc = interaction.options.getString('new-description');
     const mutuallyExclusive =
       interaction.options.getBoolean('mutually-exclusive');
     const removeRoleType = interaction.options.getString('remove-role-type');
@@ -107,11 +110,10 @@ export class EditSubCommand extends SlashSubCommand {
       interaction.options.getRole('new-required-role')?.id ?? undefined;
     const newExcludedRoleId =
       interaction.options.getRole('new-excluded-role')?.id ?? undefined;
-
     const displayString = interaction.options.getString('display-order');
 
     const displayOrder = parseDisplayString(
-      displayString as keyof typeof DisplayType
+      displayString as keyof typeof DisplayType,
     );
 
     if (
@@ -125,11 +127,11 @@ export class EditSubCommand extends SlashSubCommand {
     ) {
       this.log.info(
         `User didn't change anything about the category`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.editReply(
-        `Hey! You need to pass at _least_ one updated field about the category.`
+        `Hey! You need to pass at _least_ one updated field about the category.`,
       );
     }
 
@@ -138,27 +140,30 @@ export class EditSubCommand extends SlashSubCommand {
     if (!category) {
       this.log.info(
         `Category not found with id[${categoryId}]`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.editReply(
-        `Hey! I couldn't find the category. Please wait a second and try again.`
+        `Hey! I couldn't find the category. Please wait a second and try again.`,
       );
     }
 
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
     const excludedRoleId = newExcludedRoleId ?? category.excludedRoleId;
 
+    // Check if the user wants to remove the description.
+    newDesc = newDesc?.trim() === '[remove]' ? '' : newDesc;
+    
     const updatedCategory: Partial<ICategory> = {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
       requiredRoleId:
-        removeRoleType && removeRoleType === 'required-role'
+        removeRoleType === 'required-role'
           ? null
           : requiredRoleId,
       excludedRoleId:
-        removeRoleType && removeRoleType === 'excluded-role'
+        removeRoleType === 'excluded-role'
           ? null
           : excludedRoleId,
       displayOrder,
@@ -168,18 +173,18 @@ export class EditSubCommand extends SlashSubCommand {
       .then(() => {
         this.log.info(
           `Updated category[${category.id}] successfully.`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.editReply(
-          `Hey! I successfully updated the category \`${category.name}\` for you.`
+          `Hey! I successfully updated the category \`${category.name}\` for you.`,
         );
       })
       .catch((e) =>
         this.log.critical(
           `Failed to edit category[${category.id}]\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 }

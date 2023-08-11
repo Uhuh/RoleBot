@@ -28,8 +28,8 @@ export class EditSubCommand extends SlashSubCommand {
         type: ApplicationCommandOptionType.String,
       },
       {
-        name: 'description',
-        description: 'New description to describe the purpose of the role.',
+        name: 'new-description',
+        description: 'Description of the role, use [remove] to remove it.',
         type: ApplicationCommandOptionType.String,
       },
     ]);
@@ -64,57 +64,80 @@ export class EditSubCommand extends SlashSubCommand {
       );
     }
 
-    let updateMessageToUser = '';
+    try {
+      let updateMessageToUser = await this.updateEmoji(interaction, emoji, role.id);
+      updateMessageToUser += await this.updateDescription(description, role.id);
 
-    if (emoji) {
-      const parsedEmoji = parseEmoji(emoji);
+      return interaction.editReply(updateMessageToUser);
+    } catch (e) {
+      this.log.error(`Failed to update react role.\n${e}`, interaction.guildId);
+      
+      return interaction.editReply(`Hey! I encountered an error trying to update that react role. Wait and try again.`);
+    }
+  };
+  
+  async updateEmoji(interaction: ChatInputCommandInteraction, emoji: string | null, roleId: string): Promise<string> {
+    if (!emoji) {
+      return '';
+    }
+    
+    const parsedEmoji = parseEmoji(emoji);
 
-      if (!parsedEmoji?.id && !parsedEmoji?.name) {
-        return interaction.editReply(
+    if (!parsedEmoji?.id && !parsedEmoji?.name) {
+      await interaction.editReply(
           `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
-        );
-      }
-
-      const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
-
-      const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
-        emojiContent,
-        interaction.guildId
       );
+      
+      return '';
+    }
 
-      if (doesEmojiBelongToReactRole) {
-        return interaction.editReply(
+    const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
+
+    const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
+        emojiContent,
+        interaction.guildId ?? ''
+    );
+
+    if (doesEmojiBelongToReactRole) {
+      await interaction.editReply(
           `Hey! That emoji belongs to a react role (${RolePing(
-            doesEmojiBelongToReactRole.roleId
+              doesEmojiBelongToReactRole.roleId
           )})`
-        );
-      }
+      );
+      
+      return '';
+    }
 
-      const emojiTag = parsedEmoji?.id
+    const emojiTag = parsedEmoji?.id
         ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
         : null;
 
-      await UPDATE_REACT_ROLE_EMOJI_ID(role.id, emojiContent);
-      await UPDATE_REACT_ROLE_EMOJI_TAG(role.id, emojiTag);
+    await UPDATE_REACT_ROLE_EMOJI_ID(roleId, emojiContent);
+    await UPDATE_REACT_ROLE_EMOJI_TAG(roleId, emojiTag);
 
-      this.log.debug(
-        `Updated role[${role.id}] to use emoji[${JSON.stringify(
-          parsedEmoji
+    this.log.debug(
+        `Updated role[${roleId}] to use emoji[${JSON.stringify(
+            parsedEmoji
         )} - ${emojiTag ?? parsedEmoji.name}]`,
         interaction.guildId
-      );
+    );
 
-      updateMessageToUser += `:tada: Successfully updated the react role (${
+    return `:tada: Successfully updated the react role (${
         emojiTag ?? parsedEmoji.name
-      } - ${RolePing(role.id)}) :tada:\n`;
+    } - ${RolePing(roleId)}) :tada:\n`;
+  }
+  
+  async updateDescription(description: string | null, roleId: string): Promise<string> {
+    if (!description) {
+      return '';
     }
+    
+    const toRemove = description.trim() === '[remove]';
+    
+    description = toRemove ? '' : description;
+    
+    await UPDATE_REACT_ROLE_DESC(roleId, description);
 
-    if (description) {
-      await UPDATE_REACT_ROLE_DESC(role.id, description);
-
-      updateMessageToUser += `Updated the description!`;
-    }
-
-    return interaction.editReply(updateMessageToUser);
-  };
+    return `${toRemove ? 'Removed' : 'Updated' } the description!`;
+  }
 }

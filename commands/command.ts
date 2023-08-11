@@ -77,10 +77,10 @@ const buildOption = (
 
 export class SlashSubCommand extends CommandHandlers {
   constructor(
-    public baseName: string,
-    public name: string,
-    public description: string,
-    public options: ICommandOption[] = []
+    public readonly baseName: string,
+    public readonly name: string,
+    public readonly description: string,
+    public readonly options: ICommandOption[] = []
   ) {
     super(name, baseName);
   }
@@ -97,7 +97,7 @@ export class SlashSubCommand extends CommandHandlers {
 }
 
 export class SlashCommand extends CommandBasics {
-  private command: SlashCommandBuilder;
+  private readonly command: SlashCommandBuilder;
   public subCommands = new Map<string, SlashSubCommand>();
 
   constructor(

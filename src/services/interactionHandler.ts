@@ -205,7 +205,7 @@ export class InteractionHandler {
     | AutocompleteInteraction {
     return (
       interaction.isCommand() ||
-      interaction.isSelectMenu() ||
+      interaction.isStringSelectMenu() ||
       interaction.isButton() ||
       interaction.isAutocomplete()
     );
@@ -220,7 +220,7 @@ export class InteractionHandler {
   private static extractCommandInfo(
     interaction: SelectMenuInteraction | ButtonInteraction
   ): [string, string, string[]] {
-    const [commandName, subCommand, commandArgs] = interaction.isSelectMenu()
+    const [commandName, subCommand, commandArgs] = interaction.isStringSelectMenu()
       ? interaction.values.join('').split('_')
       : interaction.customId.split('_');
 
