@@ -49,7 +49,7 @@ export class EditSubCommand extends SlashSubCommand {
       prop: 'role',
     });
     const emoji = interaction.options.getString('new-emoji');
-    const description = interaction.options.getString('description');
+    const description = interaction.options.getString('new-description');
 
     if (!emoji && !description) {
       return interaction.editReply(
