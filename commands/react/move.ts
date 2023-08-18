@@ -13,18 +13,23 @@ import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { RolePing } from '../../utilities/utilPings';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Role = 'role',
+  Category = 'category',
+}
+
 export class MoveSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'move', 'Move a react role between categories.', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description:
           'The role that belongs to the react role you want to move.',
         type: ApplicationCommandOptionType.Role,
         required: true,
       },
       {
-        name: 'category',
+        name: CommandOptionNames.Category,
         description: 'The category to move the react role to.',
         type: ApplicationCommandOptionType.String,
         autocomplete: true,
@@ -52,12 +57,12 @@ export class MoveSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const role = this.expect(interaction.options.getRole('role'), {
+    const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
       message: `Hey! I can't find that role.`,
       prop: 'role',
     });
 
-    const categoryId = this.expect(interaction.options.getString('category'), {
+    const categoryId = this.expect(interaction.options.getString(CommandOptionNames.Category), {
       message: `Hey! I had an issue parsing the category.`,
       prop: 'categoryId',
     });

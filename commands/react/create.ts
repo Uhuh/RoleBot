@@ -18,23 +18,29 @@ import { RolePing } from '../../utilities/utilPings';
 import { isValidRolePosition } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Role = 'role',
+  Emoji = 'emoji',
+  Description = 'description',
+}
+
 export class CreateSubcommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'create', 'Create a new react role.', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description: 'The role the user will get.',
         required: true,
         type: ApplicationCommandOptionType.Role,
       },
       {
-        name: 'emoji',
+        name: CommandOptionNames.Emoji,
         description: 'The emoji users will use',
         required: true,
         type: ApplicationCommandOptionType.String,
       },
       {
-        name: 'description',
+        name: CommandOptionNames.Description,
         description: 'Describe the purpose of the role for your users!',
         type: ApplicationCommandOptionType.String,
       },
@@ -51,15 +57,15 @@ export class CreateSubcommand extends SlashSubCommand {
     const { guild } = interaction;
     if (!guild) return;
 
-    const role = this.expect(interaction.options.getRole('role'), {
+    const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
       message: `Somehow the role is missing! Please try again.`,
       prop: 'role',
     });
-    const emoji = this.expect(interaction.options.getString('emoji'), {
+    const emoji = this.expect(interaction.options.getString(CommandOptionNames.Emoji), {
       message: 'Somehow the emoji is missing! Please try again.',
       prop: 'emoji',
     });
-    const description = interaction.options.getString('description');
+    const description = interaction.options.getString(CommandOptionNames.Description);
 
     const reactRolesNotInCategory = (
       await GET_REACT_ROLES_BY_GUILD(guild.id)

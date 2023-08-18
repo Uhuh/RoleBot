@@ -14,11 +14,7 @@ export class TutorialBaseCommand extends SlashCommand {
   readonly maxPage = tutorialJson['embeds'].length - 1;
 
   constructor() {
-    super(
-      'tutorial',
-      `Need to learn the basics of RoleBot? Use this command!`,
-      []
-    );
+    super('tutorial', `Need to learn the basics of RoleBot? Use this command!`);
   }
 
   makeButtons = (pageId: number) => {

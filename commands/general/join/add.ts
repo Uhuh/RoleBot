@@ -10,11 +10,15 @@ import {
 import { RolePing } from '../../../utilities/utilPings';
 import { SlashSubCommand } from '../../command';
 
+const enum CommandOptionNames {
+  Role = 'role'
+}
+
 export class AddSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'add', 'A role users will obtain when joining.', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description: 'User will get this role when joining.',
         required: true,
         type: ApplicationCommandOptionType.Role,
@@ -29,9 +33,9 @@ export class AddSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const role = this.expect(interaction.options.getRole('role'), {
+    const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
       message: 'Could not find the role you passed.',
-      prop: 'role',
+      prop: CommandOptionNames.Role,
     });
 
     const numJoinRoles = (await GET_GUILD_JOIN_ROLES(interaction.guildId))

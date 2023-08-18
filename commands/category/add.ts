@@ -10,9 +10,9 @@ import {
 import { ReactRole } from '../../src/database/entities';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import {
+  GET_REACT_ROLE_BY_ID,
   GET_REACT_ROLES_BY_CATEGORY_ID,
   GET_REACT_ROLES_NOT_IN_CATEGORIES,
-  GET_REACT_ROLE_BY_ID,
   UPDATE_REACT_ROLE_BY_ID,
   UPDATE_REACT_ROLE_CATEGORY,
 } from '../../src/database/queries/reactRole.query';
@@ -22,11 +22,15 @@ import { spliceIntoChunks } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 import { z } from 'zod';
 
+const enum CommandOptionNames {
+  Category = 'category',
+}
+
 export class AddSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'add', 'Add react roles to your category', [
       {
-        name: 'category',
+        name: CommandOptionNames.Category,
         description: 'The category to add to.',
         type: ApplicationCommandOptionType.String,
         autocomplete: true,
@@ -73,7 +77,7 @@ export class AddSubCommand extends SlashSubCommand {
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
       message: `Failed to find the category!`,
-      prop: 'category',
+      prop: CommandOptionNames.Category,
     });
 
     // To edit our button message with the updated list of react roles.
@@ -197,7 +201,7 @@ export class AddSubCommand extends SlashSubCommand {
     });
 
     const { guildId } = interaction;
-    const categoryId = interaction.options.getString('category');
+    const categoryId = interaction.options.getString(CommandOptionNames.Category);
 
     if (categoryId && isNaN(Number(categoryId))) {
       return interaction.editReply({
@@ -218,15 +222,22 @@ export class AddSubCommand extends SlashSubCommand {
       });
     }
 
-    const roleButtons = await this.buildReactRoleButtons(
+    let roleButtons = await this.buildReactRoleButtons(
       reactRoles,
       category.id
     );
 
     try {
+      let content = `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`;
+
+      if (roleButtons.length > 5) {
+        roleButtons = roleButtons.splice(0, 5);
+        content += `\n\nYou have more than 25 unassigned react roles. We've hidden some due to Discord restrictions.\nDon't worry they're still there, just assign some react roles first!`;
+      }
+
       await interaction.editReply({
         components: roleButtons,
-        content: `Below are reaction roles and their respective emojis. Click the buttons you want to add to the category \`${category.name}\`.`,
+        content,
       });
     } catch (e: unknown) {
       this.log.error(
@@ -234,57 +245,62 @@ export class AddSubCommand extends SlashSubCommand {
         interaction.guildId
       );
 
-      const buttonErrorSchema = z.object({
-        rawError: z.object({
-          errors: z.object({
-            components: z.record(
-              z.string(),
-              z.object({
-                components: z.record(z.string(), z.unknown()),
-              })
-            ),
-          }),
-        }),
-      });
-
-      const buttonError = buttonErrorSchema.safeParse(e);
-
-      if (!buttonError.success) {
-        this.log.error(`Failed to parse button error schema.`);
-
-        return interaction.editReply(
-          `Hey! Something pretty bad happened. Please join the support server found in \`/info\` so we can work on this.`
-        );
-      }
-
-      const { data } = buttonError;
-
-      let brokenEmojis = '';
-
-      /**
-       * Discord sends some ugly error object when we submit invalid buttons.
-       * But we can find the exact button row and emoji that has the errors by reading the keys.
-       */
-      for (const row of Object.keys(data.rawError.errors.components)) {
-        for (const emoji of Object.keys(
-          data.rawError.errors.components[row].components
-        )) {
-          if (isNaN(Number(row)) || isNaN(Number(emoji))) continue;
-
-          const button =
-            roleButtons[Number(row)].components[Number(emoji)].data;
-
-          brokenEmojis += `The react role \`${button.label}\` has an invalid emoji "${button.emoji?.name}".\n`;
-        }
-      }
-
-      return interaction.editReply(
-        brokenEmojis +
-          `# **Check these things!**` +
-          `\nRemember you can only have a single emoji, and it has to be a valid emoji. Make sure it's not plain text.\n` +
-          `Run \`/category list\`, you should see ":pensive: - @your-role" not "pensive - @your-role"\n` +
-          `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
-      );
+      this.handleButtonErrors(interaction, roleButtons, e)
+        .catch((e) => console.error(`Failed to handle button errors.\n${e}`));
     }
   };
+
+  handleButtonErrors(interaction: ChatInputCommandInteraction, roleButtons: ActionRowBuilder<ButtonBuilder>[], e: unknown) {
+    const buttonErrorSchema = z.object({
+      rawError: z.object({
+        errors: z.object({
+          components: z.record(
+            z.string(),
+            z.object({
+              components: z.record(z.string(), z.unknown()),
+            })
+          ),
+        }),
+      }),
+    });
+
+    const buttonError = buttonErrorSchema.safeParse(e);
+
+    if (!buttonError.success) {
+      this.log.error(`Failed to parse button error schema.`, interaction.guildId);
+
+      return interaction.editReply(
+        `Hey! Something pretty bad happened. Please join the support server found in \`/info\` so we can work on this.`
+      );
+    }
+
+    const { data } = buttonError;
+
+    let brokenEmojis = '';
+
+    /**
+     * Discord sends some ugly error object when we submit invalid buttons.
+     * But we can find the exact button row and emoji that has the errors by reading the keys.
+     */
+    for (const row of Object.keys(data.rawError.errors.components)) {
+      for (const emoji of Object.keys(
+        data.rawError.errors.components[row].components
+      )) {
+        if (isNaN(Number(row)) || isNaN(Number(emoji))) continue;
+
+        const button = roleButtons[Number(row)].components[Number(emoji)].data;
+
+        brokenEmojis += `The react role \`${button.label}\` has an invalid emoji "${button.emoji?.name}".\n`;
+      }
+    }
+
+    return interaction.editReply(
+      brokenEmojis +
+      `# **Check these things!**` +
+      `\nRemember you can only have a single emoji, and it has to be a valid emoji. Make sure it's not plain text.\n` +
+      `Run \`/react list\`, you should see ":pensive: - @your-role" not "pensive - @your-role"\n` +
+      `If you see something like "pensive - @your-role" use \`/react edit\` to change the emoji for that role.` +
+      `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
+    );
+  }
 }

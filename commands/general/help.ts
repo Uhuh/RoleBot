@@ -13,7 +13,7 @@ import { SlashCommand } from '../command';
 
 export class HelpBaseCommand extends SlashCommand {
   constructor() {
-    super('help', 'This command!', []);
+    super('help', 'This command!');
   }
 
   handleSelect = (

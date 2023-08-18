@@ -103,7 +103,7 @@ export class SlashCommand extends CommandBasics {
   constructor(
     public name: string,
     public description: string,
-    permissions: bigint[]
+    permissions: bigint[] = [],
   ) {
     super(name, permissions);
 

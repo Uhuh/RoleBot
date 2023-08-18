@@ -13,6 +13,15 @@ import {
 } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Name = 'name',
+  Description = 'description',
+  MutuallyExclusive = 'mutually-exclusive',
+  RequiredRole = 'required-role',
+  ExcludedRole = 'excluded-role',
+  DisplayOrder = 'display-order',
+}
+
 export class CreateSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(
@@ -21,35 +30,35 @@ export class CreateSubCommand extends SlashSubCommand {
       'Create a new category to categorize your reaction roles in.',
       [
         {
-          name: 'name',
+          name: CommandOptionNames.Name,
           description: 'The name of the category.',
           type: ApplicationCommandOptionType.String,
           required: true,
         },
         {
-          name: 'description',
+          name: CommandOptionNames.Description,
           description: 'The description of the category.',
           type: ApplicationCommandOptionType.String,
         },
         {
-          name: 'mutually-exclusive',
+          name: CommandOptionNames.MutuallyExclusive,
           description: 'Make roles from this category mutually exclusive.',
           type: ApplicationCommandOptionType.Boolean,
         },
         {
-          name: 'required-role',
+          name: CommandOptionNames.RequiredRole,
           description:
             'Require users to have a certain role to obtain roles from this category.',
           type: ApplicationCommandOptionType.Role,
         },
         {
-          name: 'excluded-role',
+          name: CommandOptionNames.ExcludedRole,
           description:
             'Users with this role cannot obtain roles from this category.',
           type: ApplicationCommandOptionType.Role,
         },
         {
-          name: 'display-order',
+          name: CommandOptionNames.DisplayOrder,
           description: 'Change how the category displays the react roles.',
           type: ApplicationCommandOptionType.String,
           choices: getDisplayCommandValues(),
@@ -67,15 +76,15 @@ export class CreateSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const name = interaction.options.getString('name');
-    const description = interaction.options.getString('description');
+    const name = interaction.options.getString(CommandOptionNames.Name);
+    const description = interaction.options.getString(CommandOptionNames.Description);
     const mutuallyExclusive =
-      interaction.options.getBoolean('mutually-exclusive') ?? false;
+      interaction.options.getBoolean(CommandOptionNames.MutuallyExclusive) ?? false;
     const requiredRoleId =
-      interaction.options.getRole('required-role')?.id ?? null;
+      interaction.options.getRole(CommandOptionNames.RequiredRole)?.id ?? null;
     const excludedRoleId =
-      interaction.options.getRole('excluded-role')?.id ?? null;
-    const displayString = interaction.options.getString('display-order');
+      interaction.options.getRole(CommandOptionNames.ExcludedRole)?.id ?? null;
+    const displayString = interaction.options.getString(CommandOptionNames.DisplayOrder);
 
     const displayOrder = parseDisplayString(
       displayString as keyof typeof DisplayType
@@ -83,7 +92,7 @@ export class CreateSubCommand extends SlashSubCommand {
 
     if (!name) {
       return interaction.editReply(
-        `Hey! It says you submitted no category name! You need to submit that. Please try again.`
+        `Hey! The category name is required when creating a category.`
       );
     } else if (name.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.

@@ -10,11 +10,15 @@ import { RolePing } from '../../utilities/utilPings';
 import { ReactMessageUpdate, updateReactMessages } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Role = 'role',
+}
+
 export class RemoveSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'remove', 'Remove an existing reaction role.', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description: 'The react role to remove.',
         required: true,
         type: ApplicationCommandOptionType.Role,
@@ -23,7 +27,7 @@ export class RemoveSubCommand extends SlashSubCommand {
   }
 
   execute = async (interaction: ChatInputCommandInteraction) => {
-    const role = interaction.options.getRole('role');
+    const role = interaction.options.getRole(CommandOptionNames.Role);
 
     await interaction.deferReply({
       ephemeral: true,

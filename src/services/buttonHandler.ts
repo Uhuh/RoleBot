@@ -123,7 +123,7 @@ export class ButtonHandler {
         .catch((e) => handleError(interaction, e, 'remove'));
 
       return interaction.editReply(
-        `Hey! I remove the role ${RolePing(
+        `Hey! I removed the role ${RolePing(
           reactRole.roleId
         )} from you successfully.`
       );

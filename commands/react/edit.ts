@@ -1,8 +1,4 @@
-import {
-  ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
-  parseEmoji,
-} from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, parseEmoji, } from 'discord.js';
 import {
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
@@ -13,22 +9,28 @@ import {
 import { RolePing } from '../../utilities/utilPings';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Role = 'role',
+  Emoji = 'new-emoji',
+  Description = 'new-description',
+}
+
 export class EditSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'edit', 'Edit any existing react roles emoji!', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description: 'The role that belongs to the react role.',
         required: true,
         type: ApplicationCommandOptionType.Role,
       },
       {
-        name: 'new-emoji',
+        name: CommandOptionNames.Emoji,
         description: 'The new emoji for the react role.',
         type: ApplicationCommandOptionType.String,
       },
       {
-        name: 'new-description',
+        name: CommandOptionNames.Description,
         description: 'Description of the role, use [remove] to remove it.',
         type: ApplicationCommandOptionType.String,
       },
@@ -44,12 +46,12 @@ export class EditSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const role = this.expect(interaction.options.getRole('role'), {
+    const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
       message: `Somehow the role is missing! Please try again.`,
-      prop: 'role',
+      prop: CommandOptionNames.Role,
     });
-    const emoji = interaction.options.getString('new-emoji');
-    const description = interaction.options.getString('new-description');
+    const emoji = interaction.options.getString(CommandOptionNames.Emoji);
+    const description = interaction.options.getString(CommandOptionNames.Description);
 
     if (!emoji && !description) {
       return interaction.editReply(
@@ -71,73 +73,73 @@ export class EditSubCommand extends SlashSubCommand {
       return interaction.editReply(updateMessageToUser);
     } catch (e) {
       this.log.error(`Failed to update react role.\n${e}`, interaction.guildId);
-      
+
       return interaction.editReply(`Hey! I encountered an error trying to update that react role. Wait and try again.`);
     }
   };
-  
+
   async updateEmoji(interaction: ChatInputCommandInteraction, emoji: string | null, roleId: string): Promise<string> {
     if (!emoji) {
       return '';
     }
-    
+
     const parsedEmoji = parseEmoji(emoji);
 
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
       await interaction.editReply(
-          `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
       );
-      
+
       return '';
     }
 
     const emojiContent = parsedEmoji.id ?? parsedEmoji.name;
 
     const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
-        emojiContent,
-        interaction.guildId ?? ''
+      emojiContent,
+      interaction.guildId ?? ''
     );
 
     if (doesEmojiBelongToReactRole) {
       await interaction.editReply(
-          `Hey! That emoji belongs to a react role (${RolePing(
-              doesEmojiBelongToReactRole.roleId
-          )})`
+        `Hey! That emoji belongs to a react role (${RolePing(
+          doesEmojiBelongToReactRole.roleId
+        )})`
       );
-      
+
       return '';
     }
 
     const emojiTag = parsedEmoji?.id
-        ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
-        : null;
+      ? `<${parsedEmoji.animated ? 'a' : ''}:nn:${parsedEmoji.id}>`
+      : null;
 
     await UPDATE_REACT_ROLE_EMOJI_ID(roleId, emojiContent);
     await UPDATE_REACT_ROLE_EMOJI_TAG(roleId, emojiTag);
 
     this.log.debug(
-        `Updated role[${roleId}] to use emoji[${JSON.stringify(
-            parsedEmoji
-        )} - ${emojiTag ?? parsedEmoji.name}]`,
-        interaction.guildId
+      `Updated role[${roleId}] to use emoji[${JSON.stringify(
+        parsedEmoji
+      )} - ${emojiTag ?? parsedEmoji.name}]`,
+      interaction.guildId
     );
 
     return `:tada: Successfully updated the react role (${
-        emojiTag ?? parsedEmoji.name
+      emojiTag ?? parsedEmoji.name
     } - ${RolePing(roleId)}) :tada:\n`;
   }
-  
+
   async updateDescription(description: string | null, roleId: string): Promise<string> {
     if (!description) {
       return '';
     }
-    
+
     const toRemove = description.trim() === '[remove]';
-    
+
     description = toRemove ? '' : description;
-    
+
     await UPDATE_REACT_ROLE_DESC(roleId, description);
 
-    return `${toRemove ? 'Removed' : 'Updated' } the description!`;
+    return `${toRemove ? 'Removed' : 'Updated'} the description!`;
   }
 }

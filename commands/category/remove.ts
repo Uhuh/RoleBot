@@ -10,6 +10,10 @@ import {
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Category = 'category',
+}
+
 export class RemoveSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(
@@ -18,7 +22,7 @@ export class RemoveSubCommand extends SlashSubCommand {
       'Delete a category. Deleting a category frees all roles it contains.',
       [
         {
-          name: 'category',
+          name: CommandOptionNames.Category,
           description: 'The category to delete.',
           type: ApplicationCommandOptionType.String,
           autocomplete: true,
@@ -49,7 +53,7 @@ export class RemoveSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const categoryId = interaction.options.getString('category');
+    const categoryId = interaction.options.getString(CommandOptionNames.Category);
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     if (!category) {

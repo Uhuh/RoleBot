@@ -29,11 +29,15 @@ import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  MessageLink = 'message-link',
+}
+
 export class UpdateSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'update', 'Update an existing RoleBot message embed.', [
       {
-        name: 'message-link',
+        name: CommandOptionNames.MessageLink,
         description: 'The link to the category embed message.',
         type: ApplicationCommandOptionType.String,
         required: true,
@@ -53,7 +57,7 @@ export class UpdateSubCommand extends SlashSubCommand {
     });
 
     const messageLink = this.expect(
-      interaction.options.getString('message-link'),
+      interaction.options.getString(CommandOptionNames.MessageLink),
       {
         message:
           'Make sure to pass the message link by right click copying it on desktop!',

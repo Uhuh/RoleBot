@@ -11,7 +11,7 @@ import { SlashCommand } from '../command';
 
 export class InfoBaseCommand extends SlashCommand {
   constructor() {
-    super('info', `RoleBot's invite, ping, etc.`, []);
+    super('info', `RoleBot's invite, ping, etc.`);
   }
 
   buttons = () => {

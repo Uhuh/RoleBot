@@ -15,6 +15,12 @@ import {
 } from '../../../utilities/utils';
 import { SlashSubCommand } from '../../command';
 
+const enum CommandOptionNames {
+  ReactType = 'react-type',
+  HideEmojis = 'hide-emojis',
+  HideEmbed = 'hide-embed',
+}
+
 export class CategorySubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(
@@ -23,19 +29,19 @@ export class CategorySubCommand extends SlashSubCommand {
       'Change how categories and their react roles display.',
       [
         {
-          name: 'react-type',
+          name: CommandOptionNames.ReactType,
           description: 'Change how RoleBot serves react roles.',
           type: ApplicationCommandOptionType.String,
           choices: getGuildReactConfigValues(),
         },
         {
-          name: 'hide-emojis',
+          name: CommandOptionNames.HideEmojis,
           description:
             'If using button react-type, you can hide the emojis for the buttons.',
           type: ApplicationCommandOptionType.Boolean,
         },
         {
-          name: 'hide-embed',
+          name: CommandOptionNames.HideEmbed,
           description:
             'Change if RoleBot uses an embed or just a normal message.',
           type: ApplicationCommandOptionType.Boolean,
@@ -61,12 +67,12 @@ export class CategorySubCommand extends SlashSubCommand {
       config = await CREATE_GUILD_CONFIG(guildId);
     }
 
-    const reactTypeString = interaction.options.getString('react-type');
+    const reactTypeString = interaction.options.getString(CommandOptionNames.ReactType);
     const reactType = parseGuildReactString(
       reactTypeString as keyof typeof GuildReactType
     );
-    const hideEmojis = interaction.options.getBoolean('hide-emojis');
-    const hideEmbed = interaction.options.getBoolean('hide-embed');
+    const hideEmojis = interaction.options.getBoolean(CommandOptionNames.HideEmojis);
+    const hideEmbed = interaction.options.getBoolean(CommandOptionNames.HideEmbed);
 
     await EDIT_GUILD_CONFIG(guildId, {
       reactType: reactTypeString ? reactType : config.reactType,

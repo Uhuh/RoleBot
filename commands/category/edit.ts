@@ -18,34 +18,45 @@ import {
 } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Category = 'category',
+  Name = 'new-name',
+  Description = 'new-description',
+  MutuallyExclusive = 'mutually-exclusive',
+  RemoveRoleType = 'remove-role-type',
+  RequiredRole = 'new-required-role',
+  ExcludedRole = 'new-excluded-role',
+  DisplayOrder = 'display-order',
+}
+
 export class EditSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'edit', 'Edit a category.', [
       {
-        name: 'category',
+        name: CommandOptionNames.Category,
         description: 'The category to edit',
         type: ApplicationCommandOptionType.String,
         required: true,
         autocomplete: true,
       },
       {
-        name: 'new-name',
+        name: CommandOptionNames.Name,
         description: 'Change the name of the category.',
         type: ApplicationCommandOptionType.String,
       },
       {
-        name: 'new-description',
+        name: CommandOptionNames.Description,
         description: 'Description of the category, use [remove] to remove it.',
         type: ApplicationCommandOptionType.String,
       },
       {
-        name: 'mutually-exclusive',
+        name: CommandOptionNames.MutuallyExclusive,
         description:
           'Change if roles in this category should be mutually exclusive.',
         type: ApplicationCommandOptionType.Boolean,
       },
       {
-        name: 'remove-role-type',
+        name: CommandOptionNames.RemoveRoleType,
         description: 'Select to remove either required-role or excluded-role',
         type: ApplicationCommandOptionType.String,
         choices: [
@@ -54,17 +65,17 @@ export class EditSubCommand extends SlashSubCommand {
         ],
       },
       {
-        name: 'new-required-role',
+        name: CommandOptionNames.RequiredRole,
         description: 'Change the required-role.',
         type: ApplicationCommandOptionType.Role,
       },
       {
-        name: 'new-excluded-role',
+        name: CommandOptionNames.ExcludedRole,
         description: 'Change the excluded-role.',
         type: ApplicationCommandOptionType.Role,
       },
       {
-        name: 'display-order',
+        name: CommandOptionNames.DisplayOrder,
         description: 'Change display order',
         type: ApplicationCommandOptionType.String,
         choices: getDisplayCommandValues(),
@@ -93,24 +104,24 @@ export class EditSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const categoryId = this.expect(interaction.options.getString('category'), {
+    const categoryId = this.expect(interaction.options.getString(CommandOptionNames.Category), {
       message: 'Category appears to be invalid!',
-      prop: `category`,
+      prop: CommandOptionNames.Category,
     });
 
     /**
      * All the options from the slash command.
      */
-    let newDesc = interaction.options.getString('new-description');
-    const newName = interaction.options.getString('new-name');
+    let newDesc = interaction.options.getString(CommandOptionNames.Description);
+    const newName = interaction.options.getString(CommandOptionNames.Name);
     const mutuallyExclusive =
-      interaction.options.getBoolean('mutually-exclusive');
-    const removeRoleType = interaction.options.getString('remove-role-type');
+      interaction.options.getBoolean(CommandOptionNames.MutuallyExclusive);
+    const removeRoleType = interaction.options.getString(CommandOptionNames.RemoveRoleType);
     const newRequiredRoleId =
-      interaction.options.getRole('new-required-role')?.id ?? undefined;
+      interaction.options.getRole(CommandOptionNames.RequiredRole)?.id ?? undefined;
     const newExcludedRoleId =
-      interaction.options.getRole('new-excluded-role')?.id ?? undefined;
-    const displayString = interaction.options.getString('display-order');
+      interaction.options.getRole(CommandOptionNames.ExcludedRole)?.id ?? undefined;
+    const displayString = interaction.options.getString(CommandOptionNames.DisplayOrder);
 
     const displayOrder = parseDisplayString(
       displayString as keyof typeof DisplayType,

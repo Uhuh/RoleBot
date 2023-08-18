@@ -28,6 +28,11 @@ import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  Channel = 'channel',
+  Category = 'category',
+}
+
 export class ChannelSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(
@@ -36,13 +41,13 @@ export class ChannelSubCommand extends SlashSubCommand {
       'Send all or one categories to a selected channel.',
       [
         {
-          name: 'channel',
+          name: CommandOptionNames.Channel,
           description: 'The channel to send to.',
           type: ApplicationCommandOptionType.Channel,
           required: true,
         },
         {
-          name: 'category',
+          name: CommandOptionNames.Category,
           description: 'Send a single category to the channel.',
           type: ApplicationCommandOptionType.String,
           autocomplete: true,
@@ -71,9 +76,9 @@ export class ChannelSubCommand extends SlashSubCommand {
       return this.log.error(`GuildID did not exist on interaction.`);
     }
 
-    const channel = this.expect(interaction.options.getChannel('channel'), {
+    const channel = this.expect(interaction.options.getChannel(CommandOptionNames.Channel), {
       message: `Hey! I can't find the channel! Please wait and try again.`,
-      prop: 'channel',
+      prop: CommandOptionNames.Channel,
     });
 
     if (channel.type !== ChannelType.GuildText) {
@@ -98,7 +103,7 @@ export class ChannelSubCommand extends SlashSubCommand {
 
     const category = this.expect(await GET_CATEGORY_BY_ID(categoryId), {
       message: `I failed to find the category! Please wait and try again.`,
-      prop: 'category',
+      prop: CommandOptionNames.Category,
     });
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
@@ -132,7 +137,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     /**
      * If the user passed in a category we don't need to waste time here.
      */
-    const categoryId = interaction.options.getString('category');
+    const categoryId = interaction.options.getString(CommandOptionNames.Category);
 
     if (categoryId && !isNaN(Number(categoryId))) {
       return this.handleSingleCategory(interaction, Number(categoryId));

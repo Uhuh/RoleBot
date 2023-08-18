@@ -34,7 +34,8 @@ export class ShardHandler {
     this.log.info(`Spawning ${numShards} shards...`);
     this.manager
       .spawn({
-        amount: numShards,
+        delay: 1000,
+        amount: 'auto',
       })
       .catch((e) => this.log.error(`Failed to spawn shard.\n${e}`));
   };

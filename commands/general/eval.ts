@@ -8,6 +8,10 @@ import {
 import { SlashCommand } from '../command';
 import * as util from 'util';
 
+const enum CommandOptionNames {
+  Command = 'command',
+}
+
 export class EvalBaseCommand extends SlashCommand {
   developerIds = ['289151449412141076'];
 
@@ -16,7 +20,7 @@ export class EvalBaseCommand extends SlashCommand {
 
     this.addOption([
       {
-        name: 'command',
+        name: CommandOptionNames.Command,
         description: 'Command to run',
         required: true,
         type: ApplicationCommandOptionType.String,
@@ -37,7 +41,7 @@ export class EvalBaseCommand extends SlashCommand {
       return;
     }
 
-    let content = interaction.options.getString('command');
+    let content = interaction.options.getString(CommandOptionNames.Command);
 
     if (!content || content?.includes('TOKEN')) return;
 

@@ -18,6 +18,11 @@ import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
+const enum CommandOptionNames {
+  MessageLink = 'message-link',
+  Category = 'category',
+}
+
 export class MessageSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(
@@ -26,14 +31,14 @@ export class MessageSubCommand extends SlashSubCommand {
       'Use this command to react with a specific category of roles to a message.',
       [
         {
-          name: 'message-link',
+          name: CommandOptionNames.MessageLink,
           description:
             'Copy a message link and place it here for the message you want me to react to.',
           required: true,
           type: ApplicationCommandOptionType.String,
         },
         {
-          name: 'category',
+          name: CommandOptionNames.Category,
           description: 'The category to react with.',
           required: true,
           autocomplete: true,
@@ -76,7 +81,7 @@ export class MessageSubCommand extends SlashSubCommand {
     }
 
     const messageLink = this.expect(
-      interaction.options.getString('message-link'),
+      interaction.options.getString(CommandOptionNames.MessageLink),
       {
         message:
           'Make sure to pass the message link by right click copying it on desktop!',
@@ -92,7 +97,7 @@ export class MessageSubCommand extends SlashSubCommand {
       );
     }
 
-    const categoryId = interaction.options.getString('category');
+    const categoryId = interaction.options.getString(CommandOptionNames.Category);
 
     if (isNaN(Number(categoryId))) {
       return interaction.editReply(

@@ -8,11 +8,15 @@ import {
 } from '../../../src/database/queries/joinRole.query';
 import { SlashSubCommand } from '../../command';
 
+const enum CommandOptionNames {
+  Role = 'role',
+}
+
 export class RemoveSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
     super(baseCommand, 'remove', 'Remove an auto join role from the list.', [
       {
-        name: 'role',
+        name: CommandOptionNames.Role,
         description: 'The role to remove.',
         required: true,
         type: ApplicationCommandOptionType.Role,
@@ -25,7 +29,7 @@ export class RemoveSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
-    const role = this.expect(interaction.options.getRole('role'), {
+    const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
       message: 'Could not find the role you passed.',
       prop: 'role',
     });
