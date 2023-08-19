@@ -17,26 +17,26 @@ export interface IGuildConfig {
 @Entity()
 export class GuildConfig extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  guildId!: string;
+  guildId: string;
 
   @Column({
     type: 'enum',
     enum: GuildReactType,
     default: GuildReactType.reaction,
   })
-  reactType!: GuildReactType;
+  reactType: GuildReactType;
 
   @Column({
     default: false,
   })
-  hideEmbed!: boolean;
+  hideEmbed: boolean;
 
   // If reactType is type button, then we can allow the ability to hide emojis in buttons.
   @Column({
     default: false,
   })
-  hideEmojis!: boolean;
+  hideEmojis: boolean;
 }

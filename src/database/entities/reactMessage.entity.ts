@@ -21,30 +21,30 @@ export interface IReactMessage {
 @Entity()
 export class ReactMessage extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  isCustomMessage!: boolean;
+  isCustomMessage: boolean;
 
   @Column()
-  messageId!: string;
+  messageId: string;
 
   @Column()
-  channelId!: string;
+  channelId: string;
 
   @Column()
-  emojiId!: string;
+  emojiId: string;
 
   @Column()
-  categoryId!: number;
+  categoryId: number;
 
   @ManyToOne(() => Category, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'categoryId' })
   category?: Category;
 
   @Column()
-  roleId!: string;
+  roleId: string;
 
   @Column()
-  guildId!: string;
+  guildId: string;
 }

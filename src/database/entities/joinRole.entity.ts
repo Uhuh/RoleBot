@@ -3,14 +3,14 @@ import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class JoinRole extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id!: number;
+  id: number;
 
   @Column()
-  name!: string;
+  name: string;
 
   @Column()
-  roleId!: string;
+  roleId: string;
 
   @Column()
-  guildId!: string;
+  guildId: string;
 }

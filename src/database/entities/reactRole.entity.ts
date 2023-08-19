@@ -17,30 +17,30 @@ export enum ReactRoleType {
 @Entity()
 export class ReactRole extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  name!: string;
+  name: string;
 
   @Column({ nullable: true })
   description?: string;
 
   @Column()
-  roleId!: string;
+  roleId: string;
 
   /* If it's a custom emoji this will be the 16 character ID, otherwise it'll be the unicode. */
   @Column()
-  emojiId!: string;
+  emojiId: string;
 
   /* If the emoji is custom this will be the emoji mention. <(a?):name:id> Because emojis can be animated and Discord sucks. */
   @Column({ type: 'character varying', nullable: true })
-  emojiTag!: string | null;
+  emojiTag: string | null;
 
   @Column()
-  guildId!: string;
+  guildId: string;
 
   @Column()
-  type!: ReactRoleType;
+  type: ReactRoleType;
 
   @Column('int', { nullable: true })
   categoryId?: number;
@@ -53,5 +53,5 @@ export class ReactRole extends BaseEntity {
     type: 'timestamp',
     default: new Date(),
   })
-  categoryAddDate!: Date;
+  categoryAddDate: Date;
 }
