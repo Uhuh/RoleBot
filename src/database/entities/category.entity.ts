@@ -7,6 +7,8 @@ export enum DisplayType {
   reversedTime,
 }
 
+export type ImageType = 'card' | 'thumbnail';
+
 export interface ICategory {
   id: number;
   guildId: string;
@@ -16,35 +18,50 @@ export interface ICategory {
   requiredRoleId: string | null;
   excludedRoleId: string | null;
   displayOrder: DisplayType;
+  embedColor: string | null;
+  imageUrl: string | null;
+  imageType: ImageType;
 }
 
 @Entity()
 export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  guildId!: string;
+  guildId: string;
 
   @Column()
-  name!: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
-  description!: string | null;
+  description: string | null;
 
   @Column()
-  mutuallyExclusive!: boolean;
+  mutuallyExclusive: boolean;
 
   @Column({ type: 'text', nullable: true })
-  requiredRoleId!: string | null;
+  requiredRoleId: string | null;
 
   @Column({ type: 'text', nullable: true })
-  excludedRoleId!: string | null;
+  excludedRoleId: string | null;
 
   @Column({
     type: 'enum',
     enum: DisplayType,
     default: DisplayType.alpha,
   })
-  displayOrder!: DisplayType;
+  displayOrder: DisplayType;
+  
+  @Column({ type: 'text', nullable: true })
+  embedColor: string | null;
+  
+  @Column({ type: 'text', nullable: true })
+  imageUrl: string | null;
+  
+  @Column({
+    type: 'text',
+    default: 'card'
+  })
+  imageType: ImageType;
 }
