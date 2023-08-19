@@ -1,21 +1,18 @@
 import {
   APIRole,
-  ChannelType,
   ButtonInteraction,
+  ChannelType,
   ChatInputCommandInteraction,
+  CommandInteraction,
   Interaction,
   Message,
   Role,
   SelectMenuInteraction,
-  CommandInteraction,
 } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
-import { DisplayType } from '../src/database/entities/category.entity';
+import { ImageType, DisplayType } from '../src/database/entities/category.entity';
 import { GuildReactType } from '../src/database/entities/guild.entity';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_ROLES_BY_CATEGORY_ID,
-} from '../src/database/queries/category.query';
+import { GET_CATEGORY_BY_ID, GET_ROLES_BY_CATEGORY_ID, } from '../src/database/queries/category.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
@@ -218,12 +215,32 @@ export async function isValidRolePosition(
   return clientUser.roles.highest.position > role.position;
 }
 
-interface IDisplayOptions {
+interface IImageTypeChoice {
+  name: string;
+  value: ImageType;
+}
+
+export function getImageTypeCommandChoices(): IImageTypeChoice[] {
+  return [
+    { name: 'Large', value: 'card' },
+    { name: 'Thumbnail', value: 'thumbnail' },
+  ];
+}
+
+export function parseImageTypeString(imageType: string | null): ImageType | null {
+  if (imageType !== 'card' && imageType !== 'thumbnail') {
+    return null;
+  }
+  
+  return imageType;
+}
+
+interface IDisplayChoice {
   name: string;
   value: keyof typeof DisplayType;
 }
 
-export function getDisplayCommandValues(): IDisplayOptions[] {
+export function getDisplayCommandChoices(): IDisplayChoice[] {
   return [
     { name: 'Alphabetical', value: 'alpha' },
     { name: 'Reverse alphabetical', value: 'reversedAlpha' },
@@ -234,8 +251,8 @@ export function getDisplayCommandValues(): IDisplayOptions[] {
 
 export function parseDisplayString(
   display: keyof typeof DisplayType | null
-): DisplayType {
-  return DisplayType[display ?? 'alpha'];
+): DisplayType | null {
+  return display ? DisplayType[display ?? 'alpha'] : null;
 }
 
 export function displayOrderQuery(display?: DisplayType): {
