@@ -5,7 +5,7 @@ import {
   DisplayType,
   ICategory,
 } from '../database/entities/category.entity';
-import { ReactRole } from '../database/entities/reactRole.entity';
+import { ReactRole } from '../database/entities';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../vars';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
@@ -70,19 +70,23 @@ export class EmbedService {
         displayOrder = 'Reversed insertion';
         break;
     }
+    
+    const none = '**None!**';
 
     embed
       .setTitle(category.name)
       .setDescription(
-        `Required Role: ${
-          category.requiredRoleId ? RolePing(category.requiredRoleId) : 'None!'
-        }\nExcluded Role: ${
-          category.excludedRoleId ? RolePing(category.excludedRoleId) : 'None!'
-        }\n\nReact role display order: **${displayOrder}**\n\nMutually exclusive: **${
-          category.mutuallyExclusive
-        }**\n\nDesc: **${desc.split('\\n').join('\n')}**\n\n${reactRoles}`
+        `Required Role: ${category.requiredRoleId ? RolePing(category.requiredRoleId) : none}\n` +
+        `Excluded Role: ${category.excludedRoleId ? RolePing(category.excludedRoleId) : none}\n\n` +
+        `Display order: **${displayOrder}**\n\n` +
+        `Mutually exclusive: **${category.mutuallyExclusive}**\n\n` +
+        `Embed color: #${category.embedColor ?? none}\n` +
+        `Image URL: ${category.imageUrl ?? none}\n` +
+        `Image Type: ${category.imageType}\n\n` +
+        `Description: **${desc.split('\\n').join('\n')}**\n\n` + 
+        `React Roles\n${reactRoles}`
       )
-      .setColor(COLOR.DEFAULT);
+      .setColor(category.embedColor ? `#${category.embedColor}` : null);
 
     return embed;
   };
@@ -163,10 +167,24 @@ export class EmbedService {
       hideEmojis
     );
 
-    embed
-      .setTitle(category.name)
-      .setDescription(description)
-      .setColor(COLOR.DEFAULT);
+    /**
+     * Setting the image can throw errors if empty string gets through.
+     * When a category is edited it should be set to null, but just in case. 
+     */
+    try {
+      embed
+        .setTitle(category.name)
+        .setDescription(description)
+        .setColor(category.embedColor ? `#${category.embedColor}` : null);
+
+      if (category.imageType === 'card') {
+        embed.setImage(category.imageUrl);
+      } else {
+        embed.setThumbnail(category.imageUrl);
+      }
+    } catch (e) {
+      console.error(e);
+    }
 
     return embed;
   };
