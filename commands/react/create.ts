@@ -1,18 +1,17 @@
 import {
-  ActionRowBuilder,
+  ActionRowBuilder, APIRole,
   ApplicationCommandOptionType,
   ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
   EmbedBuilder,
-  parseEmoji,
+  parseEmoji, Role,
 } from 'discord.js';
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import {
   CREATE_REACT_ROLE,
-  GET_REACT_ROLES_BY_GUILD,
   GET_REACT_ROLE_BY_EMOJI,
-  GET_REACT_ROLE_BY_ROLE_ID,
+  GET_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_NOT_IN_CATEGORIES,
 } from '../../src/database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
 import { isValidRolePosition } from '../../utilities/utils';
@@ -68,7 +67,7 @@ export class CreateSubcommand extends SlashSubCommand {
     const description = interaction.options.getString(CommandOptionNames.Description);
 
     const reactRolesNotInCategory = (
-      await GET_REACT_ROLES_BY_GUILD(guild.id)
+      await GET_REACT_ROLES_NOT_IN_CATEGORIES(guild.id)
     ).filter((r) => !r.categoryId).length;
 
     /**
@@ -79,100 +78,15 @@ export class CreateSubcommand extends SlashSubCommand {
         content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
       });
     }
-
-    const isValidPosition = await isValidRolePosition(interaction, role);
-
-    if (!isValidPosition) {
-      const embed = new EmbedBuilder()
-        .setTitle('Reaction Roles Setup')
-        .setDescription(
-          `The role ${RolePing(
-            role.id
-          )} is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
-        );
-
-      const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-          .setLabel('Discord Roles')
-          .setURL(
-            'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101'
-          )
-          .setStyle(ButtonStyle.Link)
-      );
-
-      return interaction.editReply({
-        embeds: [embed],
-        components: [button],
-      });
+    
+    const isValid = await this.isValid(interaction, role, emoji);
+    
+    // This check if the role or emoji are already in use, and does some emoji validation
+    if (!isValid) {
+      return;
     }
 
     const parsedEmoji = parseEmoji(emoji);
-
-    if ((!parsedEmoji?.id && !parsedEmoji?.name) || !parsedEmoji) {
-      return interaction.editReply(
-        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
-      );
-    }
-
-    /**
-     * Only custom Discord emojis have IDs
-     * So check if the bot can even see the emoji.
-     */
-    if (parsedEmoji && parsedEmoji.id) {
-      // Force the emoji cache to update encase the user just added the emoji to their server.
-      const emoji = await interaction.guild?.emojis
-        .fetch(parsedEmoji.id)
-        .catch((e) =>
-          this.log.debug(
-            `Couldn't fetch emoji, most likely in different server.\n${e}`
-          )
-        );
-
-      if (!emoji) {
-        const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
-          interaction,
-          parsedEmoji
-        );
-
-        if (!doesBotHaveAccess) {
-          return interaction.editReply(
-            `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
-          );
-        }
-      }
-    }
-
-    /**
-     * For now RoleBot doesn't allow two roles to share the same emoji.
-     */
-    let reactRole = await GET_REACT_ROLE_BY_EMOJI(
-      parsedEmoji?.id ?? emoji,
-      guild.id
-    );
-
-    if (reactRole) {
-      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
-
-      return interaction.editReply(
-        `The react role (${emojiMention} - ${RolePing(
-          reactRole.roleId
-        )}) already has this emoji assigned to it.`
-      );
-    }
-
-    /**
-     * Also check that the role isn't used already.
-     */
-    reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
-
-    if (reactRole) {
-      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
-      return interaction.editReply(
-        `There's a react role already using the role \`${
-          reactRole.name
-        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
-      );
-    }
 
     /* This is used when mentioning a custom emoji, otherwise it's unicode and doesn't have a custom ID. */
     const emojiTag = parsedEmoji?.id
@@ -191,7 +105,7 @@ export class CreateSubcommand extends SlashSubCommand {
       .then((reactRole) => {
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${
-            parsedEmoji?.id ?? parsedEmoji.name
+            parsedEmoji?.id ?? parsedEmoji?.name
           }]`,
           interaction.guildId
         );
@@ -215,6 +129,124 @@ export class CreateSubcommand extends SlashSubCommand {
         );
       });
   };
+
+  /**
+   * Check that the given values are valid and that the react role doesn't already exist with these parameters.
+   * @param interaction The interaction to respond with
+   * @param role The role to check if existing
+   * @param emoji Emoji to parse and validate, and to check if already in use.
+   * @returns True if valid, false if any step is wrong.
+   */
+  private async isValid(interaction: ChatInputCommandInteraction, role: Role | APIRole, emoji: string): Promise<boolean> {
+    const { guild } = interaction;
+    if (!guild) return false;
+    
+    const isValidPosition = await isValidRolePosition(interaction, role);
+
+    if (!isValidPosition) {
+      const embed = new EmbedBuilder()
+        .setTitle('Reaction Roles Setup')
+        .setDescription(
+          `The role ${RolePing(
+            role.id
+          )} is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
+        );
+
+      const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel('Discord Roles')
+          .setURL(
+            'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101'
+          )
+          .setStyle(ButtonStyle.Link)
+      );
+
+      await interaction.editReply({
+        embeds: [embed],
+        components: [button],
+      });
+      
+      return false;
+    }
+
+    const parsedEmoji = parseEmoji(emoji);
+
+    if ((!parsedEmoji?.id && !parsedEmoji?.name) || !parsedEmoji) {
+      await interaction.editReply(
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+      );
+      
+      return false;
+    }
+
+    /**
+     * Only custom Discord emojis have IDs
+     * So check if the bot can even see the emoji.
+     */
+    if (parsedEmoji && parsedEmoji.id) {
+      // Force the emoji cache to update encase the user just added the emoji to their server.
+      const emoji = await interaction.guild?.emojis
+        .fetch(parsedEmoji.id)
+        .catch((e) =>
+          this.log.debug(
+            `Couldn't fetch emoji, most likely in different server.\n${e}`
+          )
+        );
+
+      if (!emoji) {
+        const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
+          interaction,
+          parsedEmoji
+        );
+
+        if (!doesBotHaveAccess) {
+          await interaction.editReply(
+            `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
+          );
+          
+          return false;
+        }
+      }
+    }
+
+    /**
+     * For now RoleBot doesn't allow two roles to share the same emoji.
+     */
+    let reactRole = await GET_REACT_ROLE_BY_EMOJI(
+      parsedEmoji?.id ?? emoji,
+      guild.id
+    );
+
+    if (reactRole) {
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
+
+      await interaction.editReply(
+        `The react role (${emojiMention} - ${RolePing(
+          reactRole.roleId
+        )}) already has this emoji assigned to it.`
+      );
+      
+      return false;
+    }
+
+    /**
+     * Also check that the role isn't used already.
+     */
+    reactRole = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
+
+    if (reactRole) {
+      const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
+      await interaction.editReply(
+        `There's a react role already using the role \`${
+          reactRole.name
+        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
+      );
+      
+      return false;
+    }
+    
+    return true;
+  }
 
   /**
    * Find if bot has access to an emoji on any guild on a shard.
