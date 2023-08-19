@@ -36,6 +36,7 @@ const labelMap: Record<LogLevel, string> = {
 
 export class LogService {
   _prefix: string;
+
   constructor(prefix: string) {
     this._prefix = prefix;
   }

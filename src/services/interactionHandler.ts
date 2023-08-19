@@ -13,6 +13,7 @@ import { ButtonHandler } from './buttonHandler';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
+
   /**
    * Parse raw interactions and ensure they are handled correctly based on their type.
    * @param interaction Raw interaction. Determine what type it is and handle it.

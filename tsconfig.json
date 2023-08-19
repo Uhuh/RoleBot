@@ -5,10 +5,8 @@
     "sourceMap": true,
     "target": "ES2022",
     "outDir": "build",
-
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -20,6 +18,11 @@
     "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src/", "events/", "commands/", "utilities/"],
+  "include": [
+    "src/",
+    "events/",
+    "commands/",
+    "utilities/"
+  ],
   "compileOnSave": true
 }

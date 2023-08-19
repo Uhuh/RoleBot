@@ -15,6 +15,7 @@ import { LogService } from './logService';
 
 export class ReactionHandler {
   private log: LogService;
+
   constructor() {
     this.log = new LogService('ReactionHandler');
   }

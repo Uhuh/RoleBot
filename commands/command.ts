@@ -23,6 +23,7 @@ export const PermissionMappings: Map<bigint, string> = new Map([
   [PermissionsBitField.Flags.AttachFiles, 'ATTACH_FILES'],
   [PermissionsBitField.Flags.EmbedLinks, 'EMBED_LINKS'],
 ]);
+
 export interface ICommandOption {
   name: string;
   description: string;

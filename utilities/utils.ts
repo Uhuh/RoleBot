@@ -231,7 +231,7 @@ export function parseImageTypeString(imageType: string | null): ImageType | null
   if (imageType !== 'card' && imageType !== 'thumbnail') {
     return null;
   }
-  
+
   return imageType;
 }
 

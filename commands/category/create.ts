@@ -97,7 +97,7 @@ export class CreateSubCommand extends SlashSubCommand {
       prop: CommandOptionNames.Name,
     });
     const description = interaction.options.getString(CommandOptionNames.Description);
-    
+
     // "Permissions"
     const mutuallyExclusive =
       interaction.options.getBoolean(CommandOptionNames.MutuallyExclusive) ?? false;
@@ -106,12 +106,12 @@ export class CreateSubCommand extends SlashSubCommand {
     const excludedRoleId =
       interaction.options.getRole(CommandOptionNames.ExcludedRole)?.id ?? null;
     const displayString = interaction.options.getString(CommandOptionNames.DisplayOrder);
-    
+
     // Embed styling options
     const imageTypeString = interaction.options.getString(CommandOptionNames.ImageType);
     const imageUrl = interaction.options.getString(CommandOptionNames.ImageUrl);
     let embedColor = interaction.options.getString(CommandOptionNames.EmbedColor);
-    
+
     const imageType = parseImageTypeString(imageTypeString);
     const displayOrder = parseDisplayString(
       displayString as keyof typeof DisplayType

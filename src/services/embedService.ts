@@ -70,7 +70,7 @@ export class EmbedService {
         displayOrder = 'Reversed insertion';
         break;
     }
-    
+
     const none = '**None!**';
 
     embed
@@ -83,7 +83,7 @@ export class EmbedService {
         `Embed color: #${category.embedColor ?? none}\n` +
         `Image URL: ${category.imageUrl ?? none}\n` +
         `Image Type: ${category.imageType}\n\n` +
-        `Description: **${desc.split('\\n').join('\n')}**\n\n` + 
+        `Description: **${desc.split('\\n').join('\n')}**\n\n` +
         `React Roles\n${reactRoles}`
       )
       .setColor(category.embedColor ? `#${category.embedColor}` : null);
@@ -120,14 +120,14 @@ export class EmbedService {
 
     const inCategory = rolesInCategory.length
       ? `**In a category:**\n${this.reactRolesFormattedString(
-          rolesInCategory
-        )}\n`
+        rolesInCategory
+      )}\n`
       : '';
 
     const notInCategory = rolesNotInCategory.length
       ? `**Not in a category:**\n${this.reactRolesFormattedString(
-          rolesNotInCategory
-        )}`
+        rolesNotInCategory
+      )}`
       : '';
 
     embed
@@ -169,7 +169,7 @@ export class EmbedService {
 
     /**
      * Setting the image can throw errors if empty string gets through.
-     * When a category is edited it should be set to null, but just in case. 
+     * When a category is edited it should be set to null, but just in case.
      */
     try {
       embed
@@ -234,9 +234,9 @@ export class EmbedService {
       .setColor(Colors.Green)
       .setDescription(
         `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
-          (roleIds.length > 0
-            ? roleIds.map((r) => RolePing(r)).join('\n')
-            : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
+        (roleIds.length > 0
+          ? roleIds.map((r) => RolePing(r)).join('\n')
+          : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
       )
       .setTimestamp(new Date());
 
@@ -266,11 +266,11 @@ export class EmbedService {
       .setTitle('Server configuration.')
       .setDescription(
         description +
-          `\n\nReact type: **${
-            GuildReactType[config.reactType]
-          }**\nHide button emojis: **${config.hideEmojis}**\nHide embeds: **${
-            config.hideEmbed
-          }**`
+        `\n\nReact type: **${
+          GuildReactType[config.reactType]
+        }**\nHide button emojis: **${config.hideEmojis}**\nHide embeds: **${
+          config.hideEmbed
+        }**`
       )
       .setTimestamp(new Date());
 

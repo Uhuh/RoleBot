@@ -15,6 +15,7 @@ export class CommandHandlers {
   constructor(public name: string, public baseName = '') {
     this.log = new LogService(`${baseName ? baseName + ' ' : ''}${name}`);
   }
+
   /**
    * This method should be overwritten by the child class and implement the commands functionality.
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
@@ -99,6 +100,7 @@ export class CommandBasics extends CommandHandlers {
   constructor(name: string, protected permissions: bigint[]) {
     super(name);
   }
+
   /**
    * This `run` method will never be overwritten and will always check if the `interaction` is a command,
    * if a user has the correct permissions, log that the command has been used and finally execute the implemented `execute` method

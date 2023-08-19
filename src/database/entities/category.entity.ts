@@ -52,13 +52,13 @@ export class Category extends BaseEntity {
     default: DisplayType.alpha,
   })
   displayOrder: DisplayType;
-  
+
   @Column({ type: 'text', nullable: true })
   embedColor: string | null;
-  
+
   @Column({ type: 'text', nullable: true })
   imageUrl: string | null;
-  
+
   @Column({
     type: 'text',
     default: 'card'

@@ -130,7 +130,7 @@ export class UpdateSubCommand extends SlashSubCommand {
 
       return interaction.editReply(
         `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
-          `Add some react roles to the category with \`/category add\` and then try update again. Otherwise just delete it!`
+        `Add some react roles to the category with \`/category add\` and then try update again. Otherwise just delete it!`
       );
     }
 
