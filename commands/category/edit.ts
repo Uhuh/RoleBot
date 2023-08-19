@@ -1,20 +1,12 @@
-import {
-  ApplicationCommandOptionType,
-  AutocompleteInteraction,
-  ChatInputCommandInteraction,
-} from 'discord.js';
-import {
-  DisplayType,
-  ICategory,
-} from '../../src/database/entities/category.entity';
-import {
-  EDIT_CATEGORY_BY_ID,
-  GET_CATEGORY_BY_ID,
-} from '../../src/database/queries/category.query';
+import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction, } from 'discord.js';
+import { DisplayType, ICategory, } from '../../src/database/entities/category.entity';
+import { EDIT_CATEGORY_BY_ID, GET_CATEGORY_BY_ID, } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import {
-  getDisplayCommandValues,
+  getDisplayCommandChoices,
+  getImageTypeCommandChoices,
   parseDisplayString,
+  parseImageTypeString,
 } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 
@@ -27,6 +19,9 @@ const enum CommandOptionNames {
   RequiredRole = 'new-required-role',
   ExcludedRole = 'new-excluded-role',
   DisplayOrder = 'display-order',
+  ImageType = 'image-type',
+  ImageUrl = 'image-url',
+  EmbedColor = 'embed-color',
 }
 
 export class EditSubCommand extends SlashSubCommand {
@@ -78,7 +73,23 @@ export class EditSubCommand extends SlashSubCommand {
         name: CommandOptionNames.DisplayOrder,
         description: 'Change display order',
         type: ApplicationCommandOptionType.String,
-        choices: getDisplayCommandValues(),
+        choices: getDisplayCommandChoices(),
+      },
+      {
+        name: CommandOptionNames.ImageType,
+        description: 'How images will layout in your embed.',
+        type: ApplicationCommandOptionType.String,
+        choices: getImageTypeCommandChoices(),
+      },
+      {
+        name: CommandOptionNames.ImageUrl,
+        description: 'Use an image hosting site and link it here, use [remove] to remove the image.',
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: CommandOptionNames.EmbedColor,
+        description: 'A hexcode without the #. Example `FFFFFF` for white, use [remove] to remove the color.',
+        type: ApplicationCommandOptionType.String,
       },
     ]);
   }
@@ -104,10 +115,41 @@ export class EditSubCommand extends SlashSubCommand {
       ephemeral: true,
     });
 
+    /**
+     * The options on data are the options for this current command
+     * If the length is less than 1, we know no options were passed therefore there is nothing to edit.
+     */
+    const { options } = interaction.options.data[0];
+
+    if (options && options.length <= 1) {
+      this.log.info(
+        `User didn't change anything about the category`,
+        interaction.guildId,
+      );
+
+      return interaction.editReply(
+        `Hey! You need to pass at _least_ one updated field about the category.`,
+      );
+    }
+
+    // Now that we know there is something to edit, get the category!
     const categoryId = this.expect(interaction.options.getString(CommandOptionNames.Category), {
       message: 'Category appears to be invalid!',
       prop: CommandOptionNames.Category,
     });
+
+    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
+
+    if (!category) {
+      this.log.info(
+        `Category not found with id[${categoryId}]`,
+        interaction.guildId,
+      );
+
+      return interaction.editReply(
+        `Hey! I couldn't find the category. Please wait a second and try again.`,
+      );
+    }
 
     /**
      * All the options from the slash command.
@@ -123,52 +165,41 @@ export class EditSubCommand extends SlashSubCommand {
       interaction.options.getRole(CommandOptionNames.ExcludedRole)?.id ?? undefined;
     const displayString = interaction.options.getString(CommandOptionNames.DisplayOrder);
 
+    // Embed styling options
+    const imageTypeString = interaction.options.getString(CommandOptionNames.ImageType);
+    const imageUrl = interaction.options.getString(CommandOptionNames.ImageUrl);
+    let embedColor = interaction.options.getString(CommandOptionNames.EmbedColor);
+
+    const imageType = parseImageTypeString(imageTypeString);
     const displayOrder = parseDisplayString(
       displayString as keyof typeof DisplayType,
     );
 
-    if (
-      !newName &&
-      !newDesc &&
-      !displayString &&
-      !newRequiredRoleId &&
-      !newExcludedRoleId &&
-      removeRoleType === null &&
-      mutuallyExclusive === null
-    ) {
-      this.log.info(
-        `User didn't change anything about the category`,
-        interaction.guildId,
-      );
-
-      return interaction.editReply(
-        `Hey! You need to pass at _least_ one updated field about the category.`,
-      );
-    }
-
-    const category = await GET_CATEGORY_BY_ID(Number(categoryId));
-
-    if (!category) {
-      this.log.info(
-        `Category not found with id[${categoryId}]`,
-        interaction.guildId,
-      );
-
-      return interaction.editReply(
-        `Hey! I couldn't find the category. Please wait a second and try again.`,
-      );
-    }
-
     const requiredRoleId = newRequiredRoleId ?? category.requiredRoleId;
     const excludedRoleId = newExcludedRoleId ?? category.excludedRoleId;
 
-    // Check if the user wants to remove the description.
+    // Check for removals
     newDesc = newDesc?.trim() === '[remove]' ? '' : newDesc;
-    
+    const removeImageUrl = imageUrl?.trim() === '[remove]';
+    const removeEmbedColor = embedColor?.trim() === '[remove]';
+
+    const hexRegex = new RegExp(/[0-9A-F]{6}$/gi);
+    const isCorrectHex = hexRegex.test(embedColor ?? '');
+
+    // If the user input an incorrect hex value, just default to whatever
+    if (!isCorrectHex && embedColor) {
+      // This is a shade of purple I like :)
+      embedColor = '945ad2';
+    }
+
     const updatedCategory: Partial<ICategory> = {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
+      displayOrder: displayOrder ?? category.displayOrder,
+      imageType: imageType ?? category.imageType,
+      imageUrl: removeImageUrl ? null : imageUrl ?? category.imageUrl,
+      embedColor: removeEmbedColor ? null : embedColor ?? category.embedColor,
       requiredRoleId:
         removeRoleType === 'required-role'
           ? null
@@ -177,7 +208,6 @@ export class EditSubCommand extends SlashSubCommand {
         removeRoleType === 'excluded-role'
           ? null
           : excludedRoleId,
-      displayOrder,
     };
 
     EDIT_CATEGORY_BY_ID(category.id, updatedCategory)
@@ -187,8 +217,10 @@ export class EditSubCommand extends SlashSubCommand {
           interaction.guildId,
         );
 
+        const invalidHex = `\n\nAn invalid hex code was provided. Remember, hex codes look like this \`#ff0000\`. Use an online tool to make one.`;
+
         return interaction.editReply(
-          `Hey! I successfully updated the category \`${category.name}\` for you.`,
+          `Hey! I successfully updated the category \`${category.name}\` for you.${(embedColor && !isCorrectHex) ? invalidHex : ''}`
         );
       })
       .catch((e) =>

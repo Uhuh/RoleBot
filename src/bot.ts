@@ -44,6 +44,7 @@ export default class RoleBot extends Discord.Client {
         Discord.Partials.Channel,
         Discord.Partials.Reaction,
       ],
+      // RoleBot does a lot of role "pings" for visuals, don't allow it to actually mention roles. 
       allowedMentions: { parse: [] },
     });
     this.config = config;
