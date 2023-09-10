@@ -1,12 +1,13 @@
 import {
   BaseEntity,
   Column,
-  Entity,
-  JoinColumn,
+  Entity, JoinTable, ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { LinkedRole } from './link.entity';
 
 export enum ReactRoleType {
   normal = 1,
@@ -46,8 +47,12 @@ export class ReactRole extends BaseEntity {
   categoryId?: number;
 
   @ManyToOne(() => Category, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'categoryId' })
+  @JoinTable()
   category?: Category;
+
+  @ManyToMany(() => LinkedRole, (linkedRoles) => linkedRoles.reactRole, { cascade: true })
+  @JoinTable()
+  linkedRoles: LinkedRole[];
 
   @Column({
     type: 'timestamp',

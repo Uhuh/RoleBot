@@ -33,12 +33,14 @@ export const DELETE_REACT_ROLE_BY_ROLE_ID = (roleId: string) =>
 export const DELETE_ALL_REACT_ROLES_BY_GUILD_ID = (guildId: string) =>
   ReactRole.delete({ guildId });
 
-export const GET_REACT_ROLES_BY_GUILD = (guildId: string) => {
+export const GET_REACT_ROLES_BY_GUILD = async (guildId: string) => {
   return ReactRole.find({
     where: { guildId },
     order: {
       name: 'ASC',
     },
+    /* This is how you "include" join table entities in typeorm */
+    relations: ['linkedRoles'],
   });
 };
 
