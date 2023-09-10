@@ -1,7 +1,4 @@
-import {
-  ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
 import {
   CREATE_JOIN_ROLE,
   GET_GUILD_JOIN_ROLES,

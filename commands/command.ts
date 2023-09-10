@@ -98,8 +98,8 @@ export class SlashSubCommand extends CommandHandlers {
 }
 
 export class SlashCommand extends CommandBasics {
-  private readonly command: SlashCommandBuilder;
   public subCommands = new Map<string, SlashSubCommand>();
+  private readonly command: SlashCommandBuilder;
 
   constructor(
     public name: string,

@@ -1,7 +1,4 @@
-import {
-  SlashCommandBuilder,
-  SlashCommandSubcommandsOnlyBuilder,
-} from '@discordjs/builders';
+import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder, } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
 import RoleBot from '../../src/bot';
 

@@ -1,7 +1,7 @@
-import { ChatInputCommandInteraction, CacheType } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction } from 'discord.js';
 import { GET_GUILD_JOIN_ROLES } from '../../../src/database/queries/joinRole.query';
-import { EmbedService } from '../../../src/services/embedService';
 import { SlashSubCommand } from '../../command';
+import { joinRoleEmbed } from '../../../utilities/utilEmbedHelpers';
 
 export class ListSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
@@ -17,7 +17,7 @@ export class ListSubCommand extends SlashSubCommand {
 
     const joinRoles = await GET_GUILD_JOIN_ROLES(interaction.guildId);
 
-    const embed = EmbedService.joinRoleEmbed(joinRoles.map((r) => r.roleId));
+    const embed = joinRoleEmbed(joinRoles.map((r) => r.roleId));
 
     return interaction.editReply({
       embeds: [embed],

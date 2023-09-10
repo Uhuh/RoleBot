@@ -10,7 +10,7 @@ import {
   SelectMenuInteraction,
 } from 'discord.js';
 import { ReactRole } from '../src/database/entities';
-import { ImageType, DisplayType } from '../src/database/entities/category.entity';
+import { DisplayType, ImageType } from '../src/database/entities/category.entity';
 import { GuildReactType } from '../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID, GET_ROLES_BY_CATEGORY_ID, } from '../src/database/queries/category.query';
 import {
@@ -18,9 +18,9 @@ import {
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
   GET_REACT_MESSAGE_BY_CATEGORY_ID,
 } from '../src/database/queries/reactMessage.query';
-import { EmbedService } from '../src/services/embedService';
 import { LogService } from '../src/services/logService';
 import { CLIENT_ID } from '../src/vars';
+import { reactRoleEmbed } from './utilEmbedHelpers';
 
 export const reactToMessage = async (
   message: Message,
@@ -110,7 +110,7 @@ export const updateReactMessages = async (
       categoryId,
       category.displayOrder
     );
-    const embed = EmbedService.reactRoleEmbed(categoryRoles, category);
+    const embed = reactRoleEmbed(categoryRoles, category);
 
     /**
      * The /react message command allows users to use their own message instead of RoleBots

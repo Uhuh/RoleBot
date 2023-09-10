@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
-import { EmbedService } from '../../src/services/embedService';
 import { spliceIntoChunks } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
 import { setTimeout } from 'node:timers/promises';
+import { categoryReactRoleEmbed, freeReactRoles } from '../../utilities/utilEmbedHelpers';
 
 export class ListSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
@@ -49,11 +49,11 @@ export class ListSubCommand extends SlashSubCommand {
     );
 
     if (rolesNotInCategory.length) {
-      embeds.push(await EmbedService.freeReactRoles(rolesNotInCategory));
+      embeds.push(await freeReactRoles(rolesNotInCategory));
     }
 
     for (const cat of categories) {
-      embeds.push(await EmbedService.categoryReactRoleEmbed(cat));
+      embeds.push(await categoryReactRoleEmbed(cat));
     }
 
     for (const chunk of spliceIntoChunks(embeds, 10)) {

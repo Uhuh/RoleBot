@@ -1,11 +1,5 @@
-import {
-  ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
-} from 'discord.js';
-import {
-  DELETE_JOIN_ROLE,
-  GET_JOIN_ROLE_BY_ID,
-} from '../../../src/database/queries/joinRole.query';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
+import { DELETE_JOIN_ROLE, GET_JOIN_ROLE_BY_ID, } from '../../../src/database/queries/joinRole.query';
 import { SlashSubCommand } from '../../command';
 
 const enum CommandOptionNames {

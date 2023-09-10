@@ -8,26 +8,20 @@ import {
 } from 'discord.js';
 import { ReactRole } from '../../src/database/entities';
 import { ICategory } from '../../src/database/entities/category.entity';
-import {
-  GuildReactType,
-  IGuildConfig,
-} from '../../src/database/entities/guild.entity';
+import { GuildReactType, IGuildConfig, } from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import {
-  CREATE_GUILD_CONFIG,
-  GET_GUILD_CONFIG,
-} from '../../src/database/queries/guild.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
   GET_REACT_MESSAGE_BY_MESSAGE_ID,
 } from '../../src/database/queries/reactMessage.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
-import { EmbedService } from '../../src/services/embedService';
 import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
+import { reactRoleEmbed, reactRoleEmbedless } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   MessageLink = 'message-link',
@@ -214,9 +208,9 @@ export class UpdateSubCommand extends SlashSubCommand {
     const editedMessage = {
       embeds: config.hideEmbed
         ? []
-        : [EmbedService.reactRoleEmbed(roles, category, config?.hideEmojis)],
+        : [reactRoleEmbed(roles, category, config?.hideEmojis)],
       content: config.hideEmbed
-        ? EmbedService.reactRoleEmbedless(roles, category, config?.hideEmojis)
+        ? reactRoleEmbedless(roles, category, config?.hideEmojis)
         : '',
       components: buttons,
     };
@@ -254,9 +248,9 @@ export class UpdateSubCommand extends SlashSubCommand {
     // We can only edit our own messages
     if (message.author === interaction.client.user) {
       const editedMessage = {
-        embeds: hideEmbed ? [] : [EmbedService.reactRoleEmbed(roles, category)],
+        embeds: hideEmbed ? [] : [reactRoleEmbed(roles, category)],
         content: hideEmbed
-          ? EmbedService.reactRoleEmbedless(roles, category)
+          ? reactRoleEmbedless(roles, category)
           : '',
         components: [],
       };

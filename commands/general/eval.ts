@@ -1,10 +1,5 @@
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
-import {
-  ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
-  Colors,
-  PermissionsBitField,
-} from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, PermissionsBitField, } from 'discord.js';
 import { SlashCommand } from '../command';
 import * as util from 'util';
 

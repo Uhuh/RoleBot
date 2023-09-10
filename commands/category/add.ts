@@ -165,32 +165,6 @@ export class AddSubCommand extends SlashSubCommand {
     }
   };
 
-  /**
-   * Build react roles without a category into buttons to send to the user.
-   * @param reactRoles Used to generate buttons with.
-   * @param categoryId Needed to help creating the buttons customId to parse later.
-   * @returns All the react roles as buttons.
-   */
-  private buildReactRoleButtons = async (
-    reactRoles: ReactRole[],
-    categoryId: number
-  ) => {
-    const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
-
-    return reactRoleChunks.map((chunk) =>
-      new ActionRowBuilder<ButtonBuilder>().addComponents(
-        chunk.map((r, i) =>
-          new ButtonBuilder()
-            // commandName_reactId-categoryId
-            .setCustomId(`${this.baseName}_${this.name}_${r.id}-${categoryId}`)
-            .setEmoji(r.emojiId)
-            .setLabel(r.name)
-            .setStyle(i % 2 ? ButtonStyle.Secondary : ButtonStyle.Primary)
-        )
-      )
-    );
-  };
-
   execute = async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
@@ -211,7 +185,7 @@ export class AddSubCommand extends SlashSubCommand {
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
       message: 'I failed to find that category! Try again.',
-      prop: 'category',
+      prop: CommandOptionNames.Category,
     });
 
     const reactRoles = await GET_REACT_ROLES_NOT_IN_CATEGORIES(guildId);
@@ -303,4 +277,30 @@ export class AddSubCommand extends SlashSubCommand {
       `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
     );
   }
+
+  /**
+   * Build react roles without a category into buttons to send to the user.
+   * @param reactRoles Used to generate buttons with.
+   * @param categoryId Needed to help creating the buttons customId to parse later.
+   * @returns All the react roles as buttons.
+   */
+  private buildReactRoleButtons = async (
+    reactRoles: ReactRole[],
+    categoryId: number
+  ) => {
+    const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
+
+    return reactRoleChunks.map((chunk) =>
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        chunk.map((r, i) =>
+          new ButtonBuilder()
+            // commandName_reactId-categoryId
+            .setCustomId(`${this.baseName}_${this.name}_${r.id}-${categoryId}`)
+            .setEmoji(r.emojiId)
+            .setLabel(r.name)
+            .setStyle(i % 2 ? ButtonStyle.Secondary : ButtonStyle.Primary)
+        )
+      )
+    );
+  };
 }

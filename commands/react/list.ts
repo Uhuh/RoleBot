@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
-import { EmbedService } from '../../src/services/embedService';
 import { SlashSubCommand } from '../command';
+import { reactRoleListEmbed } from '../../utilities/utilEmbedHelpers';
 
 export class ListSubCommand extends SlashSubCommand {
   constructor(baseCommand: string) {
@@ -27,7 +27,7 @@ export class ListSubCommand extends SlashSubCommand {
       });
     }
 
-    const embed = EmbedService.reactRoleListEmbed(reactRoles);
+    const embed = reactRoleListEmbed(reactRoles);
 
     return interaction.editReply({
       content: `Hey! Here's your react roles. If you notice any \`@deleted\` roles run \`/react clean\` to remove them.`,

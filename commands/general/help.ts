@@ -6,10 +6,10 @@ import {
   SelectMenuBuilder,
   SelectMenuInteraction,
 } from 'discord.js';
-import { EmbedService } from '../../src/services/embedService';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../command';
+import { helpEmbed } from '../../utilities/utilEmbedHelpers';
 
 export class HelpBaseCommand extends SlashCommand {
   constructor() {
@@ -23,7 +23,7 @@ export class HelpBaseCommand extends SlashCommand {
   ) => {
     if (!(type in Category)) return;
 
-    const embed = EmbedService.helpEmbed(type as Category);
+    const embed = helpEmbed(type as Category);
 
     interaction
       .update({ embeds: [embed] })

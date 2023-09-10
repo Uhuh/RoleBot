@@ -3,14 +3,8 @@ import { RolePing } from '../../utilities/utilPings';
 import { ReactRole } from '../database/entities';
 import { ICategory } from '../database/entities/category.entity';
 import { GuildReactType } from '../database/entities/guild.entity';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_ROLES_BY_CATEGORY_ID,
-} from '../database/queries/category.query';
-import {
-  CREATE_GUILD_CONFIG,
-  GET_GUILD_CONFIG,
-} from '../database/queries/guild.query';
+import { GET_CATEGORY_BY_ID, GET_ROLES_BY_CATEGORY_ID, } from '../database/queries/category.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../database/queries/guild.query';
 import { GET_REACT_ROLE_BY_ID } from '../database/queries/reactRole.query';
 import { LogService } from './logService';
 

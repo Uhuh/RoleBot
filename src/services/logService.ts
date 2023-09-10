@@ -1,5 +1,5 @@
 import { WebhookClient } from 'discord.js';
-import { EmbedService } from './embedService';
+import { errorEmbed } from '../../utilities/utilEmbedHelpers';
 
 enum LogLevel {
   debug = 1,
@@ -35,11 +35,11 @@ const labelMap: Record<LogLevel, string> = {
 };
 
 export class LogService {
-  _prefix: string;
-
   constructor(prefix: string) {
     this._prefix = prefix;
   }
+
+  _prefix: string;
 
   get prefix() {
     return `[ ${this._prefix} ]`;
@@ -64,7 +64,7 @@ export class LogService {
 
     if (level == LogLevel.critical || level == LogLevel.error) {
       RoleBotErrorEventsWebhook.send({
-        embeds: [EmbedService.errorEmbed(logContent)],
+        embeds: [errorEmbed(logContent)],
       }).catch((e) =>
         console.log(
           logTypeDate,

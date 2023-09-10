@@ -1,19 +1,9 @@
-import {
-  ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
 import { GuildReactType } from '../../../src/database/entities/guild.entity';
-import {
-  CREATE_GUILD_CONFIG,
-  EDIT_GUILD_CONFIG,
-  GET_GUILD_CONFIG,
-} from '../../../src/database/queries/guild.query';
-import { EmbedService } from '../../../src/services/embedService';
-import {
-  getGuildReactConfigValues,
-  parseGuildReactString,
-} from '../../../utilities/utils';
+import { CREATE_GUILD_CONFIG, EDIT_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../../src/database/queries/guild.query';
+import { getGuildReactConfigValues, parseGuildReactString, } from '../../../utilities/utils';
 import { SlashSubCommand } from '../../command';
+import { guildConfig } from '../../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   ReactType = 'react-type',
@@ -85,7 +75,7 @@ export class CategorySubCommand extends SlashSubCommand {
       prop: 'config',
     });
 
-    const embed = await EmbedService.guildConfig(updatedConfig);
+    const embed = await guildConfig(updatedConfig);
 
     return interaction.editReply({
       content: `Hey! Here's your new server configuration.`,

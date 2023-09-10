@@ -8,25 +8,19 @@ import {
 import { setTimeout } from 'timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
-import {
-  GET_CATEGORY_BY_ID,
-  GET_GUILD_CATEGORIES,
-} from '../../src/database/queries/category.query';
-import {
-  CREATE_GUILD_CONFIG,
-  GET_GUILD_CONFIG,
-} from '../../src/database/queries/guild.query';
+import { GET_CATEGORY_BY_ID, GET_GUILD_CATEGORIES, } from '../../src/database/queries/category.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
 import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
 import {
   GET_GUILD_CATEGORY_ROLE_COUNT,
   GET_REACT_ROLES_BY_CATEGORY_ID,
 } from '../../src/database/queries/reactRole.query';
-import { EmbedService } from '../../src/services/embedService';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
+import { reactRoleEmbed, reactRoleEmbedless } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   Channel = 'channel',
@@ -233,10 +227,10 @@ export class ChannelSubCommand extends SlashSubCommand {
 
     const messageOptions = {
       embeds: !config.hideEmbed
-        ? [EmbedService.reactRoleEmbed(roles, category, hideEmojis)]
+        ? [reactRoleEmbed(roles, category, hideEmojis)]
         : [],
       content: config.hideEmbed
-        ? EmbedService.reactRoleEmbedless(roles, category, hideEmojis)
+        ? reactRoleEmbedless(roles, category, hideEmojis)
         : '',
       components:
         config.reactType === GuildReactType.button

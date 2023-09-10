@@ -1,17 +1,20 @@
 import {
-  ActionRowBuilder, APIRole,
+  ActionRowBuilder,
+  APIRole,
   ApplicationCommandOptionType,
   ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
   EmbedBuilder,
-  parseEmoji, Role,
+  parseEmoji,
+  Role,
 } from 'discord.js';
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
 import {
   CREATE_REACT_ROLE,
   GET_REACT_ROLE_BY_EMOJI,
-  GET_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_NOT_IN_CATEGORIES,
+  GET_REACT_ROLE_BY_ROLE_ID,
+  GET_REACT_ROLES_NOT_IN_CATEGORIES,
 } from '../../src/database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
 import { isValidRolePosition } from '../../utilities/utils';
@@ -78,9 +81,9 @@ export class CreateSubcommand extends SlashSubCommand {
         content: `Hey! It turns out you have ${reactRolesNotInCategory} react roles not in a category.\nPlease add some react roles to a category before creating anymore. If however \`/category add\` isn't responding please *remove* some react roles to get below 25 **not in a category**. This is due to a Discord limitation!`,
       });
     }
-    
+
     const isValid = await this.isValid(interaction, role, emoji);
-    
+
     // This check if the role or emoji are already in use, and does some emoji validation
     if (!isValid) {
       return;
@@ -140,7 +143,7 @@ export class CreateSubcommand extends SlashSubCommand {
   private async isValid(interaction: ChatInputCommandInteraction, role: Role | APIRole, emoji: string): Promise<boolean> {
     const { guild } = interaction;
     if (!guild) return false;
-    
+
     const isValidPosition = await isValidRolePosition(interaction, role);
 
     if (!isValidPosition) {
@@ -165,7 +168,7 @@ export class CreateSubcommand extends SlashSubCommand {
         embeds: [embed],
         components: [button],
       });
-      
+
       return false;
     }
 
@@ -175,7 +178,7 @@ export class CreateSubcommand extends SlashSubCommand {
       await interaction.editReply(
         `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
       );
-      
+
       return false;
     }
 
@@ -203,7 +206,7 @@ export class CreateSubcommand extends SlashSubCommand {
           await interaction.editReply(
             `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
           );
-          
+
           return false;
         }
       }
@@ -225,7 +228,7 @@ export class CreateSubcommand extends SlashSubCommand {
           reactRole.roleId
         )}) already has this emoji assigned to it.`
       );
-      
+
       return false;
     }
 
@@ -241,10 +244,10 @@ export class CreateSubcommand extends SlashSubCommand {
           reactRole.name
         }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
       );
-      
+
       return false;
     }
-    
+
     return true;
   }
 

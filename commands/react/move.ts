@@ -5,10 +5,7 @@ import {
   codeBlock,
 } from 'discord.js';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import {
-  GET_REACT_ROLE_BY_ROLE_ID,
-  UPDATE_REACT_ROLE_CATEGORY,
-} from '../../src/database/queries/reactRole.query';
+import { GET_REACT_ROLE_BY_ROLE_ID, UPDATE_REACT_ROLE_CATEGORY, } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { RolePing } from '../../utilities/utilPings';
 import { SlashSubCommand } from '../command';

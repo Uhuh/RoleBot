@@ -6,19 +6,10 @@ import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { ReactionHandler } from './services/reactionHandler';
 import { createConnection } from 'typeorm';
-import {
-  Category,
-  GuildConfig,
-  JoinRole,
-  ReactMessage,
-  ReactRole,
-} from './database/entities';
+import { Category, GuildConfig, JoinRole, LinkedRoles, ReactMessage, ReactRole, } from './database/entities';
 
 import * as Discord from 'discord.js';
-import {
-  DELETE_JOIN_ROLE,
-  GET_GUILD_JOIN_ROLES,
-} from './database/queries/joinRole.query';
+import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES, } from './database/queries/joinRole.query';
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 import { SlashCommand } from '../commands/command';
@@ -128,6 +119,29 @@ export default class RoleBot extends Discord.Client {
     });
   }
 
+  public start = async () => {
+    /**
+     * Connect to postgres with all the entities.
+     * URL points to my home server.
+     * SYNC_DB should only be true if on dev.
+     */
+    await createConnection({
+      type: 'postgres',
+      url: config.POSTGRES_URL,
+      synchronize: config.SYNC_DB,
+      entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole, LinkedRoles],
+    })
+      .then(() => this.log.debug(`Successfully connected to postgres DB.`))
+      .catch((e) => this.log.critical(`Failed to connect to postgres\n${e}`));
+
+    this.log.info(`Connecting to Discord with bot token.`);
+    await this.login(this.config.TOKEN);
+    this.log.info('Bot connected.');
+
+    // 741682757486510081 - New RoleBot application.
+    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
+  };
+
   private updatePresence = () => {
     if (!this.user)
       return this.log.error(`Can't set presence due to client user missing.`);
@@ -149,28 +163,5 @@ export default class RoleBot extends Discord.Client {
       ],
       status: 'dnd',
     });
-  };
-
-  public start = async () => {
-    /**
-     * Connect to postgres with all the entities.
-     * URL points to my home server.
-     * SYNC_DB should only be true if on dev.
-     */
-    await createConnection({
-      type: 'postgres',
-      url: config.POSTGRES_URL,
-      synchronize: config.SYNC_DB,
-      entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
-    })
-      .then(() => this.log.debug(`Successfully connected to postgres DB.`))
-      .catch((e) => this.log.critical(`Failed to connect to postgres\n${e}`));
-
-    this.log.info(`Connecting to Discord with bot token.`);
-    await this.login(this.config.TOKEN);
-    this.log.info('Bot connected.');
-
-    // 741682757486510081 - New RoleBot application.
-    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
   };
 }

@@ -1,12 +1,5 @@
-import {
-  ApplicationCommandOptionType,
-  AutocompleteInteraction,
-  ChatInputCommandInteraction,
-} from 'discord.js';
-import {
-  DELETE_CATEGORY_BY_ID,
-  GET_CATEGORY_BY_ID,
-} from '../../src/database/queries/category.query';
+import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction, } from 'discord.js';
+import { DELETE_CATEGORY_BY_ID, GET_CATEGORY_BY_ID, } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { SlashSubCommand } from '../command';
 

@@ -9,10 +9,7 @@ import {
 } from 'discord.js';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import {
-  CREATE_GUILD_CONFIG,
-  GET_GUILD_CONFIG,
-} from '../../src/database/queries/guild.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { reactToMessage } from '../../utilities/utils';

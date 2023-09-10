@@ -5,10 +5,10 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
 } from 'discord.js';
-import { EmbedService } from '../../src/services/embedService';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
 import tutorialJson from '../../utilities/json/tutorial.json';
 import { SlashCommand } from '../command';
+import { tutorialEmbed } from '../../utilities/utilEmbedHelpers';
 
 export class TutorialBaseCommand extends SlashCommand {
   readonly maxPage = tutorialJson['embeds'].length - 1;
@@ -42,7 +42,7 @@ export class TutorialBaseCommand extends SlashCommand {
     /* Should only be getting page ID's from the button event */
     const pageId = Number(page);
 
-    const embed = EmbedService.tutorialEmbed(pageId);
+    const embed = tutorialEmbed(pageId);
     const buttons = this.makeButtons(pageId);
 
     interaction
@@ -59,7 +59,7 @@ export class TutorialBaseCommand extends SlashCommand {
   };
 
   execute = async (interaction: ChatInputCommandInteraction) => {
-    const embed = EmbedService.tutorialEmbed(0);
+    const embed = tutorialEmbed(0);
 
     const buttons = this.makeButtons(0);
 
