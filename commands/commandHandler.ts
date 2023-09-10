@@ -1,15 +1,12 @@
 import { REST } from '@discordjs/rest';
-import {
-  Collection,
-  RESTPostAPIApplicationCommandsJSONBody,
-  Routes,
-} from 'discord.js';
+import { Collection, RESTPostAPIApplicationCommandsJSONBody, Routes, } from 'discord.js';
 import { CLIENT_ID, SERVER_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
 import { SlashCommand } from './command';
 import * as GeneralBaseCommands from './general';
 import { CategoryBaseCommand } from './category';
 import { ReactBaseCommand } from './react';
+import { LinkBaseCommand } from './link';
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -20,9 +17,11 @@ export const commands = () => {
   const commandMap: Collection<string, SlashCommand> = new Collection();
   const category = new CategoryBaseCommand();
   const react = new ReactBaseCommand();
+  const link = new LinkBaseCommand();
 
   commandMap.set(category.name, category);
   commandMap.set(react.name, react);
+  commandMap.set(link.name, link);
 
   for (const cmd of [
     ...Object.values(GeneralBaseCommands).map((c) => new c()),
@@ -41,8 +40,9 @@ export const buildNewCommands = async (buildCommands = false, beta = false) => {
     const commandsJson: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
     const category = new CategoryBaseCommand();
     const react = new ReactBaseCommand();
+    const link = new LinkBaseCommand();
 
-    commandsJson.push(...[category.toJSON(), react.toJSON()]);
+    commandsJson.push(category.toJSON(), react.toJSON(), link.toJSON());
 
     for (const cmd of [
       ...Object.values(GeneralBaseCommands).map((c) => new c()),
