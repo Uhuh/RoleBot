@@ -14,6 +14,7 @@ const enum CommandOptionNames {
   Category = 'category',
   Name = 'new-name',
   Description = 'new-description',
+  DisplayRoles = 'display-roles',
   MutuallyExclusive = 'mutually-exclusive',
   RemoveRoleType = 'remove-role-type',
   RequiredRole = 'new-required-role',
@@ -43,6 +44,11 @@ export class EditSubCommand extends SlashSubCommand {
         name: CommandOptionNames.Description,
         description: 'Description of the category, use [remove] to remove it.',
         type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: CommandOptionNames.DisplayRoles,
+        description: 'If you want to display the roles in the embed or not.',
+        type: ApplicationCommandOptionType.Boolean,
       },
       {
         name: CommandOptionNames.MutuallyExclusive,
@@ -158,6 +164,8 @@ export class EditSubCommand extends SlashSubCommand {
     const newName = interaction.options.getString(CommandOptionNames.Name);
     const mutuallyExclusive =
       interaction.options.getBoolean(CommandOptionNames.MutuallyExclusive);
+    const displayRoles =
+      interaction.options.getBoolean(CommandOptionNames.DisplayRoles);
     const removeRoleType = interaction.options.getString(CommandOptionNames.RemoveRoleType);
     const newRequiredRoleId =
       interaction.options.getRole(CommandOptionNames.RequiredRole)?.id ?? undefined;
@@ -196,6 +204,7 @@ export class EditSubCommand extends SlashSubCommand {
       name: newName ?? category.name,
       description: newDesc ?? category.description,
       mutuallyExclusive: mutuallyExclusive ?? category.mutuallyExclusive,
+      displayRoles: displayRoles ?? category.displayRoles,
       displayOrder: displayOrder ?? category.displayOrder,
       imageType: imageType ?? category.imageType,
       imageUrl: removeImageUrl ? null : imageUrl ?? category.imageUrl,

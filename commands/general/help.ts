@@ -3,8 +3,8 @@ import {
   ChatInputCommandInteraction,
   Colors,
   EmbedBuilder,
-  SelectMenuBuilder,
-  SelectMenuInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import { TUTORIAL_PLAYLIST } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
@@ -17,7 +17,7 @@ export class HelpBaseCommand extends SlashCommand {
   }
 
   handleSelect = (
-    interaction: SelectMenuInteraction,
+    interaction: StringSelectMenuInteraction,
     type: string,
     _args: string[]
   ) => {
@@ -41,8 +41,8 @@ export class HelpBaseCommand extends SlashCommand {
     const { user } = interaction.client;
     if (!user) return;
 
-    const selectMenu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-      new SelectMenuBuilder()
+    const selectMenu = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
         .setCustomId(`select-${this.name}`)
         .setPlaceholder('Pick a category')
         .addOptions([

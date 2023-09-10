@@ -147,7 +147,7 @@ export function reactRoleEmbed(
 ) {
   const embed = new EmbedBuilder();
 
-  const description = reactRoleEmbedless(
+  const description = categoryEmbedDescription(
     reactRoles,
     category,
     hideEmojis
@@ -160,7 +160,7 @@ export function reactRoleEmbed(
   try {
     embed
       .setTitle(category.name)
-      .setDescription(description)
+      .setDescription(description || null)
       .setColor(category.embedColor ? `#${category.embedColor}` : null);
 
     if (category.imageType === 'card') {
@@ -175,27 +175,37 @@ export function reactRoleEmbed(
   return embed;
 }
 
-export function reactRoleEmbedless(
+export function categoryEmbedDescription(
   reactRoles: ReactRole[],
   category: ICategory,
   hideEmojis = false
 ) {
-  const reactRolesString = reactRolesFormattedString(
-    reactRoles,
-    hideEmojis
-  );
+  let reactRolesInfo = '';
 
-  const requiredRole = category.requiredRoleId
-    ? `\nRequired: ${RolePing(category.requiredRoleId)}`
-    : '';
+  /**
+   * Some users want to hide their react roles from their embed
+   * So hide all info if they dont want it displayed
+   */
+  if (category.displayRoles) {
+    const reactRolesString = reactRolesFormattedString(
+      reactRoles,
+      hideEmojis
+    );
 
-  const excludedRole = category.excludedRoleId
-    ? `\nExcluded: ${RolePing(category.excludedRoleId)}`
-    : '';
+    const requiredRole = category.requiredRoleId
+      ? `\nRequired: ${RolePing(category.requiredRoleId)}`
+      : '';
+
+    const excludedRole = category.excludedRoleId
+      ? `\nExcluded: ${RolePing(category.excludedRoleId)}`
+      : '';
+    
+    reactRolesInfo = `${requiredRole}${excludedRole}\n\n${reactRolesString}`;
+  }
 
   return `${
     category.description?.split('\\n').join('\n') ?? ''
-  }${requiredRole}${excludedRole}\n\n${reactRolesString}`;
+  }${reactRolesInfo}`;
 }
 
 export function tutorialEmbed(pageId: number) {
