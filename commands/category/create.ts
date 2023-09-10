@@ -13,6 +13,7 @@ const enum CommandOptionNames {
   Name = 'name',
   Description = 'description',
   MutuallyExclusive = 'mutually-exclusive',
+  DisplayRoles = 'display-roles',
   RequiredRole = 'required-role',
   ExcludedRole = 'excluded-role',
   DisplayOrder = 'display-order',
@@ -42,6 +43,11 @@ export class CreateSubCommand extends SlashSubCommand {
         {
           name: CommandOptionNames.MutuallyExclusive,
           description: 'Make roles from this category mutually exclusive.',
+          type: ApplicationCommandOptionType.Boolean,
+        },
+        {
+          name: CommandOptionNames.DisplayRoles,
+          description: 'If you want to display the roles in the embed or not.',
           type: ApplicationCommandOptionType.Boolean,
         },
         {
@@ -108,6 +114,8 @@ export class CreateSubCommand extends SlashSubCommand {
     const displayString = interaction.options.getString(CommandOptionNames.DisplayOrder);
 
     // Embed styling options
+    const displayRoles =
+      interaction.options.getBoolean(CommandOptionNames.DisplayRoles) ?? false;
     const imageTypeString = interaction.options.getString(CommandOptionNames.ImageType);
     const imageUrl = interaction.options.getString(CommandOptionNames.ImageUrl);
     let embedColor = interaction.options.getString(CommandOptionNames.EmbedColor);
@@ -143,6 +151,7 @@ export class CreateSubCommand extends SlashSubCommand {
         name,
         description,
         mutuallyExclusive,
+        displayRoles,
         requiredRoleId,
         excludedRoleId,
         displayOrder: displayOrder ?? DisplayType.alpha,

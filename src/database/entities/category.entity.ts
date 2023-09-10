@@ -14,6 +14,7 @@ export interface ICategory {
   guildId: string;
   name: string;
   description?: string | null;
+  displayRoles: boolean;
   mutuallyExclusive?: boolean;
   requiredRoleId: string | null;
   excludedRoleId: string | null;
@@ -37,8 +38,11 @@ export class Category extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column()
+  @Column({ default: false })
   mutuallyExclusive: boolean;
+  
+  @Column({ default: true })
+  displayRoles: boolean;
 
   @Column({ type: 'text', nullable: true })
   requiredRoleId: string | null;

@@ -21,7 +21,7 @@ import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
-import { reactRoleEmbed, reactRoleEmbedless } from '../../utilities/utilEmbedHelpers';
+import { reactRoleEmbed, categoryEmbedDescription } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   MessageLink = 'message-link',
@@ -210,7 +210,7 @@ export class UpdateSubCommand extends SlashSubCommand {
         ? []
         : [reactRoleEmbed(roles, category, config?.hideEmojis)],
       content: config.hideEmbed
-        ? reactRoleEmbedless(roles, category, config?.hideEmojis)
+        ? categoryEmbedDescription(roles, category, config?.hideEmojis)
         : '',
       components: buttons,
     };
@@ -250,7 +250,7 @@ export class UpdateSubCommand extends SlashSubCommand {
       const editedMessage = {
         embeds: hideEmbed ? [] : [reactRoleEmbed(roles, category)],
         content: hideEmbed
-          ? reactRoleEmbedless(roles, category)
+          ? categoryEmbedDescription(roles, category)
           : '',
         components: [],
       };

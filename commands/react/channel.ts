@@ -20,7 +20,7 @@ import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
-import { reactRoleEmbed, reactRoleEmbedless } from '../../utilities/utilEmbedHelpers';
+import { reactRoleEmbed, categoryEmbedDescription } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   Channel = 'channel',
@@ -230,7 +230,7 @@ export class ChannelSubCommand extends SlashSubCommand {
         ? [reactRoleEmbed(roles, category, hideEmojis)]
         : [],
       content: config.hideEmbed
-        ? reactRoleEmbedless(roles, category, hideEmojis)
+        ? categoryEmbedDescription(roles, category, hideEmojis)
         : '',
       components:
         config.reactType === GuildReactType.button
