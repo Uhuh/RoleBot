@@ -25,14 +25,21 @@ export const CREATE_GUILD_CATEGORY = async (
   const newCategory = new Category();
 
   newCategory.guildId = category.guildId;
+  
+  // Embed contents
   newCategory.name = category.name;
   newCategory.description = category.description ?? '';
+  
+  // React role display / settings
   newCategory.mutuallyExclusive = category.mutuallyExclusive ?? false;
   newCategory.requiredRoleId = category.requiredRoleId;
   newCategory.excludedRoleId = category.excludedRoleId;
   newCategory.displayOrder = category.displayOrder;
+
+  // Embed customization
   newCategory.imageType = category.imageType;
   newCategory.imageUrl = category.imageUrl;
+  newCategory.embedColor = category.embedColor;
 
   return await newCategory.save();
 };
