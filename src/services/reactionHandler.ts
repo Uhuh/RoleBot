@@ -1,17 +1,11 @@
-import {
-  Guild,
-  GuildMember,
-  MessageReaction,
-  PartialMessageReaction,
-  PartialUser,
-  User,
-} from 'discord.js';
+import { Guild, GuildMember, MessageReaction, PartialMessageReaction, PartialUser, User, } from 'discord.js';
 
 import { ReactMessage } from '../database/entities';
 import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';
 import { GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID } from '../database/queries/reactMessage.query';
-import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
+import { GET_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_BY_CATEGORY_ID } from '../database/queries/reactRole.query';
 import { LogService } from './logService';
+import { GET_LINKED_ROLES } from '../database/queries/link.query';
 
 export class ReactionHandler {
   private log: LogService;
@@ -108,14 +102,7 @@ export class ReactionHandler {
 
     switch (type) {
       case 'add':
-        member.roles
-          .add(reactMessage.roleId)
-          .catch((e) =>
-            this.log.debug(
-              `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`,
-              guild.id
-            )
-          );
+        this.handleRoleAdd(member, reactMessage, guild.id);
         break;
       case 'remove':
         member.roles
@@ -200,4 +187,23 @@ export class ReactionHandler {
         this.log.error(`Failed to update members roles.\n${e}`, guild.id)
       );
   };
+
+  private async handleRoleAdd(member: GuildMember, reactMessage: ReactMessage, guildId: string) {
+    const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactMessage.roleId);
+
+    // @TODO do something smart with this
+    if (!reactRole) {
+      return;
+    }
+
+    const linkedRoles = await GET_LINKED_ROLES(reactRole.id);
+
+    if (!linkedRoles.length) {
+      return;
+    }
+
+    const roleIds = [reactMessage.roleId, ...linkedRoles.map(l => l.roleId)];
+
+    member.roles.add(roleIds).catch(e => this.log.error(`Failed to add roles to member.\n${roleIds}\n${e}`));
+  }
 }
