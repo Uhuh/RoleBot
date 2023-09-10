@@ -31,6 +31,8 @@ export const CREATE_GUILD_CATEGORY = async (
   newCategory.requiredRoleId = category.requiredRoleId;
   newCategory.excludedRoleId = category.excludedRoleId;
   newCategory.displayOrder = category.displayOrder;
+  newCategory.imageType = category.imageType;
+  newCategory.imageUrl = category.imageUrl;
 
   return await newCategory.save();
 };
