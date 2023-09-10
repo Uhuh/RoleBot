@@ -6,7 +6,7 @@ import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { ReactionHandler } from './services/reactionHandler';
 import { createConnection } from 'typeorm';
-import { Category, GuildConfig, JoinRole, LinkedRoles, ReactMessage, ReactRole, } from './database/entities';
+import { Category, GuildConfig, JoinRole, ReactMessage, ReactRole, } from './database/entities';
 
 import * as Discord from 'discord.js';
 import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES, } from './database/queries/joinRole.query';
@@ -129,7 +129,7 @@ export default class RoleBot extends Discord.Client {
       type: 'postgres',
       url: config.POSTGRES_URL,
       synchronize: config.SYNC_DB,
-      entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole, LinkedRoles],
+      entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
     })
       .then(() => this.log.debug(`Successfully connected to postgres DB.`))
       .catch((e) => this.log.critical(`Failed to connect to postgres\n${e}`));
