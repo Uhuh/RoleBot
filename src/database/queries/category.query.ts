@@ -35,6 +35,7 @@ export const CREATE_GUILD_CATEGORY = async (
   newCategory.requiredRoleId = category.requiredRoleId;
   newCategory.excludedRoleId = category.excludedRoleId;
   newCategory.displayOrder = category.displayOrder;
+  newCategory.displayRoles = category.displayRoles;
 
   // Embed customization
   newCategory.imageType = category.imageType;
