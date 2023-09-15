@@ -115,7 +115,7 @@ export class CreateSubCommand extends SlashSubCommand {
 
     // Embed styling options
     const displayRoles =
-      interaction.options.getBoolean(CommandOptionNames.DisplayRoles) ?? false;
+      interaction.options.getBoolean(CommandOptionNames.DisplayRoles) ?? true;
     const imageTypeString = interaction.options.getString(CommandOptionNames.ImageType);
     const imageUrl = interaction.options.getString(CommandOptionNames.ImageUrl);
     let embedColor = interaction.options.getString(CommandOptionNames.EmbedColor);
