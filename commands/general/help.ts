@@ -6,7 +6,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { TUTORIAL_PLAYLIST } from '../../src/vars';
+import { TUTORIAL_VIDEO } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../command';
 import { helpEmbed } from '../../utilities/utilEmbedHelpers';
@@ -81,7 +81,7 @@ export class HelpBaseCommand extends SlashCommand {
 
     embed.setDescription(
       `Hey! **If you've never used me before make sure to check out \`/tutorial\`! It'll explain how RoleBot works.**\n
-      **Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n
+      **Check out the [tutorial](${TUTORIAL_VIDEO})**\n
       **Want to host the bot yourself? Check out the [GitHub](https://github.com/Uhuh/RoleBot)**\n
       Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`
     );

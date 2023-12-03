@@ -16,5 +16,5 @@ export const SERVER_ID = '567819334852804626';
 // Only sync when in dev
 export const SYNC_DB = Boolean(Number(process.env.SYNC_DB)) || false;
 
-export const TUTORIAL_PLAYLIST =
-  'https://www.youtube.com/watch?v=ikqTW4bbM7s&list=PLW0pJjCQgtaV2ukCIV_0h56Ld2wtKyvcR';
+export const TUTORIAL_VIDEO =
+  'https://www.youtube.com/watch?v=2yvY1PZOFGw';
