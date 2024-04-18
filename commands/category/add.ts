@@ -59,7 +59,7 @@ export class AddSubCommand extends SlashSubCommand {
   handleButton = async (
     interaction: ButtonInteraction,
     _subCommand: string,
-    args: string[]
+    args: string[],
   ) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
@@ -72,7 +72,7 @@ export class AddSubCommand extends SlashSubCommand {
       {
         message: 'Failed to find the react role!',
         prop: 'react role',
-      }
+      },
     );
 
     const category = this.expect(await GET_CATEGORY_BY_ID(Number(categoryId)), {
@@ -86,27 +86,27 @@ export class AddSubCommand extends SlashSubCommand {
     ).filter((r) => r.roleId !== reactRole?.roleId);
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
-      Number(categoryId)
+      Number(categoryId),
     );
 
     // Should only get here if typeorm throws.
     if (!categoryRoles) {
       this.log.error(
         `Unable to find category roles for category[${categoryId}]`,
-        interaction.guildId
+        interaction.guildId,
       );
       return interaction.reply(
-        `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`
+        `Hey! For some reason I don't see any react roles in that category. If this issues persist please report it to the support server.`,
       );
     }
 
     if (categoryRoles.length >= 20) {
       this.log.info(
         `Category[${categoryId}] already has 20 react roles in it.`,
-        interaction.guildId
+        interaction.guildId,
       );
       return interaction.reply(
-        `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`
+        `Hey! Category \`${category.name}\` already has the max of 20 react roles. This is due to Discords reaction limitation. Make another category!`,
       );
     }
 
@@ -115,17 +115,17 @@ export class AddSubCommand extends SlashSubCommand {
 
       this.log.info(
         `React role[${reactRoleId}] is already in a category[${categoryId}]`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.reply(
-        `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`
+        `Hey! This role is already in the category \`${reactRoleCategory?.name}\`.`,
       );
     }
 
     const roleButtons = await this.buildReactRoleButtons(
       rolesWithoutCategories,
-      Number(categoryId)
+      Number(categoryId),
     );
 
     try {
@@ -147,17 +147,17 @@ export class AddSubCommand extends SlashSubCommand {
 
       this.log.info(
         `Successfully updated roles[${reactRoleId}] categoryId[${categoryId}]`,
-        interaction.guildId
+        interaction.guildId,
       );
     } catch (e) {
       this.log.error(
         `Failed to update roles[${reactRoleId}] categoryId[${categoryId}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.update({
         content: `Hey! I had an issue adding ${RolePing(
-          reactRole.roleId
+          reactRole.roleId,
         )} to the category \`${
           category.name
         }\`. Please wait a second and try again.`,
@@ -198,7 +198,7 @@ export class AddSubCommand extends SlashSubCommand {
 
     let roleButtons = await this.buildReactRoleButtons(
       reactRoles,
-      category.id
+      category.id,
     );
 
     try {
@@ -216,7 +216,7 @@ export class AddSubCommand extends SlashSubCommand {
     } catch (e: unknown) {
       this.log.error(
         `Failed to send category[${category.id}] buttons\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       this.handleButtonErrors(interaction, roleButtons, e)
@@ -232,7 +232,7 @@ export class AddSubCommand extends SlashSubCommand {
             z.string(),
             z.object({
               components: z.record(z.string(), z.unknown()),
-            })
+            }),
           ),
         }),
       }),
@@ -244,7 +244,7 @@ export class AddSubCommand extends SlashSubCommand {
       this.log.error(`Failed to parse button error schema.`, interaction.guildId);
 
       return interaction.editReply(
-        `Hey! Something pretty bad happened. Please join the support server found in \`/info\` so we can work on this.`
+        `Hey! Something pretty bad happened. Please join the support server found in \`/info\` so we can work on this.`,
       );
     }
 
@@ -258,7 +258,7 @@ export class AddSubCommand extends SlashSubCommand {
      */
     for (const row of Object.keys(data.rawError.errors.components)) {
       for (const emoji of Object.keys(
-        data.rawError.errors.components[row].components
+        data.rawError.errors.components[row].components,
       )) {
         if (isNaN(Number(row)) || isNaN(Number(emoji))) continue;
 
@@ -274,7 +274,7 @@ export class AddSubCommand extends SlashSubCommand {
       `\nRemember you can only have a single emoji, and it has to be a valid emoji. Make sure it's not plain text.\n` +
       `Run \`/react list\`, you should see ":pensive: - @your-role" not "pensive - @your-role"\n` +
       `If you see something like "pensive - @your-role" use \`/react edit\` to change the emoji for that role.` +
-      `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`
+      `If the problem persist please visit the support server found in the \`/info\` command so we can figure out the issue!`,
     );
   }
 
@@ -286,7 +286,7 @@ export class AddSubCommand extends SlashSubCommand {
    */
   private buildReactRoleButtons = async (
     reactRoles: ReactRole[],
-    categoryId: number
+    categoryId: number,
   ) => {
     const reactRoleChunks = spliceIntoChunks(reactRoles, 5);
 
@@ -298,9 +298,9 @@ export class AddSubCommand extends SlashSubCommand {
             .setCustomId(`${this.baseName}_${this.name}_${r.id}-${categoryId}`)
             .setEmoji(r.emojiId)
             .setLabel(r.name)
-            .setStyle(i % 2 ? ButtonStyle.Secondary : ButtonStyle.Primary)
-        )
-      )
+            .setStyle(i % 2 ? ButtonStyle.Secondary : ButtonStyle.Primary),
+        ),
+      ),
     );
   };
 }

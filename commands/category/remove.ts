@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction, } from 'discord.js';
-import { DELETE_CATEGORY_BY_ID, GET_CATEGORY_BY_ID, } from '../../src/database/queries/category.query';
+import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import { DELETE_CATEGORY_BY_ID, GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { SlashSubCommand } from '../command';
 
@@ -21,7 +21,7 @@ export class RemoveSubCommand extends SlashSubCommand {
           autocomplete: true,
           required: true,
         },
-      ]
+      ],
     );
   }
 
@@ -52,11 +52,11 @@ export class RemoveSubCommand extends SlashSubCommand {
     if (!category) {
       this.log.error(
         `Category[${categoryId}] does not exist on guild.`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.editReply(
-        `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`
+        `Hey! This is unusual, I couldn't find that category! Please try again after waiting a second.`,
       );
     }
 
@@ -64,21 +64,21 @@ export class RemoveSubCommand extends SlashSubCommand {
       .then(() => {
         this.log.info(
           `Successfully deleted category[${categoryId}]`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.editReply(
-          `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`
+          `Hey! I successfully deleted the category \`${category.name}\` for you and freed all the roles on it.`,
         );
       })
       .catch((e) => {
         this.log.error(
           `Issues deleting category[${categoryId}]\n${e}`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.editReply(
-          `Hey! I had an issue deleting the category. Please wait a second and try again.`
+          `Hey! I had an issue deleting the category. Please wait a second and try again.`,
         );
       });
   };

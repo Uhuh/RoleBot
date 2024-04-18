@@ -2,7 +2,7 @@ import { AutocompleteInteraction } from 'discord.js';
 import { GET_GUILD_CATEGORIES } from '../src/database/queries/category.query';
 
 export async function handleAutocompleteCategory(
-  interaction: AutocompleteInteraction
+  interaction: AutocompleteInteraction,
 ) {
   if (!interaction.guildId) return;
 
@@ -12,6 +12,6 @@ export async function handleAutocompleteCategory(
   const filtered = categories.filter((c) => c.name.startsWith(focusedValue));
 
   return interaction.respond(
-    filtered.map((c) => ({ name: c.name, value: `${c.id}` }))
+    filtered.map((c) => ({ name: c.name, value: `${c.id}` })),
   );
 }

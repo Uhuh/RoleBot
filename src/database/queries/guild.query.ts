@@ -15,7 +15,7 @@ export const CREATE_GUILD_CONFIG = (guildId: string) => {
 
 export const EDIT_GUILD_CONFIG = (
   guildId: string,
-  guildConfig: Partial<IGuildConfig>
+  guildConfig: Partial<IGuildConfig>,
 ) => {
   return GuildConfig.update({ guildId }, guildConfig);
 };

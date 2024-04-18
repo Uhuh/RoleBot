@@ -27,7 +27,7 @@ export class InfoBaseCommand extends SlashCommand {
       new ButtonBuilder()
         .setLabel('Support Server')
         .setURL(SUPPORT_URL)
-        .setStyle(ButtonStyle.Link)
+        .setStyle(ButtonStyle.Link),
     );
   };
 
@@ -36,7 +36,7 @@ export class InfoBaseCommand extends SlashCommand {
     const [size, memberCount] = await Promise.all([
       interaction.client.shard?.fetchClientValues('guilds.cache.size'),
       interaction.client.shard?.broadcastEval((c) =>
-        c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
+        c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0),
       ),
     ]);
 
@@ -61,20 +61,20 @@ export class InfoBaseCommand extends SlashCommand {
           name: '<:rolebot_people:1044464965618253895> Server count',
           value: `RoleBot is in ${size?.reduce<number>(
             (acc, guildCount) => acc + Number(guildCount),
-            0
+            0,
           )} servers.`,
         },
         {
           name: '<:rolebot_people:1044464965618253895> Total Member count',
           value: `RoleBot has ${memberCount?.reduce<number>(
             (acc, memberCount) => acc + Number(memberCount),
-            0
+            0,
           )} current users.`,
         },
         {
           name: `${emoji} Ping`,
           value: `RoleBot's ping is ${ping}ms.`,
-        }
+        },
       )
       .setThumbnail(AVATAR_URL);
 
@@ -84,7 +84,7 @@ export class InfoBaseCommand extends SlashCommand {
         components: [buttons],
       })
       .catch((e) =>
-        this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+        this.log.error(`Interaction failed.\n${e}`, interaction.guildId),
       );
   };
 }

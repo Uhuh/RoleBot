@@ -8,9 +8,9 @@ import {
 } from 'discord.js';
 import { ReactRole } from '../../src/database/entities';
 import { ICategory } from '../../src/database/entities/category.entity';
-import { GuildReactType, IGuildConfig, } from '../../src/database/entities/guild.entity';
+import { GuildReactType, IGuildConfig } from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
@@ -21,7 +21,7 @@ import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
-import { reactRoleEmbed, categoryEmbedDescription } from '../../utilities/utilEmbedHelpers';
+import { categoryEmbedDescription, reactRoleEmbed } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   MessageLink = 'message-link',
@@ -56,7 +56,7 @@ export class UpdateSubCommand extends SlashSubCommand {
         message:
           'Make sure to pass the message link by right click copying it on desktop!',
         prop: 'message-link',
-      }
+      },
     );
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
@@ -64,12 +64,12 @@ export class UpdateSubCommand extends SlashSubCommand {
     const channel = await interaction.guild?.channels
       .fetch(channelId)
       .catch((e) =>
-        this.log.debug(`Failed to find channel[${channelId}]\n${e}`, guildId)
+        this.log.debug(`Failed to find channel[${channelId}]\n${e}`, guildId),
       );
 
     if (!channel || !isTextChannel(channel)) {
       return interaction.editReply(
-        `Hey! I couldn't find that channel, make sure you're copying the message link right.`
+        `Hey! I couldn't find that channel, make sure you're copying the message link right.`,
       );
     }
 
@@ -78,7 +78,7 @@ export class UpdateSubCommand extends SlashSubCommand {
     const message = await channel.messages
       .fetch(messageId)
       .catch((e) =>
-        this.log.info(`Failed to fetch message[${messageId}]\n${e}`)
+        this.log.info(`Failed to fetch message[${messageId}]\n${e}`),
       );
 
     if (!message) {
@@ -90,11 +90,11 @@ export class UpdateSubCommand extends SlashSubCommand {
     if (!reactMessage) {
       this.log.info(
         `No react messages exist with messageId[${messageId}]`,
-        guildId
+        guildId,
       );
 
       return interaction.editReply(
-        `Hey! I looked and didn't see any react roles saved that are associated with that message.`
+        `Hey! I looked and didn't see any react roles saved that are associated with that message.`,
       );
     }
 
@@ -103,28 +103,28 @@ export class UpdateSubCommand extends SlashSubCommand {
     if (!category) {
       this.log.info(
         `Category not found with categoryId[${reactMessage.categoryId}]]`,
-        guildId
+        guildId,
       );
 
       return interaction.editReply(
-        `Hey! I couldn't find a category associated with that message.`
+        `Hey! I couldn't find a category associated with that message.`,
       );
     }
 
     const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       category.id,
-      category.displayOrder
+      category.displayOrder,
     );
 
     if (!categoryRoles.length) {
       this.log.info(
         `Category[${category.id}] has no react roles associated with it.`,
-        guildId
+        guildId,
       );
 
       return interaction.editReply(
         `Hey! I see that message uses category \`${category.name}\` but it has no react roles in it.\n` +
-        `Add some react roles to the category with \`/category add\` and then try update again. Otherwise just delete it!`
+        `Add some react roles to the category with \`/category add\` and then try update again. Otherwise just delete it!`,
       );
     }
 
@@ -141,7 +141,7 @@ export class UpdateSubCommand extends SlashSubCommand {
       await message.reactions
         .removeAll()
         .catch(() =>
-          this.log.info(`Failed to remove all reactions.`, message.guildId)
+          this.log.info(`Failed to remove all reactions.`, message.guildId),
         );
 
       switch (config.reactType) {
@@ -152,7 +152,7 @@ export class UpdateSubCommand extends SlashSubCommand {
             category,
             config,
             message,
-            channel
+            channel,
           );
           break;
 
@@ -163,17 +163,17 @@ export class UpdateSubCommand extends SlashSubCommand {
             categoryRoles,
             category,
             channel,
-            config.hideEmbed
+            config.hideEmbed,
           );
 
           return interaction.editReply(
-            `Hey! I've successfully re-reacted to the message for you.`
+            `Hey! I've successfully re-reacted to the message for you.`,
           );
       }
     } catch (e) {
       this.log.error(
         `Failed to edit category[${category.id}] embed and re-react to it\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
     }
   };
@@ -184,12 +184,12 @@ export class UpdateSubCommand extends SlashSubCommand {
     category: ICategory,
     config: IGuildConfig,
     message: Message,
-    channel: Channel
+    channel: Channel,
   ) => {
     if (!interaction.guildId) throw 'Interaction guild ID missing';
     if (message.author !== interaction.client.user) {
       return interaction.editReply(
-        `Hey! I can only edit embeds and buttons that are MY message! Make sure the message you're copying is correct.`
+        `Hey! I can only edit embeds and buttons that are MY message! Make sure the message you're copying is correct.`,
       );
     }
 
@@ -223,11 +223,11 @@ export class UpdateSubCommand extends SlashSubCommand {
       .catch((e) => {
         this.log.error(
           `Failed to update message embed.\n${e}`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.editReply(
-          `Hey! I couldn't edit the embed, am I missing READ HISTORY / MANAGE MESSAGE permissions?`
+          `Hey! I couldn't edit the embed, am I missing READ HISTORY / MANAGE MESSAGE permissions?`,
         );
       });
   };
@@ -238,7 +238,7 @@ export class UpdateSubCommand extends SlashSubCommand {
     roles: ReactRole[],
     category: ICategory,
     channel: Channel,
-    hideEmbed: boolean
+    hideEmbed: boolean,
   ) => {
     if (!message.guildId) throw 'Message has no guild ID';
 
@@ -259,11 +259,11 @@ export class UpdateSubCommand extends SlashSubCommand {
       await message.edit(editedMessage).then(() => {
         this.log.info(
           `Updated category[${category.id}] embed.`,
-          message.guildId
+          message.guildId,
         );
 
         return interaction.editReply(
-          `Hey! I updated the react role embed message related to this category.`
+          `Hey! I updated the react role embed message related to this category.`,
         );
       });
     }
@@ -276,7 +276,7 @@ export class UpdateSubCommand extends SlashSubCommand {
       channel.id,
       category.id,
       isCustomMessage,
-      this.log
+      this.log,
     );
 
     if (!isSuccessfulReacting) {

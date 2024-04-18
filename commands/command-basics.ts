@@ -21,12 +21,12 @@ export class CommandHandlers {
    * @param interaction Command that was ran and handed to this command from the handleInteraction function.
    */
   public execute = async (
-    interaction: ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction,
   ): Promise<unknown> => {
     return handleInteractionReply(
       this.log,
       interaction,
-      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`
+      `Hey! Turns out you didn't implement this command[${this.name}] yet. How about you do that?`,
     );
   };
 
@@ -41,12 +41,12 @@ export class CommandHandlers {
   public handleSelect = (
     interaction: SelectMenuInteraction,
     subCommand: string,
-    _args: string[]
+    _args: string[],
   ) => {
     handleInteractionReply(
       this.log,
       interaction,
-      `Hey! Turns out you didn't implement this commands[${this.name} ${subCommand}] dropdown handler yet. How about you do that?`
+      `Hey! Turns out you didn't implement this commands[${this.name} ${subCommand}] dropdown handler yet. How about you do that?`,
     );
   };
 
@@ -58,12 +58,12 @@ export class CommandHandlers {
   public handleButton = async (
     interaction: ButtonInteraction,
     subCommand: string,
-    _args: string[]
+    _args: string[],
   ): Promise<unknown> => {
     return handleInteractionReply(
       this.log,
       interaction,
-      `Hey! Turns out you didn't implement this commands[${this.name} ${subCommand}] button handler yet. How about you do that?`
+      `Hey! Turns out you didn't implement this commands[${this.name} ${subCommand}] button handler yet. How about you do that?`,
     );
   };
 
@@ -85,7 +85,7 @@ export class CommandHandlers {
    */
   expect = <T>(
     value: T | null | undefined,
-    props: { message: string; prop: string }
+    props: { message: string; prop: string },
   ): T => {
     if (value === null || value === undefined) {
       this.log.error(`Expected ${props.prop} to not be null.`);
@@ -134,14 +134,14 @@ export class CommandBasics extends CommandHandlers {
     interaction:
       | ChatInputCommandInteraction
       | ButtonInteraction
-      | SelectMenuInteraction
+      | SelectMenuInteraction,
   ): boolean => {
     // Check all user perms.
     if (!this.canUserRunCommand(interaction)) {
       handleInteractionReply(this.log, interaction, {
         ephemeral: true,
         content: `You don't have the correct permissions to run this. To run this you need \`${this.permissions.map(
-          (p) => PermissionMappings.get(p)
+          (p) => PermissionMappings.get(p),
         )}\`.`,
       });
       return false;
@@ -160,7 +160,7 @@ export class CommandBasics extends CommandHandlers {
       | ChatInputCommandInteraction
       | ButtonInteraction
       | SelectMenuInteraction
-      | AutocompleteInteraction
+      | AutocompleteInteraction,
   ) => {
     return this.permissions.length
       ? interaction.memberPermissions?.has(this.permissions, true)

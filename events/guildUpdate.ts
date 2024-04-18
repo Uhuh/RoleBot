@@ -5,7 +5,7 @@ import { CREATE_GUILD_CONFIG } from '../src/database/queries/guild.query';
 export const guildUpdate = async (
   guild: Guild,
   type: 'Left' | 'Joined',
-  client: RoleBot
+  client: RoleBot,
 ) => {
   const color = type === 'Joined' ? Colors.Green : Colors.Red;
   try {
@@ -38,7 +38,7 @@ export const guildUpdate = async (
           value: `[${guild.memberCount}]`,
           inline: true,
         },
-        { name: 'Guild ID:', value: `[${guild.id}]`, inline: true }
+        { name: 'Guild ID:', value: `[${guild.id}]`, inline: true },
       )
       .setFooter({
         text: `Guilds I'm in: ${size}`,
@@ -53,7 +53,7 @@ export const guildUpdate = async (
         id: guild.id,
         type,
         members: guild.memberCount,
-      })}`
+      })}`,
     );
     console.error(`${e}`);
   }

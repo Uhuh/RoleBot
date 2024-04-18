@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder } from 'discord.js';
 import { COLOR } from './types/globals';
-import { Category, DisplayType, ICategory, } from '../src/database/entities/category.entity';
+import { Category, DisplayType, ICategory } from '../src/database/entities/category.entity';
 import { ReactRole } from '../src/database/entities';
 import { codeBlock } from '@discordjs/builders';
 import { AVATAR_URL } from '../src/vars';
@@ -9,7 +9,7 @@ import { RolePing } from './utilPings';
 import { Category as CommandCategory } from './types/commands';
 import tutorialJson from './json/tutorial.json';
 import commands from './json/commands.json';
-import { GuildReactType, IGuildConfig, } from '../src/database/entities/guild.entity';
+import { GuildReactType, IGuildConfig } from '../src/database/entities/guild.entity';
 
 /**
  * Generate a help embed based on the category type passed in.
@@ -22,7 +22,7 @@ export function helpEmbed(type: CommandCategory) {
   embed.setTitle(`**${type.toUpperCase()} commands**`).setColor(COLOR.AQUA);
 
   commands[type].forEach((func) =>
-    embed.addFields({ name: `/${func.name}`, value: func.description })
+    embed.addFields({ name: `/${func.name}`, value: func.description }),
   );
 
   return embed;
@@ -44,7 +44,7 @@ export async function categoryReactRoleEmbed(category: Category) {
   const embed = new EmbedBuilder();
   const categoryRoles = await GET_REACT_ROLES_BY_CATEGORY_ID(
     category.id,
-    category.displayOrder
+    category.displayOrder,
   );
 
   const reactRoles = categoryRoles.length
@@ -70,7 +70,7 @@ export async function categoryReactRoleEmbed(category: Category) {
       `Image URL: ${category.imageUrl ?? none}\n` +
       `Image Type: ${category.imageType}\n\n` +
       `Description: **${desc.split('\\n').join('\n')}**\n\n` +
-      `React Roles\n${reactRoles}`
+      `React Roles\n${reactRoles}`,
     )
     .setColor(category.embedColor ? `#${category.embedColor}` : null);
 
@@ -79,7 +79,7 @@ export async function categoryReactRoleEmbed(category: Category) {
 
 function reactRolesFormattedString(
   reactRoles: ReactRole[],
-  hideEmojis = false
+  hideEmojis = false,
 ) {
   const emoji = (r: ReactRole) => r.emojiTag ?? r.emojiId;
 
@@ -88,7 +88,7 @@ function reactRolesFormattedString(
       (r) =>
         `${hideEmojis ? '' : emoji(r) + ' - '}${RolePing(r.roleId)} ${
           r.description ?? ''
-        }`
+        }`,
     )
     .join('\n');
 }
@@ -106,20 +106,20 @@ export function reactRoleListEmbed(reactRoles: ReactRole[]) {
 
   const inCategory = rolesInCategory.length
     ? `**In a category:**\n${reactRolesFormattedString(
-      rolesInCategory
+      rolesInCategory,
     )}\n`
     : '';
 
   const notInCategory = rolesNotInCategory.length
     ? `**Not in a category:**\n${reactRolesFormattedString(
-      rolesNotInCategory
+      rolesNotInCategory,
     )}`
     : '';
 
   embed
     .setTitle(`All your reaction roles!`)
     .setDescription(
-      `This doesn't show what categories these roles are in.\nCheck out \`/category list\` for more in-depth listing.\n\n${inCategory}${notInCategory}`
+      `This doesn't show what categories these roles are in.\nCheck out \`/category list\` for more in-depth listing.\n\n${inCategory}${notInCategory}`,
     )
     .setColor(COLOR.DEFAULT);
 
@@ -133,8 +133,8 @@ export async function freeReactRoles(reactRoles: ReactRole[]) {
 
   embed.setDescription(
     `These roles are up for grabs!\nCheck out \`/category add\` if you want to add these to a category.\n\n${reactRolesFormattedString(
-      reactRoles
-    )}`
+      reactRoles,
+    )}`,
   );
 
   return embed;
@@ -143,14 +143,14 @@ export async function freeReactRoles(reactRoles: ReactRole[]) {
 export function reactRoleEmbed(
   reactRoles: ReactRole[],
   category: ICategory,
-  hideEmojis = false
+  hideEmojis = false,
 ) {
   const embed = new EmbedBuilder();
 
   const description = categoryEmbedDescription(
     reactRoles,
     category,
-    hideEmojis
+    hideEmojis,
   );
 
   /**
@@ -178,7 +178,7 @@ export function reactRoleEmbed(
 export function categoryEmbedDescription(
   reactRoles: ReactRole[],
   category: ICategory,
-  hideEmojis = false
+  hideEmojis = false,
 ) {
   let reactRolesInfo = '';
 
@@ -189,7 +189,7 @@ export function categoryEmbedDescription(
   if (category.displayRoles) {
     const reactRolesString = reactRolesFormattedString(
       reactRoles,
-      hideEmojis
+      hideEmojis,
     );
 
     const requiredRole = category.requiredRoleId
@@ -199,7 +199,7 @@ export function categoryEmbedDescription(
     const excludedRole = category.excludedRoleId
       ? `\nExcluded: ${RolePing(category.excludedRoleId)}`
       : '';
-    
+
     reactRolesInfo = `${requiredRole}${excludedRole}\n\n${reactRolesString}`;
   }
 
@@ -232,7 +232,7 @@ export function joinRoleEmbed(roleIds: string[]) {
       `These roles are given to users as they join your server.\nCurrently the max limit a server can have is 5.\n\n` +
       (roleIds.length > 0
         ? roleIds.map((r) => RolePing(r)).join('\n')
-        : `There are none! Go add some with the \`/auto-join add @Role\` command.`)
+        : `There are none! Go add some with the \`/auto-join add @Role\` command.`),
     )
     .setTimestamp(new Date());
 
@@ -266,7 +266,7 @@ export async function guildConfig(config: IGuildConfig) {
         GuildReactType[config.reactType]
       }**\nHide button emojis: **${config.hideEmojis}**\nHide embeds: **${
         config.hideEmbed
-      }**`
+      }**`,
     )
     .setTimestamp(new Date());
 

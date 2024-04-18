@@ -9,7 +9,7 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
 
 export const GET_ROLES_BY_CATEGORY_ID = async (
   categoryId: number,
-  displayType: DisplayType
+  displayType: DisplayType,
 ) => {
   const orderProperties = displayOrderQuery(displayType);
 
@@ -20,10 +20,10 @@ export const GET_ROLES_BY_CATEGORY_ID = async (
 };
 
 export const CREATE_GUILD_CATEGORY = async (
-  category: Omit<ICategory, 'id'>
+  category: Omit<ICategory, 'id'>,
 ) => {
   const newCategory = Category.create({
-    ...category
+    ...category,
   });
 
   return await Category.save(newCategory);
@@ -31,7 +31,7 @@ export const CREATE_GUILD_CATEGORY = async (
 
 export const EDIT_CATEGORY_BY_ID = (
   id: number,
-  category: Partial<ICategory>
+  category: Partial<ICategory>,
 ) => {
   return Category.update({ id }, category);
 };

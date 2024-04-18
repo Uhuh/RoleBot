@@ -35,7 +35,7 @@ export interface ICommandOption {
 
 const buildOption = (
   builder: SlashCommandSubcommandBuilder | SlashCommandBuilder,
-  option: ICommandOption
+  option: ICommandOption,
 ) => {
   switch (option.type) {
     case ApplicationCommandOptionType.Boolean:
@@ -43,7 +43,7 @@ const buildOption = (
         o
           .setName(option.name)
           .setDescription(option.description)
-          .setRequired(option.required ?? false)
+          .setRequired(option.required ?? false),
       );
       break;
     case ApplicationCommandOptionType.Channel:
@@ -52,7 +52,7 @@ const buildOption = (
           .setName(option.name)
           .addChannelTypes(ChannelType.GuildText)
           .setDescription(option.description)
-          .setRequired(option.required ?? false)
+          .setRequired(option.required ?? false),
       );
       break;
     case ApplicationCommandOptionType.Role:
@@ -60,7 +60,7 @@ const buildOption = (
         o
           .setName(option.name)
           .setDescription(option.description)
-          .setRequired(option.required ?? false)
+          .setRequired(option.required ?? false),
       );
       break;
     case ApplicationCommandOptionType.String:
@@ -70,7 +70,7 @@ const buildOption = (
           .setDescription(option.description)
           .setRequired(option.required ?? false)
           .setChoices(...(option.choices ?? []))
-          .setAutocomplete(option.autocomplete ?? false)
+          .setAutocomplete(option.autocomplete ?? false),
       );
       break;
   }
@@ -81,7 +81,7 @@ export class SlashSubCommand extends CommandHandlers {
     public readonly baseName: string,
     public readonly name: string,
     public readonly description: string,
-    public readonly options: ICommandOption[] = []
+    public readonly options: ICommandOption[] = [],
   ) {
     super(name, baseName);
   }
@@ -114,7 +114,7 @@ export class SlashCommand extends CommandBasics {
       .setDefaultMemberPermissions(
         this.permissions.length
           ? this.permissions.reduce((a, b) => a | b)
-          : undefined
+          : undefined,
       );
   }
 
@@ -136,7 +136,7 @@ export class SlashCommand extends CommandBasics {
   }
 
   getSubCommand(
-    interaction: ChatInputCommandInteraction | AutocompleteInteraction
+    interaction: ChatInputCommandInteraction | AutocompleteInteraction,
   ) {
     const subCommandName = interaction.options.getSubcommand();
     const subCommand = this.subCommands.get(subCommandName);
@@ -171,7 +171,7 @@ export class SlashCommand extends CommandBasics {
   handleButton = async (
     interaction: ButtonInteraction,
     subCommandName: string,
-    _args: string[]
+    _args: string[],
   ) => {
     try {
       const subCommand = this.subCommands.get(subCommandName);

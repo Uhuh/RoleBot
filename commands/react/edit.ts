@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, parseEmoji, } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, parseEmoji } from 'discord.js';
 import {
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
@@ -55,14 +55,14 @@ export class EditSubCommand extends SlashSubCommand {
 
     if (!emoji && !description) {
       return interaction.editReply(
-        `Hey! You need to edit either the emoji or the description, you can't change nothing!`
+        `Hey! You need to edit either the emoji or the description, you can't change nothing!`,
       );
     }
 
     const doesReactRoleExist = await GET_REACT_ROLE_BY_ROLE_ID(role.id);
     if (!doesReactRoleExist) {
       return interaction.editReply(
-        `Hey! That role doesn't belong to an existing react role.`
+        `Hey! That role doesn't belong to an existing react role.`,
       );
     }
 
@@ -87,7 +87,7 @@ export class EditSubCommand extends SlashSubCommand {
 
     if (!parsedEmoji?.id && !parsedEmoji?.name) {
       await interaction.editReply(
-        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
       );
 
       return '';
@@ -97,14 +97,14 @@ export class EditSubCommand extends SlashSubCommand {
 
     const doesEmojiBelongToReactRole = await GET_REACT_ROLE_BY_EMOJI(
       emojiContent,
-      interaction.guildId ?? ''
+      interaction.guildId ?? '',
     );
 
     if (doesEmojiBelongToReactRole) {
       await interaction.editReply(
         `Hey! That emoji belongs to a react role (${RolePing(
-          doesEmojiBelongToReactRole.roleId
-        )})`
+          doesEmojiBelongToReactRole.roleId,
+        )})`,
       );
 
       return '';
@@ -119,9 +119,9 @@ export class EditSubCommand extends SlashSubCommand {
 
     this.log.debug(
       `Updated role[${roleId}] to use emoji[${JSON.stringify(
-        parsedEmoji
+        parsedEmoji,
       )} - ${emojiTag ?? parsedEmoji.name}]`,
-      interaction.guildId
+      interaction.guildId,
     );
 
     return `:tada: Successfully updated the react role (${

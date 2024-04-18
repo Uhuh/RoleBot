@@ -1,6 +1,6 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction, } from 'discord.js';
-import { DisplayType, ICategory, } from '../../src/database/entities/category.entity';
-import { EDIT_CATEGORY_BY_ID, GET_CATEGORY_BY_ID, } from '../../src/database/queries/category.query';
+import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import { DisplayType, ICategory } from '../../src/database/entities/category.entity';
+import { EDIT_CATEGORY_BY_ID, GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import {
   getDisplayCommandChoices,
@@ -229,7 +229,7 @@ export class EditSubCommand extends SlashSubCommand {
         const invalidHex = `\n\nAn invalid hex code was provided. Remember, hex codes look like this \`#ff0000\`. Use an online tool to make one.`;
 
         return interaction.editReply(
-          `Hey! I successfully updated the category \`${category.name}\` for you.${(embedColor && !isCorrectHex) ? invalidHex : ''}`
+          `Hey! I successfully updated the category \`${category.name}\` for you.${(embedColor && !isCorrectHex) ? invalidHex : ''}`,
         );
       })
       .catch((e) =>

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
 import {
   CREATE_JOIN_ROLE,
   GET_GUILD_JOIN_ROLES,
@@ -42,7 +42,7 @@ export class AddSubCommand extends SlashSubCommand {
 
     if (doesRoleExist.length) {
       return interaction.editReply(
-        `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`
+        `Hey! That role is already in your auto-join list. Use \`/auto-join list\` to see what roles are in that list.`,
       );
     }
 
@@ -52,17 +52,17 @@ export class AddSubCommand extends SlashSubCommand {
 
         return interaction.editReply(
           `:tada: I successfully added ${RolePing(
-            role.id
-          )} to the auto-join list.`
+            role.id,
+          )} to the auto-join list.`,
         );
       } catch (e) {
         return interaction.editReply(
-          `Hey! I had an issue adding that role to the servers auto-join list.`
+          `Hey! I had an issue adding that role to the servers auto-join list.`,
         );
       }
     } else {
       return interaction.editReply(
-        `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`
+        `Hey! Currently RoleBot doesn't support having more than 5 auto-join roles.`,
       );
     }
   };

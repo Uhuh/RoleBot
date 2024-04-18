@@ -28,7 +28,7 @@ export class TutorialBaseCommand extends SlashCommand {
         .setCustomId(`${this.name}_${pageId + 1}`)
         .setDisabled(pageId === this.maxPage)
         .setLabel('Next')
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Primary),
     );
 
     return buttons;
@@ -37,7 +37,7 @@ export class TutorialBaseCommand extends SlashCommand {
   handleButton = async (
     interaction: ButtonInteraction,
     page: string,
-    _args: string[]
+    _args: string[],
   ) => {
     /* Should only be getting page ID's from the button event */
     const pageId = Number(page);
@@ -53,8 +53,8 @@ export class TutorialBaseCommand extends SlashCommand {
       .catch((e) =>
         this.log.error(
           `Failed to update tutorial interaction.\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 
@@ -73,8 +73,8 @@ export class TutorialBaseCommand extends SlashCommand {
       .catch((e) =>
         this.log.error(
           `Failed to send tutorial embed.\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 }

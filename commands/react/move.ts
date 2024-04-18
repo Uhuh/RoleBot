@@ -5,7 +5,7 @@ import {
   codeBlock,
 } from 'discord.js';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import { GET_REACT_ROLE_BY_ROLE_ID, UPDATE_REACT_ROLE_CATEGORY, } from '../../src/database/queries/reactRole.query';
+import { GET_REACT_ROLE_BY_ROLE_ID, UPDATE_REACT_ROLE_CATEGORY } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { RolePing } from '../../utilities/utilPings';
 import { SlashSubCommand } from '../command';
@@ -73,7 +73,7 @@ export class MoveSubCommand extends SlashSubCommand {
 
     if (!reactRole) {
       return interaction.editReply(
-        `Hey! The role ${RolePing(role.id)} doesn't belong to a react role.`
+        `Hey! The role ${RolePing(role.id)} doesn't belong to a react role.`,
       );
     }
 
@@ -81,12 +81,12 @@ export class MoveSubCommand extends SlashSubCommand {
       await UPDATE_REACT_ROLE_CATEGORY(reactRole.id, Number(categoryId));
 
       await interaction.editReply(
-        `Hey! I updated ${RolePing(role.id)}'s category to be ${category.name}`
+        `Hey! I updated ${RolePing(role.id)}'s category to be ${category.name}`,
       );
     } catch (e) {
       await interaction.editReply(
         `Hey! I had an issue updating the category. Here's an error message.\n
-        ${codeBlock(`${e}`)}`
+        ${codeBlock(`${e}`)}`,
       );
     }
   };

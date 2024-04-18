@@ -7,6 +7,7 @@ import {
   ChatInputCommandInteraction,
   EmbedBuilder,
   parseEmoji,
+  PartialEmoji,
   Role,
 } from 'discord.js';
 import { ReactRoleType } from '../../src/database/entities/reactRole.entity';
@@ -103,32 +104,32 @@ export class CreateSubcommand extends SlashSubCommand {
       parsedEmoji?.id ?? parsedEmoji?.name ?? emoji,
       emojiTag,
       interaction.guildId,
-      ReactRoleType.normal
+      ReactRoleType.normal,
     )
       .then((reactRole) => {
         this.log.debug(
           `Successfully created the react role[${role.id}] with emoji[${
             parsedEmoji?.id ?? parsedEmoji?.name
           }]`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         const emojiMention = reactRole?.emojiTag ?? reactRole?.emojiId;
 
         return interaction.editReply(
           `:tada: Successfully created the react role (${emojiMention} - ${RolePing(
-            role.id
-          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category add\`!**\n\n**Note: React roles can only have one emoji related to a role, if you use multiple emojis for a role it will break!**`
+            role.id,
+          )}) :tada: \n**Make sure to add your newly created react role to a category with \`/category add\`!**\n\n**Note: React roles can only have one emoji related to a role, if you use multiple emojis for a role it will break!**`,
         );
       })
       .catch((e) => {
         this.log.error(
           `Failed to create react role[${role.id}] | emoji[id: ${parsedEmoji?.id} : string: ${emoji}]\n${e}`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.editReply(
-          'React role failed to create. Please try again.'
+          'React role failed to create. Please try again.',
         );
       });
   };
@@ -151,17 +152,17 @@ export class CreateSubcommand extends SlashSubCommand {
         .setTitle('Reaction Roles Setup')
         .setDescription(
           `The role ${RolePing(
-            role.id
-          )} is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`
+            role.id,
+          )} is above me in the role list which you can find in \`Server settings > Roles\`.\nPlease make sure that my role that is listed above the roles you want to assign.`,
         );
 
       const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setLabel('Discord Roles')
           .setURL(
-            'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101'
+            'https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101',
           )
-          .setStyle(ButtonStyle.Link)
+          .setStyle(ButtonStyle.Link),
       );
 
       await interaction.editReply({
@@ -176,7 +177,7 @@ export class CreateSubcommand extends SlashSubCommand {
 
     if ((!parsedEmoji?.id && !parsedEmoji?.name) || !parsedEmoji) {
       await interaction.editReply(
-        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`
+        `Hey! I had an issue parsing whatever emoji you passed in. Please wait and try again.`,
       );
 
       return false;
@@ -192,19 +193,19 @@ export class CreateSubcommand extends SlashSubCommand {
         .fetch(parsedEmoji.id)
         .catch((e) =>
           this.log.debug(
-            `Couldn't fetch emoji, most likely in different server.\n${e}`
-          )
+            `Couldn't fetch emoji, most likely in different server.\n${e}`,
+          ),
         );
 
       if (!emoji) {
         const doesBotHaveAccess = await this.doesBotHaveEmojiAccess(
           interaction,
-          parsedEmoji
+          parsedEmoji,
         );
 
         if (!doesBotHaveAccess) {
           await interaction.editReply(
-            `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`
+            `Hey! I can't find the emoji you passed in, you most likely used an emoji that's in a server I'm not in.\nEither invite me to that server, create the emoji here or use a different emoji.`,
           );
 
           return false;
@@ -217,7 +218,7 @@ export class CreateSubcommand extends SlashSubCommand {
      */
     let reactRole = await GET_REACT_ROLE_BY_EMOJI(
       parsedEmoji?.id ?? emoji,
-      guild.id
+      guild.id,
     );
 
     if (reactRole) {
@@ -225,8 +226,8 @@ export class CreateSubcommand extends SlashSubCommand {
 
       await interaction.editReply(
         `The react role (${emojiMention} - ${RolePing(
-          reactRole.roleId
-        )}) already has this emoji assigned to it.`
+          reactRole.roleId,
+        )}) already has this emoji assigned to it.`,
       );
 
       return false;
@@ -242,7 +243,7 @@ export class CreateSubcommand extends SlashSubCommand {
       await interaction.editReply(
         `There's a react role already using the role \`${
           reactRole.name
-        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`
+        }\` (${emojiMention} - ${RolePing(reactRole.roleId)}).`,
       );
 
       return false;
@@ -259,16 +260,12 @@ export class CreateSubcommand extends SlashSubCommand {
    */
   private async doesBotHaveEmojiAccess(
     interaction: ChatInputCommandInteraction,
-    emoji: {
-      animated: boolean;
-      name: string;
-      id: string | null;
-    }
+    emoji: PartialEmoji,
   ) {
     try {
       const emojis = (
         await interaction.client.shard?.broadcastEval((c) =>
-          c.guilds.cache.map((g) => g.emojis.cache)
+          c.guilds.cache.map((g) => g.emojis.cache),
         )
       )?.flat(3);
 
@@ -281,7 +278,7 @@ export class CreateSubcommand extends SlashSubCommand {
     } catch (e) {
       this.log.critical(
         `Failed to broadcastEval emojis.\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return null;

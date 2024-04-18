@@ -1,11 +1,4 @@
-import {
-  Guild,
-  GuildMember,
-  MessageReaction,
-  PartialMessageReaction,
-  PartialUser,
-  User,
-} from 'discord.js';
+import { Guild, GuildMember, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
 
 import { ReactMessage } from '../database/entities';
 import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';
@@ -23,7 +16,7 @@ export class ReactionHandler {
   handleReaction = async (
     reaction: MessageReaction | PartialMessageReaction,
     user: User | PartialUser,
-    type: 'add' | 'remove'
+    type: 'add' | 'remove',
   ) => {
     if (!reaction || user.bot) return;
     const { message, emoji } = reaction;
@@ -36,15 +29,15 @@ export class ReactionHandler {
     if (!emojiId) {
       return this.log.debug(
         `Emoji doesn't exist on message[${message.id}] reaction`,
-        guild.id
+        guild.id,
       );
     }
 
     const reactMessage = await GET_REACT_MESSAGE_BY_MSGID_AND_EMOJI_ID(
       message.id,
-      emojiId
+      emojiId,
     ).catch((e) =>
-      this.log.error(`Failed to query for react message.\n${e}`, guild.id)
+      this.log.error(`Failed to query for react message.\n${e}`, guild.id),
     );
 
     if (!reactMessage) return;
@@ -52,7 +45,7 @@ export class ReactionHandler {
     if (!reactMessage.categoryId) {
       return this.log.error(
         `React role[${reactMessage.id}] in guild[${guild.id}] does NOT have a category set.`,
-        guild.id
+        guild.id,
       );
     }
 
@@ -61,14 +54,14 @@ export class ReactionHandler {
       .catch((e) =>
         this.log.error(
           `Fetching user[${user.id}] threw an error.\n${e}`,
-          guild.id
-        )
+          guild.id,
+        ),
       );
 
     if (!member) {
       return this.log.debug(
         `Failed to fetch member with user[${user.id}] for reaction[${type}]`,
-        guild.id
+        guild.id,
       );
     }
 
@@ -77,7 +70,7 @@ export class ReactionHandler {
     if (!category) {
       return this.log.error(
         `Category[${reactMessage.categoryId}] does not exist`,
-        guild.id
+        guild.id,
       );
     }
 
@@ -113,8 +106,8 @@ export class ReactionHandler {
           .catch((e) =>
             this.log.debug(
               `Cannot give role[${reactMessage.roleId}] to user[${member?.id}]\n${e}`,
-              guild.id
-            )
+              guild.id,
+            ),
           );
         break;
       case 'remove':
@@ -123,8 +116,8 @@ export class ReactionHandler {
           .catch((e) =>
             this.log.debug(
               `Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`,
-              guild.id
-            )
+              guild.id,
+            ),
           );
     }
   };
@@ -140,7 +133,7 @@ export class ReactionHandler {
     reactMessage: ReactMessage,
     member: GuildMember,
     guild: Guild,
-    type: 'add' | 'remove'
+    type: 'add' | 'remove',
   ) => {
     if (type === 'remove') {
       return member.roles
@@ -148,15 +141,15 @@ export class ReactionHandler {
         .catch((e) =>
           this.log.error(
             `Failed to remove role[${reactMessage.roleId}] from user[${member.id}]\n${e}`,
-            guild.id
-          )
+            guild.id,
+          ),
         );
     }
 
     if (!reactMessage.categoryId) {
       return this.log.error(
         `React role[${reactMessage.id}] category is undefined.`,
-        guild.id
+        guild.id,
       );
     }
 
@@ -169,7 +162,7 @@ export class ReactionHandler {
      * However, to edit the member we need all the OTHER roles even non RoleBot related.
      */
     const updatedRoleList = member.roles.cache.filter(
-      (r) => r.id === reactMessage.roleId || !categoryRoles.includes(r.id)
+      (r) => r.id === reactMessage.roleId || !categoryRoles.includes(r.id),
     );
 
     // Fetch the role we want to ADD to the user.
@@ -178,14 +171,14 @@ export class ReactionHandler {
       .catch((e) =>
         this.log.error(
           `Failed to fetch role[${reactMessage.roleId}]\n${e}`,
-          guild.id
-        )
+          guild.id,
+        ),
       );
 
     if (!role) {
       return this.log.debug(
         `Role[${reactMessage.roleId}] could not be found`,
-        guild.id
+        guild.id,
       );
     }
 
@@ -197,7 +190,7 @@ export class ReactionHandler {
         roles: updatedRoleList,
       })
       .catch((e) =>
-        this.log.error(`Failed to update members roles.\n${e}`, guild.id)
+        this.log.error(`Failed to update members roles.\n${e}`, guild.id),
       );
   };
 }
