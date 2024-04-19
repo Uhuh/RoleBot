@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { DELETE_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_BY_GUILD, } from '../../src/database/queries/reactRole.query';
+import { DELETE_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { SlashSubCommand } from '../command';
 
 export class CleanSubCommand extends SlashSubCommand {
@@ -7,7 +7,7 @@ export class CleanSubCommand extends SlashSubCommand {
     super(
       baseCommand,
       'clean',
-      `If you delete a role RoleBot might miss it, this will remove '@deleted' roles.`
+      `If you delete a role RoleBot might miss it, this will remove '@deleted' roles.`,
     );
   }
 
@@ -25,7 +25,7 @@ export class CleanSubCommand extends SlashSubCommand {
     try {
       const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);
       const nonCachedRoles = reactRoles.filter(
-        (r) => !interaction.guild?.roles.cache.has(r.roleId)
+        (r) => !interaction.guild?.roles.cache.has(r.roleId),
       );
 
       for (const role of nonCachedRoles) {

@@ -8,7 +8,7 @@ export class ListSubCommand extends SlashSubCommand {
     super(
       baseCommand,
       'list',
-      'List all reaction roles that are currently active.'
+      'List all reaction roles that are currently active.',
     );
   }
 

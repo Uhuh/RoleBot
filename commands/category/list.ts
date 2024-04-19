@@ -11,7 +11,7 @@ export class ListSubCommand extends SlashSubCommand {
     super(
       baseCommand,
       'list',
-      'List all your categories and the roles within them.'
+      'List all your categories and the roles within them.',
     );
   }
 
@@ -26,26 +26,26 @@ export class ListSubCommand extends SlashSubCommand {
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
       (e) =>
-        this.log.error(`Failed to get categories\n${e}`, interaction.guildId)
+        this.log.error(`Failed to get categories\n${e}`, interaction.guildId),
     );
 
     if (!categories || !categories.length) {
       this.log.info(`Guild has no categories.`, interaction.guildId);
 
       return interaction.editReply(
-        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`
+        `Hey! It appears that there aren't any categories for this server... however, if there ARE supposed to be some and you see this please wait a second and try again.`,
       );
     }
 
     await interaction.editReply(
-      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react clean\` to remove them.`
+      `Hey! Let me build those embeds for you.\n\nIf you notice any react roles that have deleted roles run \`/react clean\` to remove them.`,
     );
 
     const embeds: EmbedBuilder[] = [];
 
     // Let's show the user the free react roles and encourage them to add them to a category.
     const rolesNotInCategory = await GET_REACT_ROLES_NOT_IN_CATEGORIES(
-      interaction.guildId
+      interaction.guildId,
     );
 
     if (rolesNotInCategory.length) {

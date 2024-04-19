@@ -8,7 +8,7 @@ export const requiredPermissions = (channelId: string) => {
     .replace(/{{permissions}}/g, codeBlock(errors['required_permissions']))
     .replace(
       /{{permission_reasons}}/g,
-      codeBlock(errors['permission_reasons'])
+      codeBlock(errors['permission_reasons']),
     );
 
   return resultString;

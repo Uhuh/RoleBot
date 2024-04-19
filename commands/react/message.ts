@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
-import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
 import { GET_REACT_ROLES_BY_CATEGORY_ID } from '../../src/database/queries/reactRole.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { reactToMessage } from '../../utilities/utils';
@@ -41,7 +41,7 @@ export class MessageSubCommand extends SlashSubCommand {
           autocomplete: true,
           type: ApplicationCommandOptionType.String,
         },
-      ]
+      ],
     );
   }
 
@@ -73,7 +73,7 @@ export class MessageSubCommand extends SlashSubCommand {
 
     if (config?.reactType !== GuildReactType.reaction) {
       return interaction.editReply(
-        `Hey! You can use the message command only if the config react-type is reaction.`
+        `Hey! You can use the message command only if the config react-type is reaction.`,
       );
     }
 
@@ -83,14 +83,14 @@ export class MessageSubCommand extends SlashSubCommand {
         message:
           'Make sure to pass the message link by right click copying it on desktop!',
         prop: 'message-link',
-      }
+      },
     );
 
     const [_, channelId, messageId] = messageLink.match(/\d+/g) ?? [];
 
     if (!channelId || !messageId) {
       return interaction.editReply(
-        `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``
+        `Hey! That doesn't look like a valid message link. Make sure to right click and copy \`Copy Message Link \``,
       );
     }
 
@@ -98,7 +98,7 @@ export class MessageSubCommand extends SlashSubCommand {
 
     if (isNaN(Number(categoryId))) {
       return interaction.editReply(
-        `Hey! Did you hit enter too fast? I can't find that category. Please wait and try again.`
+        `Hey! Did you hit enter too fast? I can't find that category. Please wait and try again.`,
       );
     }
 
@@ -109,12 +109,12 @@ export class MessageSubCommand extends SlashSubCommand {
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       category.id,
-      category.displayOrder
+      category.displayOrder,
     );
 
     if (!roles.length) {
       return interaction.editReply(
-        `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react create\`?`
+        `Hey! Category \`${category.name}\` doesn't have any react roles in it. How about making some with \`/react create\`?`,
       );
     }
 
@@ -124,7 +124,7 @@ export class MessageSubCommand extends SlashSubCommand {
 
     if (!channel || !isTextChannel(channel)) {
       return interaction.editReply(
-        `Hey! I couldn't find that channel, make sure you're copying the message link right and that it's from _this_ server.`
+        `Hey! I couldn't find that channel, make sure you're copying the message link right and that it's from _this_ server.`,
       );
     }
 
@@ -134,12 +134,12 @@ export class MessageSubCommand extends SlashSubCommand {
 
     if (!message) {
       return interaction.editReply(
-        `Hey! I couldn't find that message, make sure you're copying the message link right.`
+        `Hey! I couldn't find that message, make sure you're copying the message link right.`,
       );
     }
 
     await interaction.editReply(
-      `I'm reacting to the message with all react roles associated with ${category.name}.`
+      `I'm reacting to the message with all react roles associated with ${category.name}.`,
     );
 
     return reactToMessage(
@@ -149,13 +149,13 @@ export class MessageSubCommand extends SlashSubCommand {
       channel.id,
       category.id,
       true,
-      this.log
+      this.log,
     );
   };
 }
 
 function isTextChannel(
-  channel: NonThreadGuildBasedChannel | Channel
+  channel: NonThreadGuildBasedChannel | Channel,
 ): channel is TextChannel {
   return channel.type === ChannelType.GuildText;
 }

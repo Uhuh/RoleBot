@@ -14,14 +14,14 @@ export class NukeSubCommand extends SlashSubCommand {
     super(
       baseCommand,
       'nuke',
-      'This will remove ALL react roles for this server.'
+      'This will remove ALL react roles for this server.',
     );
   }
 
   handleButton = async (interaction: ButtonInteraction) => {
     if (!interaction.guildId) {
       return interaction.reply(
-        `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`
+        `Hey! For some reason Discord didn't send me your guild info. No longer nuking.`,
       );
     }
 
@@ -33,7 +33,7 @@ export class NukeSubCommand extends SlashSubCommand {
       .catch((e) => {
         this.log.error(
           `Failed to clear react messages\n${e}`,
-          interaction.guildId
+          interaction.guildId,
         );
       });
 
@@ -41,7 +41,7 @@ export class NukeSubCommand extends SlashSubCommand {
       .then(() => {
         this.log.debug(
           `User[${interaction.user.id}] removed ALL reactroles`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.reply({
@@ -52,7 +52,7 @@ export class NukeSubCommand extends SlashSubCommand {
       .catch((e) => {
         this.log.error(
           `Failed to delete reactroles\n${e}`,
-          interaction.guildId
+          interaction.guildId,
         );
 
         return interaction.reply({
@@ -67,7 +67,7 @@ export class NukeSubCommand extends SlashSubCommand {
       new ButtonBuilder()
         .setCustomId(`${this.baseName}_${this.name}_confirm`)
         .setLabel('Confirm Nuke')
-        .setStyle(ButtonStyle.Danger)
+        .setStyle(ButtonStyle.Danger),
     );
 
     return interaction.reply({

@@ -12,7 +12,7 @@ import {
 import { ReactRole } from '../src/database/entities';
 import { DisplayType, ImageType } from '../src/database/entities/category.entity';
 import { GuildReactType } from '../src/database/entities/guild.entity';
-import { GET_CATEGORY_BY_ID, GET_ROLES_BY_CATEGORY_ID, } from '../src/database/queries/category.query';
+import { GET_CATEGORY_BY_ID, GET_ROLES_BY_CATEGORY_ID } from '../src/database/queries/category.query';
 import {
   CREATE_REACT_MESSAGE,
   DELETE_REACT_MESSAGES_BY_MESSAGE_ID,
@@ -29,7 +29,7 @@ export const reactToMessage = async (
   channelId: string,
   categoryId: number,
   isCustomMessage: boolean,
-  log: LogService
+  log: LogService,
 ) => {
   for (const role of categoryRoles) {
     try {
@@ -48,7 +48,7 @@ export const reactToMessage = async (
       log.debug(
         `Failed to react to message[${message.id}] with emoji[${
           role.emojiTag ?? role.emojiId
-        }] in guild[${guildId}]\n${e}`
+        }] in guild[${guildId}]\n${e}`,
       );
 
       return false;
@@ -67,7 +67,7 @@ export const updateReactMessages = async (
   interaction: CommandInteraction,
   categoryId: number,
   log: LogService,
-  type: ReactMessageUpdate
+  type: ReactMessageUpdate,
 ) => {
   try {
     const reactMessage = await GET_REACT_MESSAGE_BY_CATEGORY_ID(categoryId);
@@ -84,7 +84,7 @@ export const updateReactMessages = async (
 
     if (!(channel?.type === ChannelType.GuildText)) {
       return log.debug(
-        `Guild[${guildId}] apparently does not have channel[${channelId}]`
+        `Guild[${guildId}] apparently does not have channel[${channelId}]`,
       );
     }
 
@@ -94,7 +94,7 @@ export const updateReactMessages = async (
 
     if (!message) {
       return log.debug(
-        `Could not find message[${messageId}] in channel[${channelId}] in guild[${guildId}]`
+        `Could not find message[${messageId}] in channel[${channelId}] in guild[${guildId}]`,
       );
     }
 
@@ -102,13 +102,13 @@ export const updateReactMessages = async (
 
     if (!category) {
       return log.critical(
-        `Category[${categoryId}] does not exist in guild[${guildId}]`
+        `Category[${categoryId}] does not exist in guild[${guildId}]`,
       );
     }
 
     const categoryRoles = await GET_ROLES_BY_CATEGORY_ID(
       categoryId,
-      category.displayOrder
+      category.displayOrder,
     );
     const embed = reactRoleEmbed(categoryRoles, category);
 
@@ -123,8 +123,8 @@ export const updateReactMessages = async (
         })
         .catch(() =>
           log.error(
-            `Failed to edit message[${messageId}] with updated react role embed in guild[${guildId}]`
-          )
+            `Failed to edit message[${messageId}] with updated react role embed in guild[${guildId}]`,
+          ),
         );
     }
 
@@ -146,13 +146,13 @@ export const updateReactMessages = async (
         channel.id,
         categoryId,
         reactMessage.isCustomMessage,
-        log
+        log,
       );
     }
   } catch (e) {
     log.error(
       `Caught an error updating reaction messages.\n${e}`,
-      interaction.guildId
+      interaction.guildId,
     );
   }
 };
@@ -165,7 +165,7 @@ export const updateReactMessages = async (
  */
 export const spliceIntoChunks = <T>(
   arr: readonly T[],
-  chunkSize: number
+  chunkSize: number,
 ): T[][] => {
   const result: T[][] = [];
   const arrCopy = [...arr];
@@ -185,15 +185,15 @@ export const handleInteractionReply = (
     | ChatInputCommandInteraction
     | ButtonInteraction
     | SelectMenuInteraction,
-  content: { content: string; ephemeral?: boolean } | string
+  content: { content: string; ephemeral?: boolean } | string,
 ) => {
   interaction.reply(content).catch((interactionError) => {
     interaction.channel
       ?.send(typeof content === 'string' ? content : content.content)
       .catch((channelError) =>
         logger.error(
-          `Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`
-        )
+          `Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`,
+        ),
       );
   });
 };
@@ -204,7 +204,7 @@ export const handleInteractionReply = (
  */
 export async function isValidRolePosition(
   interaction: Interaction,
-  role: Role | APIRole
+  role: Role | APIRole,
 ) {
   const clientUser = await interaction.guild?.members
     .fetch(CLIENT_ID)
@@ -250,7 +250,7 @@ export function getDisplayCommandChoices(): IDisplayChoice[] {
 }
 
 export function parseDisplayString(
-  display: keyof typeof DisplayType | null
+  display: keyof typeof DisplayType | null,
 ): DisplayType | null {
   return display ? DisplayType[display ?? 'alpha'] : null;
 }
@@ -285,7 +285,7 @@ export function getGuildReactConfigValues(): IConfigOptions[] {
 }
 
 export function parseGuildReactString(
-  reactType: keyof typeof GuildReactType | null
+  reactType: keyof typeof GuildReactType | null,
 ): GuildReactType {
   return GuildReactType[reactType ?? 'reaction'];
 }

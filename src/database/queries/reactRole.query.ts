@@ -12,7 +12,7 @@ export const CREATE_REACT_ROLE = async (
   emojiId: string,
   emojiTag: string | null,
   guildId: string,
-  type: ReactRoleType
+  type: ReactRoleType,
 ) => {
   const reactRole = new ReactRole();
 
@@ -75,7 +75,7 @@ export const GET_GUILD_CATEGORY_ROLE_COUNT = (guildId: string) => {
 
 export const GET_REACT_ROLES_BY_CATEGORY_ID = async (
   categoryId: number,
-  displayType?: DisplayType
+  displayType?: DisplayType,
 ) => {
   const orderProperties = displayOrderQuery(displayType);
 
@@ -94,14 +94,14 @@ export const UPDATE_REACT_ROLE_DESC = (roleId: string, description: string) =>
 
 export const UPDATE_REACT_ROLE_EMOJI_TAG = (
   roleId: string,
-  emojiTag: string | null
+  emojiTag: string | null,
 ) => {
   return ReactRole.update({ roleId }, { emojiTag });
 };
 
 export const UPDATE_REACT_ROLE_EMOJI_ID = async (
   roleId: string,
-  emojiId: string
+  emojiId: string,
 ) => {
   const reactRole = await ReactRole.findOne({
     where: { roleId },
@@ -121,7 +121,7 @@ export const GET_REACT_ROLE_BY_EMOJI = (emojiId: string, guildId: string) => {
 
 export const UPDATE_REACT_ROLE_CATEGORY = async (
   id: number,
-  categoryId: number
+  categoryId: number,
 ) => {
   const reactRole = await ReactRole.findOne({
     where: { id },
@@ -141,7 +141,7 @@ export const UPDATE_REACT_ROLE_CATEGORY = async (
 
 export const UPDATE_REACT_ROLE_BY_ID = (
   id: number,
-  reactRole: Partial<ReactRole>
+  reactRole: Partial<ReactRole>,
 ) => {
   return ReactRole.update({ id }, reactRole);
 };

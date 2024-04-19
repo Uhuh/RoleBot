@@ -8,8 +8,8 @@ import {
 import { setTimeout } from 'timers/promises';
 import { Category, ReactRole } from '../../src/database/entities';
 import { GuildReactType } from '../../src/database/entities/guild.entity';
-import { GET_CATEGORY_BY_ID, GET_GUILD_CATEGORIES, } from '../../src/database/queries/category.query';
-import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../src/database/queries/guild.query';
+import { GET_CATEGORY_BY_ID, GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
+import { CREATE_GUILD_CONFIG, GET_GUILD_CONFIG } from '../../src/database/queries/guild.query';
 import { CREATE_REACT_MESSAGE } from '../../src/database/queries/reactMessage.query';
 import {
   GET_GUILD_CATEGORY_ROLE_COUNT,
@@ -20,7 +20,7 @@ import { reactRoleButtons } from '../../utilities/utilButtons';
 import { requiredPermissions } from '../../utilities/utilErrorMessages';
 import { reactToMessage } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
-import { reactRoleEmbed, categoryEmbedDescription } from '../../utilities/utilEmbedHelpers';
+import { categoryEmbedDescription, reactRoleEmbed } from '../../utilities/utilEmbedHelpers';
 
 const enum CommandOptionNames {
   Channel = 'channel',
@@ -46,7 +46,7 @@ export class ChannelSubCommand extends SlashSubCommand {
           type: ApplicationCommandOptionType.String,
           autocomplete: true,
         },
-      ]
+      ],
     );
   }
 
@@ -64,7 +64,7 @@ export class ChannelSubCommand extends SlashSubCommand {
 
   handleSingleCategory = async (
     interaction: ChatInputCommandInteraction,
-    categoryId: number
+    categoryId: number,
   ) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
@@ -81,7 +81,7 @@ export class ChannelSubCommand extends SlashSubCommand {
       return interaction
         .editReply(`Hey! I only support sending embeds to text channels!`)
         .catch((e) =>
-          this.log.error(`Interaction failed.\n${e}`, interaction.guildId)
+          this.log.error(`Interaction failed.\n${e}`, interaction.guildId),
         );
     }
 
@@ -90,7 +90,7 @@ export class ChannelSubCommand extends SlashSubCommand {
       {
         message: `Failed to find the channel just passed in!`,
         prop: 'text channel',
-      }
+      },
     );
 
     if (textChannel.type !== ChannelType.GuildText) return;
@@ -102,18 +102,18 @@ export class ChannelSubCommand extends SlashSubCommand {
 
     const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
       category.id,
-      category.displayOrder
+      category.displayOrder,
     );
     if (!roles.length)
       return interaction.editReply(
-        `Hey! That category has no react roles associated with it. How about adding some.`
+        `Hey! That category has no react roles associated with it. How about adding some.`,
       );
 
     return this.messageChannelAndReact(
       interaction,
       textChannel,
       category,
-      roles
+      roles,
     );
   };
 
@@ -137,19 +137,19 @@ export class ChannelSubCommand extends SlashSubCommand {
       return this.handleSingleCategory(interaction, Number(categoryId));
     } else if (categoryId) {
       return interaction.editReply(
-        `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`
+        `Hey! You need to wait for options to show before hitting enter. You entered "${categoryId}" which isn't a category here.`,
       );
     }
 
     const categories = await GET_GUILD_CATEGORIES(guildId).catch((e) =>
-      this.log.error(`Failed to get categories\n${e}`, guildId)
+      this.log.error(`Failed to get categories\n${e}`, guildId),
     );
 
     if (!categories) {
       this.log.debug(`Guild has no categories.`, guildId);
 
       return interaction.editReply(
-        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category add\`.`
+        `Hey! You need to make some categories and fill them with react roles before running this command. Check out \`/category add\`.`,
       );
     }
 
@@ -160,7 +160,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     if (!categoryRolesCount) {
       this.log.debug(
         `Guild has categories but all of them are empty.`,
-        guildId
+        guildId,
       );
 
       return interaction.editReply({
@@ -176,11 +176,11 @@ export class ChannelSubCommand extends SlashSubCommand {
     if (channel?.type !== ChannelType.GuildText) {
       this.log.error(
         `Passed in channel[${channel.id}] was not a text channel`,
-        guildId
+        guildId,
       );
 
       return interaction.editReply(
-        `Hey! I only support sending embeds to text channels!`
+        `Hey! I only support sending embeds to text channels!`,
       );
     }
 
@@ -190,7 +190,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     for (const category of categories) {
       const roles = await GET_REACT_ROLES_BY_CATEGORY_ID(
         category.id,
-        category.displayOrder
+        category.displayOrder,
       );
       if (!roles.length) continue;
 
@@ -198,7 +198,7 @@ export class ChannelSubCommand extends SlashSubCommand {
         interaction,
         textChannel,
         category,
-        roles
+        roles,
       );
 
       await setTimeout(1000);
@@ -209,7 +209,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     interaction: ChatInputCommandInteraction,
     channel: TextChannel,
     category: Category,
-    roles: ReactRole[]
+    roles: ReactRole[],
   ) => {
     if (!interaction.guildId) {
       return this.log.error(`GuildID did not exist on interaction.`);
@@ -269,7 +269,7 @@ export class ChannelSubCommand extends SlashSubCommand {
             channel.id,
             category.id,
             false,
-            this.log
+            this.log,
           );
 
           if (!isSuccessfulReacting) {

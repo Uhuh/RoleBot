@@ -68,8 +68,8 @@ export class LogService {
       }).catch((e) =>
         console.log(
           logTypeDate,
-          `- [ LogService ] RoleBotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`
-        )
+          `- [ LogService ] RoleBotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`,
+        ),
       );
     }
   }

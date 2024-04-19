@@ -1,5 +1,5 @@
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, PermissionsBitField, } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, PermissionsBitField } from 'discord.js';
 import { SlashCommand } from '../command';
 import * as util from 'util';
 
@@ -67,7 +67,7 @@ export class EvalBaseCommand extends SlashCommand {
   buildEmbed = (
     content: string,
     title = 'Output',
-    color: number = Colors.Green
+    color: number = Colors.Green,
   ) => {
     const embed = new EmbedBuilder();
 
@@ -76,8 +76,8 @@ export class EvalBaseCommand extends SlashCommand {
       .setDescription(
         codeBlock(
           'js',
-          content.length > 4096 ? content.substring(0, 4000) : content
-        )
+          content.length > 4096 ? content.substring(0, 4000) : content,
+        ),
       )
       .setColor(color)
       .setTimestamp(new Date());

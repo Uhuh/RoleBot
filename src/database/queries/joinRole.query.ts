@@ -3,7 +3,7 @@ import { JoinRole } from '../entities';
 export const CREATE_JOIN_ROLE = async (
   name: string,
   roleId: string,
-  guildId: string
+  guildId: string,
 ) => {
   const joinRole = new JoinRole();
 

@@ -4,7 +4,7 @@ import { spliceIntoChunks } from './utils';
 
 export const reactRoleButtons = (
   reactRoles: ReactRole[],
-  hideEmojis: boolean
+  hideEmojis: boolean,
 ) => {
   const customId = (r: ReactRole) => `react-button_sub_${r.id}-${r.categoryId}`;
   const buildButton = (r: ReactRole) => {
@@ -21,6 +21,6 @@ export const reactRoleButtons = (
   };
 
   return spliceIntoChunks(reactRoles, 5).map((roles) =>
-    new ActionRowBuilder<ButtonBuilder>().addComponents(roles.map(buildButton))
+    new ActionRowBuilder<ButtonBuilder>().addComponents(roles.map(buildButton)),
   );
 };

@@ -6,10 +6,10 @@ import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { ReactionHandler } from './services/reactionHandler';
 import { createConnection } from 'typeorm';
-import { Category, GuildConfig, JoinRole, ReactMessage, ReactRole, } from './database/entities';
+import { Category, GuildConfig, JoinRole, ReactMessage, ReactRole } from './database/entities';
 
 import * as Discord from 'discord.js';
-import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES, } from './database/queries/joinRole.query';
+import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES } from './database/queries/joinRole.query';
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 import { SlashCommand } from '../commands/command';
@@ -48,7 +48,7 @@ export default class RoleBot extends Discord.Client {
     this.on('ready', (): void => {
       this.log.debug(`[Started]: ${new Date()}`);
       this.log.debug(
-        `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`
+        `RoleBot reporting for duty. Currently watching ${this.guilds.cache.size} guilds.`,
       );
 
       // Discord will eventually drop the presence if it's not "updated" periodically.
@@ -61,7 +61,7 @@ export default class RoleBot extends Discord.Client {
     });
 
     this.on('interactionCreate', async (interaction) =>
-      InteractionHandler.handleInteraction(interaction, this)
+      InteractionHandler.handleInteraction(interaction, this),
     );
 
     this.on('guildCreate', (guild) => {
@@ -71,7 +71,7 @@ export default class RoleBot extends Discord.Client {
       }
 
       guildUpdate(guild, 'Joined', this).catch((e) =>
-        this.log.error(`Failed to send webhook for guild join.\n${e}`)
+        this.log.error(`Failed to send webhook for guild join.\n${e}`),
       );
     });
     this.on('guildDelete', (guild) => {
@@ -81,7 +81,7 @@ export default class RoleBot extends Discord.Client {
       }
 
       guildUpdate(guild, 'Left', this).catch((e) =>
-        this.log.error(`Failed to send webhook for guild leave.\n${e}`)
+        this.log.error(`Failed to send webhook for guild leave.\n${e}`),
       );
     });
     // React role handling
@@ -113,7 +113,7 @@ export default class RoleBot extends Discord.Client {
       } catch (e) {
         this.log.error(
           `Failed to delete react role info on role[${role.id}] delete.\n${e}`,
-          role.guild.id
+          role.guild.id,
         );
       }
     });
