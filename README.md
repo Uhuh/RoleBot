@@ -1,4 +1,4 @@
-![rolebotbannner](https://media.discordapp.net/attachments/1043396635696308325/1043429994631807016/rolebot-gitbanner.png?width=1179&height=663)
+![rolebotbannner](https://cdn.discordapp.com/attachments/1043396635696308325/1043429994631807016/rolebot-gitbanner.png?ex=6635e5e8&is=662370e8&hm=c1c5d5e7106db4439564765347000c11c183dcc2a9a563c02d26d419247b8c76&)
 
 # Check out RoleBots [Site](https://rolebot.gg)
 
