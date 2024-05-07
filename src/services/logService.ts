@@ -53,9 +53,9 @@ export class LogService {
      * To prevent RoleBot from getting your Discord IP blocked for an hour
      * collect all errors and batch submit them every minute.
      */
-    setInterval(() => {
-      this.batchSendErrors();
-    }, 60 * 1000);
+    // setInterval(() => {
+    //   this.batchSendErrors();
+    // }, 60 * 1000);
   }
 
   _prefix: string;
@@ -96,9 +96,9 @@ export class LogService {
     console.log(`${logTypeDate} ${logContent}`);
 
     // We want to batch send errors to the discord webhook.
-    if (level == LogLevel.critical || level == LogLevel.error) {
-      this.errors.push(logContent);
-    }
+    // if (level == LogLevel.critical || level == LogLevel.error) {
+    //   this.errors.push(logContent);
+    // }
   }
 
   error(content: string, guildId?: string | null) {
