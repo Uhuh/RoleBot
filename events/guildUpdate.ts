@@ -20,7 +20,7 @@ export const guildUpdate = async (
       url: process.env.GUILD_WEBHOOK,
     });
 
-    const size = await clusterClientInstance.fetchClientValues('guilds.cache.size');
+    const size: number[] = await clusterClientInstance.fetchClientValues('guilds.cache.size');
 
     const embed = new EmbedBuilder();
 
@@ -38,7 +38,7 @@ export const guildUpdate = async (
         { name: 'Guild ID:', value: `[${guild.id}]`, inline: true },
       )
       .setFooter({
-        text: `Guilds I'm in: ${size}`,
+        text: `Guilds I'm in: ${size.reduce<number>((a, b) => a + Number(b), 0)}`,
       });
 
     return RoleBotGuildEventsWebhook.send({

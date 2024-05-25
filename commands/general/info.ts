@@ -60,7 +60,7 @@ export class InfoBaseCommand extends SlashCommand {
         },
         {
           name: '🫂 Server count',
-          value: `RoleBot is in ${size} servers.`,
+          value: `RoleBot is in ${(size as number[]).reduce<number>((a, b) => a + Number(b), 0)} servers.`,
         },
         {
           name: '🫂 Total Member count',
