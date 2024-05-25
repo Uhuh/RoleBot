@@ -5,7 +5,7 @@ import { InteractionHandler } from './services/interactionHandler';
 import { LogService } from './services/logService';
 import { PermissionService } from './services/permissionService';
 import { ReactionHandler } from './services/reactionHandler';
-import { createConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Category, GuildConfig, JoinRole, ReactMessage, ReactRole } from './database/entities';
 
 import * as Discord from 'discord.js';
@@ -13,8 +13,9 @@ import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES } from './database/queries/joinR
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 import { SlashCommand } from '../commands/command';
+import { getInfo } from 'discord-hybrid-sharding';
 
-export default class RoleBot extends Discord.Client {
+export class RoleBot extends Discord.Client {
   config: typeof config;
   commands: Discord.Collection<string, SlashCommand>;
 
@@ -37,7 +38,10 @@ export default class RoleBot extends Discord.Client {
       ],
       // RoleBot does a lot of role "pings" for visuals, don't allow it to actually mention roles. 
       allowedMentions: { parse: [] },
+      shards: getInfo().SHARD_LIST,
+      shardCount: getInfo().TOTAL_SHARDS,
     });
+
     this.config = config;
     this.commands = commands();
 
@@ -70,7 +74,7 @@ export default class RoleBot extends Discord.Client {
         return;
       }
 
-      guildUpdate(guild, 'Joined', this).catch((e) =>
+      guildUpdate(guild, 'Joined').catch((e) =>
         this.log.error(`Failed to send webhook for guild join.\n${e}`),
       );
     });
@@ -80,7 +84,7 @@ export default class RoleBot extends Discord.Client {
         return;
       }
 
-      guildUpdate(guild, 'Left', this).catch((e) =>
+      guildUpdate(guild, 'Left').catch((e) =>
         this.log.error(`Failed to send webhook for guild leave.\n${e}`),
       );
     });
@@ -96,13 +100,17 @@ export default class RoleBot extends Discord.Client {
         .catch((e) => this.log.error(e));
     });
     this.on('guildMemberAdd', async (member) => {
-      const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
+      try {
+        const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
 
-      if (!joinRoles.length) return;
+        if (!joinRoles.length) return;
 
-      member.roles.add(joinRoles.map((r) => r.roleId)).catch((e) => {
-        this.log.debug(`Issue giving member join roles\n${e}`);
-      });
+        member.roles.add(joinRoles.map((r) => r.roleId)).catch((e) => {
+          this.log.debug(`Issue giving member join roles\n${e}`);
+        });
+      } catch (e) {
+        this.log.error(`Failed to get join roles for new member.\n${e}`, member.guild.id);
+      }
     });
     // To help try and prevent unknown role errors
     this.on('roleDelete', async (role) => {
@@ -120,26 +128,27 @@ export default class RoleBot extends Discord.Client {
   }
 
   public start = async () => {
-    /**
-     * Connect to postgres with all the entities.
-     * URL points to my home server.
-     * SYNC_DB should only be true if on dev.
-     */
-    await createConnection({
+    const dataSource = new DataSource({
       type: 'postgres',
-      url: config.POSTGRES_URL,
-      synchronize: config.SYNC_DB,
+      host: config.POSTGRES_HOST,
+      username: config.POSTGRES_USER,
+      password: config.POSTGRES_PASSWORD,
+      port: 5432,
+      database: config.POSTGRES_DATABASE,
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
-    })
-      .then(() => this.log.debug(`Successfully connected to postgres DB.`))
-      .catch((e) => this.log.critical(`Failed to connect to postgres\n${e}`));
+      logging: false,
+      synchronize: config.SYNC_DB,
+    });
+
+    await dataSource.initialize()
+      .catch((error) => this.log.critical(`DataSource error on initialization.\n${error}`));
 
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
 
     // 741682757486510081 - New RoleBot application.
-    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
+    await buildNewCommands(false, config.CLIENT_ID !== '741682757486510081');
   };
 
   private updatePresence = () => {
