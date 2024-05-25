@@ -1,9 +1,10 @@
-import RB from './bot';
+import { RoleBot } from './bot';
+import { ClusterClient } from 'discord-hybrid-sharding';
 
-const RoleBot = new RB();
+const botInstance = new RoleBot();
 
-RoleBot.start().catch((e) =>
-  RoleBot.log.error(`RoleBot has encounter an error while starting up. ${e}`),
+botInstance.start().catch((e) =>
+  botInstance.log.error(`RoleBot has encounter an error while starting up. ${e}`),
 );
 
-export default RoleBot;
+export const clusterClientInstance = new ClusterClient(botInstance);

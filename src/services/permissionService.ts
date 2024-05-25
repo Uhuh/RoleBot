@@ -1,7 +1,7 @@
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import RoleBot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';
+import { RoleBot } from '../bot';
 
 export enum HasPerms {
   error = 1,

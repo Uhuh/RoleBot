@@ -7,9 +7,9 @@ import {
 } from 'discord.js';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
-import RoleBot from '../bot';
 import { handleInteractionReply } from '../../utilities/utils';
 import { ButtonHandler } from './buttonHandler';
+import { RoleBot } from '../bot';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');

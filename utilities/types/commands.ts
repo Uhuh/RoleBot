@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-import RoleBot from '../../src/bot';
+import { RoleBot } from '../../src/bot';
 
 export enum Category {
   general = 'general',

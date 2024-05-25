@@ -1,11 +1,10 @@
-import RoleBot from '../src/bot';
 import { Colors, EmbedBuilder, Guild, WebhookClient } from 'discord.js';
 import { CREATE_GUILD_CONFIG } from '../src/database/queries/guild.query';
+import { clusterClientInstance } from '../src/bot-start';
 
 export const guildUpdate = async (
   guild: Guild,
   type: 'Left' | 'Joined',
-  client: RoleBot,
 ) => {
   const color = type === 'Joined' ? Colors.Green : Colors.Red;
   try {
@@ -21,9 +20,7 @@ export const guildUpdate = async (
       url: process.env.GUILD_WEBHOOK,
     });
 
-    const size = (
-      await client.shard?.fetchClientValues('guilds.cache.size')
-    )?.reduce<number>((a, b) => a + Number(b), 0);
+    const size = await clusterClientInstance.fetchClientValues('guilds.cache.size');
 
     const embed = new EmbedBuilder();
 
