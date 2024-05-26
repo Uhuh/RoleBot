@@ -178,11 +178,13 @@ export class ButtonHandler {
         )}. Do I the manage roles permission?`,
       );
     });
+    
+    const removedRoles = ` and removed ${rolesToRemove.map((r) => RolePing(r.id)).join(' ')}`;
 
     return interaction.editReply(
       `Hey! I gave you the ${RolePing(
         role.roleId,
-      )} role and removed ${rolesToRemove.map((r) => RolePing(r.id)).join(' ')}`,
+      )} role${ rolesToRemove.size ? removedRoles : '.'}`,
     );
   };
 }
