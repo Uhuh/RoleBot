@@ -136,8 +136,17 @@ export class RoleBot extends Discord.Client {
       port: 5432,
       database: config.POSTGRES_DATABASE,
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
-      logging: false,
+      logging: ['error', 'warn'],
       synchronize: config.SYNC_DB,
+      poolErrorHandler: (error) => {
+        this.log.error(`DataSource pool error. Cluster[${getInfo().CLUSTER}]\n${error}`);
+      },
+      extra: {
+        idleTimeoutMillis: 60000,
+      },
+      cache: {
+        duration: 60_000,
+      }
     });
 
     await dataSource.initialize()
