@@ -8,7 +8,6 @@ import {
 } from 'discord.js';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { SlashCommand } from '../command';
-import { clusterClientInstance } from '../../src/bot-start';
 
 export class InfoBaseCommand extends SlashCommand {
   constructor() {
@@ -35,8 +34,8 @@ export class InfoBaseCommand extends SlashCommand {
   execute = async (interaction: ChatInputCommandInteraction) => {
     const embed = new EmbedBuilder();
     const [size, memberCount] = await Promise.all([
-      clusterClientInstance.fetchClientValues('guilds.cache.size'),
-      clusterClientInstance.broadcastEval((c) =>
+      interaction.client.shard?.fetchClientValues('guilds.cache.size'),
+      interaction.client.shard?.broadcastEval((c) =>
         c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0),
       ),
     ]);

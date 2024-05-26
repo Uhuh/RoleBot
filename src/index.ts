@@ -1,17 +1,9 @@
 import * as dotenv from 'dotenv';
 import { LogService } from './services/logService';
-import { ClusterManager } from 'discord-hybrid-sharding';
+import { ShardHandler } from './shardHandler';
 
 dotenv.config();
 
-const logger = new LogService('ClusterManager');
+const shardHandler = new ShardHandler();
 
-const manager = new ClusterManager('./build/src/bot-start.js', {
-  totalShards: 'auto',
-  shardsPerClusters: 2,
-  mode: 'process',
-  token: process.env.TOKEN,
-});
-
-manager.on('clusterCreate', cluster => logger.info(`Launched Cluster ${cluster.id}`));
-manager.spawn({ timeout: -1 });
+void shardHandler.startShards(Number(process.env.SHARD_COUNT) ?? 1);

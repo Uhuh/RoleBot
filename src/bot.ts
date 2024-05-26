@@ -13,7 +13,6 @@ import { DELETE_JOIN_ROLE, GET_GUILD_JOIN_ROLES } from './database/queries/joinR
 import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage.query';
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 import { SlashCommand } from '../commands/command';
-import { getInfo } from 'discord-hybrid-sharding';
 
 export class RoleBot extends Discord.Client {
   config: typeof config;
@@ -38,8 +37,6 @@ export class RoleBot extends Discord.Client {
       ],
       // RoleBot does a lot of role "pings" for visuals, don't allow it to actually mention roles. 
       allowedMentions: { parse: [] },
-      shards: getInfo().SHARD_LIST,
-      shardCount: getInfo().TOTAL_SHARDS,
     });
 
     this.config = config;
@@ -74,7 +71,7 @@ export class RoleBot extends Discord.Client {
         return;
       }
 
-      guildUpdate(guild, 'Joined').catch((e) =>
+      guildUpdate(guild, 'Joined', this).catch((e) =>
         this.log.error(`Failed to send webhook for guild join.\n${e}`),
       );
     });
@@ -84,7 +81,7 @@ export class RoleBot extends Discord.Client {
         return;
       }
 
-      guildUpdate(guild, 'Left').catch((e) =>
+      guildUpdate(guild, 'Left', this).catch((e) =>
         this.log.error(`Failed to send webhook for guild leave.\n${e}`),
       );
     });
@@ -136,17 +133,18 @@ export class RoleBot extends Discord.Client {
       port: 5432,
       database: config.POSTGRES_DATABASE,
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
-      logging: ['error', 'warn'],
+      logging: ['warn', 'error'],
+      logger: 'advanced-console',
       synchronize: config.SYNC_DB,
       poolErrorHandler: (error) => {
-        this.log.error(`DataSource pool error. Cluster[${getInfo().CLUSTER}]\n${error}`);
-      },
-      extra: {
-        idleTimeoutMillis: 60000,
+        this.log.error(`DataSource pool error. Shards[${this.shard?.ids}]\n${error}`);
       },
       cache: {
-        duration: 60_000,
-      }
+        type: 'database',
+        alwaysEnabled: true,
+        duration: 60000,
+      },
+      maxQueryExecutionTime: 1000,
     });
 
     await dataSource.initialize()

@@ -20,7 +20,6 @@ import {
 import { RolePing } from '../../utilities/utilPings';
 import { isValidRolePosition } from '../../utilities/utils';
 import { SlashSubCommand } from '../command';
-import { clusterClientInstance } from '../../src/bot-start';
 
 const enum CommandOptionNames {
   Role = 'role',
@@ -265,7 +264,7 @@ export class CreateSubcommand extends SlashSubCommand {
   ) {
     try {
       const emojis = (
-        await clusterClientInstance.broadcastEval((c) =>
+        await interaction.client.shard?.broadcastEval((c) =>
           c.guilds.cache.map((g) => g.emojis.cache),
         )
       )?.flat(3);
