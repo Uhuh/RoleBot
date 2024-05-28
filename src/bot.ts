@@ -103,7 +103,7 @@ export class RoleBot extends Discord.Client {
         if (!joinRoles.length) return;
 
         member.roles.add(joinRoles.map((r) => r.roleId)).catch((e) => {
-          this.log.debug(`Issue giving member join roles\n${e}`);
+          this.log.debug(`Issue giving member join roles\n${e}`, member.guild.id);
         });
       } catch (e) {
         this.log.error(`Failed to get join roles for new member.\n${e}`, member.guild.id);
@@ -133,16 +133,10 @@ export class RoleBot extends Discord.Client {
       port: 5432,
       database: config.POSTGRES_DATABASE,
       entities: [ReactMessage, ReactRole, Category, GuildConfig, JoinRole],
-      logging: ['warn', 'error'],
-      logger: 'advanced-console',
+      logging: ['error', 'warn'],
       synchronize: config.SYNC_DB,
       poolErrorHandler: (error) => {
         this.log.error(`DataSource pool error. Shards[${this.shard?.ids}]\n${error}`);
-      },
-      cache: {
-        type: 'database',
-        alwaysEnabled: true,
-        duration: 60000,
       },
       maxQueryExecutionTime: 1000,
     });
