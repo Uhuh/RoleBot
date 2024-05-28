@@ -28,9 +28,12 @@ export const CREATE_REACT_MESSAGE = async (
   return reactMessage.save();
 };
 
-export const GET_REACT_MESSAGE_BY_CATEGORY_ID = async (categoryId: number) => {
+export const GET_GUILD_REACT_MESSAGE_BY_CATEGORY_ID = async (guildId: string, categoryId: number) => {
   return await ReactMessage.findOne({
-    where: { categoryId },
+    where: { categoryId, guildId },
+    order: {
+      messageId: 'DESC'
+    },
   });
 };
 
