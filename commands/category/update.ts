@@ -133,16 +133,21 @@ export class UpdateSubCommand extends SlashSubCommand {
       config = await CREATE_GUILD_CONFIG(guildId);
     }
 
-    try {
-      // Remove all react messages since they are created and depend on RoleBots reactions
-      await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
+    let failedToRemoveReactions = false;
 
-      // Clear all reactions to remove any old incorrect reactions.
+    try {
+      /**
+       * Attempt to remove reactions from embed. It's possible the user failed to give RoleBot MANAGE_MESSAGES
+       */
       await message.reactions
         .removeAll()
-        .catch(() =>
-          this.log.info(`Failed to remove all reactions.`, message.guildId),
-        );
+        .catch(() => {
+          failedToRemoveReactions = true;
+          this.log.info(`Failed to remove all reactions.`, message.guildId);
+        });
+
+      // Remove all react messages since they are created and depend on RoleBots reactions
+      await DELETE_REACT_MESSAGES_BY_MESSAGE_ID(reactMessage.messageId);
 
       switch (config.reactType) {
         case GuildReactType.button:
@@ -166,9 +171,11 @@ export class UpdateSubCommand extends SlashSubCommand {
             config.hideEmbed,
           );
 
-          return interaction.editReply(
-            `Hey! I've successfully re-reacted to the message for you.`,
-          );
+          if (failedToRemoveReactions) {
+            await interaction.editReply(`I failed to properly update the messages reactions. This is usually caused by not giving me "MANAGE_MESSAGE" permissions in a channel.`);
+          } else {
+            await interaction.editReply(`Hey! I've successfully re-reacted to the message for you.`);
+          }
       }
     } catch (e) {
       this.log.error(
