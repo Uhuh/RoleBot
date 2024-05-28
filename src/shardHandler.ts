@@ -30,8 +30,9 @@ export class ShardHandler {
     });
   }
 
-  startShards = async (numShards: number) => {
-    this.log.info(`Spawning ${numShards} shards...`);
+  startShards = async () => {
+    this.log.info(`Spawning shards...`);
+    
     this.manager
       .spawn({
         delay: 1000,
