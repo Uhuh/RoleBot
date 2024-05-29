@@ -28,53 +28,37 @@ export class ButtonHandler {
      * This can happen if users swap types and leave old messages up.
      */
     if (config?.reactType !== GuildReactType.button) {
-      return interaction.editReply(
-        `Hey! The server doesn't use button roles! The button you clicked must be out of date.`,
-      );
+      this.log.debug(`User pressed button when guild config isn't button.`, guildId);
+      return interaction.editReply(`Hey! The server doesn't use button roles! The button you clicked must be out of date.`);
     }
 
     const [reactRoleId, categoryId] = args;
 
     if (isNaN(Number(reactRoleId)) || isNaN(Number(categoryId))) {
-      return interaction.editReply(
-        `Hey! Something went wrong with processing that button press! reactRoleId: ${reactRoleId} | categoryId: ${categoryId}`,
-      );
+      this.log.error(`Invalid reactRoleId[${reactRoleId}] or categoryId[${categoryId}] for button press.`, guildId);
+      return interaction.editReply(`Hey! Something went wrong with processing that button press! reactRoleId: ${reactRoleId} | categoryId: ${categoryId}`);
     }
 
     const reactRole = await GET_REACT_ROLE_BY_ID(Number(reactRoleId));
     const category = await GET_CATEGORY_BY_ID(Number(categoryId));
 
     if (!reactRole || !category) {
-      return interaction.editReply(
-        `Hey! I failed to find the react role or category related to this button.`,
-      );
+      this.log.debug(`ReactRole[${reactRole}] of Category[${categoryId}] could not be found`, guildId);
+      return interaction.editReply(`Hey! I failed to find the react role or category related to this button.`);
     }
 
     const member = await interaction.guild?.members
       .fetch(interaction.user.id)
-      .catch((e) =>
-        this.log.error(
-          `Fetching user[${interaction.user.id}] threw an error.\n${e}`,
-        ),
-      );
+      .catch(e => this.log.error(`Fetching user[${interaction.user.id}] threw an error.\n${e}`));
 
     if (!member) {
-      this.log.debug(
-        `Failed to grab member object from interaction.`,
-        interaction.guildId,
-      );
+      this.log.debug(`Failed to grab member object from interaction.`, interaction.guildId);
 
-      return interaction.editReply(
-        `Heyo! I had some issues finding _you_ here.`,
-      );
+      return interaction.editReply(`Heyo! I had some issues finding _you_ here.`);
     }
 
     // If the category limits who can react and the user doesn't have said role ignore request.
-    if (
-      category.requiredRoleId &&
-      !member.roles.cache.has(category.requiredRoleId)
-    ) {
-      // Remove reaction as to not confuse the user that they succeeded.
+    if (category.requiredRoleId && !member.roles.cache.has(category.requiredRoleId)) {
       return interaction.editReply(
         `Hey! You lack the required role to get anything from this category. ${RolePing(
           category.requiredRoleId,
@@ -83,10 +67,7 @@ export class ButtonHandler {
     }
 
     // If the category has an excluded role, and the user has said excluded role, ignore request.
-    if (
-      category.excludedRoleId &&
-      member.roles.cache.has(category.excludedRoleId)
-    ) {
+    if (category.excludedRoleId && member.roles.cache.has(category.excludedRoleId)) {
       return interaction.editReply(
         `Heyo! You have a role that prevents you from obtaining anything from this category. ${RolePing(
           category.excludedRoleId,
@@ -109,6 +90,8 @@ export class ButtonHandler {
         )}. Do I have manage role permissions?`,
       );
     };
+
+    this.log.debug(`User[${member.id}] pressed button for ReactRole[${reactRoleId}] Category[${categoryId}]`, guildId);
 
     // Remove the role if the user has it. Should catch mutually exclusive removes too.
     if (member.roles.cache.has(reactRole.roleId)) {
@@ -158,19 +141,13 @@ export class ButtonHandler {
     );
 
     await member.roles.remove(rolesToRemove).catch((e) => {
-      this.log.error(
-        `Failed to remove roles[${rolesToRemove}] from user[${member.id}]\n${e}`,
-      );
+      this.log.error(`Failed to remove roles[${rolesToRemove}] from user[${member.id}]\n${e}`);
 
-      return interaction.editReply(
-        `Hey! I couldn't remove some mutually exclusive roles from you. Do I have the manage role permission?`,
-      );
+      return interaction.editReply(`Hey! I couldn't remove some mutually exclusive roles from you. Do I have the manage role permission?`);
     });
 
     await member.roles.add(role.roleId).catch((e) => {
-      this.log.error(
-        `Failed to add role[${role.roleId}] from user[${member.id}]\n${e}`,
-      );
+      this.log.error(`Failed to add role[${role.roleId}] from user[${member.id}]\n${e}`);
 
       return interaction.editReply(
         `Hey! I couldn't add the role ${RolePing(
@@ -178,13 +155,13 @@ export class ButtonHandler {
         )}. Do I the manage roles permission?`,
       );
     });
-    
+
     const removedRoles = ` and removed ${rolesToRemove.map((r) => RolePing(r.id)).join(' ')}`;
 
     return interaction.editReply(
       `Hey! I gave you the ${RolePing(
         role.roleId,
-      )} role${ rolesToRemove.size ? removedRoles : '.'}`,
+      )} role${rolesToRemove.size ? removedRoles : '.'}`,
     );
   };
 }
