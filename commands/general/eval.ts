@@ -44,7 +44,7 @@ export class EvalBaseCommand extends SlashCommand {
       const output = eval(content);
       console.log(output);
 
-      const embed = this.buildEmbed(output);
+      const embed = this.buildEmbed(`${content}\n\n${output}`);
 
       await interaction.reply({
         embeds: [embed],
