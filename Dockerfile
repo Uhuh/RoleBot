@@ -1,6 +1,8 @@
-FROM node:20 as base
+FROM node:alpine as base
 
 WORKDIR /home/panku/Rolebot
+
+RUN apk update && apk add --no-cache bash && apk --no-cache add curl
 
 COPY package*.json ./
 COPY yarn.lock ./
