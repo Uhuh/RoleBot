@@ -14,6 +14,22 @@ import { DELETE_REACT_MESSAGE_BY_ROLE_ID } from './database/queries/reactMessage
 import { DELETE_REACT_ROLE_BY_ROLE_ID } from './database/queries/reactRole.query';
 import { SlashCommand } from '../commands/command';
 
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  integrations: [
+    nodeProfilingIntegration(),
+  ],
+  // Performance Monitoring
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
+
+
 export class RoleBot extends Discord.Client {
   config: typeof config;
   commands: Discord.Collection<string, SlashCommand>;
@@ -147,6 +163,17 @@ export class RoleBot extends Discord.Client {
     this.log.info(`Connecting to Discord with bot token.`);
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
+
+    Sentry.startSpan({
+      op: 'test',
+      name: 'My First Test Span',
+    }, () => {
+      try {
+        throw Error('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA :3');
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
 
     // 741682757486510081 - New RoleBot application.
     await buildNewCommands(false, config.CLIENT_ID !== '741682757486510081');

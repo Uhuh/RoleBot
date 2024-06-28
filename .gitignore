@@ -7,3 +7,5 @@ build
 .vscode
 errors.log
 roles.sqlite*
+# Sentry Config File
+.sentryclirc

@@ -16,7 +16,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "inlineSources": true,
+    "sourceRoot": "/"
   },
   "include": [
     "src/",
