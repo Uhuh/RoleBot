@@ -2,10 +2,16 @@ version: '3.8'
 
 services:
   rolebot-docker:
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
       target: base
+      args:
+        SENTRY_ORG: ${SENTRY_ORG}
+        SENTRY_PROJECT: ${SENTRY_PROJECT}
+        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}  
     volumes:
       - ./src:/home/panku/RoleBot/src
     restart: always
