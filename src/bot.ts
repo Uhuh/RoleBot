@@ -164,17 +164,6 @@ export class RoleBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     this.log.info('Bot connected.');
 
-    Sentry.startSpan({
-      op: 'test',
-      name: 'My First Test Span',
-    }, () => {
-      try {
-        throw Error('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA :3');
-      } catch (e) {
-        Sentry.captureException(e);
-      }
-    });
-
     // 741682757486510081 - New RoleBot application.
     await buildNewCommands(false, config.CLIENT_ID !== '741682757486510081');
   };
