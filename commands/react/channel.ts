@@ -2,7 +2,7 @@ import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChannelType,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageFlags,
   TextChannel,
 } from 'discord.js';
 import { setTimeout } from 'timers/promises';
@@ -125,7 +125,7 @@ export class ChannelSubCommand extends SlashSubCommand {
     const { guildId } = interaction;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     /**

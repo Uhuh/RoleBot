@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { GET_GUILD_CATEGORIES } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLES_NOT_IN_CATEGORIES } from '../../src/database/queries/reactRole.query';
 import { spliceIntoChunks } from '../../utilities/utils';
@@ -21,7 +21,7 @@ export class ListSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const categories = await GET_GUILD_CATEGORIES(interaction.guildId).catch(
@@ -58,7 +58,7 @@ export class ListSubCommand extends SlashSubCommand {
 
     for (const chunk of spliceIntoChunks(embeds, 10)) {
       await interaction.followUp({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         embeds: chunk,
       });
 

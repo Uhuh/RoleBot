@@ -1,7 +1,12 @@
 ﻿import { LinkedRole, ReactRole } from '../entities';
 
 export const GET_LINKED_ROLES = (reactRoleId: number) => {
-  return LinkedRole.find({ where: { roleId: '1' } });
+  return LinkedRole.find({
+    where: { roleId: `${reactRoleId}` },
+    relations: {
+      reactRole: true,
+    },
+  });
 };
 
 export const CREATE_LINKED_ROLES = async (guildId: string, roleId: string, reactRole: ReactRole) => {
@@ -20,5 +25,10 @@ export const FIND_ROLE_IN_LINK = (reactRoleId: number, roleId: string) => {
 };
 
 export const GET_GUILDS_LINKED_ROLES = (guildId: string) => {
-  return LinkedRole.find({ where: { guildId } });
+  return LinkedRole.find({
+    where: { guildId },
+    relations: {
+      reactRole: true,
+    },
+  });
 };

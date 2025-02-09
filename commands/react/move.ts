@@ -2,7 +2,7 @@ import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  codeBlock,
+  codeBlock, MessageFlags,
 } from 'discord.js';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { GET_REACT_ROLE_BY_ROLE_ID, UPDATE_REACT_ROLE_CATEGORY } from '../../src/database/queries/reactRole.query';
@@ -51,7 +51,7 @@ export class MoveSubCommand extends SlashSubCommand {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {

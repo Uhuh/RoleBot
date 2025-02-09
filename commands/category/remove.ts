@@ -1,4 +1,9 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  MessageFlags,
+} from 'discord.js';
 import { DELETE_CATEGORY_BY_ID, GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
 import { SlashSubCommand } from '../command';
@@ -43,7 +48,7 @@ export class RemoveSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const categoryId = interaction.options.getString(CommandOptionNames.Category);

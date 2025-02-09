@@ -2,7 +2,7 @@ import {
   ActionRowBuilder,
   ChatInputCommandInteraction,
   Colors,
-  EmbedBuilder,
+  EmbedBuilder, MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
@@ -88,7 +88,7 @@ export class HelpBaseCommand extends SlashCommand {
 
     interaction
       .reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         embeds: [embed],
         components: [selectMenu],
       })

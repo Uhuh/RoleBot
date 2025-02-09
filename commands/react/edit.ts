@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, parseEmoji } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags, parseEmoji } from 'discord.js';
 import {
   GET_REACT_ROLE_BY_EMOJI,
   GET_REACT_ROLE_BY_ROLE_ID,
@@ -43,7 +43,7 @@ export class EditSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {

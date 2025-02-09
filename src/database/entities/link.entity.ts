@@ -13,6 +13,6 @@ export class LinkedRole extends BaseEntity {
   @Column()
   roleId: string;
 
-  @ManyToMany(() => ReactRole, (reactRole) => reactRole.linkedRoles)
+  @ManyToOne(() => ReactRole, (reactRole) => reactRole.linkedRoles)
   reactRole: ReactRole;
 }

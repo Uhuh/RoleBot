@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { DELETE_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLE_BY_ROLE_ID } from '../../src/database/queries/reactRole.query';
 import { RolePing } from '../../utilities/utilPings';
 import { ReactMessageUpdate, updateReactMessages } from '../../utilities/utils';
@@ -24,7 +24,7 @@ export class RemoveSubCommand extends SlashSubCommand {
     const role = interaction.options.getRole(CommandOptionNames.Role);
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     if (!role) {

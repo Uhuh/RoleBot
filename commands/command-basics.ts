@@ -1,7 +1,7 @@
 import {
   AutocompleteInteraction,
   ButtonInteraction,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageFlags,
   SelectMenuInteraction,
 } from 'discord.js';
 import { CustomError } from '../src/error/custom.error';
@@ -123,7 +123,7 @@ export class CommandBasics extends CommandHandlers {
         return interaction.editReply(errorMessage);
       } else {
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           content: errorMessage,
         });
       }

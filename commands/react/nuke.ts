@@ -3,7 +3,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageFlags,
 } from 'discord.js';
 import { DELETE_REACT_MESSAGES_BY_GUILD_ID } from '../../src/database/queries/reactMessage.query';
 import { DELETE_ALL_REACT_ROLES_BY_GUILD_ID } from '../../src/database/queries/reactRole.query';
@@ -45,7 +45,7 @@ export class NukeSubCommand extends SlashSubCommand {
         );
 
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           content: `Hey! I deleted all your react roles. Any categories that had react roles are now empty.`,
         });
       })
@@ -56,7 +56,7 @@ export class NukeSubCommand extends SlashSubCommand {
         );
 
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           content: `Hey! I had an issue deleting all the react roles.`,
         });
       });
@@ -71,7 +71,7 @@ export class NukeSubCommand extends SlashSubCommand {
     );
 
     return interaction.reply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
       components: [buttons],
       content: `This action is irreversible. By confirming you are deleting all react roles currently setup for this server.`,
     });

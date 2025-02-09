@@ -55,6 +55,9 @@ export const GET_REACT_ROLE_BY_ID = (id: number) => {
     where: {
       id,
     },
+    relations: {
+      linkedRoles: true,
+    },
   });
 };
 
@@ -62,6 +65,9 @@ export const GET_REACT_ROLE_BY_ROLE_ID = (roleId: string) => {
   return ReactRole.findOne({
     where: {
       roleId,
+    },
+    relations: {
+      linkedRoles: true,
     },
   });
 };

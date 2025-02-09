@@ -165,7 +165,7 @@ export class RoleBot extends Discord.Client {
     this.log.info('Bot connected.');
 
     // 741682757486510081 - New RoleBot application.
-    await buildNewCommands(false, config.CLIENT_ID !== '741682757486510081');
+    await buildNewCommands(true, config.CLIENT_ID !== '741682757486510081');
   };
 
   private updatePresence = () => {

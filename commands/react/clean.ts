@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { DELETE_REACT_ROLE_BY_ROLE_ID, GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { SlashSubCommand } from '../command';
 
@@ -17,7 +17,7 @@ export class CleanSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     let numRemovedRoles = 0;

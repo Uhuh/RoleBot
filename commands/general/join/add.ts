@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import {
   CREATE_JOIN_ROLE,
   GET_GUILD_JOIN_ROLES,
@@ -27,7 +27,7 @@ export class AddSubCommand extends SlashSubCommand {
     if (!interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {

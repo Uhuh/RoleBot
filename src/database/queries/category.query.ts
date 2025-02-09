@@ -16,6 +16,9 @@ export const GET_ROLES_BY_CATEGORY_ID = async (
   return await ReactRole.find({
     where: { category: { id: categoryId } },
     order: orderProperties,
+    relations: {
+      linkedRoles: true,
+    },
   });
 };
 

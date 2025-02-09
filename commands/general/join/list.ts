@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { GET_GUILD_JOIN_ROLES } from '../../../src/database/queries/joinRole.query';
 import { SlashSubCommand } from '../../command';
 import { joinRoleEmbed } from '../../../utilities/utilEmbedHelpers';
@@ -12,7 +12,7 @@ export class ListSubCommand extends SlashSubCommand {
     if (!interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const joinRoles = await GET_GUILD_JOIN_ROLES(interaction.guildId);

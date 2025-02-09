@@ -4,7 +4,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  ManyToOne,
+  ManyToOne, OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';import { Category } from './category.entity';
 import { LinkedRole } from './link.entity';
@@ -50,7 +50,7 @@ export class ReactRole extends BaseEntity {
   @JoinTable()
   category?: Category;
 
-  @ManyToMany(() => LinkedRole, (linkedRoles) => linkedRoles.reactRole, { cascade: true })
+  @OneToMany(() => LinkedRole, (linkedRoles) => linkedRoles.reactRole, { cascade: true })
   @JoinTable()
   linkedRoles: LinkedRole[];
 

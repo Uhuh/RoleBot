@@ -5,7 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
-  EmbedBuilder,
+  EmbedBuilder, MessageFlags,
   parseEmoji,
   PartialEmoji,
   Role,
@@ -54,7 +54,7 @@ export class CreateSubcommand extends SlashSubCommand {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const { guild } = interaction;

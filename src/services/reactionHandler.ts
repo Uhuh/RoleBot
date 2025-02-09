@@ -1,4 +1,12 @@
-import { Guild, GuildMember, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
+import {
+  Guild,
+  GuildMember,
+  MessageReaction,
+  MessageReactionEventDetails,
+  PartialMessageReaction,
+  PartialUser,
+  User,
+} from 'discord.js';
 
 import { ReactMessage } from '../database/entities';
 import { GET_CATEGORY_BY_ID } from '../database/queries/category.query';
@@ -17,13 +25,19 @@ export class ReactionHandler {
   handleReaction = async (
     reaction: MessageReaction | PartialMessageReaction,
     user: User | PartialUser,
+    details: MessageReactionEventDetails,
     type: 'add' | 'remove',
   ) => {
-    if (!reaction || user.bot) return;
+    if (!reaction || user.bot) {
+      return;
+    }
+
     const { message, emoji } = reaction;
     const { guild } = message;
 
-    if (!guild) return;
+    if (!guild) {
+      return;
+    }
 
     const emojiId = emoji.id || emoji.name;
 
@@ -85,12 +99,10 @@ export class ReactionHandler {
 
     switch (type) {
       case 'add':
-        this.handleRoleAdd(member, reactMessage, guild.id);
+        this.handleRoleAdd(member, reactMessage);
         break;
       case 'remove':
-        member.roles
-          .remove(reactMessage.roleId)
-          .catch((e) => this.log.debug(`Cannot remove role[${reactMessage.roleId}] from user[${member?.id}]\n${e}`, guild.id));
+        this.handleRoleRemove(member, reactMessage);
     }
   };
 
@@ -150,7 +162,7 @@ export class ReactionHandler {
       );
   };
 
-  private async handleRoleAdd(member: GuildMember, reactMessage: ReactMessage, guildId: string) {
+  private async handleRoleAdd(member: GuildMember, reactMessage: ReactMessage) {
     const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactMessage.roleId);
 
     // @TODO do something smart with this
@@ -158,14 +170,20 @@ export class ReactionHandler {
       return;
     }
 
-    const linkedRoles = await GET_LINKED_ROLES(reactRole.id);
+    const roleIds = [reactMessage.roleId, ...reactRole.linkedRoles.map(l => l.roleId)];
 
-    if (!linkedRoles.length) {
+    member.roles.add(roleIds).catch(e => this.log.error(`Failed to add roles for member.\n${roleIds}\n${e}`));
+  }
+
+  private async handleRoleRemove(member: GuildMember, reactMessage: ReactMessage) {
+    const reactRole = await GET_REACT_ROLE_BY_ROLE_ID(reactMessage.roleId);
+
+    if (!reactRole) {
       return;
     }
 
-    const roleIds = [reactMessage.roleId, ...linkedRoles.map(l => l.roleId)];
+    const roleIds = [reactMessage.roleId, ...reactRole.linkedRoles.map(l => l.roleId)];
 
-    member.roles.add(roleIds).catch(e => this.log.error(`Failed to add roles to member.\n${roleIds}\n${e}`));
+    member.roles.remove(roleIds).catch(e => this.log.error(`Failed to remove roles for member.\n${roleIds}\n${e}`));
   }
 }

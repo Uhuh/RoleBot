@@ -3,7 +3,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageFlags,
 } from 'discord.js';
 import { TUTORIAL_VIDEO } from '../../src/vars';
 import tutorialJson from '../../utilities/json/tutorial.json';
@@ -65,7 +65,7 @@ export class TutorialBaseCommand extends SlashCommand {
 
     interaction
       .reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         content: `Hey! Let's get to learning.\n**Check out the [tutorial](${TUTORIAL_VIDEO})**\n`,
         embeds: [embed],
         components: [buttons],

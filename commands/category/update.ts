@@ -3,7 +3,7 @@ import {
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
-  Message,
+  Message, MessageFlags,
   TextChannel,
 } from 'discord.js';
 import { ReactRole } from '../../src/database/entities';
@@ -47,7 +47,7 @@ export class UpdateSubCommand extends SlashSubCommand {
     const { guildId } = interaction;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const messageLink = this.expect(

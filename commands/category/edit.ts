@@ -1,4 +1,9 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  MessageFlags,
+} from 'discord.js';
 import { DisplayType, ICategory } from '../../src/database/entities/category.entity';
 import { EDIT_CATEGORY_BY_ID, GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
 import { handleAutocompleteCategory } from '../../utilities/utilAutocomplete';
@@ -118,7 +123,7 @@ export class EditSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     /**

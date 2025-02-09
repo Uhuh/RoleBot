@@ -3,7 +3,7 @@ import {
   AutocompleteInteraction,
   Channel,
   ChannelType,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageFlags,
   NonThreadGuildBasedChannel,
   TextChannel,
 } from 'discord.js';
@@ -61,7 +61,7 @@ export class MessageSubCommand extends SlashSubCommand {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const { guildId } = interaction;

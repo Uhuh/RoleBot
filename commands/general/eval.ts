@@ -1,5 +1,11 @@
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, PermissionsBitField } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+  Colors,
+  MessageFlags,
+  PermissionsBitField,
+} from 'discord.js';
 import { SlashCommand } from '../command';
 import * as util from 'util';
 
@@ -29,7 +35,7 @@ export class EvalBaseCommand extends SlashCommand {
 
     if (!this.developerIds.includes(member?.user.id ?? '')) {
       await interaction.reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         content: `Nuhuhuh! You're not a dev!`,
       });
 

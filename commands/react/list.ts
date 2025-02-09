@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { GET_REACT_ROLES_BY_GUILD } from '../../src/database/queries/reactRole.query';
 import { SlashSubCommand } from '../command';
 import { reactRoleListEmbed } from '../../utilities/utilEmbedHelpers';
@@ -16,7 +16,7 @@ export class ListSubCommand extends SlashSubCommand {
     if (!interaction.isCommand() || !interaction.guildId) return;
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const reactRoles = await GET_REACT_ROLES_BY_GUILD(interaction.guildId);

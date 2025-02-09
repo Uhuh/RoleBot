@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { GuildReactType } from '../../../src/database/entities/guild.entity';
 import { CREATE_GUILD_CONFIG, EDIT_GUILD_CONFIG, GET_GUILD_CONFIG } from '../../../src/database/queries/guild.query';
 import { getGuildReactConfigValues, parseGuildReactString } from '../../../utilities/utils';
@@ -46,7 +46,7 @@ export class CategorySubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const { guildId } = interaction;

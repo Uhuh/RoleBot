@@ -5,7 +5,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, ComponentType, MessageFlags,
 } from 'discord.js';
 import { ReactRole } from '../../src/database/entities';
 import { GET_CATEGORY_BY_ID } from '../../src/database/queries/category.query';
@@ -171,7 +171,7 @@ export class AddSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const { guildId } = interaction;
@@ -262,9 +262,10 @@ export class AddSubCommand extends SlashSubCommand {
       )) {
         if (isNaN(Number(row)) || isNaN(Number(emoji))) continue;
 
-        const button = roleButtons[Number(row)].components[Number(emoji)].data;
+        const button = roleButtons[Number(row)].components[Number(emoji)];
 
-        brokenEmojis += `The react role \`${button.label}\` has an invalid emoji "${button.emoji?.name}".\n`;
+        // @ts-ignore @TODO REMOVE THIS ONCE YOU FIGURE OUT THE ISSUE :33333
+        brokenEmojis += `The react role \`${button}\` has an invalid emoji "${button.emoji?.name}".\n`;
       }
     }
 

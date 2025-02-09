@@ -5,7 +5,7 @@ import {
   ChatInputCommandInteraction,
   CommandInteraction,
   Interaction,
-  Message,
+  Message, MessageFlags,
   Role,
   SelectMenuInteraction,
 } from 'discord.js';
@@ -170,10 +170,10 @@ export const updateReactMessages = async (
     if (failedToRemoveReactions) {
       const messageLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
       log.debug(`Informing user RoleBot failed to update the message properly.`, guildId);
-      
+
       await interaction.followUp({
         content: `I failed to update the messages reactions. This is usually caused by not giving me "MANAGE_MESSAGE" permissions in a channel.\n\nThe message I tried updating: ${messageLink}`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral
       });
     }
   } catch (e) {
@@ -214,15 +214,21 @@ export const handleInteractionReply = (
     | SelectMenuInteraction,
   content: { content: string; ephemeral?: boolean } | string,
 ) => {
-  interaction.reply(content).catch((interactionError) => {
-    interaction.channel
-      ?.send(typeof content === 'string' ? content : content.content)
-      .catch((channelError) =>
-        logger.error(
-          `Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`,
-        ),
-      );
-  });
+  interaction
+    .reply(content)
+    .catch((interactionError) => {
+      if (!interaction.channel || !('send' in interaction.channel)) {
+        return;
+      }
+
+      interaction.channel
+        .send(typeof content === 'string' ? content : content.content)
+        .catch((channelError) =>
+          logger.error(
+            `Failed to reply to interaction and failed to send channel message.\n\t\t\t${interactionError}\n\t\t\t${channelError}`,
+          ),
+        );
+    });
 };
 
 /**

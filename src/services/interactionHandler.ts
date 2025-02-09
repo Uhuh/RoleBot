@@ -2,7 +2,7 @@ import {
   AutocompleteInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
-  Interaction,
+  Interaction, MessageFlags,
   SelectMenuInteraction,
 } from 'discord.js';
 import { SUPPORT_URL } from '../vars';
@@ -155,14 +155,14 @@ export class InteractionHandler {
       if (commandName === 'react-button') {
         await interaction
           .deferReply({
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           })
           .catch((e) => {
             this.log.error(
               `Failed to defer interaction for button react role type.\n${e}`,
             );
             return interaction.reply({
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
               content: `Failed to defer interaction! Oops?!?`,
             });
           });

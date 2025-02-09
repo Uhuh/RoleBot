@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { DisplayType } from '../../src/database/entities/category.entity';
 import { CREATE_GUILD_CATEGORY, GET_CATEGORY_BY_NAME } from '../../src/database/queries/category.query';
 import {
@@ -94,7 +94,7 @@ export class CreateSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     // Essentials

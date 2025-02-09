@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { DELETE_JOIN_ROLE, GET_JOIN_ROLE_BY_ID } from '../../../src/database/queries/joinRole.query';
 import { SlashSubCommand } from '../../command';
 
@@ -20,7 +20,7 @@ export class RemoveSubCommand extends SlashSubCommand {
 
   execute = async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const role = this.expect(interaction.options.getRole(CommandOptionNames.Role), {
