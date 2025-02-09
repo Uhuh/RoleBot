@@ -4,7 +4,8 @@ import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  Role
+  MessageFlags,
+  Role,
 } from 'discord.js';
 import { handleAutocompleteReactRoles } from '../../utilities/utilAutocomplete';
 import { CREATE_LINKED_ROLES, FIND_ROLE_IN_LINK } from '../../src/database/queries/link.query';
@@ -35,8 +36,8 @@ export class CreateSubCommand extends SlashSubCommand {
           description: 'The role to link with.',
           type: ApplicationCommandOptionType.Role,
           required: true,
-        }
-      ]
+        },
+      ],
     );
   }
 
@@ -58,7 +59,7 @@ export class CreateSubCommand extends SlashSubCommand {
     }
 
     await interaction.deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const reactRoleId = this.expect(interaction.options.getString(CommandOptionsNames.ReactRole), {
@@ -77,8 +78,12 @@ export class CreateSubCommand extends SlashSubCommand {
 
     const role = this.expect(interaction.options.getRole(CommandOptionsNames.Role), {
       message: 'Failed to find that role! Try again.',
-      prop: CommandOptionsNames.Role
+      prop: CommandOptionsNames.Role,
     });
+
+    if (role.managed) {
+      return interaction.editReply(`Hey! ${role} is a managed role for another application, try another role!`);
+    }
 
     const isRoleInLink = await FIND_ROLE_IN_LINK(reactRole.id, role.id);
 
@@ -95,10 +100,8 @@ export class CreateSubCommand extends SlashSubCommand {
     // Should've been verified in execute
     if (!guildId) return;
 
-    const linkedRoles = await CREATE_LINKED_ROLES(guildId, role.id, reactRole);
+    await CREATE_LINKED_ROLES(guildId, role.id, reactRole);
 
-    console.log(linkedRoles);
-
-    return interaction.editReply(`Successfully linked ${role} to the react role ${reactRole.name}`);
+    return interaction.editReply(`Successfully linked ${role} to the react role \`${reactRole.name}\``);
   }
 }
