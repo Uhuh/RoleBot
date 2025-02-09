@@ -3,7 +3,7 @@ import { GET_GUILD_CATEGORIES } from '../src/database/queries/category.query';
 import { GET_REACT_ROLES_BY_GUILD } from '../src/database/queries/reactRole.query';
 
 export async function handleAutocompleteCategory(
-  interaction: AutocompleteInteraction
+  interaction: AutocompleteInteraction,
 ) {
   if (!interaction.guildId) return;
 
@@ -13,7 +13,7 @@ export async function handleAutocompleteCategory(
   const filtered = categories.filter((c) => c.name.toLowerCase().startsWith(focusedValue));
 
   return interaction.respond(
-    filtered.map((c) => ({ name: c.name, value: `${c.id}` }))
+    filtered.map((c) => ({ name: c.name, value: `${c.id}` })),
   );
 }
 

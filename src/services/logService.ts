@@ -35,14 +35,52 @@ const labelMap: Record<LogLevel, string> = {
 };
 
 export class LogService {
+  private readonly roleBotErrorEventsWebhook: WebhookClient;
+
   constructor(prefix: string) {
     this._prefix = prefix;
+
+    if (!process.env.ERROR_WEBHOOK) {
+      return;
+    }
+    
+    this.roleBotErrorEventsWebhook = new WebhookClient({
+      url: process.env.ERROR_WEBHOOK,
+    });
+
+    /**
+     * Discord webhook ratelimit is 20 / minute
+     * To prevent RoleBot from getting your Discord IP blocked for an hour
+     * collect all errors and batch submit them every minute.
+     */
+    // setInterval(() => {
+    //   this.batchSendErrors();
+    // }, 60 * 1000);
   }
 
   _prefix: string;
 
   get prefix() {
     return `[ ${this._prefix} ]`;
+  }
+
+  private errors: string[] = [];
+
+  private batchSendErrors() {
+    const formattedErrors = this.errors.join('\n');
+
+    if (!formattedErrors.length) {
+      return;
+    }
+
+    this.roleBotErrorEventsWebhook.send({
+      embeds: [errorEmbed(formattedErrors)],
+    }).catch((e) =>
+      console.log(`- [ LogService ] RoleBotEventsWebhook threw an error.\n${e}`),
+    );
+    
+    // We want to clear memory and all errors we just logged.
+    this.errors.length = 0;
   }
 
   log(level: LogLevel, content: string, guildId?: string | null) {
@@ -54,24 +92,13 @@ export class LogService {
 
     const logContent = `${guildString} ${this.prefix} ${content}`;
 
+    // Log everything for the docker container.
     console.log(`${logTypeDate} ${logContent}`);
 
-    if (!process.env.ERROR_WEBHOOK) return;
-
-    const RoleBotErrorEventsWebhook = new WebhookClient({
-      url: process.env.ERROR_WEBHOOK,
-    });
-
-    if (level == LogLevel.critical || level == LogLevel.error) {
-      RoleBotErrorEventsWebhook.send({
-        embeds: [errorEmbed(logContent)],
-      }).catch((e) =>
-        console.log(
-          logTypeDate,
-          `- [ LogService ] RoleBotEventsWebhook threw an error.\n\t\t\t\t\t ${e}`
-        )
-      );
-    }
+    // We want to batch send errors to the discord webhook.
+    // if (level == LogLevel.critical || level == LogLevel.error) {
+    //   this.errors.push(logContent);
+    // }
   }
 
   error(content: string, guildId?: string | null) {

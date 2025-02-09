@@ -1,7 +1,7 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
 import { GuildReactType } from '../../../src/database/entities/guild.entity';
-import { CREATE_GUILD_CONFIG, EDIT_GUILD_CONFIG, GET_GUILD_CONFIG, } from '../../../src/database/queries/guild.query';
-import { getGuildReactConfigValues, parseGuildReactString, } from '../../../utilities/utils';
+import { CREATE_GUILD_CONFIG, EDIT_GUILD_CONFIG, GET_GUILD_CONFIG } from '../../../src/database/queries/guild.query';
+import { getGuildReactConfigValues, parseGuildReactString } from '../../../utilities/utils';
 import { SlashSubCommand } from '../../command';
 import { guildConfig } from '../../../utilities/utilEmbedHelpers';
 
@@ -36,7 +36,7 @@ export class CategorySubCommand extends SlashSubCommand {
             'Change if RoleBot uses an embed or just a normal message.',
           type: ApplicationCommandOptionType.Boolean,
         },
-      ]
+      ],
     );
   }
 
@@ -59,7 +59,7 @@ export class CategorySubCommand extends SlashSubCommand {
 
     const reactTypeString = interaction.options.getString(CommandOptionNames.ReactType);
     const reactType = parseGuildReactString(
-      reactTypeString as keyof typeof GuildReactType
+      reactTypeString as keyof typeof GuildReactType,
     );
     const hideEmojis = interaction.options.getBoolean(CommandOptionNames.HideEmojis);
     const hideEmbed = interaction.options.getBoolean(CommandOptionNames.HideEmbed);

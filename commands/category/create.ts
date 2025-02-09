@@ -1,6 +1,6 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
 import { DisplayType } from '../../src/database/entities/category.entity';
-import { CREATE_GUILD_CATEGORY, GET_CATEGORY_BY_NAME, } from '../../src/database/queries/category.query';
+import { CREATE_GUILD_CATEGORY, GET_CATEGORY_BY_NAME } from '../../src/database/queries/category.query';
 import {
   getDisplayCommandChoices,
   getImageTypeCommandChoices,
@@ -84,7 +84,7 @@ export class CreateSubCommand extends SlashSubCommand {
           description: 'The hexcode you want the embed sidebar to be. Don\'t include the #.',
           type: ApplicationCommandOptionType.String,
         },
-      ]
+      ],
     );
   }
 
@@ -115,24 +115,24 @@ export class CreateSubCommand extends SlashSubCommand {
 
     // Embed styling options
     const displayRoles =
-      interaction.options.getBoolean(CommandOptionNames.DisplayRoles) ?? false;
+      interaction.options.getBoolean(CommandOptionNames.DisplayRoles) ?? true;
     const imageTypeString = interaction.options.getString(CommandOptionNames.ImageType);
     const imageUrl = interaction.options.getString(CommandOptionNames.ImageUrl);
     let embedColor = interaction.options.getString(CommandOptionNames.EmbedColor);
 
     const imageType = parseImageTypeString(imageTypeString);
     const displayOrder = parseDisplayString(
-      displayString as keyof typeof DisplayType
+      displayString as keyof typeof DisplayType,
     );
 
     if (name.length > 90) {
       // Discord max embed title is 100 so let's be safe and make it smaller.
       return interaction.editReply(
-        `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`
+        `Hey! Discord only allows 100 characters max for their embed titles. Try making the category name simple and make the rest the category description!`,
       );
     } else if (await GET_CATEGORY_BY_NAME(interaction.guildId, name)) {
       return interaction.editReply(
-        `Hey! It turns out you already have a category with that name made. Try checking it out.`
+        `Hey! It turns out you already have a category with that name made. Try checking it out.`,
       );
     }
 
@@ -162,22 +162,22 @@ export class CreateSubCommand extends SlashSubCommand {
 
       this.log.info(
         `Successfully created category[${name}]`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       const invalidHex = `\n\nAn invalid hex code was provided. Remember, hex codes look like this \`ff0000\`. Use an online tool to make one.`;
 
       await interaction.editReply(
-        `Hey! I successfully created the category \`${name}\` for you!${(embedColor && !isCorrectHex) ? invalidHex : ''}`
+        `Hey! I successfully created the category \`${name}\` for you!${(embedColor && !isCorrectHex) ? invalidHex : ''}`,
       );
     } catch (e) {
       this.log.error(
         `Issue creating category[${name}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       await interaction.editReply(
-        `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`
+        `Hey! I had some trouble creating that category for you. Please wait a minute and try again.`,
       );
     }
   };

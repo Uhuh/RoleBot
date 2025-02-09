@@ -40,7 +40,7 @@ export class Category extends BaseEntity {
 
   @Column({ default: false })
   mutuallyExclusive: boolean;
-  
+
   @Column({ default: true })
   displayRoles: boolean;
 
@@ -65,7 +65,7 @@ export class Category extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: 'card'
+    default: 'card',
   })
   imageType: ImageType;
 }

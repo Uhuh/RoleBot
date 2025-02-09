@@ -6,7 +6,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { TUTORIAL_PLAYLIST } from '../../src/vars';
+import { TUTORIAL_VIDEO } from '../../src/vars';
 import { Category } from '../../utilities/types/commands';
 import { SlashCommand } from '../command';
 import { helpEmbed } from '../../utilities/utilEmbedHelpers';
@@ -19,7 +19,7 @@ export class HelpBaseCommand extends SlashCommand {
   handleSelect = (
     interaction: StringSelectMenuInteraction,
     type: string,
-    _args: string[]
+    _args: string[],
   ) => {
     if (!(type in Category)) return;
 
@@ -30,8 +30,8 @@ export class HelpBaseCommand extends SlashCommand {
       .catch(() =>
         this.log.error(
           `Error sending help embed for interaction.`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 
@@ -62,7 +62,7 @@ export class HelpBaseCommand extends SlashCommand {
             description: 'Basic commands everyone can use!',
             value: `${this.name}_${Category.general}`,
           },
-        ])
+        ]),
     );
 
     embed
@@ -81,9 +81,9 @@ export class HelpBaseCommand extends SlashCommand {
 
     embed.setDescription(
       `Hey! **If you've never used me before make sure to check out \`/tutorial\`! It'll explain how RoleBot works.**\n
-      **Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n
+      **Check out the [tutorial](${TUTORIAL_VIDEO})**\n
       **Want to host the bot yourself? Check out the [GitHub](https://github.com/Uhuh/RoleBot)**\n
-      Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`
+      Thanks for using me! I know setting up reaction roles can be scary so here's some helpful descriptions for each commands!\nI've broken them up by category for your convenience.`,
     );
 
     interaction
@@ -95,10 +95,10 @@ export class HelpBaseCommand extends SlashCommand {
       .catch((e) =>
         this.log.error(
           `Failed to defer interaction. Interaction timestamp: ${new Date(
-            interaction.createdTimestamp
+            interaction.createdTimestamp,
           )}\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 }

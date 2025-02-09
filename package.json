@@ -4,12 +4,11 @@
   "description": "Manage reaction roles",
   "main": "build/src/index.js",
   "scripts": {
-    "build": "yarn lint && tsc",
+    "build": "yarn tsc",
     "build:dist": "tsc -p tsconfig.json",
     "prestart": "yarn build",
-    "start": "node --trace-warnings build/src/index.js",
-    "watch": "tsc -w",
-    "lint": "eslint . --ext .ts"
+    "start": "node build/src/index.js",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -22,25 +21,24 @@
   },
   "homepage": "https://github.com/Uhuh/RoleBot#readme",
   "dependencies": {
-    "@discordjs/builders": "^1.2.0",
-    "@discordjs/rest": "^1.1.0",
-    "discord-api-types": "^0.37.5",
-    "discord.js": "~14.11.0",
+    "@discordjs/builders": "^1.7.0",
+    "@discordjs/rest": "^2.2.0",
+    "@sentry/node": "^8.13.0",
+    "@sentry/profiling-node": "^8.13.0",
+    "discord-api-types": "^0.37.79",
+    "discord.js": "^14.15.2",
     "dotenv": "*",
-    "emoji-regex": "^10.0.0",
+    "emoji-regex": "^10.3.0",
     "fs": "^0.0.1-security",
-    "pg": "^8.8.0",
-    "typeorm": "^0.3.9",
-    "typescript": "^4.8.0",
-    "zod": "^3.21.4"
+    "pg": "^8.11.5",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.4.5",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/dotenv": "*",
     "@types/emoji-regex": "^9.2.0",
-    "@types/node": "^18.7.13",
-    "@types/ws": "^8.5.3",
-    "@typescript-eslint/eslint-plugin": "^5.35.1",
-    "@typescript-eslint/parser": "^5.35.1",
-    "eslint": "^8.23.0"
+    "@types/node": "^20.12.7",
+    "@types/ws": "^8.5.10"
   }
 }

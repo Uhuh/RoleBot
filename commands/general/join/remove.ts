@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, } from 'discord.js';
-import { DELETE_JOIN_ROLE, GET_JOIN_ROLE_BY_ID, } from '../../../src/database/queries/joinRole.query';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
+import { DELETE_JOIN_ROLE, GET_JOIN_ROLE_BY_ID } from '../../../src/database/queries/joinRole.query';
 import { SlashSubCommand } from '../../command';
 
 const enum CommandOptionNames {
@@ -33,7 +33,7 @@ export class RemoveSubCommand extends SlashSubCommand {
     // If the role isn't in the database then no point in trying to remove.
     if (!doesRoleExist) {
       return interaction.editReply(
-        `That role wasn't found in the auto-join list so nothing was removed.`
+        `That role wasn't found in the auto-join list so nothing was removed.`,
       );
     }
 
@@ -41,16 +41,16 @@ export class RemoveSubCommand extends SlashSubCommand {
       await DELETE_JOIN_ROLE(role.id);
 
       return interaction.editReply(
-        `Hey! I successfully removed the role from the auto-join list.`
+        `Hey! I successfully removed the role from the auto-join list.`,
       );
     } catch (e) {
       this.log.error(
         `Failed to remove auto-join role[${role.id}]`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       return interaction.editReply(
-        `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`
+        `Hey! I'm having trouble removing that role from the auto-join list.\nIt may be worth joining the support server and reporting this.`,
       );
     }
   };

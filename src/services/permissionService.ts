@@ -1,7 +1,7 @@
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import RoleBot from '../bot';
 import { CLIENT_ID } from '../vars';
 import { LogService } from './logService';
+import { RoleBot } from '../bot';
 
 export enum HasPerms {
   error = 1,
@@ -26,13 +26,13 @@ export class PermissionService {
    */
   canClientPrepareReactMessage = async (
     guildId: string,
-    channelId: string
+    channelId: string,
   ): Promise<HasPerms.error | boolean> => {
     const guild = await this.client.guilds.fetch(guildId);
 
     if (!guild) {
       this.log.error(
-        `Client could not find guild[${guildId}] in cache. Is it not cached?`
+        `Client could not find guild[${guildId}] in cache. Is it not cached?`,
       );
       return HasPerms.error;
     }
@@ -48,12 +48,12 @@ export class PermissionService {
 
     if (!channel) {
       this.log.error(
-        `Client could not find channel[${channelId}] on guild[${guildId}].`
+        `Client could not find channel[${channelId}] on guild[${guildId}].`,
       );
       return HasPerms.error;
     } else if (channel.type !== ChannelType.GuildText) {
       this.log.error(
-        `Channel[${channelId}] on guild[${guildId}] is not a text channel somehow.`
+        `Channel[${channelId}] on guild[${guildId}] is not a text channel somehow.`,
       );
       return HasPerms.error;
     }
@@ -73,7 +73,7 @@ export class PermissionService {
         PermissionsBitField.Flags.ManageMessages,
         PermissionsBitField.Flags.ManageRoles,
       ],
-      true
+      true,
     );
 
     return hasCorrectPerms;

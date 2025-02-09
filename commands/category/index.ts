@@ -12,7 +12,7 @@ export class CategoryBaseCommand extends SlashCommand {
     super(
       'category',
       'add, create, remove, edit and more for your categories',
-      [PermissionsBitField.Flags.ManageRoles]
+      [PermissionsBitField.Flags.ManageRoles],
     );
 
     this.addSubCommands([

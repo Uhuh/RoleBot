@@ -1,5 +1,5 @@
 import { REST } from '@discordjs/rest';
-import { Collection, RESTPostAPIApplicationCommandsJSONBody, Routes, } from 'discord.js';
+import { Collection, RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
 import { CLIENT_ID, SERVER_ID, TOKEN } from '../src/vars';
 import { LogService } from '../src/services/logService';
 import { SlashCommand } from './command';
@@ -63,7 +63,7 @@ export const buildNewCommands = async (buildCommands = false, beta = false) => {
 
 async function generateSlashCommands(
   route: `/${string}`,
-  commandsJson: RESTPostAPIApplicationCommandsJSONBody[]
+  commandsJson: RESTPostAPIApplicationCommandsJSONBody[],
 ) {
   const log = new LogService('GenerateSlashCommands');
   // Make a request to Discord to create all the slash commands.

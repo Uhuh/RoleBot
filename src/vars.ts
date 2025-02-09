@@ -11,10 +11,13 @@ export const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=741682
 export const TOKEN: string = process.env.TOKEN || '';
 export const DB_NAME = process.env.DB_NAME || 'rolebotBeta';
 export const POSTGRES_URL = `${process.env.POSTGRES_URL}${DB_NAME}` || '';
-export const SHARD_COUNT = Number(process.env.SHARD_COUNT) || 6;
+export const POSTGRES_HOST = process.env.POSTGRES_HOST || '';
+export const POSTGRES_USER = process.env.POSTGRES_USER || '';
+export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || '';
+export const POSTGRES_DATABASE = process.env.POSTGRES_DATABASE || '';
 export const SERVER_ID = '567819334852804626';
 // Only sync when in dev
 export const SYNC_DB = Boolean(Number(process.env.SYNC_DB)) || false;
 
-export const TUTORIAL_PLAYLIST =
-  'https://www.youtube.com/watch?v=ikqTW4bbM7s&list=PLW0pJjCQgtaV2ukCIV_0h56Ld2wtKyvcR';
+export const TUTORIAL_VIDEO =
+  'https://www.youtube.com/watch?v=2yvY1PZOFGw';

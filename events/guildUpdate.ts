@@ -1,6 +1,6 @@
-import RoleBot from '../src/bot';
 import { Colors, EmbedBuilder, Guild, WebhookClient } from 'discord.js';
 import { CREATE_GUILD_CONFIG } from '../src/database/queries/guild.query';
+import { RoleBot } from '../src/bot';
 
 export const guildUpdate = async (
   guild: Guild,
@@ -38,7 +38,7 @@ export const guildUpdate = async (
           value: `[${guild.memberCount}]`,
           inline: true,
         },
-        { name: 'Guild ID:', value: `[${guild.id}]`, inline: true }
+        { name: 'Guild ID:', value: `[${guild.id}]`, inline: true },
       )
       .setFooter({
         text: `Guilds I'm in: ${size}`,
@@ -53,7 +53,7 @@ export const guildUpdate = async (
         id: guild.id,
         type,
         members: guild.memberCount,
-      })}`
+      })}`,
     );
     console.error(`${e}`);
   }

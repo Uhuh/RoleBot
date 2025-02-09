@@ -1,12 +1,12 @@
 import {
   BaseEntity,
   Column,
-  Entity, JoinTable, ManyToMany,
+  Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Category } from './category.entity';
+} from 'typeorm';import { Category } from './category.entity';
 import { LinkedRole } from './link.entity';
 
 export enum ReactRoleType {

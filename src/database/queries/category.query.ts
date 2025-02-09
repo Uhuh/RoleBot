@@ -9,7 +9,7 @@ export const GET_GUILD_CATEGORIES = async (guildId: string) => {
 
 export const GET_ROLES_BY_CATEGORY_ID = async (
   categoryId: number,
-  displayType: DisplayType
+  displayType: DisplayType,
 ) => {
   const orderProperties = displayOrderQuery(displayType);
 
@@ -20,33 +20,18 @@ export const GET_ROLES_BY_CATEGORY_ID = async (
 };
 
 export const CREATE_GUILD_CATEGORY = async (
-  category: Omit<ICategory, 'id'>
+  category: Omit<ICategory, 'id'>,
 ) => {
-  const newCategory = new Category();
+  const newCategory = Category.create({
+    ...category,
+  });
 
-  newCategory.guildId = category.guildId;
-  
-  // Embed contents
-  newCategory.name = category.name;
-  newCategory.description = category.description ?? '';
-  
-  // React role display / settings
-  newCategory.mutuallyExclusive = category.mutuallyExclusive ?? false;
-  newCategory.requiredRoleId = category.requiredRoleId;
-  newCategory.excludedRoleId = category.excludedRoleId;
-  newCategory.displayOrder = category.displayOrder;
-
-  // Embed customization
-  newCategory.imageType = category.imageType;
-  newCategory.imageUrl = category.imageUrl;
-  newCategory.embedColor = category.embedColor;
-
-  return await newCategory.save();
+  return await Category.save(newCategory);
 };
 
 export const EDIT_CATEGORY_BY_ID = (
   id: number,
-  category: Partial<ICategory>
+  category: Partial<ICategory>,
 ) => {
   return Category.update({ id }, category);
 };

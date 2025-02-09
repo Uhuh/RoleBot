@@ -5,7 +5,7 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
 } from 'discord.js';
-import { TUTORIAL_PLAYLIST } from '../../src/vars';
+import { TUTORIAL_VIDEO } from '../../src/vars';
 import tutorialJson from '../../utilities/json/tutorial.json';
 import { SlashCommand } from '../command';
 import { tutorialEmbed } from '../../utilities/utilEmbedHelpers';
@@ -28,7 +28,7 @@ export class TutorialBaseCommand extends SlashCommand {
         .setCustomId(`${this.name}_${pageId + 1}`)
         .setDisabled(pageId === this.maxPage)
         .setLabel('Next')
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Primary),
     );
 
     return buttons;
@@ -37,7 +37,7 @@ export class TutorialBaseCommand extends SlashCommand {
   handleButton = async (
     interaction: ButtonInteraction,
     page: string,
-    _args: string[]
+    _args: string[],
   ) => {
     /* Should only be getting page ID's from the button event */
     const pageId = Number(page);
@@ -53,8 +53,8 @@ export class TutorialBaseCommand extends SlashCommand {
       .catch((e) =>
         this.log.error(
           `Failed to update tutorial interaction.\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 
@@ -66,15 +66,15 @@ export class TutorialBaseCommand extends SlashCommand {
     interaction
       .reply({
         ephemeral: true,
-        content: `Hey! Let's get to learning.\n**Want short form videos for help? Check out the [tutorial playlist](${TUTORIAL_PLAYLIST})**\n`,
+        content: `Hey! Let's get to learning.\n**Check out the [tutorial](${TUTORIAL_VIDEO})**\n`,
         embeds: [embed],
         components: [buttons],
       })
       .catch((e) =>
         this.log.error(
           `Failed to send tutorial embed.\n${e}`,
-          interaction.guildId
-        )
+          interaction.guildId,
+        ),
       );
   };
 }

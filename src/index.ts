@@ -1,9 +1,9 @@
-import { ShardHandler } from './shardHandler';
 import * as dotenv from 'dotenv';
-import { SHARD_COUNT } from './vars';
+import { LogService } from './services/logService';
+import { ShardHandler } from './shardHandler';
 
 dotenv.config();
 
 const shardHandler = new ShardHandler();
 
-void shardHandler.startShards(Number(process.env.SHARD_COUNT) ?? SHARD_COUNT);
+void shardHandler.startShards();

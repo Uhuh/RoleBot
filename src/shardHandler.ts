@@ -16,22 +16,23 @@ export class ShardHandler {
 
       shard.on('death', () => this.log.critical(`Shard[${shard.id}] died.`));
       shard.on('spawn', () =>
-        this.log.info(`Shard[${shard.id}] successfully spawned`)
+        this.log.info(`Shard[${shard.id}] successfully spawned`),
       );
       shard.on('disconnect', () =>
-        this.log.critical(`Shard[${shard.id}] disconnected.`)
+        this.log.critical(`Shard[${shard.id}] disconnected.`),
       );
       shard.on('reconnecting', () =>
-        this.log.debug(`Shard[${shard.id}] attempting to reconnect.`)
+        this.log.debug(`Shard[${shard.id}] attempting to reconnect.`),
       );
       shard.on('error', (e) =>
-        this.log.error(`Shard[${shard.id}] errored.\n${e}`)
+        this.log.error(`Shard[${shard.id}] errored.\n${e}`),
       );
     });
   }
 
-  startShards = async (numShards: number) => {
-    this.log.info(`Spawning ${numShards} shards...`);
+  startShards = async () => {
+    this.log.info(`Spawning shards...`);
+    
     this.manager
       .spawn({
         delay: 1000,

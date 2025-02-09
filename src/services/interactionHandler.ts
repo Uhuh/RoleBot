@@ -7,9 +7,9 @@ import {
 } from 'discord.js';
 import { SUPPORT_URL } from '../vars';
 import { LogService } from './logService';
-import RoleBot from '../bot';
 import { handleInteractionReply } from '../../utilities/utils';
 import { ButtonHandler } from './buttonHandler';
+import { RoleBot } from '../bot';
 
 export class InteractionHandler {
   public static log = new LogService('InteractionHandler');
@@ -24,13 +24,13 @@ export class InteractionHandler {
     if (!InteractionHandler.isSupportedInteractionType(interaction)) {
       return this.log.debug(
         `Received interaction that is not one of the supported types.`,
-        interaction.guildId
+        interaction.guildId,
       );
     }
 
     if (interaction.isCommand())
       InteractionHandler.handleCommand(interaction, client).catch((e) =>
-        this.log.error(`HandleCommand: ${e}`)
+        this.log.error(`HandleCommand: ${e}`),
       );
     else if (interaction.isStringSelectMenu())
       InteractionHandler.handleSelect(interaction, client);
@@ -38,7 +38,7 @@ export class InteractionHandler {
       void InteractionHandler.handleButton(interaction, client);
     else if (interaction.isAutocomplete())
       InteractionHandler.handleAutocomplete(interaction, client).catch((e) =>
-        this.log.error(`HandleAutocomplete: ${e}`)
+        this.log.error(`HandleAutocomplete: ${e}`),
       );
   }
 
@@ -50,7 +50,7 @@ export class InteractionHandler {
    */
   private static async handleCommand(
     interaction: ChatInputCommandInteraction,
-    client: RoleBot
+    client: RoleBot,
   ) {
     const command = client.commands.get(interaction.commandName.toLowerCase());
 
@@ -58,7 +58,7 @@ export class InteractionHandler {
     else if (!command.canUserRunInteraction(interaction)) {
       return this.log.debug(
         `User[${interaction.user.id}] tried to run command[${command.name}] without sufficient permissions.`,
-        interaction.guildId
+        interaction.guildId,
       );
     }
 
@@ -67,7 +67,7 @@ export class InteractionHandler {
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       handleInteractionReply(this.log, interaction, {
@@ -84,7 +84,7 @@ export class InteractionHandler {
    */
   private static async handleAutocomplete(
     interaction: AutocompleteInteraction,
-    client: RoleBot
+    client: RoleBot,
   ) {
     const command = client.commands.get(interaction.commandName.toLowerCase());
 
@@ -95,7 +95,7 @@ export class InteractionHandler {
     } catch (e) {
       this.log.error(
         `Encountered an error trying to run command[${command.name}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
     }
   }
@@ -107,7 +107,7 @@ export class InteractionHandler {
    */
   private static handleSelect(
     interaction: SelectMenuInteraction,
-    client: RoleBot
+    client: RoleBot,
   ) {
     try {
       const [commandName, subCommand, args] =
@@ -117,7 +117,7 @@ export class InteractionHandler {
       if (!command?.canUserRunInteraction(interaction)) {
         return this.log.debug(
           `User[${interaction.user.id}] selected option but does not have sufficient permissions to execute the commands[${commandName}] handleSelect`,
-          interaction.guildId
+          interaction.guildId,
         );
       }
 
@@ -125,7 +125,7 @@ export class InteractionHandler {
     } catch (e) {
       this.log.error(
         `An error occured with select[${interaction.customId}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       handleInteractionReply(this.log, interaction, {
@@ -142,7 +142,7 @@ export class InteractionHandler {
    */
   private static async handleButton(
     interaction: ButtonInteraction,
-    client: RoleBot
+    client: RoleBot,
   ) {
     try {
       const [commandName, subCommand, args] =
@@ -159,7 +159,7 @@ export class InteractionHandler {
           })
           .catch((e) => {
             this.log.error(
-              `Failed to defer interaction for button react role type.\n${e}`
+              `Failed to defer interaction for button react role type.\n${e}`,
             );
             return interaction.reply({
               ephemeral: true,
@@ -174,7 +174,7 @@ export class InteractionHandler {
       if (!command?.canUserRunInteraction(interaction)) {
         return this.log.debug(
           `User[${interaction.user.id}] clicked a button but does not have sufficient permissions to execute the commands[${commandName}] handleButton.`,
-          interaction.guildId
+          interaction.guildId,
         );
       }
 
@@ -182,7 +182,7 @@ export class InteractionHandler {
     } catch (e) {
       this.log.error(
         `An error occured with button[${interaction.customId}]\n${e}`,
-        interaction.guildId
+        interaction.guildId,
       );
 
       handleInteractionReply(this.log, interaction, {
@@ -198,7 +198,7 @@ export class InteractionHandler {
    * @returns If interaction is one of the supported types.
    */
   private static isSupportedInteractionType(
-    interaction: Interaction
+    interaction: Interaction,
   ): interaction is
     | ChatInputCommandInteraction
     | SelectMenuInteraction
@@ -219,7 +219,7 @@ export class InteractionHandler {
    * @returns Tuple [commandName, subCommand, commandArgs]
    */
   private static extractCommandInfo(
-    interaction: SelectMenuInteraction | ButtonInteraction
+    interaction: SelectMenuInteraction | ButtonInteraction,
   ): [string, string, string[]] {
     const [commandName, subCommand, commandArgs] = interaction.isStringSelectMenu()
       ? interaction.values.join('').split('_')
