@@ -112,7 +112,32 @@ export class RoleBot extends Discord.Client {
         .handleReaction(...r, 'remove')
         .catch((e) => this.log.error(e));
     });
+    this.on('guildMemberUpdate', async (oldMember, newMember) => {
+      /**
+       *  If a user goes from pending TRUE to FALSE that means the finished onboarding.
+       */
+      if (!oldMember.pending && !newMember.pending) {
+        return;
+      }
+
+      try {
+        const joinRoles = await GET_GUILD_JOIN_ROLES(newMember.guild.id);
+
+        if (!joinRoles.length) return;
+
+        newMember.roles.add(joinRoles.map((r) => r.roleId)).catch((e) => {
+          this.log.debug(`Issue giving newMember join roles\n${e}`, newMember.guild.id);
+        });
+      } catch (e) {
+        this.log.error(`Failed to get join roles for new newMember.\n${e}`, newMember.guild.id);
+      }
+    });
     this.on('guildMemberAdd', async (member) => {
+      // Ignore users that are doing onboarding.
+      if (member.pending) {
+        return;
+      }
+
       try {
         const joinRoles = await GET_GUILD_JOIN_ROLES(member.guild.id);
 
